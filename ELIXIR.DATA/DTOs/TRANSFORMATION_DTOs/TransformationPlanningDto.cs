@@ -24,6 +24,10 @@ namespace ELIXIR.DATA.DTOs.TRANSFORMATION_DTOs
         public string StatusRemarks { get; set; }
         public bool IsPrepared { get; set; }
         public decimal WarehouseStock { get; set; }
+        public int BatchAvailable { get; set; }
+        public bool IsMixed { get; set; }
+        public int BatchRemaining { get; set; }
+
 
     }
 }

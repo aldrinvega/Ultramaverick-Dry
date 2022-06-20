@@ -4,11 +4,8 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DTOs.RECEIVING_DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER

@@ -1,6 +1,7 @@
 ﻿using ELIXIR.DATA.CORE.INTERFACES;
 using ELIXIR.DATA.CORE.INTERFACES.IMPORT_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE;
+using ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.QC_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.TRANSFORMATION_INTERFACE;
@@ -41,6 +42,9 @@ namespace ELIXIR.DATA.CORE.ICONFIGURATION
         //Transformation Preparation
         ITransformationPreparation Preparation { get; }
 
+
+        //Ordering
+        IOrdering Order { get; }
 
         //Inventory
         IRawMaterialInventory Inventory { get; }

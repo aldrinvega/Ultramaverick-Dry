@@ -52,5 +52,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL
         public string ReceivedBy { get; set; }
         public string TransactionType { get; set; }
 
+        public int TransformId { get; set; }
+        public int BatchCount { get; set; }
+
+
+
     }
 }

@@ -117,7 +117,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                      Version = formulacode.Version,
                                      ItemCode = requirements.RawMaterial.ItemCode,
                                      ItemDescription = requirements.ItemDescription,
-                                   //  Batch = formulacode.Batch,
                                      Uom = formulacode.Uom,
                                      Quantity = requirements.Quantity,
                                      IsActive = requirements.IsActive
@@ -202,7 +201,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                 Uom = x.Uom,
                 Batch = x.Batch,
                 Version = x.Version,
-                Quantity = x.Quantity,
+                Quantity = Math.Round(Convert.ToDecimal(x.Quantity),2),
                 ProdPlan = x.ProdPlan.ToString("MM/dd/yyyy"),
                 IsActive = x.IsActive,
                 IsPrepared = x.IsPrepared
@@ -231,14 +230,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
 
             }).Where(x => x.IsActive == true);
 
-            //var computeStock = await _context.WarehouseReceived.Where(x => x.ItemCode == planning.ItemCode)
-            //                                               .Where(x => x.IsWarehouseReceive == true)
-            //                                               .Where(x => x.WarehouseItemStatus == "Available")
-            //                                               .SumAsync(x => x.ActualGood);
-
-            //var computeRequest = await _context.Transformation_Request.Where(x => x.ItemCode == planning.ItemCode)
-            //                                                          .Where(x => x.IsActive == true)
-            //                                                          .SumAsync(x => x.Quantity);
 
             var validateRequest = (from formula in _context.Formulas
                                    where formula.ItemCode == planning.ItemCode && formula.Version == planning.Version
@@ -274,7 +265,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                      request.ItemCode,
                                      request.Quantity,
                                      totalR.Reserve,
-                                  //   stock.WarehouseItemStatus
 
 
                                  } into total
@@ -283,12 +273,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                  {
                                      ItemCode = total.Key.ItemCode,
                                      Quantity = total.Key.Quantity,
-                                     Reserve = total.Sum(x => x.ActualGood) - total.Key.Reserve,
-                               //      WarehouseItemStatus = total.Key.WarehouseItemStatus
+                                     Reserve = total.Sum(x => x.ActualGood) - total.Key.Reserve
 
                                  }).Where(x => x.WarehouseItemStatus == true);
 
-          //  var x = validateStock;
 
             foreach(var items in validateStock)
             {
@@ -329,13 +317,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                 ProdPlan = planning.ProdPlan.ToString("MM/dd/yyyy"),
                 Version = planning.Version,
                 Batch = planning.Batch,
-                Quantity = planning.Quantity,
+                Quantity = Math.Round(Convert.ToDecimal(planning.Quantity),2),
                 AddedBy = planning.AddedBy,
                 DateAdded = planning.DateAdded.ToString("MM/dd/yyyy"),
                 Status = planning.Status,
-                IsApproved = planning.Is_Approved != null
+                IsApproved = planning.Is_Approved != null,
+                IsPrepared = planning.IsPrepared,
+                IsMixed = planning.IsMixed != null
             }).Where(x => x.Status == true)
               .Where(x => x.IsApproved == true)
+              .Where(x => x.IsPrepared == false)
+              .Where(x => x.IsMixed == false)
               .ToListAsync();
         }
 
@@ -352,7 +344,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                                                         ProdPlan = planning.ProdPlan.ToString("MM/dd/yyyy"),
                                                                         Version = planning.Version,
                                                                         Batch = planning.Batch,
-                                                                        Quantity = planning.Quantity,
+                                                                        Quantity = Math.Round(Convert.ToDecimal(planning.Quantity), 2),
                                                                         AddedBy = planning.AddedBy,
                                                                         DateAdded = planning.DateAdded.ToString("MM/dd/yyyy"),
                                                                         Status = planning.Status,
@@ -360,7 +352,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                                                         StatusRemarks = planning.StatusRequest
 
                                                                     });
-            return await pendingRequest.ToListAsync();
+
+            return await pendingRequest.Where(x => x.IsApproved != true)
+                                       .ToListAsync();
 
         }
 
@@ -376,7 +370,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                 Uom = x.Uom,
                 Batch = x.Batch,
                 Version = x.Version,
-                Quantity = x.Quantity,
+                Quantity = Math.Round(Convert.ToDecimal(x.Quantity), 2),
                 ProdPlan = x.ProdPlan.ToString("MM/dd/yyyy"),
                 IsActive = x.IsActive,
                 IsPrepared = x.IsPrepared
@@ -496,7 +490,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                 ProdPlan = planning.ProdPlan.ToString("MM/dd/yyyy"),
                 Version = planning.Version,
                 Batch = planning.Batch,
-                Quantity = planning.Quantity,
+                Quantity = Math.Round(Convert.ToDecimal(planning.Quantity), 2),
                 AddedBy = planning.AddedBy,
                 Status = planning.Status,
                 DateAdded = planning.DateAdded.ToString("MM/dd/yyyy")
@@ -527,14 +521,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                 TransformId = planning.Id,
                                 FormulaCode = planning.ItemCode,
                                 FormulaDescription = planning.ItemDescription,
-                                FormulaQuantity = planning.Quantity,
+                                FormulaQuantity = Math.Round(Convert.ToDecimal(planning.Quantity), 2),
                                 Uom = planning.Uom,
                                 Batch = planning.Batch,
                                 Version = planning.Version,
                                 ProdPlan = planning.ProdPlan.ToString("MM/dd/yyyy"),
                                 RawmaterialCode = requested.ItemCode,
                                 RawmaterialDescription = requested.ItemDescription,
-                                RawmaterialQuantity = requested.Quantity,
+                                RawmaterialQuantity = Math.Round(Convert.ToDecimal(requested.Quantity), 2),
                                 IsActive = planning.Status
 
                             });
@@ -671,7 +665,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                                             ProdPlan = request.ProdPlan.ToString("MM/dd/yyyy"),
                                                             Version = request.Version,
                                                             Batch = request.Batch,
-                                                            Quantity = request.Quantity,
+                                                            Quantity = Math.Round(Convert.ToDecimal(request.Quantity), 2),
                                                             DateAdded = request.DateAdded.ToString("MM/dd/yyyy"),
                                                             AddedBy = request.AddedBy,
                                                             StatusRemarks = request.StatusRequest,
@@ -705,11 +699,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
         public async Task<decimal> GetAllItemsWithStock(string itemcode)
         {
             var compute = await _context.WarehouseReceived.Where(x => x.ItemCode == itemcode)
-                                                        //      .Where(x => x.WarehouseItemStatus == true)
-                                                              .SumAsync(x => x.ActualGood);
+                                                          .SumAsync(x => x.ActualGood);
 
-            var computeRequest = await _context.Transformation_Request.Where(x => x.ItemCode == itemcode)
-                                                                      .Where(x => x.IsPrepared == false)
+            var computeRequest = await _context.Transformation_Request.Where(x => x.ItemCode == itemcode)                                                     
                                                                       .Where(x => x.IsActive == true)
                                                                       .SumAsync(x => x.Quantity);
             var final = compute - computeRequest;
@@ -721,11 +713,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
         {
            
             var computeRequest = await _context.Transformation_Request.Where(x => x.ItemCode == itemcode)
-                                                                      .Where(x => x.IsPrepared == true)
                                                                       .SumAsync(x => x.Quantity);
 
             var computeStock = await _context.WarehouseReceived.Where(x => x.ItemCode == itemcode)
-                                                          //     .Where(x => x.WarehouseItemStatus == true)
                                                                .SumAsync(x => x.ActualGood);
 
             if ((quantity * batch) > (computeStock - computeRequest))
@@ -761,7 +751,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                ItemCode = requirements.RawMaterial.ItemCode,
                                ItemDescription = requirements.ItemDescription,
                                Uom = formulacode.Uom,
-                               Quantity = requirements.Quantity,
+                               Quantity = Math.Round(Convert.ToDecimal(requirements.Quantity), 2),
                                IsActive = requirements.IsActive
                            });
 
@@ -896,7 +886,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                     Uom = total.Key.Uom,
                                     Batch = total.Key.Batch,
                                     Version = total.Key.Version,
-                                    Quantity = total.Key.Quantity,
+                                    Quantity = Math.Round(Convert.ToDecimal(total.Key.Quantity), 2),
                                     ProdPlan = total.Key.ProdPlan.ToString("MM/dd/yyyy"),
                                     IsPrepared = total.Key.IsPrepared,
                                     CancelRemarks = total.Key.CancelRemarks
@@ -904,6 +894,53 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
 
             return await requirements.ToListAsync();
 
+        }
+
+        public async Task<IReadOnlyList<TransformationPlanningDto>> GetAllRejectRequest()
+        {
+            return await _context.Transformation_Planning.Select(planning => new TransformationPlanningDto
+            {
+                Id = planning.Id,
+                ItemCode = planning.ItemCode,
+                ItemDescription = planning.ItemDescription,
+                Uom = planning.Uom,
+                ProdPlan = planning.ProdPlan.ToString("MM/dd/yyyy"),
+                Version = planning.Version,
+                Batch = planning.Batch,
+                Quantity = Math.Round(Convert.ToDecimal(planning.Quantity),2),
+                AddedBy = planning.AddedBy,
+                Status = planning.Status,
+                DateAdded = planning.DateAdded.ToString("MM/dd/yyyy"),
+                StatusRemarks = planning.StatusRequest
+            })
+         .Where(x => x.StatusRemarks == "Rejected")
+         .ToListAsync();
+        }
+
+        public async Task<bool> ValidateIfPrepared(int id)
+        {
+            var validate = await _context.Transformation_Preparation.Where(x => x.TransformId == id)
+                                                                    .ToListAsync();
+
+
+            if (validate.Count != 0)
+                return false;
+
+
+            return true;
+
+        }
+
+        public Task<bool> ValidateIfDecimal(int batch)
+        {
+
+            var validate = decimal.TryParse(Convert.ToString(batch), out decimal value);
+
+            if (validate == true)
+                return Task.FromResult(true);
+
+
+            return Task.FromResult(false);
         }
     }   
 }

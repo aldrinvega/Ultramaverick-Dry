@@ -2,6 +2,7 @@
 using ELIXIR.DATA.CORE.INTERFACES;
 using ELIXIR.DATA.CORE.INTERFACES.IMPORT_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE;
+using ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.QC_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.TRANSFORMATION_INTERFACE;
@@ -9,6 +10,7 @@ using ELIXIR.DATA.CORE.INTERFACES.WAREHOUSE_INTERFACE;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.IMPORT_REPOSITORY;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY;
@@ -58,6 +60,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
         //Inventory
         public IRawMaterialInventory Inventory { get; set; }
 
+        //Ordering
+        public IOrdering Order { get; set; }
+
 
         public UnitOfWork(
             StoreContext context,
@@ -94,6 +99,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
             //Transformation Planning
             Planning = new TransformationPlanningRepository(_context);
             Preparation = new TransformationPreparationRepository(_context);
+
+            //Ordering
+            Order = new OrderingRepository(_context);
+
 
             //Inventory
             Inventory = new RawMaterialInventory(_context);

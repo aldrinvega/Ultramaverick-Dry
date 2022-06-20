@@ -447,6 +447,8 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
             //Transformation
             var listOfRequest = await _unitOfWork.Planning.GetAllPendingRequestNotif();
             var listofReject = await _unitOfWork.Planning.GetAllRejectRequestNotif();
+            var listofpreparation = await _unitOfWork.Preparation.GetAllTransformationFormulaInformation();
+            var listofmixing = await _unitOfWork.Preparation.GetAllTransformationForMixing();
 
 
             //QC Receiving
@@ -457,10 +459,12 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
             var approvalrejectcount = approvalreject.Count();
             var confirmrejectcount = confirmreject.Count();
 
-
             //Transformation
             var approvalrequestcount = listOfRequest.Count();
             var requestrejectcount = listofReject.Count();
+            var preparationcount = listofpreparation.Count();
+            var mixingcount = listofmixing.Count();
+
 
 
             var countList = new
@@ -496,6 +500,14 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
                 RejectRequest = new
                 {
                     requestrejectcount
+                },
+                Preparation = new
+                {
+                    preparationcount
+                },
+                Mixing = new
+                {
+                    mixingcount
                 }
 
             };

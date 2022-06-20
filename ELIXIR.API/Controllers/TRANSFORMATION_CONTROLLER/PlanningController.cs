@@ -64,6 +64,12 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
                     else
                     {
+                    //    var validateBatch = await _unitOfWork.Planning.ValidateIfDecimal(planning.Batch);
+
+
+                    //    if (validateBatch == true)
+                    //        return BadRequest("Decimal values for batch is not accepted!");
+
                         var validateFormulaCode = await _unitOfWork.Planning.ValidateFormulaCode(planning);
 
                         if (validateFormulaCode == false)
@@ -210,6 +216,12 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
         {
             if (id != planning.Id)
                 return BadRequest();
+
+
+            var validate = await _unitOfWork.Planning.ValidateIfPrepared(id);
+
+            if (validate == false)
+                return BadRequest("Cancel failed, transform Id already have prepared items!");
 
             await _unitOfWork.Planning.CancelTransformationRequest(planning);
             await _unitOfWork.CompleteAsync();
@@ -418,6 +430,18 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
             var pending = await _unitOfWork.Planning.GetAllCancelRequirements(id);
 
             return Ok(pending);
+        }
+
+
+        [HttpGet]
+        [Route("GetAllRejectRequest")]
+        public async Task<IActionResult> GetAllRejectRequest()
+        {
+
+            var planning = await _unitOfWork.Planning.GetAllRejectRequest();
+
+            return Ok(planning);
+
         }
 
     }

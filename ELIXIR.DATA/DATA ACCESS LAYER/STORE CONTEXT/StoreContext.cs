@@ -1,12 +1,12 @@
 ﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
 {
@@ -40,18 +40,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public virtual DbSet<TransformationRequest> Transformation_Request { get; set; }
         public virtual DbSet<TransformationReject> Transformation_Reject { get; set; }
         public virtual DbSet<TransformationPreparation> Transformation_Preparation { get; set; }
+        public virtual DbSet<Ordering> Orders { get; set; }
+
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
         }
-        //protected override void OnModelCreating( modelBuilder)
-        //{
-
-        //    //modelBuilder.<YourEntity>()
-        //    //         .Property(x => x.TheProprty)
-        //    //         .HasPrecision(18, 2);
-        //}
     }
 } 

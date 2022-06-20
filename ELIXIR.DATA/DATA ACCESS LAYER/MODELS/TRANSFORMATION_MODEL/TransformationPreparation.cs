@@ -30,7 +30,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL
         public DateTime PreparedDate { get; set; }
         public string PreparedBy { get; set; }
         public int WarehouseId { get; set; }
-
+        public bool IsMixed { get; set; }
 
 
     }

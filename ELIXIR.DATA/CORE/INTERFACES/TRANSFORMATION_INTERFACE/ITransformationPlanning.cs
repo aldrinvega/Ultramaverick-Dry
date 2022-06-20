@@ -53,6 +53,15 @@ namespace ELIXIR.DATA.CORE.INTERFACES.TRANSFORMATION_INTERFACE
         Task<IReadOnlyList<MaterialRequirements>> GetAllCancelRequirements(int id);
 
 
+        Task<IReadOnlyList<TransformationPlanningDto>> GetAllRejectRequest();
+
+        Task<bool> ValidateIfPrepared(int id);
+
+        Task<bool> ValidateIfDecimal(int batch);
+
+
+
+
 
     }
 }

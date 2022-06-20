@@ -1,4 +1,5 @@
 ﻿using ELIXIR.DATA.CORE.INTERFACES.TRANSFORMATION_INTERFACE;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
@@ -13,13 +14,12 @@ using System.Threading.Tasks;
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
 {
     public class TransformationPreparationRepository : ITransformationPreparation
+
     {
         private readonly StoreContext _context;
         public TransformationPreparationRepository(StoreContext context)
         {
-
             _context = context;
-
 
         }
 
@@ -36,12 +36,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                             TranformationId = plan.Id,
                             FormulaCode = plan.ItemCode,
                             FormulaDescription = plan.ItemDescription,
-                            FormulaQuantity = plan.Quantity,
+                            FormulaQuantity = Math.Round(Convert.ToDecimal(planning.Quantity),2),
                             RawmaterialCode = request.ItemCode,
                             RawmaterialDescription = request.ItemDescription,
                             Uom = plan.Uom,
                             Batch = request.Batch,
-                            RawmaterialQuantity = request.Quantity,
+                            RawmaterialQuantity = Math.Round(Convert.ToDecimal(request.Quantity), 2),
                             IsRequirementActive = request.IsActive,
                             IsPrepared = request.IsPrepared
 
@@ -65,166 +65,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
         public async Task<bool> PrepareTransformationMaterials(TransformationPreparation preparation)
         {
 
-            decimal max = (decimal)1.05;
-            decimal min = (decimal)0.95;
-
-            //var computeStock = await _context.WarehouseReceived.Where(x => x.ItemCode == preparation.ItemCode)
-            //                                                 .Where(x => x.IsWarehouseReceive == true)
-            //                                                 .Where(x => x.WarehouseItemStatus == true)
-            //                                                 .SumAsync(x => x.ActualGood);
-
-            //var computePrepared = await _context.Transformation_Preparation.Where(x => x.ItemCode == preparation.ItemCode)
-            //                                                               .Where(x => x.IsActive == true)
-            //                                                               .SumAsync(x => x.WeighingScale);
-
-            //var warehousereceived = (from request in _context.Transformation_Request
-            //                         where request.IsActive == true
-            //                         join warehouse in _context.WarehouseReceived
-            //                         on request.ItemCode equals warehouse.ItemCode into leftJ
-            //                         from warehouse in leftJ.DefaultIfEmpty()
-            //                         where warehouse.ItemCode == preparation.ItemCode
-            //                         orderby warehouse.ExpirationDays ascending
-
-            //                         select new RawmaterialDetailsFromWarehouseDto
-            //                         {
-            //                             WarehouseReceivedId = warehouse.Id,
-            //                             Supplier = warehouse.Supplier,
-            //                             ItemCode = warehouse.ItemCode,
-            //                             ItemDescription = warehouse.ItemDescription,
-            //                             ManufacturingDate = warehouse.ManufacturingDate.ToString("MM/dd/yyyy"),
-            //                             ExpirationDate = warehouse.Expiration.ToString("MM/dd/yyyy"),
-            //                             ExpirationDays = warehouse.ExpirationDays,
-            //                             Balance = computeStock - computePrepared,
-            //                             QuantityNeeded = request.Quantity,
-            //                             Batch = request.Batch
-
-            //                         }).ToListAsync();
-
-
-            //var getRequirements =       await (from request in _context.Transformation_Request
-            //                             where request.IsActive == true
-            //                             join warehouse in _context.WarehouseReceived
-            //                             on request.ItemCode equals warehouse.ItemCode into leftJ
-            //                             from warehouse in leftJ.DefaultIfEmpty()
-            //                             orderby warehouse.ExpirationDays ascending
-
-            //                             select new
-            //                             {
-            //                                 request.TransformId,
-            //                                 request.ItemCode,
-            //                                 request.ItemDescription,
-            //                                 request.Quantity,
-            //                                 warehouse.ManufacturingDate,
-            //                                 warehouse.Expiration,
-            //                                 request.Batch,
-            //                                 request.IsActive,
-            //                                 warehouse.ExpirationDays,
-            //                         //        warehouse.WarehouseItemStatus,
-            //                                 warehouse.Id
-            //                             })
-            //                               .Where(x => x.TransformId == preparation.TransformId)
-            //                       //        .Where(x => x.WarehouseItemStatus == true)
-            //                               .Where(x => x.ItemCode == preparation.ItemCode)
-            //                               .FirstOrDefaultAsync();
-
-            //var updateStatus =  await _context.Transformation_Request.Where(x => x.TransformId == preparation.TransformId)
-            //                                                        .Where(x => x.ItemCode == preparation.ItemCode)
-            //                                                        .Where(x => x.IsActive == true)
-            //                                                        .FirstOrDefaultAsync();
-
-            //var updateWarehouse =  _context.WarehouseReceived.Where(x => x.ItemCode == preparation.ItemCode)
-            //                                                      .FirstOrDefaultAsync();
-
-
-            //var computeWarehousestock = await (from request in _context.Transformation_Request
-            //                                   where request.IsActive == true
-            //                                   join warehouse in _context.WarehouseReceived
-            //                                   on request.ItemCode equals warehouse.ItemCode into leftJ
-            //                                   from warehouse in leftJ.DefaultIfEmpty()
-            //                                   where warehouse.ItemCode == preparation.ItemCode
-            //                                   orderby warehouse.ExpirationDays ascending
-
-            //                                   select new RawmaterialDetailsFromWarehouseDto
-            //                                   {
-            //                                       WarehouseReceivedId = warehouse.Id,
-            //                                       Supplier = warehouse.Supplier,
-            //                                       ItemCode = warehouse.ItemCode,
-            //                                       ItemDescription = warehouse.ItemDescription,
-            //                                       ManufacturingDate = warehouse.ManufacturingDate.ToString("MM/dd/yyyy"),
-            //                                       ExpirationDate = warehouse.Expiration.ToString("MM/dd/yyyy"),
-            //                                       ExpirationDays = warehouse.ExpirationDays,
-            //                                       Balance = warehouse.ActualGood - computePrepared,
-            //                                       QuantityNeeded = request.Quantity,
-            //                                       Batch = request.Batch,
-            //                               //        WarehouseItemStatus = warehouse.WarehouseItemStatus
-
-            //                                   })
-            //                               //      .Where(x => x.WarehouseItemStatus == true)
-            //                                     .FirstOrDefaultAsync();
-
-            //var getAvailableItem = await _context.WarehouseReceived.Where(x => x.ItemCode == preparation.ItemCode)
-            //                                                       .Where(x => x.WarehouseItemStatus == true)
-            //                                                       .OrderBy(x => x.ExpirationDays)
-            //                                                       .ToListAsync();
-
-            //if (computeWarehousestock.Balance < preparation.WeighingScale)
-
-            //{
-            //    preparation.TransformId = getRequirements.TransformId;
-            //    preparation.ItemCode = getRequirements.ItemCode;
-            //    preparation.ItemDescription = getRequirements.ItemDescription;
-            //    preparation.ManufacturingDate = getRequirements.ManufacturingDate;
-            //    preparation.ExpirationDate = getRequirements.Expiration;
-            //    preparation.Batch = getRequirements.Batch;
-            //    preparation.QuantityNeeded = getRequirements.Quantity;
-            //    preparation.PreparedDate = DateTime.Now;
-            //    preparation.IsActive = true;
-            //    preparation.WarehouseId = getRequirements.Id;
-            //    preparation.WeighingScale = computeWarehousestock.Balance;
-
-
-                await AddPreparationMaterials(preparation);
-            //}
-
-            //else
-            //{
-                 
-                //preparation.TransformId = getRequirements.TransformId;
-                //preparation.ItemCode = getRequirements.ItemCode;
-                //preparation.ItemDescription = getRequirements.ItemDescription;
-                //preparation.ManufacturingDate = getRequirements.ManufacturingDate;
-                //preparation.ExpirationDate = getRequirements.Expiration;
-                //preparation.Batch = getRequirements.Batch;
-                //preparation.QuantityNeeded = getRequirements.Quantity;
-                //preparation.PreparedDate = DateTime.Now;
-                //preparation.IsActive = true;
-                //preparation.WarehouseId = getRequirements.Id;
-
-                //if (getRequirements.Quantity * (decimal)min > preparation.WeighingScale ||
-                //                getRequirements.Quantity * (decimal)max < preparation.WeighingScale)
-
-            //    await AddPreparationMaterials(preparation);
-
-            //    updateStatus.IsPrepared = true;
-
-
-            //}
-
-            //preparation.TransformId = getRequirements.TransformId;
-            //preparation.ItemCode = getRequirements.ItemCode;
-            //preparation.ItemDescription = getRequirements.ItemDescription;
-            //preparation.ManufacturingDate = getRequirements.ManufacturingDate;
-            //preparation.ExpirationDate = getRequirements.Expiration;
-            //preparation.Batch = getRequirements.Batch;
-            //preparation.QuantityNeeded = getRequirements.Quantity;
-            //preparation.PreparedDate = DateTime.Now;
-            //preparation.IsActive = true;
-            //preparation.WarehouseId = getRequirements.Id;
-
-            //if (getRequirements.Quantity * (decimal)min > preparation.WeighingScale ||
-            //                getRequirements.Quantity * (decimal)max < preparation.WeighingScale)
-            //    return false;
-
+            await AddPreparationMaterials(preparation);
+         
             return true;
         } 
 
@@ -268,18 +110,24 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                 Version = planning.Version,
                 ProdPlan = planning.ProdPlan.ToString("MM/dd/yyyy"),
                 Batch = planning.Batch,
-                Quantity = planning.Quantity,
+                Quantity = Math.Round(Convert.ToDecimal(planning.Quantity),2),
                 AddedBy = planning.AddedBy,
                 Status = planning.Status,
                 DateAdded = planning.DateAdded.ToString("MM/dd/yyyy"),
                 IsPrepared = planning.IsPrepared,
                 IsApproved = planning.Is_Approved != null,
-                StatusRemarks = planning.StatusRequest
+                StatusRemarks = planning.StatusRequest,
+                IsMixed = planning.IsMixed != null
+
+
             }).Where(x => x.Status == true)
               .Where(x => x.IsApproved == true)
-              .Where(x => x.IsPrepared == false)
+              .Where(x => x.IsPrepared == true)
+              .Where(x => x.IsMixed == false)
               .Where(x => x.StatusRemarks == "Approved")
               .ToListAsync();
+
+
         }
 
         public async Task<bool> ValidateIfApproved(int id)
@@ -294,24 +142,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
             return true;
         }
 
-        public async Task<IReadOnlyList<TransformationMixingRequirements>> GetAllRequirementsForMixing(int id)
-        {
-            var requirements =  _context.Transformation_Preparation.Select(mixing => new TransformationMixingRequirements
-            {
-                TransformId = mixing.TransformId,
-                ItemCode = mixing.ItemCode,
-                ItemDescription = mixing.ItemDescription,
-                Batch = mixing.Batch,
-                QuantityBatch = mixing.QuantityNeeded,
-                TotalQuantity = mixing.QuantityNeeded,
-                WeighingScale = mixing.WeighingScale
-
-            });
-
-            return await requirements.ToListAsync();
-                                
-        }
-
         public async Task<bool> AddMixingTransformation(WarehouseReceiving warehouse)
         {
             await _context.WarehouseReceived.AddAsync(warehouse);
@@ -319,73 +149,46 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
             return true;
         }
 
-        public async Task<bool> FinishedMixedMaterialsForWarehouse(WarehouseReceiving warehouse)
+        public async Task<bool> FinishedMixedMaterialsForWarehouse(WarehouseReceiving warehouse, int id)
         {
             DateTime dateNow = DateTime.Now;
 
-       //     var mixing = await _context.Transformation_Planning.Where(x => x.Id == warehouse.TransformId)
-                  //                                             .FirstOrDefaultAsync();
+            var mixing = await _context.Transformation_Planning.Where(x => x.Id == id)
+                                                               .FirstOrDefaultAsync();
 
-            //var countBatch = await _context.WarehouseReceived.Where(x => x.TransformId == warehouse.TransformId)
-            //                                                 .ToListAsync();
+            var countBatch = await _context.WarehouseReceived.Where(x => x.TransformId == warehouse.TransformId)
+                                                             .ToListAsync();
 
-            //if (mixing.Batch <= countBatch.Count)
-            //    return false;
+            if (mixing.Batch <= countBatch.Count)
+                return false;
 
-            //warehouse.TransformId = mixing.Id;
-            //warehouse.ManufacturingDate = DateTime.Now;
-            //warehouse.ItemCode = mixing.ItemCode;
-            //warehouse.ItemDescription = mixing.ItemDescription;
-            //warehouse.Uom = mixing.Uom;
-            //warehouse.Supplier = "RDF";
-            //warehouse.ReceivingDate = DateTime.Now;
-            //warehouse.TransactionType = "Transformation";
-            //warehouse.BatchCount = countBatch.Count + 1;
-            //warehouse.ActualGood = mixing.Quantity;
-            //warehouse.IsWarehouseReceive = true;
-            //warehouse.IsActive = true;
-            //warehouse.ExpirationDays = warehouse.Expiration.Subtract(dateNow).Days;
 
-            //await AddMixingTransformation(warehouse);
+            warehouse.ManufacturingDate = DateTime.Now;
+            warehouse.ItemCode = mixing.ItemCode;
+            warehouse.ItemDescription = mixing.ItemDescription;
+            warehouse.Uom = mixing.Uom;
+            warehouse.Supplier = "RDF";
+            warehouse.ReceivingDate = DateTime.Now;
+            warehouse.TransactionType = "Transformation";
+            warehouse.ActualGood = mixing.Quantity;
+            warehouse.IsWarehouseReceive = true;
+            warehouse.IsActive = true;
+            warehouse.Expiration = warehouse.Expiration;
+            warehouse.ExpirationDays = warehouse.Expiration.Subtract(dateNow).Days;
+            warehouse.TransformId = id;
+            warehouse.BatchCount = countBatch.Count + 1;
+
+            await AddMixingTransformation(warehouse);
 
             return true;
 
         }
 
-        public async Task<RawmaterialDetailsFromWarehouseDto> GetReceivingDetailsForRawmaterials(string code)
+        public async Task<RawmaterialDetailsFromWarehouseDto> GetReceivingDetailsForRawmaterials(int id, string code)
         {
 
-            //var computeStock = await _context.WarehouseReceived.Where(x => x.ItemCode == code)
-            //                                                   .Where(x => x.IsWarehouseReceive == true)
-            //                                                   .Where(x => x.WarehouseItemStatus == true)
-            //                                                   .SumAsync(x => x.ActualGood);
-
-            //var computePrepared = await _context.Transformation_Preparation.Where(x => x.ItemCode == code)
-            //                                                               .Where(x => x.WarehouseId == id)
-            //                                                               .Where(x => x.IsActive == true)
-            //                                                               .SumAsync(x => x.WeighingScale);
-
-
-            //var totalRequest = _context.Transformation_Preparation.GroupBy(x => new
-            //{
-            //    x.ItemCode,
-            //    x.IsActive,
-            //    x.WarehouseId,
-
-            //}).Select(x => new MaterialRequirements
-            //{
-            //    ItemCode = x.Key.ItemCode,
-            //    Reserve = x.Sum(x => x.WeighingScale),
-            //    IsActive = x.Key.IsActive,
-            //    WarehouseId = x.Key.WarehouseId
-
-            //}).Where(x => x.IsActive == true);
-
-            //var computePrepared = await _context.Transformation_Preparation.Where(x => x.ItemCode == code)
-            //                                                               .Where(x => x.IsActive == true)
-            //                                                               .SumAsync(x => x.WeighingScale);
-
             var warehouseStock = (from warehouse in _context.WarehouseReceived
+                                  where warehouse.IsActive == true
                                   join req in _context.Transformation_Preparation
                                   on warehouse.Id equals req.WarehouseId into leftJ
 
@@ -401,7 +204,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                       warehouse.ManufacturingDate,
                                       warehouse.Expiration,
                                       warehouse.ExpirationDays,
-                                 //     warehouse.WarehouseItemStatus,
                                       warehouse.ActualGood
 
                                   } into total
@@ -417,18 +219,15 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                       total.Key.Expiration,
                                       total.Key.ExpirationDays,
                                       Reserve = total.Sum(x => x.WeighingScale),
-                                //      total.Key.WarehouseItemStatus,
                                       total.Key.ActualGood
 
                                   });
 
             var warehousereceived = (from request in _context.Transformation_Request
-                                     where request.IsActive == true && request.IsPrepared == false                         
+                                     where request.IsActive == true && request.IsPrepared == false && request.TransformId == id                        
                                      join warehouse in warehouseStock
                                      on request.ItemCode equals warehouse.ItemCode
-    
-                         //            where warehouse.ItemCode == code && warehouse.WarehouseItemStatus == true
-                                                           
+                               
                                      group warehouse by new
                                      {
                                         
@@ -439,7 +238,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                          warehouse.ManufacturingDate,
                                          warehouse.Expiration,
                                          warehouse.ExpirationDays,
-                                 //        warehouse.WarehouseItemStatus,
                                          warehouse.ActualGood,                                     
                                          request.Quantity,
                                          request.Batch,                            
@@ -458,17 +256,19 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                          Supplier = total.Key.Supplier,
                                          ItemCode = total.Key.ItemCode,
                                          ItemDescription = total.Key.ItemDescription,
-                                         ManufacturingDate = total.Key.ManufacturingDate.ToString("MM/dd/yyyy"),
-                                         ExpirationDate = total.Key.Expiration.ToString("MM/dd/yyyy"),
+                                         ManufacturingDate = total.Key.ManufacturingDate,
+                                         ExpirationDate = total.Key.Expiration,
                                          ExpirationDays = total.Key.ExpirationDays,                          
-                                         QuantityNeeded = total.Key.Quantity,
+                                         QuantityNeeded = Math.Round(Convert.ToDecimal(total.Key.Quantity), 2),
                                          Batch = total.Key.Batch,
                                          IsPrepared = total.Key.IsPrepared,
                                          Balance = total.Key.ActualGood - total.Key.Reserve
 
                                      });
 
-             return await warehousereceived.FirstOrDefaultAsync();
+             return await warehousereceived.Where(x => x.ItemCode == code)
+                                           .Where(x => x.Balance != 0)
+                                           .FirstOrDefaultAsync();
 
         }
 
@@ -476,7 +276,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
         {
    
             var warehouseStock = await _context.WarehouseReceived.Where(x => x.ItemCode == code)
-                                                             //    .Where(x => x.WarehouseItemStatus == true)
                                                                  .OrderBy(x => x.ExpirationDays)                                                           
                                                                  .FirstOrDefaultAsync();
 
@@ -498,19 +297,15 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                          Supplier = warehouse.Supplier,
                                          ItemCode = warehouse.ItemCode,
                                          ItemDescription = warehouse.ItemDescription,
-                                         ManufacturingDate = warehouse.ManufacturingDate.ToString("MM/dd/yyyy"),
-                                         ExpirationDate = warehouse.Expiration.ToString("MM/dd/yyyy"),
+                                         ManufacturingDate = warehouse.ManufacturingDate,
+                                         ExpirationDate = warehouse.Expiration,
                                          ExpirationDays = warehouse.ExpirationDays,
                                          Balance = warehouse.ActualGood - computePrepared,
                                          QuantityNeeded = request.Quantity,
-                                         Batch = request.Batch,
-                                    //     WarehouseItemStatus = warehouse.WarehouseItemStatus
+                                         Batch = request.Batch
 
                                      }).Where(x => x.WarehouseItemStatus == true)
                                        .FirstOrDefaultAsync();
-
-          //  if (warehousereceived.Balance == 0)
-             //   warehouseStock.WarehouseItemStatus = false;
 
             return false;
 
@@ -520,6 +315,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
         {
 
             var transformplanning =  (from planning in _context.Transformation_Planning
+                                     where planning.Is_Approved == true && planning.StatusRequest == "Approved" && planning.IsPrepared == false
                                      join warehouse in _context.WarehouseReceived
                                      on planning.ItemCode equals warehouse.ItemCode into leftJ
                                      from warehouse in leftJ.DefaultIfEmpty()
@@ -535,7 +331,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
 
                                      } into total
 
-                                 select new TransformationPlanningDto
+    
+                                      select new TransformationPlanningDto
                                  {
                                      Id = total.Key.Id,
                                      ItemCode = total.Key.ItemCode,
@@ -566,93 +363,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
         public async Task<IReadOnlyList<ForTesting>> GetAllAvailableStocks()
         {
 
-            //var warehouseStock = (from warehouse in _context.WarehouseReceived
-            //                      join req in _context.Transformation_Preparation
-            //                      on warehouse.Id equals req.WarehouseId into leftJ
-
-            //                      from req in leftJ.DefaultIfEmpty()
-
-            //                      group req by new
-            //                      {
-
-            //                          warehouse.Id,
-            //                          warehouse.Supplier,
-            //                          warehouse.ItemCode,
-            //                          warehouse.ItemDescription,
-            //                          warehouse.ManufacturingDate,
-            //                          warehouse.Expiration,
-            //                          warehouse.ExpirationDays,
-            //                          warehouse.WarehouseItemStatus,
-            //                          warehouse.ActualGood
-
-            //                      } into total
-
-            //                      select new
-            //                      {
-
-            //                          total.Key.Id,
-            //                          total.Key.Supplier,
-            //                          total.Key.ItemCode,
-            //                          total.Key.ItemDescription,
-            //                          total.Key.ManufacturingDate,
-            //                          total.Key.Expiration,
-            //                          total.Key.ExpirationDays,
-            //                          Reserve = total.Sum(x => x.WeighingScale),
-            //                          total.Key.WarehouseItemStatus,
-            //                          total.Key.ActualGood
-
-            //                      });
-
-            //var warehousereceived = (from request in _context.Transformation_Request
-            //                         where request.IsActive == true && request.IsPrepared == false
-            //                         join warehouse in warehouseStock
-            //                         on request.ItemCode equals warehouse.ItemCode
-
-            //                    //     where warehouse.ItemCode == code && warehouse.WarehouseItemStatus == true
-
-            //                         group warehouse by new
-            //                         {
-
-            //                             warehouse.Id,
-            //                             warehouse.Supplier,
-            //                             warehouse.ItemCode,
-            //                             warehouse.ItemDescription,
-            //                             warehouse.ManufacturingDate,
-            //                             warehouse.Expiration,
-            //                             warehouse.ExpirationDays,
-            //                             warehouse.WarehouseItemStatus,
-            //                             warehouse.ActualGood,
-            //                             request.Quantity,
-            //                             request.Batch,
-            //                             request.IsPrepared,
-            //                             warehouse.Reserve,
-            //                             request.TransformId
-
-            //                         } into total
-
-            //                         orderby total.Key.ExpirationDays ascending
-
-            //                         select new RawmaterialDetailsFromWarehouseDto
-            //                         {
-            //                             TransformId = total.Key.TransformId,
-            //                             WarehouseReceivedId = total.Key.Id,
-            //                             Supplier = total.Key.Supplier,
-            //                             ItemCode = total.Key.ItemCode,
-            //                             ItemDescription = total.Key.ItemDescription,
-            //                             ManufacturingDate = total.Key.ManufacturingDate.ToString("MM/dd/yyyy"),
-            //                             ExpirationDate = total.Key.Expiration.ToString("MM/dd/yyyy"),
-            //                             ExpirationDays = total.Key.ExpirationDays,
-            //                             QuantityNeeded = total.Key.Quantity,
-            //                             Batch = total.Key.Batch,
-            //                             WarehouseItemStatus = total.Key.WarehouseItemStatus,
-            //                             IsPrepared = total.Key.IsPrepared,
-            //                             Balance = total.Key.ActualGood - total.Key.Reserve
-            //                             //   PreparationBalance = total.Sum(x => x.)
-
-            //                         });
-
-            //return await warehousereceived.ToListAsync();
-
             var totalOut = (from warehouse in _context.WarehouseReceived
                        join req in _context.Transformation_Preparation
                        on warehouse.Id equals req.WarehouseId into leftJ
@@ -669,7 +379,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                            warehouse.ManufacturingDate,
                            warehouse.Expiration,
                            warehouse.ExpirationDays,
-                         //  warehouse.WarehouseItemStatus,
                            warehouse.ActualGood
 
                        } into total
@@ -685,21 +394,19 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                            total.Key.Expiration,
                            total.Key.ExpirationDays,
                            Reserve = total.Sum(x => x.WeighingScale),
-                      //     total.Key.WarehouseItemStatus,
                            total.Key.ActualGood
 
                        });
 
             var warehousestock = _context.WarehouseReceived.OrderBy(x => x.ExpirationDays)                                                    
-                                                      .Select(x => new ForTesting
-            {
-                ReceivedId = x.Id,
-                ItemCode = x.ItemCode,
-                ExpirationDays = x.ExpirationDays,
-                In = x.ActualGood,
-             //   Out  = x.ActualGood
+                                                           .Select(x => new ForTesting
+                                                            {
+                                                                ReceivedId = x.Id,
+                                                                ItemCode = x.ItemCode,
+                                                                ExpirationDays = x.ExpirationDays,
+                                                                In = x.ActualGood,
 
-            });
+                                                            });
 
 
             return await warehousestock.ToListAsync();
@@ -722,6 +429,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
             });
 
             var totalRemaining = (from totalIn in _context.WarehouseReceived
+                                  where totalIn.ItemCode == itemcode && totalIn.IsActive == true
                                   join totalOut in totalout
 
                                   on totalIn.Id equals totalOut.WarehouseId
@@ -733,6 +441,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
 
                                       totalIn.Id,
                                       totalIn.ItemCode,
+                                      totalIn.ItemDescription,
+                                      totalIn.ManufacturingDate,
+                                      totalIn.Expiration,
                                       totalIn.ActualGood,
                                       totalIn.ExpirationDays
                                       
@@ -744,16 +455,298 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                   {
                                       WarehouseId = total.Key.Id,
                                       ItemCode = total.Key.ItemCode,
+                                      ItemDescription = total.Key.ItemDescription,
+                                      ManufacturingDate = total.Key.ManufacturingDate,
+                                      ExpirationDate = total.Key.Expiration,
                                       ExpirationDays = total.Key.ExpirationDays,
                                       In = total.Key.ActualGood,
                                       Out = total.Sum(x => x.Out),
                                       Remaining = total.Key.ActualGood - total.Sum(x => x.Out)
+
                                   });
 
-            return await totalRemaining.Where(x => x.ItemCode == itemcode)
-                                       .Where(x => x.Remaining != 0)
+            return await totalRemaining.Where(x => x.Remaining != 0)
                                        .ToListAsync();
 
         }
+
+        public async Task<RawmaterialDetailsFromWarehouseDto> GetQuantityAndBatch(int id, string code)
+        {
+
+            var getInfo = _context.Transformation_Request.Select(x => new RawmaterialDetailsFromWarehouseDto
+            {
+
+                TransformId = x.TransformId,
+                ItemCode = x.ItemCode,
+                QuantityNeeded = x.Quantity,
+                Batch = x.Batch,
+
+            });
+
+            return await getInfo.Where(x => x.TransformId == id)
+                                .Where(x => x.ItemCode == code)
+                                .FirstOrDefaultAsync();
+
+        }
+
+        public async Task<bool> UpdateRequestStatus(TransformationPreparation preparation)
+        {
+            var existingList = await _context.Transformation_Request.Where(x => x.ItemCode == preparation.ItemCode)
+                                                                    .Where(x => x.TransformId == preparation.TransformId)
+                                                                    .Where(x => x.IsActive == true)
+                                                                    .FirstOrDefaultAsync();
+
+            var existingPlan = await _context.Transformation_Planning.Where(x => x.Id == preparation.TransformId)
+                                                                     .FirstOrDefaultAsync();
+
+            if (existingList == null)
+            {
+                return false;
+            }
+            else
+            {
+                existingList.IsPrepared = true;
+            }
+
+           
+            return true;
+        }
+
+        public async Task<bool> ValidateRequestAndPreparation(int id)
+        {
+            var request = await _context.Transformation_Request.Where(x => x.TransformId == id)
+                                                               .Where(x => x.IsPrepared == false)
+                                                               .Where(x => x.IsActive == true)
+                                                               .ToListAsync();
+            if (request.Count != 0)
+                return false;
+
+
+            return true;
+       
+        }
+
+        public async Task<PagedList<TransformationPlanningDto>> GetAllTransformationFormulaInformationPagination(UserParams userParams)
+        {
+
+
+            var transformplanning = (from planning in _context.Transformation_Planning
+                                     where planning.Is_Approved == true && planning.StatusRequest == "Approved" && planning.IsPrepared == false
+                                     join warehouse in _context.WarehouseReceived
+                                     on planning.ItemCode equals warehouse.ItemCode into leftJ
+                                     from warehouse in leftJ.DefaultIfEmpty()
+
+                                     group warehouse by new
+                                     {
+
+                                         planning.Id,
+                                         planning.ProdPlan,
+                                         planning.ItemCode,
+                                         planning.ItemDescription,
+                                         planning.Quantity,
+                                         planning.Batch,
+                                         planning.Is_Approved 
+
+                                     } into total
+
+                                     orderby total.Key.ProdPlan ascending
+
+                                     select new TransformationPlanningDto
+                                     {
+                                         Id = total.Key.Id,
+                                         ItemCode = total.Key.ItemCode,
+                                         ItemDescription = total.Key.ItemDescription,
+                                         ProdPlan = total.Key.ProdPlan.ToString("MM/dd/yyyy"),
+                                         Quantity = Math.Round(Convert.ToDecimal(total.Key.Quantity * total.Key.Batch), 2),
+                                         Batch = total.Key.Batch,
+                                         WarehouseStock = total.Sum(x => x.ActualGood),
+                                         IsApproved = total.Key.Is_Approved != null
+                                     });
+
+            return await PagedList<TransformationPlanningDto>.CreateAsync(transformplanning, userParams.PageNumber, userParams.PageSize);
+
+
+        }
+
+        public async Task<bool> UpdatePlanningStatus(TransformationPreparation preparation)
+        {
+            var getRequestList = await _context.Transformation_Request.Where(x => x.TransformId == preparation.TransformId)
+                                                                      .Where(x => x.IsPrepared == false)
+                                                                      .Where(x => x.IsActive == true)
+                                                                      .ToListAsync();
+
+            var existingPlan = await _context.Transformation_Planning.Where(x => x.Id == preparation.TransformId)
+                                                                     .FirstOrDefaultAsync();
+
+            if (getRequestList.Count == 0)
+            {
+                existingPlan.IsPrepared = true;
+            }
+
+            return true;
+
+        }
+
+        public async Task<IReadOnlyList<TransformationPlanningDto>> GetAllTransformationForMixing()
+        {
+
+
+            var mixing =  _context.Transformation_Planning.Select(x => new TransformationPlanningDto
+            {
+
+                Id = x.Id,
+                ItemCode = x.ItemCode, 
+                ItemDescription = x.ItemDescription, 
+                Batch = x.Batch,
+                Version = x.Version, 
+                Quantity = Math.Round(Convert.ToDecimal(x.Quantity * x.Batch), 2),
+                ProdPlan = x.ProdPlan.ToString("MM/dd/yyyy"),
+                IsApproved = x.Is_Approved != null, 
+                IsPrepared = x.IsPrepared,
+                Status = x.Status,
+                IsMixed = x.IsMixed != null,
+                StatusRemarks = x.StatusRequest
+
+            });
+
+            return await mixing.Where(x => x.Status == true)
+                               .Where(x => x.IsApproved == true)
+                               .Where(x => x.IsPrepared == true)
+                               .Where(x => x.IsMixed != true)
+                               .Where(x => x.StatusRemarks == "Approved")
+                               .ToListAsync();
+
+        }
+
+        public async Task<PagedList<TransformationPlanningDto>> GetAllTransformationForMixingPagination(UserParams userParams)
+        {
+            var mixing = (from planning in _context.Transformation_Planning
+                          where planning.Status == true && planning.Is_Approved == true && planning.IsPrepared == true &&
+                          planning.IsMixed != true && planning.StatusRequest == "Approved"
+                          join warehouse in _context.WarehouseReceived
+                          on planning.Id equals warehouse.TransformId into leftJ
+
+                          from warehouse in leftJ.DefaultIfEmpty()
+
+                          group warehouse by new
+                          {
+                              planning.Id,
+                              planning.ItemCode,
+                              planning.ItemDescription,
+                              planning.Uom,
+                              planning.Batch,
+                              planning.Version,
+                              planning.Quantity,
+                              planning.ProdPlan,
+                              planning.IsPrepared,
+                              planning.CancelRemarks,
+                              planning.Is_Approved,
+                              planning.Status,
+                              planning.DateAdded,
+                              planning.StatusRequest,
+                              planning.IsMixed
+
+                          } into total
+                          
+                          orderby total.Key.ProdPlan ascending
+
+                          select new TransformationPlanningDto
+                          {
+
+                              Id = total.Key.Id,
+                              ItemCode = total.Key.ItemCode,
+                              ItemDescription = total.Key.ItemDescription,
+                              Uom = total.Key.Uom,
+                              Batch = total.Key.Batch,
+                              Version = total.Key.Version,
+                              Quantity = Math.Round(Convert.ToDecimal(total.Key.Quantity * total.Key.Batch), 2),
+                              ProdPlan = total.Key.ProdPlan.ToString("MM/dd/yyyy"),
+                              IsApproved = total.Key.Is_Approved != null,
+                              IsPrepared = total.Key.IsPrepared,
+                              Status = total.Key.Status,
+                              DateAdded = total.Key.DateAdded.ToString("MM/dd/yyyy"),
+                              StatusRemarks = total.Key.StatusRequest,
+                              IsMixed = total.Key.IsMixed != null
+      
+                          });
+
+
+            return await PagedList<TransformationPlanningDto>.CreateAsync(mixing, userParams.PageNumber, userParams.PageSize);
+        }
+
+        public async Task<IReadOnlyList<TransformationMixingRequirements>> GetAllRequirementsForMixing(int id)
+        {
+
+            var mixing = (from preparation in _context.Transformation_Preparation
+                          where preparation.TransformId == id && preparation.IsMixed == false
+
+                          group preparation by new
+                          {
+
+                              preparation.TransformId,
+                              preparation.ItemCode,
+                              preparation.ItemDescription,
+                              preparation.Batch,
+                              preparation.QuantityNeeded
+                              
+
+                          } into total
+
+                          select new TransformationMixingRequirements
+                          {
+
+                              TransformId = total.Key.TransformId,
+                              ItemCode = total.Key.ItemCode,
+                              ItemDescription = total.Key.ItemDescription,
+                              Batch = total.Key.Batch,
+                              QuantityBatch = Math.Round(Convert.ToDecimal(total.Key.QuantityNeeded/total.Key.Batch),2),
+                              TotalQuantity = total.Key.QuantityNeeded,
+                              WeighingScale = total.Sum(x => x.WeighingScale)
+
+                          });
+                        
+            return await mixing.ToListAsync();
+
+        }
+
+        public async Task<bool> CompareBatchCount(int id)
+        {
+            var warehouse = await _context.WarehouseReceived.Where(x => x.TransformId == id)
+                                                            .ToListAsync();
+
+            var planning = await _context.Transformation_Planning.Where(x => x.Id == id)
+                                                                 .FirstOrDefaultAsync();
+
+            var preparation = await _context.Transformation_Preparation.Where(x => x.TransformId == id)
+                                                                       .ToListAsync();
+
+            if(warehouse.Count == planning.Batch)
+            {
+                planning.IsMixed = true;
+
+                foreach(var items in preparation)
+                {
+                    items.IsMixed = true;
+                }
+
+            }
+
+            return false;
+
+        }
+
+        public async Task<int> CountBatch(int id)
+        {
+
+            var batch = await _context.WarehouseReceived.Where(x => x.TransformId == id)
+                                                        .ToListAsync();
+
+            var planning = await _context.Transformation_Planning.Where(x => x.Id == id)
+                                                                 .FirstOrDefaultAsync();
+            var temp = planning.Batch - batch.Count;
+
+                return temp;
+        }
+
     }
 }

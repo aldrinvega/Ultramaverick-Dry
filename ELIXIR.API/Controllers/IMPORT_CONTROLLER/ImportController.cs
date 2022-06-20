@@ -384,29 +384,9 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                     else
                         availableImport.Add(items);
 
-
-                    //var validateItemcode = await _unitOfWork.Imports.CheckItemCode(items.ItemCode);
-                    //if (validateItemcode == false)
-                    //    return BadRequest("ItemCode not exist, Please input data first!");
-
-                    //var validateUom = await _unitOfWork.Imports.CheckUomCode(items.UOM);
-                    //if (validateUom == false)
-                    //    return BadRequest("Uom Code not exist, Please input data first!");
-
-                    //var validateSupplier = await _unitOfWork.Imports.CheckSupplier(items.VendorName);
-                    //if (validateSupplier == false)
-                    //    return BadRequest("Supplier not exist, Please input data first!");
-
-                    //var validatePoandItem = await _unitOfWork.Imports.ValidatePOAndItemcodeManual(items.PO_Number, items.ItemCode);
-                    //if (validatePoandItem == true)
-                    //    return BadRequest("PO Number with Item code already exist!");
-
-
                     await _unitOfWork.Imports.AddNewPORequest(items);
 
                 }
-
-
 
                 var resultList = new
                 {
@@ -425,11 +405,7 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                 {
         
                     return BadRequest(resultList);
-                }
-                  
-                //await _unitOfWork.CompleteAsync();
-                //return Ok("Succesfully Added!");
-
+                }              
             }
             return new JsonResult("Something went Wrong!") { StatusCode = 500 };
         }

@@ -1,4 +1,5 @@
-﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL;
+﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DTOs.TRANSFORMATION_DTOs;
 using System;
@@ -20,15 +21,15 @@ namespace ELIXIR.DATA.CORE.INTERFACES.TRANSFORMATION_INTERFACE
 
 
         Task<bool> UpdatePrepareStatusInRequest(int id);
-        Task<bool> ValidatePreparedMaterials(int id, string code);
+        Task<bool> ValidatePreparedMaterials(int id, string code); 
         Task<bool> ValidateIfApproved(int id);
         Task<IReadOnlyList<TransformationPlanningDto>> GetAllListOfTransformationRequestForMixing();
         Task<IReadOnlyList<TransformationMixingRequirements>> GetAllRequirementsForMixing(int id);
 
         Task<bool> AddMixingTransformation(WarehouseReceiving warehouse);
-        Task<bool> FinishedMixedMaterialsForWarehouse(WarehouseReceiving warehouse);
+        Task<bool> FinishedMixedMaterialsForWarehouse(WarehouseReceiving warehouse, int id);
 
-        Task<RawmaterialDetailsFromWarehouseDto>GetReceivingDetailsForRawmaterials(string code);
+        Task<RawmaterialDetailsFromWarehouseDto>GetReceivingDetailsForRawmaterials(int id, string code);
         Task<bool> UpdatedWarehouseStock(string code);
 
 
@@ -39,6 +40,32 @@ namespace ELIXIR.DATA.CORE.INTERFACES.TRANSFORMATION_INTERFACE
         Task<IReadOnlyList<ForTesting>> GetAllAvailableStocks();
 
         Task<IReadOnlyList<ItemStocks>> GetAllRemainingStocksPerReceivingId(string itemcode);
+
+
+        Task<RawmaterialDetailsFromWarehouseDto> GetQuantityAndBatch(int id, string code);
+
+        Task<bool> UpdateRequestStatus(TransformationPreparation preparation);
+
+        Task<bool> UpdatePlanningStatus(TransformationPreparation preparation);
+
+
+        Task<bool> ValidateRequestAndPreparation(int id);
+
+
+        Task<PagedList<TransformationPlanningDto>> GetAllTransformationFormulaInformationPagination(UserParams userParams);
+
+
+        Task<IReadOnlyList<TransformationPlanningDto>> GetAllTransformationForMixing();
+
+
+        Task<PagedList<TransformationPlanningDto>> GetAllTransformationForMixingPagination(UserParams userParams);
+
+
+        Task<bool> CompareBatchCount(int id);
+
+        Task<int> CountBatch(int id);
+
+
 
     }
 }

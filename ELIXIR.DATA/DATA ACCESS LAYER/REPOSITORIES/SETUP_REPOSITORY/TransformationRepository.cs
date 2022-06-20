@@ -14,7 +14,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
     public class TransformationRepository : GenericRepository<TransformationFormulaDto>, ITransformationRepository
     {
         private new readonly StoreContext _context;
-        public TransformationRepository(StoreContext context) : base (context)
+        public TransformationRepository(StoreContext context) : base(context)
         {
             _context = context;
         }
@@ -153,10 +153,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<bool> AddNewRequirementsInFormula(TransformationRequirement requirement)
         {
-    
+
             var getitemDescription = await _context.RawMaterials.FindAsync(requirement.RawMaterialId);
 
- 
+
 
             requirement.ItemDescription = getitemDescription.ItemDescription;
 
@@ -173,20 +173,20 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         public async Task<IReadOnlyList<TransformationRequirementDto>> GetAllRequirementwithFormula()
         {
             var transform = (from requirement in _context.FormulaRequirements
-                         join formula in _context.Formulas on requirement.TransformationFormulaId equals formula.Id
-                         join rawmaterial in _context.RawMaterials on requirement.RawMaterialId equals rawmaterial.Id
+                             join formula in _context.Formulas on requirement.TransformationFormulaId equals formula.Id
+                             join rawmaterial in _context.RawMaterials on requirement.RawMaterialId equals rawmaterial.Id
 
-                         select new TransformationRequirementDto
-                         {
-                             FormulaCode = formula.ItemCode,
-                             FormulaDescription = formula.ItemDescription,
-                             FormulaVersion = formula.Version,
-                             FormulaQuantity = formula.Quantity,
-                             RequirementCode = rawmaterial.ItemCode,
-                             RequirementDescription = rawmaterial.ItemDescription,
-                             RequirementQuantity = requirement.Quantity,
-                             AddedBy = requirement.AddedBy
-                         });
+                             select new TransformationRequirementDto
+                             {
+                                 FormulaCode = formula.ItemCode,
+                                 FormulaDescription = formula.ItemDescription,
+                                 FormulaVersion = formula.Version,
+                                 FormulaQuantity = formula.Quantity,
+                                 RequirementCode = rawmaterial.ItemCode,
+                                 RequirementDescription = rawmaterial.ItemDescription,
+                                 RequirementQuantity = requirement.Quantity,
+                                 AddedBy = requirement.AddedBy
+                             });
 
             return await transform.ToListAsync();
         }
@@ -221,7 +221,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                 return false;
 
             _context.FormulaRequirements.Remove(existingRawmaterial);
-           
+
             return true;
 
         }
@@ -282,7 +282,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                  uom = formula.Uom
                              });
 
-            return await transform.Where(x => x.Id == id) 
+            return await transform.Where(x => x.Id == id)
                                   .Where(x => x.IsActive == true)
                                   .ToListAsync();
         }
@@ -303,10 +303,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
             var formula = (from formulacode in _context.Formulas
                            where formulacode.IsActive == status
-                           join requirements in _context.FormulaRequirements                
+                           join requirements in _context.FormulaRequirements
                            on formulacode.Id equals requirements.TransformationFormulaId into leftJ
                            from requirements in leftJ.DefaultIfEmpty()
-                           where requirements.IsActive == true || requirements != null
+                           where requirements.IsActive == true || requirements == null
 
                            group requirements by new
                            {
@@ -341,7 +341,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                CountQuantity = total.Sum(x => x.Quantity)
                            });
 
-                            
+
 
             return await PagedList<TransformationFormulaDto>.CreateAsync(formula, userParams.PageNumber, userParams.PageSize);
         }
@@ -349,13 +349,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         public async Task<PagedList<TransformationFormulaDto>> GetFormulaByStatusWithPaginationOrig(UserParams userParams, bool status, string search)
         {
 
-
             var formula = (from formulacode in _context.Formulas
                            where formulacode.IsActive == status && formulacode.ItemCode.ToLower().Contains(search.Trim().ToLower())
                            join requirements in _context.FormulaRequirements
-                           on formulacode.Id equals requirements.TransformationFormulaId into leftJ           
+                           on formulacode.Id equals requirements.TransformationFormulaId into leftJ
                            from requirements in leftJ.DefaultIfEmpty()
-                           where requirements.IsActive == true || requirements != null
+                           where requirements.IsActive == true || requirements == null
+
 
                            group requirements by new
                            {
@@ -386,11 +386,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                IsActive = total.Key.IsActive,
                                Reason = total.Key.Reason,
                                CountFormula = total.Key.Testing,
-                            //   CountFormula = total.Count(x => x.Id)
                                Uom = total.Key.Uom,
-                              CountQuantity = total.Sum(x => x.Quantity)
+                               CountQuantity = total.Sum(x => x.Quantity)
                            });
-            
+
             return await PagedList<TransformationFormulaDto>.CreateAsync(formula, userParams.PageNumber, userParams.PageSize);
         }
 
@@ -450,7 +449,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<IReadOnlyList<TransformationRequirementDto>> GetAllInActiveRequirements(int id)
         {
-            var validateInactive =  _context.FormulaRequirements.Select(requirements => new TransformationRequirementDto
+            var validateInactive = _context.FormulaRequirements.Select(requirements => new TransformationRequirementDto
             {
                 Id = requirements.TransformationFormulaId,
                 RequirementCode = requirements.RawMaterial.ItemCode,
@@ -461,6 +460,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
             }).Where(x => x.Id == id)
               .Where(x => x.IsActive == false);
+
 
             return await validateInactive.ToListAsync();
 
@@ -483,12 +483,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
             if (existingInfo == null)
                 return false;
-           
+
 
             existingInfo.Quantity = requirement.Quantity;
 
             return true;
-                
+
         }
+
+
     }
 }

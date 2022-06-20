@@ -1,5 +1,6 @@
 ﻿ using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -34,6 +35,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL
         public string RejectRemarks { get; set; }
 
         public string StatusRequest { get; set; }
+        public bool? IsMixed { get; set; }
+
 
 
 
