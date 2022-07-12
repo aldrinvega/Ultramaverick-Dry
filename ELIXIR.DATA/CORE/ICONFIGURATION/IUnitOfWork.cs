@@ -48,7 +48,7 @@ namespace ELIXIR.DATA.CORE.ICONFIGURATION
 
         //Inventory
         IRawMaterialInventory Inventory { get; }
-
+        IMiscellaneous Miscellaneous { get; }
 
 
 

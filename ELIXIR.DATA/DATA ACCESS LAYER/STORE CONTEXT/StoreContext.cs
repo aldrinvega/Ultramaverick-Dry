@@ -1,5 +1,6 @@
 ﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
@@ -41,10 +42,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public virtual DbSet<TransformationReject> Transformation_Reject { get; set; }
         public virtual DbSet<TransformationPreparation> Transformation_Preparation { get; set; }
         public virtual DbSet<Ordering> Orders { get; set; }
-
-
-
-
+        public virtual DbSet<MoveOrder> MoveOrders { get; set; }
+        public virtual DbSet<GenerateOrderNo> GenerateOrderNos { get; set; }
+        public virtual DbSet<TransactMoveOrder> TransactMoveOrder { get; set; }
+        public virtual DbSet<MiscellaneousReceipt> MiscellaneousReceipts { get; set; }
+        public virtual DbSet<GenerateMReceipt> GenerateReceiptNos { get; set; }
+        public virtual DbSet<MiscellaneousIssue> MiscellaneousIssues { get; set; }
+        public virtual DbSet<GenerateMIssue> GenerateIssueNos { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

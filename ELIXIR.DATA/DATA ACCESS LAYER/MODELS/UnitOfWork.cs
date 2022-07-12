@@ -59,6 +59,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
 
         //Inventory
         public IRawMaterialInventory Inventory { get; set; }
+        public IMiscellaneous Miscellaneous  { get; set; }
+
 
         //Ordering
         public IOrdering Order { get; set; }
@@ -106,6 +108,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
 
             //Inventory
             Inventory = new RawMaterialInventory(_context);
+            Miscellaneous = new MiscellaneousRepository(_context);
 
         }
         public async Task CompleteAsync()

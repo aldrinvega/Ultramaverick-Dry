@@ -4,6 +4,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
 using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -47,9 +48,18 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         public async Task<IActionResult> SchedulePreparedOrderedDate([FromBody] Ordering[] order)
         {
 
+            var generate = new GenerateOrderNo();
+
+            generate.IsActive = true;
+
+            await _unitOfWork.Order.GenerateNumber(generate);
+            await _unitOfWork.CompleteAsync();
 
             foreach(Ordering items in order)
             {
+
+                items.OrderNoPKey = generate.Id;
+      
                 await _unitOfWork.Order.SchedulePreparedDate(items);
                 
             }
@@ -63,10 +73,9 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("ApprovePreparedDate")]
         public async Task<IActionResult> ApprovePreparedDate([FromBody] Ordering order)
         {
-
-            await _unitOfWork.Order.ApprovePreparedDate(order);
-            await _unitOfWork.CompleteAsync();
-
+                await _unitOfWork.Order.ApprovePreparedDate(order);
+                await _unitOfWork.CompleteAsync();
+        
             return new JsonResult("Successfully approved prepared date!");
         }
 
@@ -115,7 +124,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             List<Ordering> notExistRawMats = new List<Ordering>();
             List<Ordering> notExistUom = new List<Ordering>();
             List<Ordering> duplicateList = new List<Ordering>();
-         //   List<Ordering> invaliddatelist = new List<Ordering>();
 
 
             List<Ordering> filteredOrders = new List<Ordering>();
@@ -129,18 +137,12 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 var validateFarmCode = await _unitOfWork.Order.ValidateFarmCode(items);
                 var validateRawMaterial = await _unitOfWork.Order.ValidateRawMaterial(items);
                 var validateUom = await _unitOfWork.Order.ValidateUom(items);
-             //   var validateDate = await _unitOfWork.Order.ValidateOrderAndDateNeeded(items);
 
 
                 if (validateDuplicate == false)
                 {
                     duplicateList.Add(items);
                 }
-
-                //else if (validateDate == false)
-                //{
-                //    invaliddatelist.Add(items);
-                //}
 
                 else if (validateFarmName == false)
                 {
@@ -174,7 +176,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             {
                 duplicateList,
                 filteredOrders,
-              //  invaliddatelist,
                 notExistFarmName,
                 notExistFarmCode,
                 notExistRawMats,
@@ -292,11 +293,410 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         public async Task<IActionResult> GetAllListOfApprovedPreparedForMoveOrder([FromQuery] string farm)
         {
 
-            var orders = await _unitOfWork.Order.GetAllListOfApprovedPreparedDate(farm);
+            var orders = await _unitOfWork.Order.TotalListOfApprovedPreparedDate(farm);
 
             return Ok(orders);
 
         }
 
+        [HttpGet]
+        [Route("DetailedListOfOrders")]
+        public async Task<IActionResult> DetailedListOfOrders([FromQuery] string farm)
+        {
+
+            var orders = await _unitOfWork.Order.DetailedListOfOrders(farm);
+
+            return Ok(orders);
+
+        }
+
+        [HttpGet]
+        [Route("GetAllListForScheduleApproval")]
+        public async Task<IActionResult> GetAllListForScheduleApproval()
+        {
+
+            var orders = await _unitOfWork.Order.GetAllListForApprovalOfSchedule();
+
+            return Ok(orders);
+
+        }
+
+        [HttpGet]
+        [Route("GetAllOrdersForScheduleApproval")]
+        public async Task<IActionResult> GetAllOrdersForScheduleApproval([FromQuery] int id)
+        {
+
+            var orders = await _unitOfWork.Order.GetAllOrdersForScheduleApproval(id);
+
+            return Ok(orders);
+
+        }
+
+
+        [HttpGet]
+        [Route("GetAllOutOfStockByItemCodeAndOrderDate")]
+        public async Task<IActionResult> GetAllOutOfStockByItemCodeAndOrderDate([FromQuery] string itemcode, [FromQuery] string orderdate)
+        {
+
+            var orders = await _unitOfWork.Order.GetAllOutOfStockByItemCodeAndOrderDate(itemcode, orderdate);
+
+            return Ok(orders);
+
+        }
+
+
+        [HttpPost]
+        [Route("PrepareItemsForMoveOrder")]
+        public async Task<IActionResult> PrepareItemsForMoveOrder([FromBody] MoveOrder order)
+        {
+
+            var details = await _unitOfWork.Order.GetMoveOrderDetailsForMoveOrder(order.OrderNoPKey);
+
+            order.OrderNoPKey = details.Id;
+            order.OrderDate = Convert.ToDateTime(details.OrderDate);
+            order.DateNeeded = Convert.ToDateTime(details.DateNeeded);
+            order.PreparedDate = Convert.ToDateTime(details.PreparedDate);
+            order.FarmName = details.Farm;
+            order.FarmCode = details.FarmCode;
+            order.FarmType = details.FarmType;
+            order.ItemCode = details.ItemCode;
+            order.ItemDescription = details.ItemDescription;
+            order.Uom = details.Uom;
+            order.Category = details.Category;
+            order.IsActive = true;
+            order.IsPrepared = true;
+
+            await _unitOfWork.Order.PrepareItemForMoveOrder(order);
+            await _unitOfWork.CompleteAsync();
+
+            return Ok(order);
+
+        }
+
+
+        [HttpGet]
+        [Route("GetAllListOfOrdersForMoveOrder")]
+        public async Task<IActionResult> GetAllListOfOrdersForMoveOrder([FromQuery] int id)
+        {
+
+            var orders = await _unitOfWork.Order.ListOfOrdersForMoveOrder(id);
+
+            return Ok(orders);
+
+        }
+
+        [HttpGet]
+        [Route("GetAvailableStockFromWarehouse")]
+        public async Task<IActionResult> GetAvailableStockFromWarehouse([FromQuery] int id, [FromQuery] string itemcode)
+        {
+
+            var orders = await _unitOfWork.Order.GetActualItemQuantityInWarehouse(id, itemcode);
+
+            return Ok(orders);
+
+
+        }
+
+
+        [HttpGet]
+        [Route("ListOfPreparedItemsForMoveOrder")]
+        public async Task<IActionResult> ListOfPreparedItemsForMoveOrder([FromQuery] int id)
+        {
+
+            var orders = await _unitOfWork.Order.ListOfPreparedItemsForMoveOrder(id);
+
+            return Ok(orders);
+
+        }
+
+
+        [HttpPut]
+        [Route("CancelPreparedItems")]
+        public async Task<IActionResult> CancelPreparedItems([FromBody] MoveOrder moveorder)
+        {
+
+            await _unitOfWork.Order.CancelMoveOrder(moveorder);
+            await _unitOfWork.CompleteAsync();
+
+            return Ok("Successfully cancel prepared items");
+
+        }
+
+
+        [HttpPut]
+        [Route("AddPlateNumberInMoveOrder")]
+        public async Task<IActionResult> AddPlateNumberInMoveOrder([FromBody] Ordering[] order)
+        {
+
+            foreach (Ordering items in order)
+            {
+
+                await _unitOfWork.Order.AddPlateNumberInMoveOrder(items);
+
+            }
+
+            await _unitOfWork.CompleteAsync();
+
+            return new JsonResult("Successfully added plate number!");
+        }
+
+
+        [HttpPut]
+        [Route("ApproveListOfMoveOrder")]
+        public async Task<IActionResult> ApproveListOfMoveOrder([FromBody] MoveOrder moveorder)
+        {
+
+            await _unitOfWork.Order.ApprovalForMoveOrder(moveorder);
+            await _unitOfWork.CompleteAsync();
+
+            return new JsonResult("Successfully approved list for move order!");
+        }
+
+        [HttpPut]
+        [Route("RejectListOfMoveOrder")]
+        public async Task<IActionResult> RejectListOfMoveOrder([FromBody] MoveOrder moveorder)
+        {
+
+            await _unitOfWork.Order.RejectForMoveOrder(moveorder);
+            await _unitOfWork.CompleteAsync();
+
+            return new JsonResult("Successfully reject list for move order!");
+        }
+
+        [HttpPut]
+        [Route("ReturnMoveOrderForApproval")]
+        public async Task<IActionResult> ReturnMoveOrderForApproval([FromBody] MoveOrder moveorder)
+        {
+
+            await _unitOfWork.Order.ReturnMoveOrderForApproval(moveorder);
+            await _unitOfWork.CompleteAsync();
+
+            return new JsonResult("Successfully return list for move order!");
+        }
+
+
+        [HttpPut]
+        [Route("UpdatePrintStatus")]
+        public async Task<IActionResult> UpdatePrintStatus([FromBody] MoveOrder moveorder)
+        {
+
+            await _unitOfWork.Order.UpdatePrintStatus(moveorder);
+            await _unitOfWork.CompleteAsync();
+
+            return Ok(moveorder);
+        }
+
+
+        [HttpGet]
+        [Route("GetAllForApprovalMoveOrderPagination")]
+        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> GetAllForApprovalMoveOrderPagination([FromQuery] UserParams userParams)
+        {
+            var moveorder = await _unitOfWork.Order.ForApprovalMoveOrderPagination(userParams);
+
+            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount, moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
+
+            var moveorderResult = new
+            {
+                moveorder,
+                moveorder.CurrentPage,
+                moveorder.PageSize,
+                moveorder.TotalCount,
+                moveorder.TotalPages,
+                moveorder.HasNextPage,
+                moveorder.HasPreviousPage
+            };
+
+            return Ok(moveorderResult);
+        }
+
+        [HttpGet]
+        [Route("GetAllForApprovalMoveOrderPaginationOrig")]
+        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> GetAllForApprovalMoveOrderPaginationOrig([FromQuery] UserParams userParams, [FromQuery] string search)
+        {
+
+            if (search == null)
+
+                return await GetAllForApprovalMoveOrderPagination(userParams);
+
+            var moveorder = await _unitOfWork.Order.ForApprovalMoveOrderPaginationOrig(userParams, search);
+
+            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount, moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
+
+            var moveorderResult = new
+            {
+                moveorder,
+                moveorder.CurrentPage,
+                moveorder.PageSize,
+                moveorder.TotalCount,
+                moveorder.TotalPages,
+                moveorder.HasNextPage,
+                moveorder.HasPreviousPage
+            };
+
+            return Ok(moveorderResult);
+        }
+
+
+        [HttpGet]
+        [Route("ViewMoveOrderForApproval")]
+        public async Task<IActionResult> ViewMoveOrderForApproval([FromQuery] int id)
+        {
+
+            var orders = await _unitOfWork.Order.ViewMoveOrderForApproval(id);
+
+            return Ok(orders);
+
+        }
+
+        [HttpGet]
+        [Route("ApprovedMoveOrderPagination")]
+        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> ApprovedMoveOrderPagination([FromQuery] UserParams userParams)
+        {
+            var moveorder = await _unitOfWork.Order.ApprovedMoveOrderPagination(userParams);
+
+            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount, moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
+
+            var moveorderResult = new
+            {
+                moveorder,
+                moveorder.CurrentPage,
+                moveorder.PageSize,
+                moveorder.TotalCount,
+                moveorder.TotalPages,
+                moveorder.HasNextPage,
+                moveorder.HasPreviousPage
+            };
+
+            return Ok(moveorderResult);
+        }
+
+        [HttpGet]
+        [Route("ApprovedMoveOrderPaginationOrig")]
+        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> ApprovedMoveOrderPaginationOrig([FromQuery] UserParams userParams, [FromQuery] string search)
+        {
+
+            if (search == null)
+
+                return await ApprovedMoveOrderPagination(userParams);
+
+            var moveorder = await _unitOfWork.Order.ApprovedMoveOrderPaginationOrig(userParams, search);
+
+            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount, moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
+
+            var moveorderResult = new
+            {
+                moveorder,
+                moveorder.CurrentPage,
+                moveorder.PageSize,
+                moveorder.TotalCount,
+                moveorder.TotalPages,
+                moveorder.HasNextPage,
+                moveorder.HasPreviousPage
+            };
+
+            return Ok(moveorderResult);
+        }
+
+
+        [HttpGet]
+        [Route("RejectedMoveOrderPagination")]
+        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> RejectedMoveOrderPagination([FromQuery] UserParams userParams)
+        {
+            var moveorder = await _unitOfWork.Order.RejectedMoveOrderPagination(userParams);
+
+            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount, moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
+
+            var moveorderResult = new
+            {
+                moveorder,
+                moveorder.CurrentPage,
+                moveorder.PageSize,
+                moveorder.TotalCount,
+                moveorder.TotalPages,
+                moveorder.HasNextPage,
+                moveorder.HasPreviousPage
+            };
+
+            return Ok(moveorderResult);
+        }
+
+        [HttpGet]
+        [Route("RejectedMoveOrderPaginationOrig")]
+        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> RejectedMoveOrderPaginationOrig([FromQuery] UserParams userParams, [FromQuery] string search)
+        {
+
+            if (search == null)
+
+                return await RejectedMoveOrderPagination(userParams);
+
+            var moveorder = await _unitOfWork.Order.RejectedMoveOrderPaginationOrig(userParams, search);
+
+            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount, moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
+
+            var moveorderResult = new
+            {
+                moveorder,
+                moveorder.CurrentPage,
+                moveorder.PageSize,
+                moveorder.TotalCount,
+                moveorder.TotalPages,
+                moveorder.HasNextPage,
+                moveorder.HasPreviousPage
+            };
+
+            return Ok(moveorderResult);
+        }
+
+
+        //------------------TRANSACT MOVE ORDER-------------------------
+
+
+        [HttpGet]
+        [Route("GetTotalListForMoveOrder")]
+        public async Task<IActionResult> GetTotalListForMoveOrder()
+        {
+
+            var orders = await _unitOfWork.Order.TotalListForTransactMoveOrder();
+
+            return Ok(orders);
+
+        }
+
+        [HttpGet]
+        [Route("ListOfMoveOrdersForTransact")]
+        public async Task<IActionResult> ListOfMoveOrdersForTransact([FromQuery] int orderid)
+        {
+
+            var orders = await _unitOfWork.Order.ListOfMoveOrdersForTransact(orderid);
+
+            return Ok(orders);
+
+        }
+
+        [HttpPost]
+        [Route("TransactListOfMoveOrders")]
+        public async Task<IActionResult> TransactListOfMoveOrders([FromBody] TransactMoveOrder[] transact)
+        {
+
+            foreach(TransactMoveOrder items in transact)
+            {
+
+                items.IsActive = true;
+                items.IsTransact = true;
+                items.PreparedDate = DateTime.Now;
+
+                await _unitOfWork.Order.TransanctListOfMoveOrders(items);
+            }
+   
+            await _unitOfWork.CompleteAsync();
+
+            return Ok(transact);
+
+        }
+
+
+
+
     }
+
 }

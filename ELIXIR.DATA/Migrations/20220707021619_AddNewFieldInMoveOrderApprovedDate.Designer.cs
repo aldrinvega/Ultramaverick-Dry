@@ -4,14 +4,16 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20220707021619_AddNewFieldInMoveOrderApprovedDate")]
+    partial class AddNewFieldInMoveOrderApprovedDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -331,13 +333,7 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<bool>("IsPrepared")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("IsPrint")
-                        .HasColumnType("bit");
-
                     b.Property<bool?>("IsReject")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsTransact")
                         .HasColumnType("bit");
 
                     b.Property<string>("ItemCode")
@@ -368,12 +364,6 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("RejectBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("RejectedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Uom")

@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
 {
-    public class OrderDto
+    public class TransactMoveOrderDto
     {
+
         public int Id { get; set; }
         public string OrderDate { get; set; }
         public int OrderNo { get; set; }
@@ -18,24 +19,13 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         public string Category { get; set; }
         public string ItemCode { get; set; }
         public string ItemDescription { get; set; }
-        public string Uom{ get; set; }
-        public decimal QuantityOrder { get; set; }
+        public string Uom { get; set; }
+        public decimal TotalQuantityOrder { get; set; }
         public string PreparedDate { get; set; }
         public bool IsApproved { get; set; }
         public bool IsActive { get; set; }
         public bool IsPrepared { get; set; }
-        public decimal StockOnHand { get; set; }
-        public decimal TotalOrders { get; set; }
-        public decimal Difference { get; set; }
-        public string CancelDate { get; set; }
-        public string CancelBy { get; set; }
-        public decimal PreparedQuantity { get; set; }
-        public string PlateNumber { get; set; }
         public bool IsMove { get; set; }
-        public bool IsReject { get; set; }
-        public string Remarks { get; set; }
-
-
 
 
     }
