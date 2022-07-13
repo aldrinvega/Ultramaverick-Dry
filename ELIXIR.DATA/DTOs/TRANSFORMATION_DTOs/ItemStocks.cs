@@ -19,6 +19,7 @@ namespace ELIXIR.DATA.DTOs.TRANSFORMATION_DTOs
         public decimal In { get; set; }
         public decimal Out { get; set; }
         public decimal Remaining { get; set; }
+        public decimal TotalMoveOrder { get; set; }
 
     }
 }

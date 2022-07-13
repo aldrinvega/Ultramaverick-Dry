@@ -440,6 +440,22 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             return new JsonResult("Successfully added plate number!");
         }
 
+        [HttpPut]
+        [Route("AddDeliveryStatus")]
+        public async Task<IActionResult> AddDeliveryStatus([FromBody] Ordering[] order)
+        {
+
+            foreach (Ordering items in order)
+            {
+
+                await _unitOfWork.Order.AddDeliveryStatus(items);
+
+            }
+
+            await _unitOfWork.CompleteAsync();
+
+            return new JsonResult("Successfully added delivery status!");
+        }
 
         [HttpPut]
         [Route("ApproveListOfMoveOrder")]

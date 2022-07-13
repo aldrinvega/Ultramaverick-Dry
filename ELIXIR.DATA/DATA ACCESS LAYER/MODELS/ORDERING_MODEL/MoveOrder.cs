@@ -34,6 +34,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
 
         public DateTime? ApprovedDate { get; set; }
 
+        [Column(TypeName = "Date")]
+        public DateTime? ApproveDateTempo { get; set; }
+        
         public bool IsPrepared { get; set; }
         public string PreparedBy { get; set; }
         public DateTime? PreparedDate { get; set; }
@@ -45,10 +48,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
         public int OrderNoPKey { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public string PlateNumber { get; set; }
-
+        public string DeliveryStatus { get; set; }
         public bool? IsReject { get; set; }
         public string RejectBy { get; set; }
         public DateTime? RejectedDate { get; set; }
+
+        [Column(TypeName = "Date")]
+        public DateTime? RejectedDateTempo { get; set; }
+
         public string Remarks { get; set; }
 
         public bool? IsTransact { get; set; }

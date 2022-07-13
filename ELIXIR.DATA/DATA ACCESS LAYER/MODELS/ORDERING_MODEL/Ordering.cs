@@ -50,6 +50,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
         public bool IsMove { get; set; }
 
         public string PlateNumber { get; set; }
+        public string DeliveryStatus { get; set; }
 
 
     }

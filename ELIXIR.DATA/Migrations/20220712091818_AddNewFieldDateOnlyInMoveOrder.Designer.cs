@@ -4,14 +4,16 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20220712091818_AddNewFieldDateOnlyInMoveOrder")]
+    partial class AddNewFieldDateOnlyInMoveOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,9 +312,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<DateTime>("DateNeeded")
                         .HasColumnType("Date");
 
-                    b.Property<string>("DeliveryStatus")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("ExpirationDate")
                         .HasColumnType("datetime2");
 
@@ -423,9 +422,6 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<DateTime>("DateNeeded")
                         .HasColumnType("Date");
-
-                    b.Property<string>("DeliveryStatus")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FarmCode")
                         .HasColumnType("nvarchar(max)");
