@@ -34,8 +34,8 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         public bool IsMove { get; set; }
         public bool IsReject { get; set; }
         public string Remarks { get; set; }
-
-
+        public int OrderNoPKey { get; set; }
+        public string DeliveryStatus { get; set; }
 
 
     }

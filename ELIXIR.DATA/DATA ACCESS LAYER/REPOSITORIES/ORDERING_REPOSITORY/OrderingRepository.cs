@@ -47,9 +47,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                TotalOrders = x.Sum(x => x.QuantityOrdered)
            });
 
-
-            var x = totalOrders;
-
             var totalRemaining = (from totalIn in _context.WarehouseReceived
                                   join totalOut in totalout
 
@@ -978,7 +975,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await totalRemaining.Where(x => x.Remaining != 0)
                                        .FirstOrDefaultAsync();
         }
-
         public async Task<IReadOnlyList<MoveOrderDto>> ListOfPreparedItemsForMoveOrder(int id)
         {
             var orders = _context.MoveOrders.Select(x => new MoveOrderDto
@@ -998,7 +994,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                .Where(x => x.IsActive == true)
                                .ToListAsync();
         }
-
         public async Task<bool> CancelMoveOrder(MoveOrder moveorder)
         {
 
@@ -1015,7 +1010,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
 
         }
-
         public async Task<bool> AddPlateNumberInMoveOrder(Ordering order)
         {
 
@@ -1038,7 +1032,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return true;
         }
-
         public async Task<bool> AddDeliveryStatus(Ordering order)
         {
             var existing = await _context.Orders.Where(x => x.Id == order.Id)
@@ -1060,10 +1053,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             }
 
             return true;
-
-
         }
-
 
         public async Task<bool> ApprovalForMoveOrder(MoveOrder moveorder)
         {
@@ -1084,7 +1074,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
 
         }
-
 
         public async Task<bool> RejectForMoveOrder(MoveOrder moveorder)
         {
@@ -1166,10 +1155,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.OrderDate,
                 x.PreparedDate,
                 x.IsApprove,
-                x.PlateNumber
+                x.DeliveryStatus
 
             }).Where(x => x.Key.IsApprove != true)
-             .Where(x => x.Key.PlateNumber != null)
+             .Where(x => x.Key.DeliveryStatus != null)
 
 
            .Select(x => new MoveOrderDto
@@ -1181,7 +1170,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                Quantity = x.Sum(x => x.QuantityOrdered),
                OrderDate = x.Key.OrderDate.ToString(),
                PreparedDate = x.Key.PreparedDate.ToString(),
-               PlateNumber = x.Key.PlateNumber
+               DeliveryStatus = x.Key.DeliveryStatus
 
            });
 
@@ -1201,10 +1190,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.OrderDate,
                 x.PreparedDate,
                 x.IsApprove,
-                x.PlateNumber
+                x.DeliveryStatus
 
             }).Where(x => x.Key.IsApprove != true)
-              .Where(x => x.Key.PlateNumber != null)
+              .Where(x => x.Key.DeliveryStatus != null)
 
           .Select(x => new MoveOrderDto
           {
@@ -1215,7 +1204,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
               Quantity = x.Sum(x => x.QuantityOrdered),
               OrderDate = x.Key.OrderDate.ToString(),
               PreparedDate = x.Key.PreparedDate.ToString(),
-              PlateNumber = x.Key.PlateNumber
+              DeliveryStatus = x.Key.DeliveryStatus
 
           }).Where(x => Convert.ToString(x.OrderNo).ToLower()
             .Contains(search.Trim().ToLower()));
@@ -1233,8 +1222,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 BarcodeNo = x.WarehouseId,
                 ItemCode = x.ItemCode,
                 ItemDescription = x.ItemDescription,
+                Uom = x.Uom,
+                FarmName = x.FarmName, 
+                ApprovedDate = x.ApprovedDate.ToString(),
                 Quantity = x.QuantityOrdered,
-                Expiration = x.ExpirationDate.ToString()
+                Expiration = x.ExpirationDate.ToString(),
+                DeliveryStatus = x.DeliveryStatus
 
             });
 
@@ -1256,7 +1249,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.OrderDate,
                 x.PreparedDate,
                 x.IsApprove,
-                x.PlateNumber,
+                x.DeliveryStatus,
                 x.IsPrepared,
                 x.IsReject,
                 x.ApproveDateTempo,
@@ -1264,7 +1257,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.IsTransact
 
             }).Where(x => x.Key.IsApprove == true)
-              .Where(x => x.Key.PlateNumber != null)
+              .Where(x => x.Key.DeliveryStatus != null)
               .Where(x => x.Key.IsReject != true)
 
 
@@ -1278,7 +1271,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                  Quantity = x.Sum(x => x.QuantityOrdered),
                  OrderDate = x.Key.OrderDate.ToString(),
                  PreparedDate = x.Key.PreparedDate.ToString(),
-                 PlateNumber = x.Key.PlateNumber,
+                 DeliveryStatus = x.Key.DeliveryStatus,
                  IsApprove = x.Key.IsApprove != null,
                  IsPrepared = x.Key.IsPrepared,
                  ApprovedDate = x.Key.ApproveDateTempo.ToString(),
@@ -1297,17 +1290,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
                 x.OrderNo,
                 x.WarehouseId,
-                x.ExpirationDate,
-                x.ItemCode,
-                x.ItemDescription,
-                x.Uom,
                 x.FarmName,
                 x.FarmCode,
                 x.FarmType,
                 x.OrderDate,
                 x.PreparedDate,
                 x.IsApprove,
-                x.PlateNumber,
+                x.DeliveryStatus,
                 x.IsPrepared,
                 x.IsReject,
                 x.ApproveDateTempo,
@@ -1316,24 +1305,20 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             })
               .Where(x => x.Key.IsApprove == true)
-              .Where(x => x.Key.PlateNumber != null)
+              .Where(x => x.Key.DeliveryStatus != null)
               .Where(x => x.Key.IsReject != true)
 
              .Select(x => new MoveOrderDto
              {
                  OrderNo = x.Key.OrderNo,
                  BarcodeNo = x.Key.WarehouseId,
-                 Expiration = x.Key.ExpirationDate.ToString(),
-                 ItemCode = x.Key.ItemCode,
-                 ItemDescription = x.Key.ItemDescription,
-                 Uom = x.Key.Uom,
                  FarmName = x.Key.FarmName,
                  FarmCode = x.Key.FarmCode,
                  Category = x.Key.FarmType,
                  Quantity = x.Sum(x => x.QuantityOrdered),
                  OrderDate = x.Key.OrderDate.ToString(),
                  PreparedDate = x.Key.PreparedDate.ToString(),
-                 PlateNumber = x.Key.PlateNumber,
+                 DeliveryStatus = x.Key.DeliveryStatus,
                  IsApprove = x.Key.IsApprove != null,
                  IsPrepared = x.Key.IsPrepared,
                  ApprovedDate = x.Key.ApproveDateTempo.ToString(),
@@ -1358,13 +1343,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.OrderDate,
                 x.PreparedDate,
                 x.IsApprove,
-                x.PlateNumber,
+                x.DeliveryStatus,
                 x.IsReject,
                 x.RejectedDateTempo,
                 x.Remarks
 
             })
-              .Where(x => x.Key.PlateNumber != null)
+              .Where(x => x.Key.DeliveryStatus != null)
               .Where(x => x.Key.IsReject == true)
 
 
@@ -1377,7 +1362,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             Quantity = x.Sum(x => x.QuantityOrdered),
             OrderDate = x.Key.OrderDate.ToString(),
             PreparedDate = x.Key.PreparedDate.ToString(),
-            PlateNumber = x.Key.PlateNumber,
+            DeliveryStatus = x.Key.DeliveryStatus,
             IsReject = x.Key.IsReject != null,
             RejectedDate = x.Key.RejectedDateTempo.ToString(),
             Remarks = x.Key.Remarks
@@ -1399,13 +1384,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.OrderDate,
                 x.PreparedDate,
                 x.IsApprove,
-                x.PlateNumber,
+                x.DeliveryStatus,
                 x.IsReject,
                 x.RejectedDateTempo,
                 x.Remarks
 
             })
-              .Where(x => x.Key.PlateNumber != null)
+              .Where(x => x.Key.DeliveryStatus != null)
               .Where(x => x.Key.IsReject == true)
 
        .Select(x => new MoveOrderDto
@@ -1417,7 +1402,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
            Quantity = x.Sum(x => x.QuantityOrdered),
            OrderDate = x.Key.OrderDate.ToString(),
            PreparedDate = x.Key.PreparedDate.ToString(),
-           PlateNumber = x.Key.PlateNumber,
+           DeliveryStatus = x.Key.DeliveryStatus,
            IsReject = x.Key.IsReject != null,
            RejectedDate = x.Key.RejectedDateTempo.Value.ToString("MM/dd/yyyy"),
            Remarks = x.Key.Remarks
@@ -1444,24 +1429,80 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
         }
 
-       
-        //-----------------TRANSACT MOVE ORDER------------------------
+        public async Task<MoveOrderDto> GetAllApprovedMoveOrder(int id)
+        {
+            var orders = _context.MoveOrders.Where(x => x.OrderNoPKey == id)
+           .GroupBy(x => new
+            {
+                x.OrderNo,
+                x.WarehouseId,
+                x.ExpirationDate,
+                x.ItemCode,
+                x.ItemDescription,
+                x.Uom,
+                x.FarmName,
+                x.FarmCode,
+                x.FarmType,
+                x.OrderDate,
+                x.PreparedDate,
+                x.IsApprove,
+                x.PlateNumber,
+                x.IsPrepared,
+                x.IsReject,
+                x.ApproveDateTempo,
+                x.IsPrint,
+                x.IsTransact,
+                x.DeliveryStatus
 
+            }).Where(x => x.Key.IsApprove == true)
+            .Where(x => x.Key.DeliveryStatus != null)
+            .Where(x => x.Key.IsReject != true)
+
+
+           .Select(x => new MoveOrderDto
+           {
+               OrderNo = x.Key.OrderNo,
+               BarcodeNo = x.Key.WarehouseId,
+               Expiration = x.Key.ExpirationDate.ToString(),
+               ItemCode = x.Key.ItemCode,
+               ItemDescription = x.Key.ItemDescription,
+               Uom = x.Key.Uom,
+               FarmName = x.Key.FarmName,
+               FarmCode = x.Key.FarmCode,
+               Category = x.Key.FarmType,
+               Quantity = x.Sum(x => x.QuantityOrdered),
+               OrderDate = x.Key.OrderDate.ToString(),
+               PreparedDate = x.Key.PreparedDate.ToString(),
+               DeliveryStatus = x.Key.DeliveryStatus,
+               IsApprove = x.Key.IsApprove != null,
+               IsPrepared = x.Key.IsPrepared,
+               ApprovedDate = x.Key.ApproveDateTempo.ToString(),
+               IsPrint = x.Key.IsPrint != null,
+               IsTransact = x.Key.IsTransact != null
+
+           });
+
+            return await orders.FirstOrDefaultAsync();
+        }
+
+        //-----------------TRANSACT MOVE ORDER------------------------
         public async Task<IReadOnlyList<OrderDto>> TotalListForTransactMoveOrder()
         {
 
             var orders = _context.MoveOrders.GroupBy(x => new
             {
                 x.OrderNo,
+                x.OrderNoPKey,
                 x.FarmName,
                 x.FarmCode,
                 x.FarmType,
                 x.OrderDate,
                 x.DateNeeded,
                 x.PreparedDate,
-                x.PlateNumber,
+                x.DeliveryStatus,
                 x.IsApprove,
-                x.IsTransact
+                x.IsTransact,
+                
 
             }).Where(x => x.Key.IsApprove == true)
               .Where(x => x.Key.IsTransact != true)
@@ -1469,14 +1510,16 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
            .Select(x => new OrderDto
            {
                OrderNo = x.Key.OrderNo,
+               OrderNoPKey = x.Key.OrderNoPKey,
                Farm = x.Key.FarmName,
                FarmCode = x.Key.FarmCode,
+               FarmType = x.Key.FarmType,
                Category = x.Key.FarmType,
                TotalOrders = x.Sum(x => x.QuantityOrdered),
                OrderDate = x.Key.OrderDate.ToString("MM/dd/yyyy"),
                DateNeeded = x.Key.DateNeeded.ToString("MM/dd/yyyy"),
                PreparedDate = x.Key.PreparedDate.ToString(),
-               PlateNumber = x.Key.PlateNumber,
+               DeliveryStatus = x.Key.DeliveryStatus,
                IsApproved = x.Key.IsApprove != null
 
            });
@@ -1484,7 +1527,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await orders.ToListAsync();
 
         }
-
         public async Task<IReadOnlyList<MoveOrderDto>> ListOfMoveOrdersForTransact(int orderid)
         {
             var orders = _context.MoveOrders.Select(x => new MoveOrderDto
@@ -1515,26 +1557,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                .ToListAsync();
 
         }
-
         public async Task<bool> TransanctListOfMoveOrders(TransactMoveOrder transact)
         {
-
-            var existing = await _context.MoveOrders.Where(x => x.OrderNo == transact.OrderNo)
-                                                    .ToListAsync();
-
-
             await _context.TransactMoveOrder.AddAsync(transact);
-
-
-            foreach(var items in existing)
-            {
-                items.IsTransact = true;
-            }
-
             return true;
 
-        }
-
-       
+        }  
     }
 }

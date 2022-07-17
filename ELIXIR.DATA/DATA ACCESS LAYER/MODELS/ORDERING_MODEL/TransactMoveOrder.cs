@@ -15,21 +15,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
         public string FarmCode { get; set; }
         public string FarmName { get; set; }
 
-        public string ItemCode { get; set; }
-        public string ItemDescription { get; set; }
-        public string Uom { get; set; }
+    //    public string ItemCode { get; set; }
+    //    public string ItemDescription { get; set; }
+   //     public string Uom { get; set; }
 
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal QuantityOrdered { get; set; }
-        public string Category { get; set; }
+     //   [Column(TypeName = "decimal(18,2)")]
+  //      public decimal QuantityOrdered { get; set; }
+     //   public string Category { get; set; }
 
-        [Column(TypeName = "Date")]
-        public DateTime OrderDate { get; set; }
+   //     [Column(TypeName = "Date")]
+    //    public DateTime OrderDate { get; set; }
 
-        [Column(TypeName = "Date")]
-        public DateTime DateNeeded { get; set; }
+    //    [Column(TypeName = "Date")]
+  //      public DateTime DateNeeded { get; set; }
 
-        public int WarehouseId { get; set; }
+   //     public int WarehouseId { get; set; }
         public bool IsActive { get; set; }
         public bool? IsApprove { get; set; }
 
@@ -37,8 +37,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
         public DateTime? PreparedDate { get; set; }
 
         public int OrderNoPKey { get; set; }
-        public DateTime? ExpirationDate { get; set; }
-        public string PlateNumber { get; set; }
+     //   public DateTime? ExpirationDate { get; set; }
+
+   //     public string PlateNumber { get; set; }
 
         public DateTime? DeliveryDate { get; set; }
         public bool? IsTransact { get; set; }

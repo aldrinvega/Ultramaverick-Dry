@@ -40,6 +40,7 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         public bool IsPrint { get; set; }
         public bool IsTransact { get; set; }
 
+        public string DeliveryStatus { get; set; }
 
 
 

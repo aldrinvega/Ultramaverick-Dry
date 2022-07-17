@@ -28,6 +28,14 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
             return Ok(rawmaterial);
         }
 
+        [HttpGet]
+        [Route("MRPInventory")]
+        public async Task<IActionResult> MRPInventory()
+        {
+            var inventory = await _unitOfWork.Inventory.GetAllItemForInventory();
+
+            return Ok(inventory);
+        }
 
     }
 }

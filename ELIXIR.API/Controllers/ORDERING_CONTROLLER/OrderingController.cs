@@ -389,14 +389,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("GetAvailableStockFromWarehouse")]
         public async Task<IActionResult> GetAvailableStockFromWarehouse([FromQuery] int id, [FromQuery] string itemcode)
         {
-
             var orders = await _unitOfWork.Order.GetActualItemQuantityInWarehouse(id, itemcode);
 
             return Ok(orders);
-
-
         }
-
 
         [HttpGet]
         [Route("ListOfPreparedItemsForMoveOrder")]
@@ -663,6 +659,16 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             return Ok(moveorderResult);
         }
 
+        [HttpGet]
+        [Route("GetAllApprovedMoveOrder")]
+        public async Task<IActionResult> GetAllApprovedMoveOrder([FromQuery] int id)
+        {
+
+            var orders = await _unitOfWork.Order.GetAllApprovedMoveOrder(id);
+
+            return Ok(orders);
+
+        }
 
         //------------------TRANSACT MOVE ORDER-------------------------
 

@@ -10,10 +10,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
 {
     public class RawMaterial : BaseEntity
     {
- //       [Required(ErrorMessage = "Item Code is Required!")]
         public string ItemCode { get; set; }
-
-  //      [Required(ErrorMessage = "Item Description is Required!")]
         public string ItemDescription { get; set; }
 
         public ItemCategory ItemCategory { get; set; }

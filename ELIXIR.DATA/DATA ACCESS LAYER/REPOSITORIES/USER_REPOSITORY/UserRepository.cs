@@ -110,7 +110,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES
                              ModifiedBy = user.ModifiedBy,
                              Reason = user.Reason,
                          }).Where(x => x.Status == status)
-                        //   .OrderByDescending(x => x.DateAdded)
                            .Where(x => x.UserName.ToLower()
                            .Contains(search.Trim().ToLower()));
 
