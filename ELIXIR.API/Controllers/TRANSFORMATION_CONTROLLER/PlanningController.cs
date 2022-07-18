@@ -64,12 +64,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
                     else
                     {
-                    //    var validateBatch = await _unitOfWork.Planning.ValidateIfDecimal(planning.Batch);
-
-
-                    //    if (validateBatch == true)
-                    //        return BadRequest("Decimal values for batch is not accepted!");
-
                         var validateFormulaCode = await _unitOfWork.Planning.ValidateFormulaCode(planning);
 
                         if (validateFormulaCode == false)

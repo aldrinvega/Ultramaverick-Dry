@@ -11,10 +11,12 @@ namespace ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE
     {
 
         Task<IReadOnlyList<RawmaterialInventory>> GetAllAvailbleInRawmaterialInventory();
-
-
         Task<IReadOnlyList<MRPDto>> GetAllItemForInventory();
 
+
+
+        //MRP
+        Task<PoSummaryInventory> GetPOSummary();
 
 
     }

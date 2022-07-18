@@ -1,4 +1,5 @@
 ﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,15 +12,10 @@ namespace ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE
     {
 
         Task<bool> AddMiscellaneousReceipt(MiscellaneousReceipt receipt);
-
         Task<bool> GenerateReceiptNumber(GenerateMReceipt receipt);
-
-
         Task<bool> AddMiscellaneousIssue(MiscellaneousIssue issue);
-
-
-
         Task<bool> GenerateIssueNumber(GenerateMIssue issue);
+        Task<bool> AddWarehouseReceiveForReceipt(WarehouseReceiving warehouse);
 
 
     }

@@ -1,5 +1,6 @@
 ﻿using ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using System;
 using System.Collections.Generic;
@@ -41,6 +42,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
             return true;
         }
 
-
+        public async Task<bool> AddWarehouseReceiveForReceipt(WarehouseReceiving warehouse)
+        {
+            await _context.WarehouseReceived.AddAsync(warehouse);
+            return true;
+        }
     }
 }

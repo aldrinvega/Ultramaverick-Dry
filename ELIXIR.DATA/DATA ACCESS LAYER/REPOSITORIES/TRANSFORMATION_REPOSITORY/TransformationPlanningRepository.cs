@@ -699,12 +699,27 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
         public async Task<decimal> GetAllItemsWithStock(string itemcode)
         {
             var compute = await _context.WarehouseReceived.Where(x => x.ItemCode == itemcode)
+                                                          .Where(x => x.IsActive == true)
                                                           .SumAsync(x => x.ActualGood);
 
             var computeRequest = await _context.Transformation_Request.Where(x => x.ItemCode == itemcode)                                                     
                                                                       .Where(x => x.IsActive == true)
                                                                       .SumAsync(x => x.Quantity);
-            var final = compute - computeRequest;
+
+            var computePreparation = await _context.Transformation_Preparation.Where(x => x.ItemCode == itemcode)
+                                                                              .Where(x => x.IsActive == true)
+                                                                              .SumAsync(x => x.WeighingScale);
+
+            var computeMoveOrder = await _context.MoveOrders.Where(x => x.ItemCode == itemcode)
+                                                            .Where(x => x.IsActive == true)
+                                                            .SumAsync(x => x.QuantityOrdered);
+
+            var computeOrderReserve = await _context.Orders.Where(x => x.ItemCode == itemcode)
+                                                           .Where(x => x.IsActive == true)
+                                                           .Where(x => x.PreparedDate != null)
+                                                           .SumAsync(x => x.QuantityOrdered);
+
+            var final = compute - computeRequest - computeMoveOrder - computeOrderReserve - computePreparation;
 
             return final;
         }

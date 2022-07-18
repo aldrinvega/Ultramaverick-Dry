@@ -391,7 +391,15 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         {
             var orders = await _unitOfWork.Order.GetActualItemQuantityInWarehouse(id, itemcode);
 
-            return Ok(orders);
+            var getFirstExpiry = await _unitOfWork.Order.GetFirstExpiry(itemcode);
+            
+                var resultList = new
+                {
+                    orders,
+                    getFirstExpiry.WarehouseId
+                };
+
+            return Ok(resultList);
         }
 
         [HttpGet]

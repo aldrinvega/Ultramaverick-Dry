@@ -2,6 +2,7 @@
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
+using ELIXIR.DATA.DTOs.INVENTORY_DTOs;
 using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 using ELIXIR.DATA.DTOs.TRANSFORMATION_DTOs;
 using Microsoft.EntityFrameworkCore;
@@ -139,7 +140,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await orders.ToListAsync();
 
         }
-
         public async Task<bool> EditQuantityOrder(Ordering orders)
         {
             var existingOrder = await _context.Orders.Where(x => x.Id == orders.Id)
@@ -153,7 +153,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return true;
         }
-
         public async Task<bool> SchedulePreparedDate(Ordering orders)
         {
 
@@ -168,7 +167,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return true;
         }
-
         public async Task<IReadOnlyList<OrderDto>> GetAllListOfPreparedDate()
         {
             var orders = _context.Orders.Select(x => new OrderDto
@@ -190,7 +188,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                .ToListAsync();
 
         }
-
         public async Task<bool> ApprovePreparedDate(Ordering orders)
         {
 
@@ -211,7 +208,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
 
         }
-
         public async Task<bool> RejectPreparedDate(Ordering orders)
         {
 
@@ -233,7 +229,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return true;
         }
-
         public async Task<IReadOnlyList<OrderDto>> OrderSummary(string DateFrom, string DateTo)
         {
             var totalout = _context.Transformation_Preparation.GroupBy(x => new
@@ -354,7 +349,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
 
         }
-
         public async Task<bool> AddNewOrders(Ordering orders)
         {
 
@@ -365,7 +359,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
 
         }
-
         public async Task<bool> ValidateFarmType(Ordering orders)
         {
             var farmtype = await _context.Farms.Where(x => x.FarmName == orders.FarmName)
@@ -379,7 +372,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
             
         }
-
         public async Task<bool> ValidateFarmCode(Ordering orders)
         {
             var farmcode = await _context.Farms.Where(x => x.FarmCode == orders.FarmCode)
@@ -403,7 +395,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return true;
         }
-
         public async Task<bool> ValidateUom(Ordering orders)
         {
             var uom = await _context.UOMS.Where(x => x.UOM_Code == orders.Uom)
@@ -415,7 +406,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return true;
         }
-
         public async Task<bool> ValidateExistingOrders(Ordering orders)
         {
             var validate = await _context.Orders.Where(x => x.TransactId == orders.TransactId)
@@ -428,7 +418,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return false;
 
         }
-
         public async Task<PagedList<OrderDto>> GetAllListofOrdersPagination(UserParams userParams)
         {
      
@@ -451,7 +440,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
 
         }
-
         public async Task<bool> ValidateOrderAndDateNeeded(Ordering orders)
         {
             var dateNow = DateTime.Now;
@@ -461,7 +449,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return true;
         }
-
         public async Task<bool> CancelOrders(Ordering orders)
         {
             var existing = await _context.Orders.Where(x => x.Id == orders.Id)
@@ -480,7 +467,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
                                                
         }
-
         public async Task<IReadOnlyList<OrderDto>> GetAllListOfCancelledOrders()
         {
             var cancelled = _context.Orders.Where(x => x.CancelDate != null)
@@ -506,7 +492,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
 
         }
-
         public async Task<bool> ReturnCancellOrdersInList(Ordering orders)
         {
             var existing = await _context.Orders.Where(x => x.Id == orders.Id)
@@ -524,7 +509,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
 
         }
-
         public async Task<IReadOnlyList<OrderDto>> DetailedListOfOrders(string farm)
         {
             var orders = _context.Orders.Select(x => new OrderDto
@@ -547,7 +531,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                .ToListAsync();
 
         }
-
         public async Task<IReadOnlyList<OrderDto>> GetAllListForApprovalOfSchedule()
         {
             var orders = _context.Orders.GroupBy(x => new
@@ -578,7 +561,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return await orders.ToListAsync();
         }
-
         public async Task<IReadOnlyList<OrderDto>> GetAllOrdersForScheduleApproval(int id)
         {
             var orders = _context.Orders.OrderBy(x => x.PreparedDate)
@@ -603,7 +585,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                .Where(x => x.IsApproved == false)
                                .ToListAsync();
         }
-
         public async Task<int> CountOrderNoKey()
         {
             var count = await _context.Orders.Where(x => x.OrderNoPKey > 0)
@@ -622,7 +603,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return getCount;
 
         }
-
         public async Task<PagedList<OrderDto>> GetAllListForMoveOrderPagination(UserParams userParams)
         {
 
@@ -648,7 +628,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
 
         }
-
         public async Task<IReadOnlyList<OrderDto>> TotalListOfApprovedPreparedDate(string farm)
         {
 
@@ -695,7 +674,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             await _context.GenerateOrderNos.AddAsync(generate);
             return true;
         }
-
         public async Task<bool> PrepareItemForMoveOrder(MoveOrder orders)
         {
 
@@ -703,7 +681,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
 
         }
-
         public async Task<IReadOnlyList<OrderDto>> GetAllOutOfStockByItemCodeAndOrderDate(string itemcode, string orderdate)
         {
 
@@ -828,7 +805,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         
 
         }
-
         public async Task<IReadOnlyList<OrderDto>> ListOfOrdersForMoveOrder(int id)
         {
             var moveorders = _context.MoveOrders.Where(x => x.IsActive == true)
@@ -891,7 +867,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await orders.ToListAsync();
 
         }
-
         public async Task<OrderDto> GetMoveOrderDetailsForMoveOrder(int orderid)
         {
                 var orders = _context.Orders.Select(x => new OrderDto
@@ -917,7 +892,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                    .FirstOrDefaultAsync();
              
         }
-
         public async Task<ItemStocks> GetActualItemQuantityInWarehouse(int id, string itemcode)
         {
             var totalout = _context.Transformation_Preparation.GroupBy(x => new
@@ -1054,7 +1028,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return true;
         }
-
         public async Task<bool> ApprovalForMoveOrder(MoveOrder moveorder)
         {
             var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
@@ -1074,7 +1047,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
 
         }
-
         public async Task<bool> RejectForMoveOrder(MoveOrder moveorder)
         {
             var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
@@ -1110,7 +1082,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
 
         }
-
         public async Task<bool> ReturnMoveOrderForApproval(MoveOrder moveorder)
         {
             var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
@@ -1141,7 +1112,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
 
         }
-
         public async Task<PagedList<MoveOrderDto>> ForApprovalMoveOrderPagination(UserParams userParams)
 
         {
@@ -1177,7 +1147,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
 
         }
-
         public async Task<PagedList<MoveOrderDto>> ForApprovalMoveOrderPaginationOrig(UserParams userParams, string search)
         {
             var orders = _context.MoveOrders.GroupBy(x => new
@@ -1211,7 +1180,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
-
         public async Task<IReadOnlyList<MoveOrderDto>> ViewMoveOrderForApproval(int orderid)
         {
             var orders = _context.MoveOrders.Select(x => new MoveOrderDto
@@ -1235,7 +1203,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                .ToListAsync();
 
         }
-
         public async Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPagination(UserParams userParams)
         {
             var orders = _context.MoveOrders.GroupBy(x => new
@@ -1282,7 +1249,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
-
         public async Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPaginationOrig(UserParams userParams, string search)
         {
             var orders = _context.MoveOrders.GroupBy(x => new
@@ -1330,7 +1296,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
-
         public async Task<PagedList<MoveOrderDto>> RejectedMoveOrderPagination(UserParams userParams)
         {
             var orders = _context.MoveOrders.GroupBy(x => new
@@ -1371,7 +1336,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
-
         public async Task<PagedList<MoveOrderDto>> RejectedMoveOrderPaginationOrig(UserParams userParams, string search)
         {
             var orders = _context.MoveOrders.GroupBy(x => new
@@ -1412,7 +1376,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
-
         public async Task<bool> UpdatePrintStatus(MoveOrder moveorder)
         {
             var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
@@ -1428,7 +1391,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
 
         }
-
         public async Task<MoveOrderDto> GetAllApprovedMoveOrder(int id)
         {
             var orders = _context.MoveOrders.Where(x => x.OrderNoPKey == id)
@@ -1484,6 +1446,94 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return await orders.FirstOrDefaultAsync();
         }
+
+        public async Task<ItemStocks> GetFirstExpiry(string itemcode)
+        {
+            var getWarehouseIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
+          .GroupBy(x => new
+          {
+              x.Id,
+              x.ItemCode,
+              x.ExpirationDays
+
+          }).Select(x => new WarehouseInventory
+          {
+              WarehouseId = x.Key.Id,
+              ItemCode = x.Key.ItemCode,
+              ActualGood = x.Sum(x => x.ActualGood),
+              ExpirationDays = x.Key.ExpirationDays
+              
+          });
+
+            var getTransformationPreparation = _context.Transformation_Preparation.GroupBy(x => new
+            {
+                x.ItemCode,
+                x.WarehouseId,
+
+            }).Select(x => new ItemStocks
+            {
+                ItemCode = x.Key.ItemCode,
+                Out = x.Sum(x => x.WeighingScale),
+                WarehouseId = x.Key.WarehouseId
+            });
+
+            var getMoveorder = _context.MoveOrders.GroupBy(x => new
+            {
+                x.ItemCode,
+                x.WarehouseId,
+
+            }).Select(x => new ItemStocks
+            {
+                ItemCode = x.Key.ItemCode,
+                Remaining = x.Sum(x => x.QuantityOrdered),
+                WarehouseId = x.Key.WarehouseId
+            });
+
+            var totalRemaining = (from warehouse in getWarehouseIn
+                                  join preparation in getTransformationPreparation
+                                  on warehouse.WarehouseId equals preparation.WarehouseId
+                                  into leftJ1
+                                  from preparation in leftJ1.DefaultIfEmpty()
+
+                                  join moveorder in getMoveorder
+                                  on warehouse.WarehouseId equals moveorder.WarehouseId
+                                  into leftJ2
+                                  from moveorder in leftJ2.DefaultIfEmpty()
+
+                                  group new
+                                  {
+                                      warehouse,
+                                      preparation,
+                                      moveorder
+                                  }
+                                  
+                                  by new
+                                  {
+
+                                   warehouse.WarehouseId,
+                                   warehouse.ItemCode, 
+                                   warehouse.ExpirationDays
+
+
+                                  } into total
+
+                                  orderby total.Key.ExpirationDays ascending
+
+                                  select new ItemStocks
+                                  {
+                                      WarehouseId = total.Key.WarehouseId,
+                                      ItemCode = total.Key.ItemCode,                     
+                                      ExpirationDays = total.Key.ExpirationDays,
+                                      Remaining = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
+                                                  total.Sum(x => x.preparation.Out == null ? 0 : x.preparation.Out) -
+                                                  total.Sum(x => x.moveorder.Remaining == null ? 0 : x.moveorder.Remaining) 
+                                  });
+
+            return await totalRemaining.Where(x => x.Remaining != 0)
+                                       .Where(x => x.ItemCode == itemcode)
+                                       .FirstOrDefaultAsync();
+        }
+
 
         //-----------------TRANSACT MOVE ORDER------------------------
         public async Task<IReadOnlyList<OrderDto>> TotalListForTransactMoveOrder()
@@ -1559,9 +1609,22 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         }
         public async Task<bool> TransanctListOfMoveOrders(TransactMoveOrder transact)
         {
+
+            var existing = await _context.MoveOrders.Where(x => x.OrderNo == transact.OrderNo)
+                                                    .ToListAsync();
+
             await _context.TransactMoveOrder.AddAsync(transact);
+
+
+            foreach(var items in existing)
+            {
+                items.IsTransact = true;
+            }    
+
             return true;
 
-        }  
+        }
+
+      
     }
 }

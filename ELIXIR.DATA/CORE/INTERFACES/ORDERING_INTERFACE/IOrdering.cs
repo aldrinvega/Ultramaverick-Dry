@@ -70,6 +70,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 
         Task<MoveOrderDto> GetAllApprovedMoveOrder(int id);
 
+        Task<ItemStocks> GetFirstExpiry(string itemcode);
+
 
 
         //--------------------Transact Move Order--------------------
