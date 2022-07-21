@@ -154,6 +154,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 });
 
             var getTransformation = _context.Transformation_Preparation.Where(x => x.IsActive == true)
+                                                                       .Where(x => x.IsMixed == true)
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -187,7 +188,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                QuantityOrdered = x.Sum(x => x.QuantityOrdered)
            });
 
-            var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)                                                              
+            var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)
+                                                                          .Where(x => x.IsPrepared == true)
            .GroupBy(x => new
            {
                x.ItemCode,
@@ -204,21 +206,28 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                           into leftJ1
                           from preparation in leftJ1.DefaultIfEmpty()
 
-                          join moveorder in getMoveOrderOut
-                          on warehouse.ItemCode equals moveorder.ItemCode
-                          into leftJ3
-                          from moveorder in leftJ3.DefaultIfEmpty()
-
                           join issue in getIssueOut
                           on warehouse.ItemCode equals issue.ItemCode
                           into leftJ2
                           from issue in leftJ2.DefaultIfEmpty()
 
+                          join moveorder in getMoveOrderOut
+                          on warehouse.ItemCode equals moveorder.ItemCode
+                          into leftJ3
+                          from moveorder in leftJ3.DefaultIfEmpty()
+
+                          join receipt in getReceiptIn
+                          on warehouse.ItemCode equals receipt.ItemCode
+                          into leftJ4
+                          from receipt in leftJ4.DefaultIfEmpty()
+
+                       
                           group new
                           {
                               warehouse,
                               preparation,
                               moveorder,
+                              receipt,
                               issue
                           }
 

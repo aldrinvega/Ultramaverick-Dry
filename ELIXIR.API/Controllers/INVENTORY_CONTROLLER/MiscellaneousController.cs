@@ -42,6 +42,9 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
             {
 
                 items.ReceiptPKey = generate.Id;
+                items.PreparedDate = DateTime.Now;
+                items.IsActive = true;
+
                 await _unitOfWork.Miscellaneous.AddMiscellaneousReceipt(items);
 
                 warehouse.ItemCode = items.ItemCode;
