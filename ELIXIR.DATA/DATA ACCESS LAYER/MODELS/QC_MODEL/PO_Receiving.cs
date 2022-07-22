@@ -20,7 +20,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Actual_Delivered { get; set; }
-
+        public string ItemCode { get; set; }
         public int Batch_No { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]

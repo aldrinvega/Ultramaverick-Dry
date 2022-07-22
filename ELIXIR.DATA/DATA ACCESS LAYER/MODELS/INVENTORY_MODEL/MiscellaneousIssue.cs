@@ -13,7 +13,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL
         public string ItemCode { get; set; }
         public string ItemDescription { get; set; }
         public string Uom { get; set; }
-        public string Supplier { get; set; }
+        public string Customer { get; set; }
 
         [Column(TypeName = "Date")]
         public DateTime ExpirationDate { get; set; }
@@ -28,6 +28,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL
 
         public string Remarks { get; set; }
         public bool IsActive { get; set; }
+
 
 
 

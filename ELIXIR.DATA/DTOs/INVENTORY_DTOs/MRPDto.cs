@@ -24,6 +24,10 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs
         public decimal QCReceiving { get; set; }
         public decimal TotalPrice { get; set; }
 
+        public decimal SuggestedPo { get; set; }
+        public decimal AverageIssuance { get; set; }
+        public decimal DaysLevel { get; set; }
+
 
 
     }

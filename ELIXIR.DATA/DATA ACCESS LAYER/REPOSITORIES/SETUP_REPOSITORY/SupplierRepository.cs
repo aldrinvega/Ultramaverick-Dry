@@ -82,6 +82,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                             {
                                 Id = supplier.Id,
                                 SupplierName = supplier.SupplierName,
+                                SupplierCode = supplier.SupplierCode,
                                 SupplierAddress = supplier.SupplierAddress,
                                 DateAdded = (supplier.DateAdded).ToString("MM/dd/yyyy"),
                                 AddedBy = supplier.AddedBy,

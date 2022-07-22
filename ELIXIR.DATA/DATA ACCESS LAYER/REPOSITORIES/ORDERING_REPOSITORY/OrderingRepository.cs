@@ -1067,6 +1067,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 items.Remarks = moveorder.Remarks;
                 items.IsReject = true;
                 items.IsActive = false;
+                items.IsPrepared = false;
             }
 
             foreach (var items in existingOrders)
@@ -1098,6 +1099,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 items.Remarks = moveorder.Remarks;
                 items.IsReject = null;
                 items.IsActive = true;
+                items.IsPrepared = true;
+                items.IsApprove = null;
             }
 
             foreach (var items in existingOrders)
@@ -1125,11 +1128,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.OrderDate,
                 x.PreparedDate,
                 x.IsApprove,
-                x.DeliveryStatus
+                x.DeliveryStatus,
+                x.IsPrepared
 
             }).Where(x => x.Key.IsApprove != true)
-             .Where(x => x.Key.DeliveryStatus != null)
-
+              .Where(x => x.Key.DeliveryStatus != null)
+              .Where(x => x.Key.IsPrepared == true)
+ 
 
            .Select(x => new MoveOrderDto
            {
@@ -1159,10 +1164,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.OrderDate,
                 x.PreparedDate,
                 x.IsApprove,
-                x.DeliveryStatus
+                x.DeliveryStatus,
+                x.IsPrepared
 
             }).Where(x => x.Key.IsApprove != true)
               .Where(x => x.Key.DeliveryStatus != null)
+              .Where(x => x.Key.IsPrepared == true)
 
           .Select(x => new MoveOrderDto
           {

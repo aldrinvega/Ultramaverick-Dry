@@ -71,6 +71,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
         public async Task<IReadOnlyList<MRPDto>> GetAllItemForInventory()
         {
+            var EndDate = DateTime.Now;
+            var StartDate = EndDate.AddDays(-30);
 
             var getPoSummary = _context.POSummary.Where(x => x.IsActive == true)
               .GroupBy(x => new
@@ -80,7 +82,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
               }).Select(x => new PoSummaryInventory
               {
                   ItemCode = x.Key.ItemCode,
-                  UnitPrice = x.Sum(x => x.UnitPrice)
+                  UnitPrice = x.Sum(x => x.UnitPrice),
+                  Ordered = x.Sum(x => x.Ordered)
 
               });
 
@@ -97,6 +100,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
             });
 
             var getMoveOrderOut = _context.MoveOrders.Where(x => x.IsActive == true)
+                                                     .Where(x => x.IsPrepared == true)
                    .GroupBy(x => new
                    {
                        x.ItemCode,
@@ -108,28 +112,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
                    });
 
-            var getQCReceivingIn = (from posummary in _context.POSummary
-                                    where posummary.IsActive == true
-                                    join receive in _context.QC_Receiving on posummary.Id equals receive.PO_Summary_Id into leftJ
-                                    from receive in leftJ.DefaultIfEmpty()
+            var getQCReceivingIn = _context.QC_Receiving.Where(x => x.IsActive == true)
+                   .GroupBy(x => new
+                   {
+                       x.ItemCode,
 
-                                    group receive by new
-                                    {
-                                        posummary.Id,
-                                        posummary.ItemCode,
-                                        receive.IsActive
-                                      
-                                    } into total
+                   }).Select(x => new MoveOrderInventory
+                   {
+                       ItemCode = x.Key.ItemCode,
+                       QuantityOrdered = x.Sum(x => x.Actual_Delivered)
 
-                                    where total.Key.IsActive == true
-
-                                    select new QcReceivingInventory
-
-                                    {
-                                        Id = total.Key.Id,
-                                        ItemCode = total.Key.ItemCode,
-                                        QcReceive = total.Sum(x => x.Actual_Delivered)
-                                    });
+                   });
 
             var getReceiptIn = _context.MiscellaneousReceipts.Where(x => x.IsActive == true)
                    .GroupBy(x => new
@@ -188,8 +181,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                QuantityOrdered = x.Sum(x => x.QuantityOrdered)
            });
 
-            var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)
-                                                                          .Where(x => x.IsPrepared == true)
+            var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)                                                                       
            .GroupBy(x => new
            {
                x.ItemCode,
@@ -233,7 +225,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
                           by new
                           {
-
                               warehouse.ItemCode
 
                           } into total
@@ -280,7 +271,108 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                             total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))
                               });
 
-              var inventory = (from rawmaterial in _context.RawMaterials
+
+            var getSuggestedPo = (from posummary in getPoSummary
+                                  join receive in getQCReceivingIn
+                                  on posummary.ItemCode equals receive.ItemCode
+                                  into leftJ
+                                  from receive in leftJ.DefaultIfEmpty()
+
+                                  group new
+                                  {
+                                      posummary,
+                                      receive
+                                  }
+                                  by new
+                                  {
+                                      posummary.ItemCode
+
+                                  } into total
+
+                                  select new PoSummaryInventory
+                                  {
+                                      ItemCode = total.Key.ItemCode,
+                                      Ordered = total.Sum(x => x.posummary.Ordered == null ? 0 : x.posummary.Ordered) -
+                                              total.Sum(x => x.receive.QuantityOrdered == null ? 0 : x.receive.QuantityOrdered)
+
+                                  });
+
+            var getTransformOutPerMonth = _context.Transformation_Preparation.Where(x => x.PreparedDate >= StartDate && x.PreparedDate <= EndDate)
+                                                                             .Where(x => x.IsActive == true)
+                                                                             .Where(x => x.IsMixed == true)
+                .GroupBy(x => new
+                {
+                    x.ItemCode,
+
+                }).Select(x => new TransformationInventory
+                {
+                    ItemCode = x.Key.ItemCode,
+                    WeighingScale = x.Sum(x => x.WeighingScale)
+                });
+
+            var getMoveOrderOutPerMonth = _context.MoveOrders.Where(x => x.PreparedDate >= StartDate && x.PreparedDate <= EndDate)
+                                                                           .Where(x => x.IsActive == true)
+                                                                           .Where(x => x.IsPrepared == true)
+              .GroupBy(x => new
+              {
+                  x.ItemCode,
+
+              }).Select(x => new MoveOrderInventory
+              {
+                  ItemCode = x.Key.ItemCode,
+                  QuantityOrdered = x.Sum(x => x.QuantityOrdered)
+              });
+
+            var getAverageIssuance = (from warehouse in getWarehouseStock
+                                      join transformation in getTransformOutPerMonth
+                                      on warehouse.ItemCode equals transformation.ItemCode
+                                      into leftJ1
+                                      from transformation in leftJ1.DefaultIfEmpty()
+
+                                      join ordering in getMoveOrderOutPerMonth
+                                      on warehouse.ItemCode equals ordering.ItemCode
+                                      into leftJ2
+                                      from ordering in leftJ2.DefaultIfEmpty()
+
+                                      group new
+                                      {
+                                          warehouse,
+                                          transformation,
+                                          ordering
+                                      }
+
+                                      by new
+                                      {
+
+                                          warehouse.ItemCode
+
+                                      } into total
+
+                                      select new WarehouseInventory
+                                      {
+
+                                          ItemCode = total.Key.ItemCode,
+                                          ActualGood = (total.Sum(x => x.transformation.WeighingScale == null ? 0 : x.transformation.WeighingScale) + 
+                                                       total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))/30
+                                      });
+
+            //var getLastUsed = (from transform in _context.Transformation_Preparation
+            //                   select new
+            //                   {
+            //                       Itemcode = transform.ItemCode,
+            //                       PreparedDate = (DateTime?)transform.PreparedDate
+            //                   })
+            //                   .Union
+            //                        (from moveorder in _context.MoveOrders
+            //                         select new
+            //                         {
+            //                             ItemCode = moveorder.ItemCode,
+            //                             PreparedDate = (DateTime?)moveorder.PreparedDate
+            //                         });
+                    
+            //var x = getLastUsed;
+     
+            var inventory = (from rawmaterial in _context.RawMaterials
                              join posummary in getPoSummary
                              on rawmaterial.ItemCode equals posummary.ItemCode
                              into leftJ1
@@ -321,7 +413,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                              into leftJ8
                              from Reserve in leftJ8.DefaultIfEmpty()
 
-                               group new { 
+                             join suggestedpo in getSuggestedPo
+                             on rawmaterial.ItemCode equals suggestedpo.ItemCode
+                             into leftJ9
+                             from suggestedpo in leftJ9.DefaultIfEmpty()
+
+                             join averageissuance in getAverageIssuance
+                             on rawmaterial.ItemCode equals averageissuance.ItemCode
+                             into leftJ10
+                             from averageissuance in leftJ10.DefaultIfEmpty()
+
+                             group new { 
 
                                          posummary, 
                                          warehouse,
@@ -330,37 +432,51 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                          receiptin,
                                          issueout,
                                          SOH,
-                                         Reserve
-                                       }
+                                         Reserve,
+                                         suggestedpo,
+                                         averageissuance
+                             }
                              by new
                              {
                                  rawmaterial.ItemCode,
                                  rawmaterial.ItemDescription,
                                  rawmaterial.UOM.UOM_Code,
                                  rawmaterial.ItemCategory.ItemCategoryName,
-                                 rawmaterial.BufferLevel
-                    
+                                 rawmaterial.BufferLevel,
+                                 Price = posummary.UnitPrice != null ? posummary.UnitPrice : 0,
+                                 SuggestedPo = suggestedpo.Ordered != null ? suggestedpo.Ordered : 0,
+                                 WarehouseActualGood = warehouse.ActualGood != null ? warehouse.ActualGood : 0,
+                                 ReceiptIn = receiptin.Quantity != null ? receiptin.Quantity : 0,
+                                 MoveOrderOut = moveorders.QuantityOrdered != null ? moveorders.QuantityOrdered : 0,
+                                 QcReceiving = qcreceive.QuantityOrdered != null ? qcreceive.QuantityOrdered : 0,
+                                 IssueOut = issueout.Quantity != null ? issueout.Quantity : 0,
+                                 TotalPrice = posummary.UnitPrice != null ? posummary.UnitPrice : 0,
+                                 SOH = SOH.SOH != null ? SOH.SOH : 0,
+                                 Reserve = Reserve.Reserve != null ? Reserve.Reserve : 0,
+                                 AverageIssuance = averageissuance.ActualGood != null ? averageissuance.ActualGood : 0
+
                              } into total
 
                              select new MRPDto
-                             {
+                             {                          
                                  ItemCode = total.Key.ItemCode,
                                  ItemDescription = total.Key.ItemDescription,
                                  Uom = total.Key.UOM_Code,
                                  ItemCategory = total.Key.ItemCategoryName,
                                  BufferLevel = total.Key.BufferLevel,
-                                 Price = total.Sum(x => x.posummary.UnitPrice == null ? 0 : x.posummary.UnitPrice),
-                                 ReceiveIn = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) +
-                                             total.Sum(x => x.receiptin.Quantity == null ? 0 : x.receiptin.Quantity),
-                                 MoveOrderOut = total.Sum(x => x.moveorders.QuantityOrdered == null ? 0 : x.moveorders.QuantityOrdered),
-                                 QCReceiving = total.Sum(x => x.qcreceive.QcReceive == null ? 0 : x.qcreceive.QcReceive),
-                                 ReceiptIn = total.Sum(x => x.receiptin.Quantity == null ? 0 : x.receiptin.Quantity),
-                                 IssueOut = total.Sum(x => x.issueout.Quantity == null ? 0 : x.issueout.Quantity),
-                                 TotalPrice = total.Average(x => x.posummary.UnitPrice == null ? 0 : x.posummary.UnitPrice),
-                                 SOH = total.Sum(x => x.SOH.SOH == null ? 0 : x.SOH.SOH) -                               
-                                       total.Sum(x => x.issueout.Quantity == null ? 0 : x.issueout.Quantity),
-                                 Reserve = total.Sum(x => x.Reserve.Reserve == null ? 0 : x.Reserve.Reserve) -
-                                           total.Sum(x => x.issueout.Quantity == null ? 0 : x.issueout.Quantity)
+                                 Price = total.Key.Price,
+                                 ReceiveIn = total.Key.WarehouseActualGood + total.Key.ReceiptIn,
+                                 MoveOrderOut = total.Key.MoveOrderOut,
+                                 QCReceiving = total.Key.QcReceiving,
+                                 ReceiptIn = total.Key.ReceiptIn,
+                                 IssueOut = total.Key.IssueOut,
+                                 TotalPrice = total.Key.TotalPrice,
+                                 SOH = total.Key.SOH - total.Key.IssueOut,
+                                 Reserve = total.Key.Reserve - total.Key.IssueOut,
+                                 SuggestedPo = total.Key.SuggestedPo,
+                                 AverageIssuance = total.Key.AverageIssuance,
+                                 DaysLevel = (total.Key.Reserve / (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1))
+
                              });
 
 

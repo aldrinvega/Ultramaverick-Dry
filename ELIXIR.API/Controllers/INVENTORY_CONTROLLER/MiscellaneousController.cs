@@ -47,6 +47,8 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 
                 await _unitOfWork.Miscellaneous.AddMiscellaneousReceipt(items);
 
+                warehouse.Id = 0;
+
                 warehouse.ItemCode = items.ItemCode;
                 warehouse.ItemDescription = items.ItemDescription;
                 warehouse.Uom = items.Uom;
@@ -60,11 +62,14 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
                 warehouse.TransactionType = "MiscelleneousReceipt";
                 warehouse.ReceivedBy = items.PreparedBy;
                 warehouse.MiscellaneousReceiptId = items.ReceiptPKey;
+                warehouse.ManufacturingDate = DateTime.Now;
 
                 await _unitOfWork.Miscellaneous.AddWarehouseReceiveForReceipt(warehouse);
+
+                await _unitOfWork.CompleteAsync();
             }
 
-            await _unitOfWork.CompleteAsync();
+        
 
             return Ok("Successfully add new miscellaneous receipt!");
 
@@ -83,6 +88,9 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
             foreach (MiscellaneousIssue items in issue)
             {
                 items.IssuePKey = generate.Id;
+
+                items.IsActive = true;
+
                 await _unitOfWork.Miscellaneous.AddMiscellaneousIssue(items);
             }
 
