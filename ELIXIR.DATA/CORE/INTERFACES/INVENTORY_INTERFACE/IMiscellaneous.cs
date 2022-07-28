@@ -22,10 +22,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE
         Task<bool> ActivateMiscellaenousReceipt(MiscellaneousReceipt receipt);
         Task<bool> InActivateMiscellaenousReceipt(MiscellaneousReceipt receipt);
         Task<IReadOnlyList<WarehouseReceived>> GetWarehouseDetailsByMReceipt(int id);
-
-        Task<bool> GenerateReceiptNumber(GenerateMReceipt receipt);
         Task<bool> AddMiscellaneousIssue(MiscellaneousIssue issue);
-        Task<bool> GenerateIssueNumber(GenerateMIssue issue);
         Task<bool> AddWarehouseReceiveForReceipt(WarehouseReceiving warehouse);
 
         Task<IReadOnlyList<MIssueDto>> GetAvailableStocksForIssue();

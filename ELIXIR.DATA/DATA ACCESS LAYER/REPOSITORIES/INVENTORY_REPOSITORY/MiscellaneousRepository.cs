@@ -37,13 +37,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
             return true;
         }
 
-        public async Task<bool> GenerateReceiptNumber(GenerateMReceipt receipt)
-        {
-            await _context.GenerateReceiptNos.AddAsync(receipt);
-            return true;
-        }
-
-
         public async Task<bool> AddWarehouseReceiveForReceipt(WarehouseReceiving warehouse)
         {
             await _context.WarehouseReceived.AddAsync(warehouse);
@@ -266,12 +259,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
         public async Task<bool> AddMiscellaneousIssue(MiscellaneousIssue issue)
         {
             await _context.MiscellaneousIssues.AddAsync(issue);
-            return true;
-        }
-
-        public async Task<bool> GenerateIssueNumber(GenerateMIssue issue)
-        {
-            await _context.GenerateIssueNos.AddAsync(issue);
             return true;
         }
 

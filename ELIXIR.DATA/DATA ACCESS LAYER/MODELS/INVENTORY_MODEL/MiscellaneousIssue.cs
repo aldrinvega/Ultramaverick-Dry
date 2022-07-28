@@ -19,7 +19,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL
         public DateTime PreparedDate { get; set; }
         public string PreparedBy { get; set; }
 
-        public int WarehouseId { get; set; }
         public string Remarks { get; set; }
         public bool IsActive { get; set; }
 
