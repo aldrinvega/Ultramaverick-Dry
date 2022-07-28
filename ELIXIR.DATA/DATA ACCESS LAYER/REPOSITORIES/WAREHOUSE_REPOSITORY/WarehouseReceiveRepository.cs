@@ -199,6 +199,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
 
                                    } into total
 
+                                   where total.Key.ConfirmRejectbyWarehouse == false
+
                                    select new RejectWarehouseReceivingDto
                                    {
                                        Id = total.Key.Id,
@@ -538,7 +540,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                    QuantityOrderded = posummary.Ordered
                                });
 
-
             var warehousereject =  (from warehouse in _context.WarehouseReceived
                                    join rejectwarehouse in _context.Warehouse_Reject
                                    on warehouse.Id equals rejectwarehouse.WarehouseReceivingId into leftJ
@@ -569,7 +570,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
 
                                    } into total
 
-                                   select new RejectWarehouseReceivingDto
+                                    select new RejectWarehouseReceivingDto
                                    {
                                        Id = total.Key.Id,
                                        PO_Number = total.Key.PO_Number,

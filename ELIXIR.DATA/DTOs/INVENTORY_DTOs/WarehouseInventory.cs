@@ -12,6 +12,8 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs
         public string ItemCode { get; set; }
         public decimal ActualGood { get; set; }
 
+        public string ExpirationDate { get; set; }
         public int ExpirationDays { get; set; }
+
     }
 }

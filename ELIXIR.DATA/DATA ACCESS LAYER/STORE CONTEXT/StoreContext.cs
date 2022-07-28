@@ -48,6 +48,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public virtual DbSet<MiscellaneousReceipt> MiscellaneousReceipts { get; set; }
         public virtual DbSet<GenerateMReceipt> GenerateReceiptNos { get; set; }
         public virtual DbSet<MiscellaneousIssue> MiscellaneousIssues { get; set; }
+        public virtual DbSet<MiscellaneousIssueDetails> MiscellaneousIssueDetails { get; set; }
         public virtual DbSet<GenerateMIssue> GenerateIssueNos { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

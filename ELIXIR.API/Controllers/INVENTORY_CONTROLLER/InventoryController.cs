@@ -37,5 +37,7 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
             return Ok(inventory);
         }
 
+
+
     }
 }

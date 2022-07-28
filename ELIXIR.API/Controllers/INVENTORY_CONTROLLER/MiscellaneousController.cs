@@ -1,6 +1,9 @@
 ﻿using ELIXIR.DATA.CORE.ICONFIGURATION;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
+using ELIXIR.DATA.DTOs.MISCELLANEOUS_DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -23,80 +26,257 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
             _unitOfWork = unitofwork;
         }
 
+
+        //--------------------------MISCELLANEOUS RECEIPT---------------------------------//
+
+
         [HttpPost]
         [Route("AddNewMiscellaneousReceipt")]
-        public async Task<IActionResult> AddNewMiscellaneousReceipt([FromBody] MiscellaneousReceipt[] receipt)
+        public async Task<IActionResult> AddNewMiscellaneousReceipt([FromBody] MiscellaneousReceipt receipt)
+        {
+
+            receipt.IsActive = true;
+            receipt.PreparedDate = DateTime.Now;
+
+            await _unitOfWork.Miscellaneous.AddMiscellaneousReceipt(receipt);
+            await _unitOfWork.CompleteAsync();
+
+            return Ok(receipt);
+        }
+
+
+        [HttpPost]
+        [Route("AddNewMiscellaneousReceiptInWarehouse")]
+        public async Task<IActionResult> AddNewMiscellaneousReceiptInWarehouse([FromBody] WarehouseReceiving[] receive)
         {
             DateTime dateNow = DateTime.Now;
 
-
-            var generate = new GenerateMReceipt();
-            var warehouse = new WarehouseReceiving();
-
-            generate.IsActive = true;
-
-            await _unitOfWork.Miscellaneous.GenerateReceiptNumber(generate);
-            await _unitOfWork.CompleteAsync();
-
-            foreach (MiscellaneousReceipt items in receipt)
+            foreach (WarehouseReceiving items in receive)
             {
 
-                items.ReceiptPKey = generate.Id;
-                items.PreparedDate = DateTime.Now;
                 items.IsActive = true;
-
-                await _unitOfWork.Miscellaneous.AddMiscellaneousReceipt(items);
-
-                warehouse.Id = 0;
-
-                warehouse.ItemCode = items.ItemCode;
-                warehouse.ItemDescription = items.ItemDescription;
-                warehouse.Uom = items.Uom;
-                warehouse.Supplier = items.Supplier;
-                warehouse.Expiration = items.ExpirationDate;
-                warehouse.ExpirationDays = items.ExpirationDate.Subtract(dateNow).Days;
-                warehouse.ActualGood = items.Quantity;
-                warehouse.ReceivingDate = DateTime.Now;
-                warehouse.IsActive = true;
-                warehouse.IsWarehouseReceive = true;
-                warehouse.TransactionType = "MiscelleneousReceipt";
-                warehouse.ReceivedBy = items.PreparedBy;
-                warehouse.MiscellaneousReceiptId = items.ReceiptPKey;
-                warehouse.ManufacturingDate = DateTime.Now;
-
-                await _unitOfWork.Miscellaneous.AddWarehouseReceiveForReceipt(warehouse);
-
+                items.ExpirationDays = items.Expiration.Subtract(dateNow).Days;
+                items.ReceivingDate = DateTime.Now;
+                items.IsWarehouseReceive = true;
+                items.TransactionType = "MiscelleneousReceipt";
+                items.ManufacturingDate = DateTime.Now;
+                await _unitOfWork.Miscellaneous.AddMiscellaneousReceiptInWarehouse(items);
                 await _unitOfWork.CompleteAsync();
             }
 
-        
+            return Ok("Successfully add new miscellaneous receipt in warehouse!");
+        }
 
-            return Ok("Successfully add new miscellaneous receipt!");
+        [HttpPut]
+        [Route("InActiveReceipt")]
+        public async Task<IActionResult> InActiveReceipt([FromBody] MiscellaneousReceipt receipt)
+        {
+    
+            await _unitOfWork.Miscellaneous.InActivateMiscellaenousReceipt(receipt);
+            await _unitOfWork.CompleteAsync();
+
+            return new JsonResult("Successfully inactive receipt!");
+        }
+
+        [HttpPut]
+        [Route("ActivateReceipt")]
+        public async Task<IActionResult> ActivateReceipt([FromBody] MiscellaneousReceipt receipt)
+        {
+
+            await _unitOfWork.Miscellaneous.ActivateMiscellaenousReceipt(receipt);
+            await _unitOfWork.CompleteAsync();
+
+            return new JsonResult("Successfully active receipt!");
+        }
+
+        [HttpGet]
+        [Route("GetAllMiscellaneousReceiptPagination")]
+        public async Task<ActionResult<IEnumerable<MReceiptDto>>> GetAllMiscellaneousReceiptPagination([FromQuery] UserParams userParams, [FromQuery] bool status)
+        {
+            var receipt = await _unitOfWork.Miscellaneous.GetAllMReceiptWithPagination(userParams, status);
+
+            Response.AddPaginationHeader(receipt.CurrentPage, receipt.PageSize, receipt.TotalCount, receipt.TotalPages, receipt.HasNextPage, receipt.HasPreviousPage);
+
+            var receiptResult = new
+            {
+                receipt,
+                receipt.CurrentPage,
+                receipt.PageSize,
+                receipt.TotalCount,
+                receipt.TotalPages,
+                receipt.HasNextPage,
+                receipt.HasPreviousPage
+            };
+
+            return Ok(receiptResult);
+        }
+
+        [HttpGet]
+        [Route("GetAllMiscellaneousReceiptPaginationOrig")]
+        public async Task<ActionResult<IEnumerable<MReceiptDto>>> GetAllMiscellaneousReceiptPaginationOrig([FromQuery] UserParams userParams, [FromQuery] string search, [FromQuery] bool status)
+        {
+
+            if (search == null)
+
+                return await GetAllMiscellaneousReceiptPagination(userParams, status);
+
+            var receipt = await _unitOfWork.Miscellaneous.GetAllMReceiptWithPaginationOrig(userParams, search, status);
+
+            Response.AddPaginationHeader(receipt.CurrentPage, receipt.PageSize, receipt.TotalCount, receipt.TotalPages, receipt.HasNextPage, receipt.HasPreviousPage);
+
+            var receiptResult = new
+            {
+                receipt,
+                receipt.CurrentPage,
+                receipt.PageSize,
+                receipt.TotalCount,
+                receipt.TotalPages,
+                receipt.HasNextPage,
+                receipt.HasPreviousPage
+            };
+
+            return Ok(receiptResult);
+        }
+
+        [HttpGet]
+        [Route("GetAllDetailsFromWarehouseByMReceipt")]
+        public async Task<IActionResult> GetAllListofOrders([FromQuery] int id)
+        {
+
+            var receipt = await _unitOfWork.Miscellaneous.GetWarehouseDetailsByMReceipt(id);
+
+            return Ok(receipt);
 
         }
 
+
+
+        //--------------------------MISCELLANEOUS ISSUE---------------------------------//
+
+
         [HttpPost]
         [Route("AddNewMiscellaneousIssue")]
-        public async Task<IActionResult> AddNewMiscellaneousIssue([FromBody] MiscellaneousIssue[] issue)
+        public async Task<IActionResult> AddNewMiscellaneousIssue([FromBody] MiscellaneousIssue issue)
         {
 
-            var generate = new GenerateMIssue();
+            issue.IsActive = true;
+            issue.PreparedDate = DateTime.Now;
 
-            await _unitOfWork.Miscellaneous.GenerateIssueNumber(generate);
+            await _unitOfWork.Miscellaneous.AddMiscellaneousIssue(issue);
             await _unitOfWork.CompleteAsync();
 
-            foreach (MiscellaneousIssue items in issue)
+            return Ok(issue);
+        }
+
+        [HttpPost]
+        [Route("AddNewMiscellaneousIssueDetails")]
+        public async Task<IActionResult> AddNewMiscellaneousIssueDetails([FromBody] MiscellaneousIssueDetails[] issue)
+        {
+      
+            foreach (MiscellaneousIssueDetails items in issue)
             {
-                items.IssuePKey = generate.Id;
 
                 items.IsActive = true;
 
-                await _unitOfWork.Miscellaneous.AddMiscellaneousIssue(items);
+                await _unitOfWork.Miscellaneous.AddMiscellaneousIssueDetails(items);
+                await _unitOfWork.CompleteAsync();
             }
 
+            return Ok("Successfully add new miscellaneous issue!");
+        }
+
+
+        [HttpGet]
+        [Route("GetAllAvailableStocksForMIsssue")]
+        public async Task<IActionResult> GetAllAvailableStocksForMIsssue()
+        {
+
+            var receipt = await _unitOfWork.Miscellaneous.GetAvailableStocksForIssue();
+
+            return Ok(receipt);
+
+        }
+
+        [HttpGet]
+        [Route("GetAllMiscellaneousIssuePagination")]
+        public async Task<ActionResult<IEnumerable<MReceiptDto>>> GetAllMiscellaneousIssuePagination([FromQuery] UserParams userParams, [FromQuery] bool status)
+        {
+            var issue = await _unitOfWork.Miscellaneous.GetAllMIssueWithPagination(userParams, status);
+
+            Response.AddPaginationHeader(issue.CurrentPage, issue.PageSize, issue.TotalCount, issue.TotalPages, issue.HasNextPage, issue.HasPreviousPage);
+
+            var issueResult = new
+            {
+                issue,
+                issue.CurrentPage,
+                issue.PageSize,
+                issue.TotalCount,
+                issue.TotalPages,
+                issue.HasNextPage,
+                issue.HasPreviousPage
+            };
+
+            return Ok(issueResult);
+        }
+
+        [HttpGet]
+        [Route("GetAllMiscellaneousIssuePaginationOrig")]
+        public async Task<ActionResult<IEnumerable<MReceiptDto>>> GetAllMiscellaneousIssuePaginationOrig([FromQuery] UserParams userParams, [FromQuery] string search, [FromQuery] bool status)
+        {
+
+            if (search == null)
+
+                return await GetAllMiscellaneousIssuePagination(userParams, status);
+
+            var issue = await _unitOfWork.Miscellaneous.GetAllMIssueWithPaginationOrig(userParams, search, status);
+
+            Response.AddPaginationHeader(issue.CurrentPage, issue.PageSize, issue.TotalCount, issue.TotalPages, issue.HasNextPage, issue.HasPreviousPage);
+
+            var issueResult = new
+            {
+                issue,
+                issue.CurrentPage,
+                issue.PageSize,
+                issue.TotalCount,
+                issue.TotalPages,
+                issue.HasNextPage,
+                issue.HasPreviousPage
+            };
+
+            return Ok(issueResult);
+        }
+
+        [HttpPut]
+        [Route("InActiveIssue")]
+        public async Task<IActionResult> InActiveIssue([FromBody] MiscellaneousIssue issue)
+        {
+
+            await _unitOfWork.Miscellaneous.InActivateMiscellaenousIssue(issue);
             await _unitOfWork.CompleteAsync();
 
-            return Ok("Successfully add new miscellaneous issue!");
+            return new JsonResult("Successfully inactive issue!");
+        }
+
+        [HttpPut]
+        [Route("ActivateIssue")]
+        public async Task<IActionResult> ActivateIssue([FromBody] MiscellaneousIssue issue)
+        {
+
+            await _unitOfWork.Miscellaneous.ActivateMiscellaenousIssue(issue);
+            await _unitOfWork.CompleteAsync();
+
+            return new JsonResult("Successfully active issue!");
+        }
+
+
+        [HttpGet]
+        [Route("GetAllDetailsInMiscellaneousIssue")]
+        public async Task<IActionResult> GetAllDetailsInMiscellaneousIssue([FromQuery] int id)
+        {
+
+            var receipt = await _unitOfWork.Miscellaneous.GetAllDetailsInMiscellaneousIssue(id);
+
+            return Ok(receipt);
 
         }
 

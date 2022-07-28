@@ -1,5 +1,8 @@
-﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL;
+﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
+using ELIXIR.DATA.DTOs.MISCELLANEOUS_DTOs;
+using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +15,29 @@ namespace ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE
     {
 
         Task<bool> AddMiscellaneousReceipt(MiscellaneousReceipt receipt);
+        Task<bool> AddMiscellaneousReceiptInWarehouse(WarehouseReceiving receive);
+        Task<IReadOnlyList<MReceiptDto>> GetAllMiscellanousReceipt(bool status);
+        Task<PagedList<MReceiptDto>> GetAllMReceiptWithPagination(UserParams userParams, bool status);
+        Task<PagedList<MReceiptDto>> GetAllMReceiptWithPaginationOrig(UserParams userParams, string search, bool status);
+        Task<bool> ActivateMiscellaenousReceipt(MiscellaneousReceipt receipt);
+        Task<bool> InActivateMiscellaenousReceipt(MiscellaneousReceipt receipt);
+        Task<IReadOnlyList<WarehouseReceived>> GetWarehouseDetailsByMReceipt(int id);
+
         Task<bool> GenerateReceiptNumber(GenerateMReceipt receipt);
         Task<bool> AddMiscellaneousIssue(MiscellaneousIssue issue);
         Task<bool> GenerateIssueNumber(GenerateMIssue issue);
         Task<bool> AddWarehouseReceiveForReceipt(WarehouseReceiving warehouse);
 
+        Task<IReadOnlyList<MIssueDto>> GetAvailableStocksForIssue();
+        Task<bool> AddMiscellaneousIssueDetails(MiscellaneousIssueDetails details);
+
+        Task<PagedList<MIssueDto>> GetAllMIssueWithPagination(UserParams userParams, bool status);
+        Task<PagedList<MIssueDto>> GetAllMIssueWithPaginationOrig(UserParams userParams, string search, bool status);
+
+        Task<bool> ActivateMiscellaenousIssue(MiscellaneousIssue issue);
+        Task<bool> InActivateMiscellaenousIssue(MiscellaneousIssue issue);
+
+        Task<IReadOnlyList<MIssueDto>> GetAllDetailsInMiscellaneousIssue(int id);
 
     }
 }

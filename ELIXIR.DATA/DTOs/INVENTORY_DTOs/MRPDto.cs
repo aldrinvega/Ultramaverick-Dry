@@ -28,6 +28,9 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs
         public decimal AverageIssuance { get; set; }
         public decimal DaysLevel { get; set; }
 
+        public string LastUsed { get; set; }
+
+
 
 
     }

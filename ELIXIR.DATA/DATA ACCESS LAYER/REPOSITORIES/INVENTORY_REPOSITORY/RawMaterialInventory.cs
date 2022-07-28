@@ -60,7 +60,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                }).Select(x => new PoSummaryInventory
                {
                    ItemCode = x.Key.ItemCode,
-                   UnitPrice = x.Sum(x => x.UnitPrice)
+                   UnitPrice = x.Sum(x => x.UnitPrice),
+                   TotalPrice = x.Average(x => x.UnitPrice)
 
                });
 
@@ -83,7 +84,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
               {
                   ItemCode = x.Key.ItemCode,
                   UnitPrice = x.Sum(x => x.UnitPrice),
-                  Ordered = x.Sum(x => x.Ordered)
+                  Ordered = x.Sum(x => x.Ordered),
+                  TotalPrice = x.Average(x => x.UnitPrice)
 
               });
 
@@ -124,27 +126,27 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
                    });
 
-            var getReceiptIn = _context.MiscellaneousReceipts.Where(x => x.IsActive == true)
-                   .GroupBy(x => new
-                   {
-                       x.ItemCode,
+            //var getReceiptIn = _context.MiscellaneousReceipts.Where(x => x.IsActive == true)
+            //       .GroupBy(x => new
+            //       {
+            //           x.ItemCode,
 
-                   }).Select(x => new ReceiptInventory
-                   {
-                       ItemCode = x.Key.ItemCode,
-                       Quantity = x.Sum(x => x.Quantity)
-                   });
+            //       }).Select(x => new ReceiptInventory
+            //       {
+            //           ItemCode = x.Key.ItemCode,
+            //           Quantity = x.Sum(x => x.Quantity)
+            //       });
 
-            var getIssueOut = _context.MiscellaneousIssues.Where(x => x.IsActive == true)
-                .GroupBy(x => new
-                {
-                    x.ItemCode,
+            //var getIssueOut = _context.MiscellaneousIssues.Where(x => x.IsActive == true)
+            //    .GroupBy(x => new
+            //    {
+            //        x.ItemCode,
 
-                }).Select(x => new IssueInventory
-                {
-                    ItemCode = x.Key.ItemCode,
-                    Quantity = x.Sum(x => x.Quantity)
-                });
+            //    }).Select(x => new IssueInventory
+            //    {
+            //        ItemCode = x.Key.ItemCode,
+            //        Quantity = x.Sum(x => x.Quantity)
+            //    });
 
             var getTransformation = _context.Transformation_Preparation.Where(x => x.IsActive == true)
                                                                        .Where(x => x.IsMixed == true)
@@ -181,7 +183,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                QuantityOrdered = x.Sum(x => x.QuantityOrdered)
            });
 
-            var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)                                                                       
+            var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)
            .GroupBy(x => new
            {
                x.ItemCode,
@@ -198,29 +200,29 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                           into leftJ1
                           from preparation in leftJ1.DefaultIfEmpty()
 
-                          join issue in getIssueOut
-                          on warehouse.ItemCode equals issue.ItemCode
-                          into leftJ2
-                          from issue in leftJ2.DefaultIfEmpty()
+                          //join issue in getIssueOut
+                          //on warehouse.ItemCode equals issue.ItemCode
+                          //into leftJ2
+                          //from issue in leftJ2.DefaultIfEmpty()
 
                           join moveorder in getMoveOrderOut
                           on warehouse.ItemCode equals moveorder.ItemCode
                           into leftJ3
                           from moveorder in leftJ3.DefaultIfEmpty()
 
-                          join receipt in getReceiptIn
-                          on warehouse.ItemCode equals receipt.ItemCode
-                          into leftJ4
-                          from receipt in leftJ4.DefaultIfEmpty()
+                          //join receipt in getReceiptIn
+                          //on warehouse.ItemCode equals receipt.ItemCode
+                          //into leftJ4
+                          //from receipt in leftJ4.DefaultIfEmpty()
 
-                       
+
                           group new
                           {
                               warehouse,
                               preparation,
                               moveorder,
-                              receipt,
-                              issue
+                      //        receipt,
+                         //     issue
                           }
 
                           by new
@@ -232,10 +234,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                           select new SOHInventory
                           {
                               ItemCode = total.Key.ItemCode,
-                              SOH = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) - 
+                              SOH = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
                                     total.Sum(x => x.preparation.WeighingScale == null ? 0 : x.preparation.WeighingScale) -
-                                    total.Sum(x => x.moveorder.QuantityOrdered == null ? 0 : x.moveorder.QuantityOrdered) -
-                                    total.Sum(x => x.issue.Quantity == null ? 0 : x.issue.Quantity)
+                                    total.Sum(x => x.moveorder.QuantityOrdered == null ? 0 : x.moveorder.QuantityOrdered)
+                              //     -total.Sum(x => x.issue.Quantity == null ? 0 : x.issue.Quantity)
                           });
 
 
@@ -265,7 +267,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                               select new ReserveInventory
                               {
 
-                                  ItemCode = total.Key.ItemCode, 
+                                  ItemCode = total.Key.ItemCode,
                                   Reserve = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
                                            (total.Sum(x => x.request.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
                                             total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))
@@ -352,26 +354,37 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                       {
 
                                           ItemCode = total.Key.ItemCode,
-                                          ActualGood = (total.Sum(x => x.transformation.WeighingScale == null ? 0 : x.transformation.WeighingScale) + 
-                                                       total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))/30
+                                          ActualGood = (total.Sum(x => x.transformation.WeighingScale == null ? 0 : x.transformation.WeighingScale) +
+                                                       total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered)) / 30
                                       });
 
-            //var getLastUsed = (from transform in _context.Transformation_Preparation
-            //                   select new
-            //                   {
-            //                       Itemcode = transform.ItemCode,
-            //                       PreparedDate = (DateTime?)transform.PreparedDate
-            //                   })
-            //                   .Union
-            //                        (from moveorder in _context.MoveOrders
-            //                         select new
-            //                         {
-            //                             ItemCode = moveorder.ItemCode,
-            //                             PreparedDate = (DateTime?)moveorder.PreparedDate
-            //                         });
-                    
-            //var x = getLastUsed;
-     
+            var getLastUsed = (from transform in _context.Transformation_Preparation
+                               where transform.IsActive == true && transform.IsMixed == true
+                               select new
+                               {
+                                   ItemCode = transform.ItemCode,
+                                   PreparedDate = (DateTime?)transform.PreparedDate
+                               }).Distinct()
+                               .Union
+                                (from moveorder in _context.MoveOrders
+                                 where moveorder.IsActive == true && moveorder.IsPrepared == true
+                                 select new
+                                 {
+                                     ItemCode = moveorder.ItemCode,
+                                     PreparedDate = moveorder.PreparedDate
+
+                                 });
+                                //.OrderByDescending(x => x.PreparedDate);
+              
+
+            //var x = getLastUsed.ToLookup(x => new
+            //{ 
+            //    x.PreparedDate,
+            //    x.ItemCode
+            //}).Distinct();
+
+            var xx = getLastUsed;
+
             var inventory = (from rawmaterial in _context.RawMaterials
                              join posummary in getPoSummary
                              on rawmaterial.ItemCode equals posummary.ItemCode
@@ -393,15 +406,15 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                              into leftJ4
                              from qcreceive in leftJ4.DefaultIfEmpty()
 
-                             join receiptin in getReceiptIn
-                             on rawmaterial.ItemCode equals receiptin.ItemCode
-                             into leftJ5
-                             from receiptin in leftJ5.DefaultIfEmpty()
+                             //join receiptin in getReceiptIn
+                             //on rawmaterial.ItemCode equals receiptin.ItemCode
+                             //into leftJ5
+                             //from receiptin in leftJ5.DefaultIfEmpty()
 
-                             join issueout in getIssueOut
-                             on rawmaterial.ItemCode equals issueout.ItemCode
-                             into leftJ6
-                             from issueout in leftJ6.DefaultIfEmpty()
+                             //join issueout in getIssueOut
+                             //on rawmaterial.ItemCode equals issueout.ItemCode
+                             //into leftJ6
+                             //from issueout in leftJ6.DefaultIfEmpty()
 
                              join SOH in getSOH
                              on rawmaterial.ItemCode equals SOH.ItemCode
@@ -423,37 +436,44 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                              into leftJ10
                              from averageissuance in leftJ10.DefaultIfEmpty()
 
+                        //     join lastUsed in x
+                             //on rawmaterial.ItemCode equals lastUsed.ItemCode
+                             //into leftJ11
+                             //from lastUsed in leftJ11.DefaultIfEmpty()
+
                              group new { 
 
                                          posummary, 
                                          warehouse,
                                          moveorders,
                                          qcreceive,
-                                         receiptin,
-                                         issueout,
+                                   //      receiptin,
+                                         //issueout,
                                          SOH,
                                          Reserve,
                                          suggestedpo,
-                                         averageissuance
+                                         averageissuance,
+                                      //   lastUsed
                              }
                              by new
                              {
                                  rawmaterial.ItemCode,
                                  rawmaterial.ItemDescription,
-                                 rawmaterial.UOM.UOM_Code,
+                                 rawmaterial.UOM.UOM_Code, 
                                  rawmaterial.ItemCategory.ItemCategoryName,
                                  rawmaterial.BufferLevel,
-                                 Price = posummary.UnitPrice != null ? posummary.UnitPrice : 0,
+                                 UnitPrice = posummary.UnitPrice != null ? posummary.UnitPrice : 0,
                                  SuggestedPo = suggestedpo.Ordered != null ? suggestedpo.Ordered : 0,
                                  WarehouseActualGood = warehouse.ActualGood != null ? warehouse.ActualGood : 0,
-                                 ReceiptIn = receiptin.Quantity != null ? receiptin.Quantity : 0,
+                            //     ReceiptIn = receiptin.Quantity != null ? receiptin.Quantity : 0,
                                  MoveOrderOut = moveorders.QuantityOrdered != null ? moveorders.QuantityOrdered : 0,
                                  QcReceiving = qcreceive.QuantityOrdered != null ? qcreceive.QuantityOrdered : 0,
-                                 IssueOut = issueout.Quantity != null ? issueout.Quantity : 0,
-                                 TotalPrice = posummary.UnitPrice != null ? posummary.UnitPrice : 0,
+                           //      IssueOut = issueout.Quantity != null ? issueout.Quantity : 0,
+                                 TotalPrice = posummary.TotalPrice != null ? posummary.TotalPrice : 0,
                                  SOH = SOH.SOH != null ? SOH.SOH : 0,
                                  Reserve = Reserve.Reserve != null ? Reserve.Reserve : 0,
-                                 AverageIssuance = averageissuance.ActualGood != null ? averageissuance.ActualGood : 0
+                                 AverageIssuance = averageissuance.ActualGood != null ? averageissuance.ActualGood : 0,
+                               //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
 
                              } into total
 
@@ -464,21 +484,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  Uom = total.Key.UOM_Code,
                                  ItemCategory = total.Key.ItemCategoryName,
                                  BufferLevel = total.Key.BufferLevel,
-                                 Price = total.Key.Price,
-                                 ReceiveIn = total.Key.WarehouseActualGood + total.Key.ReceiptIn,
+                                 Price = total.Key.UnitPrice,
+                          //       ReceiveIn = total.Key.WarehouseActualGood + total.Key.ReceiptIn,
                                  MoveOrderOut = total.Key.MoveOrderOut,
                                  QCReceiving = total.Key.QcReceiving,
-                                 ReceiptIn = total.Key.ReceiptIn,
-                                 IssueOut = total.Key.IssueOut,
-                                 TotalPrice = total.Key.TotalPrice,
-                                 SOH = total.Key.SOH - total.Key.IssueOut,
-                                 Reserve = total.Key.Reserve - total.Key.IssueOut,
+                         //       ReceiptIn = total.Key.ReceiptIn,
+                             //    IssueOut = total.Key.IssueOut,
+                                 TotalPrice = Math.Round(Convert.ToDecimal(total.Key.TotalPrice),2),
+                             //    SOH = total.Key.SOH - total.Key.IssueOut,
+                           //      Reserve = total.Key.Reserve - total.Key.IssueOut,
                                  SuggestedPo = total.Key.SuggestedPo,
-                                 AverageIssuance = total.Key.AverageIssuance,
-                                 DaysLevel = (total.Key.Reserve / (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1))
+                                 AverageIssuance = Math.Round(Convert.ToDecimal(total.Key.AverageIssuance), 2),
+                                 DaysLevel = Math.Round(Convert.ToDecimal(total.Key.Reserve / (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)),2),
+                            //     LastUsed = total.Key.LastUsed.ToString()
 
                              });
-
 
             return await inventory.ToListAsync();
 

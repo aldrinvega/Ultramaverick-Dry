@@ -14,7 +14,7 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs
         public string Uom { get; set; }
         public string ItemCategory { get; set; }
         public decimal BufferLevel { get; set; }
-        public decimal Price { get; set; }
+        public decimal TotalPrice { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal Ordered { get; set; }
 

@@ -393,6 +393,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             receiving.QC_ReceiveDate = itemQc.QC_ReceiveDate;
             receiving.Id = 0;
 
+            itemWarehouse.ConfirmRejectbyWarehouse = false;
+
                await AddNewReceivingInformation(receiving);
 
             return true;

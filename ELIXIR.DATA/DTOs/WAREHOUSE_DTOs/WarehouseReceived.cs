@@ -17,6 +17,7 @@ namespace ELIXIR.DATA.DTOs.WAREHOUSE_DTOs
         public string ManufacturingDate { get; set; }
         public string ReceivedDate { get; set; }
         public decimal TotalStock { get; set; }
+        public decimal Quantity { get; set; }
         public bool IsActive { get; set; }
 
 
