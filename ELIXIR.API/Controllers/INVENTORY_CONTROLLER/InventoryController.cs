@@ -1,4 +1,7 @@
 ﻿using ELIXIR.DATA.CORE.ICONFIGURATION;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
+using ELIXIR.DATA.DTOs.INVENTORY_DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -38,6 +41,54 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
         }
 
 
+        [HttpGet]
+        [Route("GetAllItemForInventoryPagination")]
+        public async Task<ActionResult<IEnumerable<MRPDto>>> GetAllItemForInventoryPagination([FromQuery] UserParams userParams)
+        {
+            var inventory = await _unitOfWork.Inventory.GetAllItemForInventoryPagination(userParams);
+
+            Response.AddPaginationHeader(inventory.CurrentPage, inventory.PageSize, inventory.TotalCount, inventory.TotalPages, inventory.HasNextPage, inventory.HasPreviousPage);
+
+            var inventoryResult = new
+            {
+                inventory,
+                inventory.CurrentPage,
+                inventory.PageSize,
+                inventory.TotalCount,
+                inventory.TotalPages,
+                inventory.HasNextPage,
+                inventory.HasPreviousPage
+            };
+
+            return Ok(inventoryResult);
+        }
+
+        [HttpGet]
+        [Route("GetAllItemForInventoryPaginationOrig")]
+        public async Task<ActionResult<IEnumerable<MRPDto>>> GetAllMiscellaneousIssuePaginationOrig([FromQuery] UserParams userParams, [FromQuery] string search)
+        {
+
+            if (search == null)
+
+                return await GetAllItemForInventoryPagination(userParams);
+
+            var inventory = await _unitOfWork.Inventory.GetAllItemForInventoryPaginationOrig(userParams, search);
+
+            Response.AddPaginationHeader(inventory.CurrentPage, inventory.PageSize, inventory.TotalCount, inventory.TotalPages, inventory.HasNextPage, inventory.HasPreviousPage);
+
+            var inventoryResult = new
+            {
+                inventory,
+                inventory.CurrentPage,
+                inventory.PageSize,
+                inventory.TotalCount,
+                inventory.TotalPages,
+                inventory.HasNextPage,
+                inventory.HasPreviousPage
+            };
+
+            return Ok(inventoryResult);
+        }
 
     }
 }

@@ -162,97 +162,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                      
         }
 
-        public async Task<IReadOnlyList<MIssueDto>> GetAvailableStocksForIssue()
-        {
-
-            var getWarehouseStocks = _context.WarehouseReceived.Where(x => x.IsActive == true)
-         .GroupBy(x => new
-         {
-             x.Id,
-             x.ItemCode,
-             x.ActualGood,
-             x.Expiration
-
-         }).Select(x => new WarehouseInventory
-         {
-             WarehouseId = x.Key.Id,
-             ItemCode = x.Key.ItemCode,
-             ActualGood = x.Key.ActualGood,
-             ExpirationDate = x.Key.Expiration.ToString()
-
-         });
-
-            var x = getWarehouseStocks;
-
-            var transformOut = _context.Transformation_Preparation.Where(x => x.IsActive == true)
-                                                                  .Where(x => x.IsMixed == true)
-                        .GroupBy(x => new
-                        {
-                            x.WarehouseId,
-                            x.ItemCode
-                        })
-                        .Select(x => new TransformationInventory
-                        {
-                            WarehouseId = x.Key.WarehouseId,
-                            ItemCode = x.Key.ItemCode,
-                            WeighingScale = x.Sum(x => x.WeighingScale)
-                        });
-            var moveorderOut = _context.MoveOrders.Where(x => x.IsActive == true)
-                                                  .Where(x => x.IsPrepared == true)
-                        .GroupBy(x => new
-                        {
-                            x.WarehouseId,
-                            x.ItemCode
-                        })
-                        .Select(x => new MoveOrderInventory
-                        {
-                            WarehouseId = x.Key.WarehouseId,
-                            ItemCode = x.Key.ItemCode,
-                            QuantityOrdered = x.Sum(x => x.QuantityOrdered)
-                        });
-
-            var getAvailable = (from warehouse in getWarehouseStocks
-                                join transform in transformOut
-                                on warehouse.WarehouseId equals transform.WarehouseId
-                                into leftJ1
-                                from transform in leftJ1.DefaultIfEmpty()
-
-                                join moveorder in moveorderOut
-                                on warehouse.WarehouseId equals moveorder.WarehouseId
-                                into leftJ2
-                                from moveorder in leftJ2.DefaultIfEmpty()
-
-                                group new
-                                {
-                                    warehouse,
-                                    transform,
-                                    moveorder
-                                }
-
-                                by new
-                                {
-                                    warehouse.WarehouseId,
-                                    warehouse.ItemCode,
-                                    warehouse.ExpirationDate,
-                                    WarehouseActualGood = warehouse.ActualGood != null ? warehouse.ActualGood : 0,
-                                    TransformOut = transform.WeighingScale != null ? transform.WeighingScale : 0,
-                                    MoveOrderOut = moveorder.QuantityOrdered != null ? moveorder.QuantityOrdered : 0
-                                   
-                                } into total
-
-                                select new MIssueDto
-                                {
-                                    WarehouseId = total.Key.WarehouseId,
-                                    ItemCode = total.Key.ItemCode,
-                                    RemainingStocks = total.Key.WarehouseActualGood - total.Key.TransformOut - total.Key.MoveOrderOut,
-                                    ExpirationDate = total.Key.ExpirationDate
-                                    
-                                }).Where(x => x.RemainingStocks != 0);
-
-
-            return await getAvailable.ToListAsync();
-
-        }
+        
 
         //-----------------------MISCELLANEOUS ISSUE-----------------------------//
 
@@ -363,5 +273,99 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
             return await warehouse.ToListAsync();
         }
+
+
+        public async Task<IReadOnlyList<MIssueDto>> GetAvailableStocksForIssue(string itemcode)
+        {
+
+            var getWarehouseStocks = _context.WarehouseReceived.Where(x => x.IsActive == true)
+         .GroupBy(x => new
+         {
+             x.Id,
+             x.ItemCode,
+             x.ActualGood,
+             x.Expiration
+
+         }).Select(x => new WarehouseInventory
+         {
+             WarehouseId = x.Key.Id,
+             ItemCode = x.Key.ItemCode,
+             ActualGood = x.Key.ActualGood,
+             ExpirationDate = x.Key.Expiration.ToString()
+
+         });
+
+            var transformOut = _context.Transformation_Preparation.Where(x => x.IsActive == true)
+                                                                  .Where(x => x.IsMixed == true)
+                        .GroupBy(x => new
+                        {
+                            x.WarehouseId,
+                            x.ItemCode
+                        })
+                        .Select(x => new TransformationInventory
+                        {
+                            WarehouseId = x.Key.WarehouseId,
+                            ItemCode = x.Key.ItemCode,
+                            WeighingScale = x.Sum(x => x.WeighingScale)
+                        });
+            var moveorderOut = _context.MoveOrders.Where(x => x.IsActive == true)
+                                                  .Where(x => x.IsPrepared == true)
+                        .GroupBy(x => new
+                        {
+                            x.WarehouseId,
+                            x.ItemCode
+                        })
+                        .Select(x => new MoveOrderInventory
+                        {
+                            WarehouseId = x.Key.WarehouseId,
+                            ItemCode = x.Key.ItemCode,
+                            QuantityOrdered = x.Sum(x => x.QuantityOrdered)
+                        });
+
+            var getAvailable = (from warehouse in getWarehouseStocks
+                                join transform in transformOut
+                                on warehouse.WarehouseId equals transform.WarehouseId
+                                into leftJ1
+                                from transform in leftJ1.DefaultIfEmpty()
+
+                                join moveorder in moveorderOut
+                                on warehouse.WarehouseId equals moveorder.WarehouseId
+                                into leftJ2
+                                from moveorder in leftJ2.DefaultIfEmpty()
+
+                                group new
+                                {
+                                    warehouse,
+                                    transform,
+                                    moveorder
+                                }
+
+                                by new
+                                {
+                                    warehouse.WarehouseId,
+                                    warehouse.ItemCode,
+                                    warehouse.ExpirationDate,
+                                    WarehouseActualGood = warehouse.ActualGood != null ? warehouse.ActualGood : 0,
+                                    TransformOut = transform.WeighingScale != null ? transform.WeighingScale : 0,
+                                    MoveOrderOut = moveorder.QuantityOrdered != null ? moveorder.QuantityOrdered : 0
+
+                                } into total
+
+                                select new MIssueDto
+                                {
+                                    WarehouseId = total.Key.WarehouseId,
+                                    ItemCode = total.Key.ItemCode,
+                                    RemainingStocks = total.Key.WarehouseActualGood - total.Key.TransformOut - total.Key.MoveOrderOut,
+                                    ExpirationDate = total.Key.ExpirationDate
+
+                                }).Where(x => x.RemainingStocks != 0)
+                                  .Where(x => x.ItemCode == itemcode);
+
+
+            return await getAvailable.ToListAsync();
+
+        }
+
+     
     }
 }

@@ -188,10 +188,10 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 
         [HttpGet]
         [Route("GetAllAvailableStocksForMIsssue")]
-        public async Task<IActionResult> GetAllAvailableStocksForMIsssue()
+        public async Task<IActionResult> GetAllAvailableStocksForMIsssue([FromQuery] string itemcode)
         {
 
-            var receipt = await _unitOfWork.Miscellaneous.GetAvailableStocksForIssue();
+            var receipt = await _unitOfWork.Miscellaneous.GetAvailableStocksForIssue(itemcode);
 
             return Ok(receipt);
 

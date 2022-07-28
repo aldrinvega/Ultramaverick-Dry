@@ -25,7 +25,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE
         Task<bool> AddMiscellaneousIssue(MiscellaneousIssue issue);
         Task<bool> AddWarehouseReceiveForReceipt(WarehouseReceiving warehouse);
 
-        Task<IReadOnlyList<MIssueDto>> GetAvailableStocksForIssue();
+        Task<IReadOnlyList<MIssueDto>> GetAvailableStocksForIssue(string itemcode);
         Task<bool> AddMiscellaneousIssueDetails(MiscellaneousIssueDetails details);
 
         Task<PagedList<MIssueDto>> GetAllMIssueWithPagination(UserParams userParams, bool status);
@@ -35,6 +35,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE
         Task<bool> InActivateMiscellaenousIssue(MiscellaneousIssue issue);
 
         Task<IReadOnlyList<MIssueDto>> GetAllDetailsInMiscellaneousIssue(int id);
+
 
     }
 }

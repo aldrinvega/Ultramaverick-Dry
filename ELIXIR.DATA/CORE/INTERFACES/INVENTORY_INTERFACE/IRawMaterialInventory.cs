@@ -1,4 +1,5 @@
-﻿using ELIXIR.DATA.DTOs.INVENTORY_DTOs;
+﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
+using ELIXIR.DATA.DTOs.INVENTORY_DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +15,14 @@ namespace ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE
         Task<IReadOnlyList<MRPDto>> GetAllItemForInventory();
 
 
+        Task<PagedList<MRPDto>> GetAllItemForInventoryPagination(UserParams userParams);
+        Task<PagedList<MRPDto>> GetAllItemForInventoryPaginationOrig(UserParams userParams, string search);
+
 
         //MRP
         Task<PoSummaryInventory> GetPOSummary();
+
+
 
 
     }
