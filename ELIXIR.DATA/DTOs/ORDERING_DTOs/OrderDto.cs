@@ -37,6 +37,8 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         public int OrderNoPKey { get; set; }
         public string DeliveryStatus { get; set; }
 
+        public int Days { get; set; }
+
 
     }
 }

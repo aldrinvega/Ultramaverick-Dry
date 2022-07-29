@@ -63,7 +63,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.TRANSFORMATION_INTERFACE
 
         Task<bool> CompareBatchCount(int id);
 
-        Task<int> CountBatch(int id);
+        Task<MixingValue> CountBatch(int id);
 
 
 

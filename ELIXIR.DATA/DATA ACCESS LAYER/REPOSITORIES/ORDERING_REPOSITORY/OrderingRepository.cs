@@ -24,6 +24,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         }
         public async Task<IReadOnlyList<OrderDto>> GetAllListofOrders(string farms)
         {
+            var datenow = DateTime.Now;
 
             var totalout = _context.Transformation_Preparation.GroupBy(x => new
             {
@@ -134,8 +135,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                               IsActive = total.Key.IsActive,
                               IsPrepared = total.Key.IsPrepared,
                               StockOnHand = total.Sum(x => x.Remaining) - total.Sum(x => x.TotalMoveOrder),
-
-                          });
+                              Days = total.Key.DateNeeded.Subtract(datenow).Days                         
+        });
 
             return await orders.ToListAsync();
 
@@ -438,6 +439,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                           });
             
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
+
 
         }
         public async Task<bool> ValidateOrderAndDateNeeded(Ordering orders)

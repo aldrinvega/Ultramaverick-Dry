@@ -735,7 +735,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
 
         }
 
-        public async Task<int> CountBatch(int id)
+        public async Task<MixingValue> CountBatch(int id)
         {
 
             var batch = await _context.WarehouseReceived.Where(x => x.TransformId == id)
@@ -743,9 +743,20 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
 
             var planning = await _context.Transformation_Planning.Where(x => x.Id == id)
                                                                  .FirstOrDefaultAsync();
-            var temp = planning.Batch - batch.Count;
 
-                return temp;
+            var mixing = await _context.WarehouseReceived.Where(x => x.TransformId == id)
+                                                         .Where(x => x.IsActive == true)
+                                                         .SumAsync(x => x.ActualGood);                                                          
+            var temp = planning.Batch - batch.Count;  
+
+            var remainingResult = new MixingValue
+            {
+                 RemainingBatch = temp,
+                 TotalWeighingScale = mixing
+            };
+
+            return remainingResult; 
+
         }
 
     }

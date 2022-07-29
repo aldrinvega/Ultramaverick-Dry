@@ -89,7 +89,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                     Reason = rawmaterial.Reason
                                 });
 
-            return await rawmaterials
+            return await rawmaterials.OrderBy(x => x.ItemCode)
                                      .Where(x => x.IsActive == true)
                                      .ToListAsync();
         }
