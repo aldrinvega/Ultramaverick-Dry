@@ -140,6 +140,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                    });
 
             var getIssueOut = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
+                                                                .Where(x => x.IsTransact == true)
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -1008,6 +1009,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                    });
 
             var getIssueOut = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
+                                                                .Where(x => x.IsTransact == true)
                 .GroupBy(x => new
                 {
                     x.ItemCode,

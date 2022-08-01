@@ -147,18 +147,30 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
             return await PagedList<MReceiptDto>.CreateAsync(receipt, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<IReadOnlyList<WarehouseReceived>> GetWarehouseDetailsByMReceipt(int id)
+        public async Task<IReadOnlyList<MReceiptDto>> GetWarehouseDetailsByMReceipt(int id)
         {
-            var warehouse = _context.WarehouseReceived.Where(x => x.MiscellaneousReceiptId == id)
-                                                      .Select(x => new WarehouseReceived
-                                                      {
-                                                          Id = (int)x.MiscellaneousReceiptId,
-                                                          ItemCode = x.ItemCode,
-                                                          ItemDescription = x.ItemDescription,
-                                                          Quantity = x.ActualGood
-                                                      });
 
-            return await warehouse.ToListAsync();
+            var receipt = (from warehouse in _context.WarehouseReceived
+                           where warehouse.MiscellaneousReceiptId == id && warehouse.IsActive == true
+                           join receiptParent in _context.MiscellaneousReceipts
+                           on warehouse.MiscellaneousReceiptId equals receiptParent.Id into leftJ
+                           from receiptParent in leftJ.DefaultIfEmpty()
+
+                           select new MReceiptDto
+                           {
+
+                               Id = receiptParent.Id,
+                               ItemCode = warehouse.ItemCode,
+                               ItemDescription = warehouse.ItemDescription,
+                               TotalQuantity = warehouse.ActualGood,
+                               SupplierCode = receiptParent.SupplierCode,
+                               SupplierName = receiptParent.Supplier,
+                               PreparedDate = receiptParent.PreparedDate.ToString(),
+                               PreparedBy = receiptParent.PreparedBy,
+                               Remarks = receiptParent.Remarks
+                           });
+
+            return await receipt.ToListAsync();
                                                      
         }
 
@@ -266,9 +278,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                     .Select(x => new MIssueDto
                                                     {
                                                         IssuePKey = x.IssuePKey,
+                                                        Customer = x.Customer,
+                                                        CustomerCode = x.CustomerCode,
+                                                        PreparedDate = x.PreparedDate.ToString(),
+                                                        PreparedBy = x.PreparedBy,
                                                         ItemCode = x.ItemCode,
                                                         ItemDescription = x.ItemDescription,
-                                                        TotalQuantity = x.Quantity
+                                                        TotalQuantity = x.Quantity,
+                                                        Remarks = x.Remarks
                                                     });
 
             return await warehouse.ToListAsync();
@@ -366,6 +383,70 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
         }
 
-     
+        public async Task<bool> UpdateIssuePKey(MiscellaneousIssueDetails details)
+        {
+            var existing = await _context.MiscellaneousIssueDetails.Where(x => x.Id == details.Id)
+                                                                   .FirstOrDefaultAsync();
+
+            if (existing == null)
+                return false;
+
+            existing.IssuePKey = details.IssuePKey;
+            existing.IsTransact = true;
+
+            return true;
+
+        }
+
+        public async Task<IReadOnlyList<MIssueDto>> GetAllAvailableIssue(int empid)
+        {
+            var employee = await _context.Users.Where(x => x.Id == empid)
+                                         .FirstOrDefaultAsync();
+
+            var items = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
+                                                          .Where(x => x.IsTransact != true)
+                                                          .Where(x => x.PreparedBy == employee.UserName)
+                .Select(x => new MIssueDto
+                {
+                    Id = x.Id,
+                    ItemCode = x.ItemCode,
+                    ItemDescription = x.ItemDescription,
+                    Uom = x.Uom,
+                    TotalQuantity = x.Quantity,
+                    ExpirationDate = x.ExpirationDate.ToString()
+
+                });
+
+            return await items.ToListAsync();           
+        }
+
+        public async Task<bool> CancelIssuePerItemCode(MiscellaneousIssueDetails issue)
+        {
+            var items = await _context.MiscellaneousIssueDetails.Where(x => x.Id == issue.Id)
+                                                                .FirstOrDefaultAsync();
+            if (items == null)
+                return false;
+
+            items.IsActive = false;
+
+            return true;
+        }
+
+        public async Task<bool> ValidateMiscellaneousReceiptInIssue(MiscellaneousReceipt receipt)
+        {
+            var validate = await _context.WarehouseReceived.Where(x => x.MiscellaneousReceiptId == receipt.Id)
+                                                           .FirstOrDefaultAsync();
+
+
+            var issue = await _context.MiscellaneousIssueDetails.Where(x => x.WarehouseId == validate.Id)
+                                                                .ToListAsync();
+
+            if (issue != null)
+                return false;
+
+
+            return true;
+
+        }
     }
 }

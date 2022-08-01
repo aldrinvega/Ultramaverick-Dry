@@ -71,7 +71,13 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
         [Route("InActiveReceipt")]
         public async Task<IActionResult> InActiveReceipt([FromBody] MiscellaneousReceipt receipt)
         {
-    
+
+            var validate = await _unitOfWork.Miscellaneous.ValidateMiscellaneousReceiptInIssue(receipt);
+
+            if (validate == false)
+                return BadRequest("Inactive failed, you already use thr receiving id");
+
+
             await _unitOfWork.Miscellaneous.InActivateMiscellaenousReceipt(receipt);
             await _unitOfWork.CompleteAsync();
 
@@ -153,6 +159,19 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 
         //--------------------------MISCELLANEOUS ISSUE---------------------------------//
 
+        [HttpPost]
+        [Route("AddNewMiscellaneousIssueDetails")]
+        public async Task<IActionResult> AddNewMiscellaneousIssueDetails([FromBody] MiscellaneousIssueDetails issue)
+        {
+            issue.IsActive = true;
+
+            issue.PreparedDate = DateTime.Now;
+            await _unitOfWork.Miscellaneous.AddMiscellaneousIssueDetails(issue);
+            await _unitOfWork.CompleteAsync();
+
+
+            return Ok("Successfully add new miscellaneous issue!");
+        }
 
         [HttpPost]
         [Route("AddNewMiscellaneousIssue")]
@@ -161,6 +180,7 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 
             issue.IsActive = true;
             issue.PreparedDate = DateTime.Now;
+            issue.IsTransact = true;
 
             await _unitOfWork.Miscellaneous.AddMiscellaneousIssue(issue);
             await _unitOfWork.CompleteAsync();
@@ -168,23 +188,24 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
             return Ok(issue);
         }
 
-        [HttpPost]
-        [Route("AddNewMiscellaneousIssueDetails")]
-        public async Task<IActionResult> AddNewMiscellaneousIssueDetails([FromBody] MiscellaneousIssueDetails[] issue)
+        [HttpPut]
+        [Route("UpdateMiscellaneousIssuePKey")]
+        public async Task<IActionResult> UpdateMiscellaneousIssuePKey([FromBody] MiscellaneousIssueDetails [] details)
         {
-      
-            foreach (MiscellaneousIssueDetails items in issue)
+
+
+            foreach(MiscellaneousIssueDetails items in details)
             {
-
                 items.IsActive = true;
+                items.PreparedDate = DateTime.Now;
 
-                await _unitOfWork.Miscellaneous.AddMiscellaneousIssueDetails(items);
-                await _unitOfWork.CompleteAsync();
+                await _unitOfWork.Miscellaneous.UpdateIssuePKey(items);         
             }
 
-            return Ok("Successfully add new miscellaneous issue!");
-        }
+            await _unitOfWork.CompleteAsync();
 
+            return Ok(details);
+        }
 
         [HttpGet]
         [Route("GetAllAvailableStocksForMIsssue")]
@@ -251,6 +272,8 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
         public async Task<IActionResult> InActiveIssue([FromBody] MiscellaneousIssue issue)
         {
 
+
+
             await _unitOfWork.Miscellaneous.InActivateMiscellaenousIssue(issue);
             await _unitOfWork.CompleteAsync();
 
@@ -279,6 +302,33 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
             return Ok(receipt);
 
         }
+
+        [HttpGet]
+        [Route("GetAllActiveMiscellaneousIssueTransaction")]
+        public async Task<IActionResult> GetAllActiveMiscellaneousIssueTransaction([FromQuery]int empid)
+        {
+
+            var issue = await _unitOfWork.Miscellaneous.GetAllAvailableIssue(empid);
+
+            return Ok(issue);
+
+        }
+
+        [HttpPut]
+        [Route("CancelItemCodeInMiscellaneousIssue")]
+        public async Task<IActionResult> CancelItemCodeInMiscellaneousIssue([FromBody] MiscellaneousIssueDetails [] issue)
+        {
+
+            foreach(MiscellaneousIssueDetails items in issue)
+            {
+                await _unitOfWork.Miscellaneous.CancelIssuePerItemCode(items);
+                await _unitOfWork.CompleteAsync();
+            }
+
+            return new JsonResult("Successfully cancelled transaction!");
+        }
+
+
 
     }
 }

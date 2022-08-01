@@ -31,6 +31,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL
         public int IssuePKey { get; set; }
         public string Remarks { get; set; }
         public bool IsActive { get; set; }
+        public bool? IsTransact { get; set; }
 
     }
 }

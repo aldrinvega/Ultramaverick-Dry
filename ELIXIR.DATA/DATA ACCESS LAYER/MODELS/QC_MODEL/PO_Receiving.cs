@@ -75,6 +75,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
         public bool? IsWareHouseReceive { get; set; }
 
         public string CancelRemarks { get; set; }
+        public string QcBy { get; set; }
+
 
     }
 }

@@ -21,7 +21,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE
         Task<PagedList<MReceiptDto>> GetAllMReceiptWithPaginationOrig(UserParams userParams, string search, bool status);
         Task<bool> ActivateMiscellaenousReceipt(MiscellaneousReceipt receipt);
         Task<bool> InActivateMiscellaenousReceipt(MiscellaneousReceipt receipt);
-        Task<IReadOnlyList<WarehouseReceived>> GetWarehouseDetailsByMReceipt(int id);
+        Task<IReadOnlyList<MReceiptDto>> GetWarehouseDetailsByMReceipt(int id);
         Task<bool> AddMiscellaneousIssue(MiscellaneousIssue issue);
         Task<bool> AddWarehouseReceiveForReceipt(WarehouseReceiving warehouse);
 
@@ -35,6 +35,14 @@ namespace ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE
         Task<bool> InActivateMiscellaenousIssue(MiscellaneousIssue issue);
 
         Task<IReadOnlyList<MIssueDto>> GetAllDetailsInMiscellaneousIssue(int id);
+
+        Task<bool> UpdateIssuePKey(MiscellaneousIssueDetails details);
+
+        Task<IReadOnlyList<MIssueDto>> GetAllAvailableIssue(int empid);
+
+        Task<bool> CancelIssuePerItemCode(MiscellaneousIssueDetails issue);
+
+        Task<bool> ValidateMiscellaneousReceiptInIssue(MiscellaneousReceipt receipt);
 
 
     }

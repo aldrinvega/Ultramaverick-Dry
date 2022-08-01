@@ -10,6 +10,8 @@ namespace ELIXIR.DATA.DTOs.MISCELLANEOUS_DTOs
     {
 
         public int Id { get; set; }
+        public string ItemCode { get; set; }
+        public string ItemDescription { get; set; }
         public string SupplierCode { get; set; }
         public string SupplierName { get; set; }
         public decimal TotalQuantity { get; set; }

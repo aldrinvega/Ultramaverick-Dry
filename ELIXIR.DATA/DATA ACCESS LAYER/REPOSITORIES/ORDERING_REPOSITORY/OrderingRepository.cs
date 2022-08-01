@@ -1191,7 +1191,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         }
         public async Task<IReadOnlyList<MoveOrderDto>> ViewMoveOrderForApproval(int orderid)
         {
-            var orders = _context.MoveOrders.Select(x => new MoveOrderDto
+            var orders = _context.MoveOrders.Where(x => x.IsActive == true)
+                .Select(x => new MoveOrderDto
             {
 
                 Id = x.Id,

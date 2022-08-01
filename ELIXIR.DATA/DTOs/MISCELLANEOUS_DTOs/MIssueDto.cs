@@ -8,10 +8,11 @@ namespace ELIXIR.DATA.DTOs.MISCELLANEOUS_DTOs
 {
     public class MIssueDto
     {
-
+        public int Id { get; set; }
         public int WarehouseId { get; set; }
         public string ItemCode { get; set; }
         public string ItemDescription { get; set; }
+        public string Uom { get; set; }
         public string CustomerCode { get; set; }
         public string Customer { get; set; }
         public string PreparedDate { get; set; }
