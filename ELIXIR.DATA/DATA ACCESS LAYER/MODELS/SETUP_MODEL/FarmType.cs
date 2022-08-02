@@ -9,12 +9,30 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
 {
     public class FarmType : BaseEntity
     {
-        public string FarmName { get; set; }
-        public string FarmCode { get; set; }
-        public DateTime DateAdded { get; set; }
-        public string AddedBy { get; set; }
-        public bool IsActive { get; set; }
-        public string Reason { get; set; }
+        public string FarmName {
+            get;
+            set; 
+        }
+        public string FarmCode {
+            get; 
+            set;
+        }
+        public DateTime DateAdded { 
+            get;
+            set;
+        }
+        public string AddedBy {
+            get; 
+            set;
+        }
+        public bool IsActive { 
+            get;
+            set; 
+        }
+        public string Reason {
+            get; 
+            set;
+        }
 
     }
 }

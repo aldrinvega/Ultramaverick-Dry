@@ -9,22 +9,50 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL
 {
     public class TransformationRequest : BaseEntity
     {
-        public int TransformId { get; set; }
-        public string ItemCode { get; set; }
-        public string ItemDescription { get; set; }
+        public int TransformId { 
+            get; 
+            set; 
+        }
+        public string ItemCode {
+            get;
+            set; 
+        }
+        public string ItemDescription { 
+            get; 
+            set; 
+        }
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal Quantity { get; set; }
+        public decimal Quantity {
+            get; 
+            set; 
+        }
 
-        public string Uom { get; set; }
-        public int Batch { get; set; }
-        public int Version { get; set; }
-        public DateTime ProdPlan { get; set; }
+        public string Uom {
+            get; 
+            set;
+        }
+        public int Batch { 
+            get; 
+            set; 
+        }
+        public int Version { 
+            get; 
+            set;
+        }
+        public DateTime ProdPlan {
+            get; 
+            set; 
+        }
 
-        public bool IsActive { get; set; }
-        public bool IsPrepared { get; set; }
-
-
+        public bool IsActive {
+            get; 
+            set;
+        }
+        public bool IsPrepared { 
+            get; 
+            set;
+        }
 
     }
 }

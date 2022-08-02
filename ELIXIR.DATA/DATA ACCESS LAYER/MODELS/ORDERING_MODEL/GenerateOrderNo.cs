@@ -8,7 +8,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
 {
     public class GenerateOrderNo : BaseEntity
     {
-        public bool IsActive { get; set; }
+        public bool IsActive {
+            get; 
+            set;
+        }
 
     }
 }

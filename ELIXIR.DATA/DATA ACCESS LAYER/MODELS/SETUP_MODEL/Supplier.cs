@@ -9,13 +9,34 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
 {
     public class Supplier : BaseEntity
     {
-        public string SupplierCode { get; set; }
-        public string SupplierName { get; set; }
-        public string SupplierAddress { get; set; }
-        public bool IsActive { get; set; }
-        public DateTime DateAdded { get; set; }
-        public string AddedBy { get; set; }
-        public string Reason { get; set; }
+        public string SupplierCode { 
+            get; 
+            set;
+        }
+        public string SupplierName { 
+            get; 
+            set; 
+        }
+        public string SupplierAddress { 
+            get; 
+            set; 
+        }
+        public bool IsActive {
+            get; 
+            set; 
+        }
+        public DateTime DateAdded {
+            get; 
+            set;
+        }
+        public string AddedBy { 
+            get;
+            set; 
+        }
+        public string Reason {
+            get;
+            set;
+        }
 
     }
 }

@@ -9,10 +9,25 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
 {
     public class Reason : BaseEntity
     {
-        public int MenuId { get; set; }
-        public string ReasonName { get; set; }
-        public bool IsActive { get; set; }
-        public DateTime DateAdded { get; set; }
-        public string AddedBy { get; set; }
+        public int MenuId { 
+            get; 
+            set;
+        }
+        public string ReasonName {
+            get; 
+            set; 
+        }
+        public bool IsActive {
+            get;
+            set;
+        }
+        public DateTime DateAdded { 
+            get;
+            set; 
+        }
+        public string AddedBy { 
+            get; 
+            set;
+        }
     }
 }

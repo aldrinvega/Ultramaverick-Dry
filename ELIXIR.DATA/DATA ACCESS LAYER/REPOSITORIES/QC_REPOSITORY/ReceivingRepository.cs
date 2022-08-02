@@ -46,7 +46,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 receiving.ExpiryIsApprove = true;
  
             receiving.QC_ReceiveDate = DateTime.Now;
-
+          
             return await AddNewReceivingInformation(receiving);
 
              var totalreject = await _context.QC_Reject.Where(x => x.PO_ReceivingId == existingInfo.Id)
