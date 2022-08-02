@@ -106,7 +106,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
         public async Task<PagedList<MReceiptDto>> GetAllMReceiptWithPagination(UserParams userParams, bool status)
         {
 
-            var receipt = _context.MiscellaneousReceipts.Where(x => x.IsActive == status)
+            var receipt = _context.MiscellaneousReceipts.OrderByDescending(x => x.PreparedDate)
+                                                        .Where(x => x.IsActive == status)
                 .Select(x => new MReceiptDto
                 {
                     Id = x.Id,
@@ -127,7 +128,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
         public async Task<PagedList<MReceiptDto>> GetAllMReceiptWithPaginationOrig(UserParams userParams, string search, bool status)
         {
-            var receipt = _context.MiscellaneousReceipts.Where(x => x.IsActive == status)
+            var receipt = _context.MiscellaneousReceipts.OrderByDescending(x => x.PreparedDate)
+                                                        .Where(x => x.IsActive == status)
             .Select(x => new MReceiptDto
             {
                 Id = x.Id,
@@ -193,7 +195,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
         public async Task<PagedList<MIssueDto>> GetAllMIssueWithPagination(UserParams userParams, bool status)
         {
 
-            var issue = _context.MiscellaneousIssues.Where(x => x.IsActive == status)
+            var issue = _context.MiscellaneousIssues.OrderByDescending(x => x.PreparedDate)
+                                                    .Where(x => x.IsActive == status)
                 .Select(x => new MIssueDto
                 {
                     IssuePKey = x.Id,
@@ -211,7 +214,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
         public async Task<PagedList<MIssueDto>> GetAllMIssueWithPaginationOrig(UserParams userParams, string search, bool status)
         {
-            var issue = _context.MiscellaneousIssues.Where(x => x.IsActive == status)
+            var issue = _context.MiscellaneousIssues.OrderByDescending(x => x.PreparedDate)
+                                                    .Where(x => x.IsActive == status)
              .Select(x => new MIssueDto
              {
                  IssuePKey = x.Id,
@@ -274,7 +278,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
         public async Task<IReadOnlyList<MIssueDto>> GetAllDetailsInMiscellaneousIssue(int id)
         {
-            var warehouse = _context.MiscellaneousIssueDetails.Where(x => x.IssuePKey == id)
+            var warehouse = _context.MiscellaneousIssueDetails
+                                                              .Where(x => x.IssuePKey == id)
                                                     .Select(x => new MIssueDto
                                                     {
                                                         IssuePKey = x.IssuePKey,
