@@ -44,7 +44,6 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
             return Ok(receipt);
         }
 
-
         [HttpPost]
         [Route("AddNewMiscellaneousReceiptInWarehouse")]
         public async Task<IActionResult> AddNewMiscellaneousReceiptInWarehouse([FromBody] WarehouseReceiving[] receive)
@@ -58,7 +57,7 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
                 items.ExpirationDays = items.Expiration.Subtract(dateNow).Days;
                 items.ReceivingDate = DateTime.Now;
                 items.IsWarehouseReceive = true;
-                items.TransactionType = "MiscelleneousReceipt";
+                items.TransactionType = "MiscellaneousReceipt";
                 items.ManufacturingDate = DateTime.Now;
                 await _unitOfWork.Miscellaneous.AddMiscellaneousReceiptInWarehouse(items);
                 await _unitOfWork.CompleteAsync();
@@ -75,10 +74,10 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
             var validate = await _unitOfWork.Miscellaneous.ValidateMiscellaneousReceiptInIssue(receipt);
 
             if (validate == false)
-                return BadRequest("Inactive failed, you already use thr receiving id");
+                return BadRequest("Inactive failed, you already use the receiving id");
 
 
-            await _unitOfWork.Miscellaneous.InActivateMiscellaenousReceipt(receipt);
+            await _unitOfWork.Miscellaneous.InActivateMiscellaenousReceipt(receipt);    
             await _unitOfWork.CompleteAsync();
 
             return new JsonResult("Successfully inactive receipt!");
@@ -290,7 +289,6 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 
             return new JsonResult("Successfully active issue!");
         }
-
 
         [HttpGet]
         [Route("GetAllDetailsInMiscellaneousIssue")]

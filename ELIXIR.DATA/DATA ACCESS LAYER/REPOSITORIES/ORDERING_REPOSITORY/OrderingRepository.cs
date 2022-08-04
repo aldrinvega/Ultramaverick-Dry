@@ -360,26 +360,26 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
 
         }
-        public async Task<bool> ValidateFarmType(Ordering orders)
+        public async Task<bool> ValidateCustomerName(Ordering orders)
         {
-            var farmtype = await _context.Farms.Where(x => x.FarmName == orders.FarmName)
-                                               .Where(x => x.IsActive == true)
-                                               .FirstOrDefaultAsync();
+            var customername = await _context.Customers.Where(x => x.CustomerName == orders.FarmName)
+                                                       .Where(x => x.IsActive == true)
+                                                       .FirstOrDefaultAsync();
 
-            if (farmtype == null)
+            if (customername == null)
                 return false;
 
 
             return true;
             
         }
-        public async Task<bool> ValidateFarmCode(Ordering orders)
+        public async Task<bool> ValidateCustomerCode(Ordering orders)
         {
-            var farmcode = await _context.Farms.Where(x => x.FarmCode == orders.FarmCode)
-                                               .Where(x => x.IsActive == true)
-                                               .FirstOrDefaultAsync();
+            var customercode = await _context.Customers.Where(x => x.CustomerCode == orders.FarmCode)
+                                                   .Where(x => x.IsActive == true)
+                                                   .FirstOrDefaultAsync();
 
-            if (farmcode == null)
+            if (customercode == null)
                 return false;
 
 
@@ -909,6 +909,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             });
 
             var totaloutMoveorder = await _context.MoveOrders.Where(x => x.WarehouseId == id)
+                                                             .Where(x => x.IsActive == true)
                                                              .Where(x => x.ItemCode == itemcode)
                                                              .SumAsync(x => x.QuantityOrdered);
              
@@ -1054,7 +1055,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
                                                       .ToListAsync();
 
-
             var existingOrders = await _context.Orders.Where(x => x.OrderNoPKey == moveorder.OrderNo)
                                                       .ToListAsync();
 
@@ -1070,6 +1070,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 items.IsReject = true;
                 items.IsActive = false;
                 items.IsPrepared = false;
+                items.IsApproveReject = null;
             }
 
             foreach (var items in existingOrders)
@@ -1077,14 +1078,38 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 items.IsMove = false;
                 items.IsReject = true;
                 items.RejectBy = moveorder.RejectBy;
-                items.Remarks = moveorder.Remarks;
-                
+                items.Remarks = moveorder.Remarks;          
             }
-
 
             return true;
 
         }
+
+        public async Task<bool> RejectApproveMoveOrder(MoveOrder moveorder)
+        {
+            var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
+                                                     .ToListAsync();
+
+            if (existing == null)
+                return false;
+
+            foreach (var items in existing)
+            {
+                items.RejectBy = moveorder.RejectBy;
+                items.RejectedDate = DateTime.Now;
+                items.RejectedDateTempo = DateTime.Now;
+                items.Remarks = moveorder.Remarks;
+                items.IsReject = null;
+                items.IsApproveReject = true;
+                items.IsActive = false;
+                items.IsPrepared = true;
+                items.IsApprove = false;
+              
+            }
+
+            return true;
+        }
+
         public async Task<bool> ReturnMoveOrderForApproval(MoveOrder moveorder)
         {
             var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
@@ -1103,6 +1128,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 items.IsActive = true;
                 items.IsPrepared = true;
                 items.IsApprove = null;
+                items.IsApproveReject = null;
             }
 
             foreach (var items in existingOrders)
@@ -1120,7 +1146,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         public async Task<PagedList<MoveOrderDto>> ForApprovalMoveOrderPagination(UserParams userParams)
 
         {
-            var orders = _context.MoveOrders.GroupBy(x => new
+            var orders = _context.MoveOrders.Where(x => x.IsApproveReject == null )
+                .GroupBy(x => new
             {
 
                 x.OrderNo,
@@ -1156,7 +1183,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         }
         public async Task<PagedList<MoveOrderDto>> ForApprovalMoveOrderPaginationOrig(UserParams userParams, string search)
         {
-            var orders = _context.MoveOrders.GroupBy(x => new
+            var orders = _context.MoveOrders.Where(x => x.IsApproveReject == null)
+                .GroupBy(x => new
             {
 
                 x.OrderNo,
@@ -1219,7 +1247,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             {
 
                 x.OrderNo,
-                x.WarehouseId,
                 x.FarmName,
                 x.FarmCode,
                 x.FarmType,
@@ -1241,7 +1268,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
              .Select(x => new MoveOrderDto
              {
                  OrderNo = x.Key.OrderNo,
-                 BarcodeNo = x.Key.WarehouseId,
                  FarmName = x.Key.FarmName,
                  FarmCode = x.Key.FarmCode,
                  Category = x.Key.FarmType,
@@ -1265,7 +1291,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             {
 
                 x.OrderNo,
-                x.WarehouseId,
                 x.FarmName,
                 x.FarmCode,
                 x.FarmType,
@@ -1287,7 +1312,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
              .Select(x => new MoveOrderDto
              {
                  OrderNo = x.Key.OrderNo,
-                 BarcodeNo = x.Key.WarehouseId,
                  FarmName = x.Key.FarmName,
                  FarmCode = x.Key.FarmCode,
                  Category = x.Key.FarmType,
@@ -1308,7 +1332,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         }
         public async Task<PagedList<MoveOrderDto>> RejectedMoveOrderPagination(UserParams userParams)
         {
-            var orders = _context.MoveOrders.GroupBy(x => new
+            var orders = _context.MoveOrders.Where(x => x.IsApproveReject == true)
+                .GroupBy(x => new
             {
 
                 x.OrderNo,
@@ -1325,9 +1350,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             })
               .Where(x => x.Key.DeliveryStatus != null)
-              .Where(x => x.Key.IsReject == true)
-
-
+          //    .Where(x => x.Key.IsReject == true)
+         
         .Select(x => new MoveOrderDto
         {
             OrderNo = x.Key.OrderNo,
@@ -1348,7 +1372,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         }
         public async Task<PagedList<MoveOrderDto>> RejectedMoveOrderPaginationOrig(UserParams userParams, string search)
         {
-            var orders = _context.MoveOrders.GroupBy(x => new
+            var orders = _context.MoveOrders.Where(x => x.IsApproveReject == true)
+                .GroupBy(x => new
             {
 
                 x.OrderNo,
@@ -1365,7 +1390,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             })
               .Where(x => x.Key.DeliveryStatus != null)
-              .Where(x => x.Key.IsReject == true)
+          //    .Where(x => x.Key.IsReject == true)
 
        .Select(x => new MoveOrderDto
        {
@@ -1635,6 +1660,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
         }
 
-      
+     
     }
 }

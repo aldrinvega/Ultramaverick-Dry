@@ -79,8 +79,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok(reasonResult);
         }
 
-
-
         [HttpGet]
         [Route("GetAllReasonById/{id}")]
         public async Task<IActionResult> GetAllReasonById(int id)
@@ -142,9 +140,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
 
             var moduleId = await _unitOfWork.Reasons.ValidateModuleId(reason.MenuId);
-
-            //if (await _unitOfWork.Reasons.ReasonNameExist(reason.ReasonName))
-            //    return BadRequest("Reason already Exist!, Please try something else!");
 
             if (moduleId == false)
                 return BadRequest("Module doesn't exist, Please add data first!");

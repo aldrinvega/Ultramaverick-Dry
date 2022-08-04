@@ -189,7 +189,6 @@ namespace ELIXIR.API.Controllers
             return Ok(module);
         }
 
-
         //------Main Menu------
 
         [HttpGet]

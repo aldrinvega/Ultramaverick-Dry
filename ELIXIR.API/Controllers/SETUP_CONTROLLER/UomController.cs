@@ -90,7 +90,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok(uomResult);
         }
 
-
         [HttpPost]
         [Route("AddNewUOM")]
         public async Task<IActionResult> CreateNewUOM(UOM uom)
@@ -117,13 +116,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         {
             if (id != uom.Id)
                 return BadRequest();
-
-
-            //if (await _unitOfWork.Uoms.UomCodeExist(uom.UOM_Code))
-            //    return BadRequest("Uom Code already Exist!, Please try something else!");
-
-            //if (await _unitOfWork.Uoms.UomDescription(uom.UOM_Description))
-            //    return BadRequest("Uom Code Description already Exist!, Please try something else!");
 
             await _unitOfWork.Uoms.UpdateUom(uom);
             await _unitOfWork.CompleteAsync();
@@ -174,7 +166,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
             return Ok(uom);
         }
-
 
     }
 }

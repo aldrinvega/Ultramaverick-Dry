@@ -160,5 +160,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
             set;
         }
 
+        public bool? IsApproveReject
+        {
+            get;
+            set;
+        }
     }
 }

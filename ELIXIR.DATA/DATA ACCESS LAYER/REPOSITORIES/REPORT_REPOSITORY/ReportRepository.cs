@@ -23,7 +23,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
         public async Task<IReadOnlyList<QCReport>> QcRecevingReport(string DateFrom, string DateTo)
         {
-
             var items = (from rawmaterials in _context.RawMaterials
                          where rawmaterials.IsActive == true
                          join category in _context.ItemCategories
@@ -53,17 +52,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
                               Id = receiving.Id,
                               QcDate = receiving.QC_ReceiveDate.ToString(),
-                              PONumber = posummary.PO_Number,
-                              ItemCode = posummary.ItemCode, 
-                              ItemDescription = posummary.ItemDescription, 
-                              Uom = posummary.UOM,
-                              Category = category.ItemCategory,
+                              PONumber = posummary != null ? posummary.PO_Number : 0,
+                              ItemCode = receiving.ItemCode,
+                              ItemDescription = posummary != null ? posummary.ItemDescription : null,
+                              Uom = posummary != null ? posummary.UOM : null,
+                              Category = category != null ? category.ItemCategory : null,
                               Quantity = receiving.Actual_Delivered,
                               ManufacturingDate = receiving.Manufacturing_Date.ToString(),
                               ExpirationDate = receiving.Expiry_Date.ToString(),
-                              TotalReject = receiving.TotalReject, 
-                              SupplierName = posummary.VendorName,
-                              Price = posummary.UnitPrice, 
+                              TotalReject = receiving.TotalReject,
+                              SupplierName = posummary != null ? posummary.VendorName : null,
+                              Price = posummary != null ? posummary.UnitPrice : 0,
                               QcBy = receiving.QcBy
 
                           });
@@ -77,7 +76,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             var warehouse = _context.WarehouseReceived.Where(x => x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo))
                                                       .Where(x => x.IsActive == true)
             .Select(x => new WarehouseReport
-            {
+            { 
+                WarehouseId = x.Id,
+                PONumber = x.PO_Number,
                 ReceiveDate = x.ReceivingDate.ToString(),
                 ItemCode = x.ItemCode,
                 ItemDescription = x.ItemDescription, 
@@ -163,11 +164,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
         public async Task<IReadOnlyList<MiscellaneousReceiptReport>> MReceiptReport(string DateFrom, string DateTo)
         {
 
-            var receipts = (from receiptHeader in _context.MiscellaneousReceipts
-                            where receiptHeader.PreparedDate >= DateTime.Parse(DateFrom) && receiptHeader.PreparedDate <= DateTime.Parse(DateTo) && receiptHeader.IsActive == true
+            var receipts = (from receiptHeader in _context.MiscellaneousReceipts                    
                             join receipt in _context.WarehouseReceived
                             on receiptHeader.Id equals receipt.MiscellaneousReceiptId into leftJ
                             from receipt in leftJ.DefaultIfEmpty()
+
+                            where receipt.ReceivingDate >= DateTime.Parse(DateFrom) && receipt.ReceivingDate <= DateTime.Parse(DateTo) && receipt.IsActive == true && receipt.TransactionType == "MiscellaneousReceipt"
 
                             select new MiscellaneousReceiptReport
                             {
@@ -183,7 +185,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                                 Quantity = receipt.ActualGood,
                                 ExpirationDate = receipt.Expiration.ToString(),
                                 TransactBy = receiptHeader.PreparedBy,
-                                TransactDate = receiptHeader.PreparedDate.ToString()
+                                TransactDate = receipt.ReceivingDate.ToString()
 
                             });
 
@@ -195,29 +197,29 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
         public async Task<IReadOnlyList<MiscellaneousIssueReport>> MIssueReport(string DateFrom, string DateTo)
         {
 
-            var issues =    (from issue in _context.MiscellaneousIssues
-                            where issue.PreparedDate >= DateTime.Parse(DateFrom) && issue.PreparedDate <= DateTime.Parse(DateTo) && issue.IsActive == true
-                            join issuedetails in _context.WarehouseReceived
-                            on issue.Id equals issuedetails.MiscellaneousReceiptId into leftJ
-                            from issuedetails in leftJ.DefaultIfEmpty()
+            var issues = (from issue in _context.MiscellaneousIssues
+                          join issuedetails in _context.MiscellaneousIssueDetails
+                          on issue.Id equals issuedetails.IssuePKey into leftJ
+                          from issuedetails in leftJ.DefaultIfEmpty()
 
-                            select new MiscellaneousIssueReport
-                            {
+                          where issuedetails.PreparedDate >= DateTime.Parse(DateFrom) && issuedetails.PreparedDate <= DateTime.Parse(DateTo) && issuedetails.IsActive == true && issuedetails.IsTransact == true
 
-                                IssueId = issue.Id,
-                                CustomerCode = issue.CustomerCode,
-                                CustomerName = issue.Customer,
-                                Details = issue.Remarks,
-                                ItemCode = issuedetails.ItemCode,
-                                ItemDescription = issuedetails.ItemDescription,
-                                Uom = issuedetails.Uom,
-                                Category = issuedetails.LotCategory,
-                                Quantity = issuedetails.ActualGood,
-                                ExpirationDate = issuedetails.Expiration.ToString(),
-                                TransactBy = issue.PreparedBy,
-                                TransactDate = issue.PreparedDate.ToString()
+                          select new MiscellaneousIssueReport
+                          {
 
-                            });
+                              IssueId = issue.Id,
+                              CustomerCode = issue.CustomerCode,
+                              CustomerName = issue.Customer,
+                              Details = issue.Remarks,
+                              ItemCode = issuedetails != null ? issuedetails.ItemCode : null,
+                              ItemDescription = issuedetails != null ? issuedetails.ItemDescription : null,
+                              Uom = issuedetails != null ? issuedetails.Uom : null,
+                              Quantity = issuedetails != null ? issuedetails.Quantity : 0,
+                              ExpirationDate = issuedetails != null ? issuedetails.ExpirationDate.ToString() : null,
+                              TransactBy = issue.PreparedBy,
+                              TransactDate = issuedetails != null ? issuedetails.PreparedDate.ToString() : null
+
+                          });
 
             return await issues.ToListAsync();
         }

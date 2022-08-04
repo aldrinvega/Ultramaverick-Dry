@@ -24,7 +24,6 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
             _unitOfWork = unitofwork;
         }
 
- 
         [HttpPost]
         [Route("AddNewReceivingInformationInPO")]
         public async Task<IActionResult> CreateNewCustomer(PO_Receiving receive)
@@ -68,8 +67,6 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
 
             if (id != receiving.PO_Summary_Id)
                 return BadRequest();
-
-         //   if((receiving.Expected_Delivery * .10) )
 
             if (receiving.Actual_Delivered <= 0)
                 return BadRequest("Received failed, please check your input in actual delivered!");
@@ -138,7 +135,6 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
 
             return Ok(posummary);
         }
-
 
         [HttpPut]
         [Route("CancelPO/{id}")]
@@ -313,7 +309,7 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
 
                 return await GetAllAvailableForWarehouseReceivingWithPagination(userParams);
 
-            var warehouse = await _unitOfWork.Receives.GetPoSummaryByStatusWithPaginationOrig(userParams, search);
+            var warehouse = await _unitOfWork.Receives.GetAllAvailableForWarehouseWithPaginationOrig(userParams, search);
 
             Response.AddPaginationHeader(warehouse.CurrentPage, warehouse.PageSize, warehouse.TotalCount, warehouse.TotalPages, warehouse.HasNextPage, warehouse.HasPreviousPage);
 
@@ -379,7 +375,6 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
 
             return Ok(warehouseResult);
         }
-
 
         [HttpGet]
         [Route("GetAllNearlyExpireWithPagination")]
@@ -514,7 +509,6 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
 
             return Ok(countList);
         }
-
 
         [HttpGet]
         [Route("GetAllWarehouseConfirmRejectWithPagination")]

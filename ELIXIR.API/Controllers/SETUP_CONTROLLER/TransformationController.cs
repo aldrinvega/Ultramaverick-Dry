@@ -22,7 +22,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
         //-----TRANSFORMATION FORMULA---------
 
-
         [HttpGet]
         [Route("GetAllTransformationFormula")]
         public async Task<IActionResult> GetAllTransformationFormula()
@@ -82,7 +81,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok(formulaResult);
         }
 
-
         [HttpGet]
         [Route("GetFormulaById/{id}")]
         public async Task<IActionResult> GetFormulaById(int id)
@@ -119,12 +117,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         {
             if (ModelState.IsValid)
             {
-                //if (await _unitOfWork.Uoms.UomCodeExist(uom.UOM_Code))
-                //    return BadRequest("Uom Code already Exist!, Please try something else!");
-
-                //if (await _unitOfWork.Uoms.UomDescription(uom.UOM_Description))
-                //    return BadRequest("Uom Code Description already Exist!, Please try something else!");
-
                 await _unitOfWork.Transforms.AddNewTransformationFormula(formula);
                 await _unitOfWork.CompleteAsync();
 

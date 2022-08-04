@@ -95,7 +95,6 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
             return Ok(warehouse);
         }
 
-
         [HttpPut]
         [Route("RejectMaterialFromWarehouse")]
         public async Task<IActionResult> RejectMaterialFromWarehouse([FromBody] Warehouse_Reject [] reject)
@@ -130,7 +129,6 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
             return Ok(warehouse);
         }
 
-
         [HttpPut]
         [Route("ReturnRawmaterialByWarehouse/{id}")]
         public async Task<IActionResult> ReturnRawmaterialByWarehouse(int id, [FromBody] PO_Receiving receiving)
@@ -156,7 +154,6 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
 
             return Ok(reject);
         }
-
 
         [HttpGet]
         [Route("GetAllWarehouseReceived")]
@@ -192,7 +189,6 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
 
             return new JsonResult("Successfully cancelled materials received in warehouse!");
         }
-
 
         [HttpGet]
         [Route("GetAllListForWarehouseWithPagination")]
@@ -242,7 +238,6 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
 
             return Ok(warehouseResult);
         }
-
 
         [HttpGet]
         [Route("GetAllRejectMaterialsFromWarehouse")]

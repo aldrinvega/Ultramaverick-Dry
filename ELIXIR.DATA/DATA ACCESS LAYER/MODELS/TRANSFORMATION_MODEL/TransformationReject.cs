@@ -69,5 +69,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL
             set; 
         }
 
+        public string RejectRemarks
+        {
+            get;
+            set;
+        }
+
+
     }
 }

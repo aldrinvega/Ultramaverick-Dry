@@ -351,7 +351,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                     AddedBy = rawmaterial.AddedBy,
                                     IsActive = rawmaterial.IsActive,
                                     Reason = rawmaterial.Reason
-                                }).Where(x => x.IsActive == status);
+                                }).OrderBy(x => x.ItemCode)
+                                  .Where(x => x.IsActive == status);
 
 
             return await PagedList<RawMaterialDto>.CreateAsync(rawmaterials, userParams.PageNumber, userParams.PageSize);
@@ -377,10 +378,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                     AddedBy = rawmaterial.AddedBy,
                                     IsActive = rawmaterial.IsActive,
                                     Reason = rawmaterial.Reason
-                                }).Where(x => x.IsActive == status)
+                                }).OrderBy(x => x.ItemCode)
+                                  .Where(x => x.IsActive == status)
                                   .Where(x => x.ItemCode.ToLower()
                                   .Contains(search.Trim().ToLower()));
-
+            
             return await PagedList<RawMaterialDto>.CreateAsync(rawmaterials, userParams.PageNumber, userParams.PageSize);
 
         }

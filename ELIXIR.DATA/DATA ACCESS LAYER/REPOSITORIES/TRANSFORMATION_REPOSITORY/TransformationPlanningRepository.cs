@@ -210,6 +210,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
 
             return await requirement.Where(x => x.TransformationId == id)                  
                                     .Where(x => x.IsPrepared == false)
+                                    .Where(x => x.IsActive == true)
                                     .ToListAsync();
         }                                   
 
@@ -400,10 +401,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
             existingInfo.Is_Approved = false;
             existingInfo.RejectedDate = DateTime.Now;
             existingInfo.StatusRequest = "Rejected";
+            existingInfo.RejectRemarks = reject.RejectRemarks;
 
             foreach(var items in validateRequest)
             {
-                items.IsActive = false;
+                items.IsReject = true;
             }
 
             return true;
@@ -543,6 +545,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                                                      .FirstOrDefaultAsync();
 
             var getRequirements = await _context.Transformation_Request.Where(x => x.TransformId == request.TransformId)
+                                                                       .Where(x => x.IsReject == true)
                                                                        .ToListAsync();
 
             var getFormulaInfo = await _context.Formulas.Where(x => x.ItemCode == request.ItemCode)
@@ -566,7 +569,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
 
             foreach(var items in getRequirements)
             {
-
+                items.IsReject = false;
                 items.IsActive = false;
 
             }
@@ -825,7 +828,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
         public async Task<IReadOnlyList<MaterialRequirements>> GetAllRejectRequirements(int id)
         {
             var requirements = (from request in _context.Transformation_Request
-                                where request.TransformId == id
+                                where request.TransformId == id && request.IsReject == true && request.IsActive == true
                                 join reject in _context.Transformation_Reject             
                                 on request.TransformId equals reject.TransformId into leftJ
 
@@ -915,6 +918,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
         {
             return await _context.Transformation_Planning.Select(planning => new TransformationPlanningDto
             {
+
                 Id = planning.Id,
                 ItemCode = planning.ItemCode,
                 ItemDescription = planning.ItemDescription,
@@ -926,7 +930,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                 AddedBy = planning.AddedBy,
                 Status = planning.Status,
                 DateAdded = planning.DateAdded.ToString("MM/dd/yyyy"),
-                StatusRemarks = planning.StatusRequest
+                StatusRemarks = planning.StatusRequest,
+                RejectRemarks = planning.RejectRemarks
+
             })
          .Where(x => x.StatusRemarks == "Rejected")
          .ToListAsync();

@@ -101,7 +101,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             return new JsonResult("Successfully schedules ordered");
         }
 
-
         [HttpGet]
         [Route("OrderSummary")]
         public async Task<IActionResult> OrderSummary([FromQuery] string DateFrom, [FromQuery] string DateTo)
@@ -112,7 +111,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             return Ok(orders);
 
         }
-
 
         [HttpPost]
         [Route("AddNewOrders")]
@@ -133,8 +131,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             {
 
                 var validateDuplicate = await _unitOfWork.Order.ValidateExistingOrders(items);
-                var validateFarmName = await _unitOfWork.Order.ValidateFarmType(items);
-                var validateFarmCode = await _unitOfWork.Order.ValidateFarmCode(items);
+                var validateFarmName = await _unitOfWork.Order.ValidateCustomerName(items);
+                var validateFarmCode = await _unitOfWork.Order.ValidateCustomerCode(items);
                 var validateRawMaterial = await _unitOfWork.Order.ValidateRawMaterial(items);
                 var validateUom = await _unitOfWork.Order.ValidateUom(items);
 
@@ -413,7 +411,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         }
 
-
         [HttpPut]
         [Route("CancelPreparedItems")]
         public async Task<IActionResult> CancelPreparedItems([FromBody] MoveOrder moveorder)
@@ -481,6 +478,17 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             await _unitOfWork.CompleteAsync();
 
             return new JsonResult("Successfully reject list for move order!");
+        }
+
+        [HttpPut]
+        [Route("RejectApproveListOfMoveOrder")]
+        public async Task<IActionResult> RejectApproveListOfMoveOrder([FromBody] MoveOrder moveorder)
+        {
+
+            await _unitOfWork.Order.RejectApproveMoveOrder(moveorder);
+            await _unitOfWork.CompleteAsync();
+
+            return new JsonResult("Successfully reject approved list for move order!");
         }
 
         [HttpPut]
@@ -680,7 +688,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         //------------------TRANSACT MOVE ORDER-------------------------
 
-
         [HttpGet]
         [Route("GetTotalListForMoveOrder")]
         public async Task<IActionResult> GetTotalListForMoveOrder()
@@ -723,9 +730,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             return Ok(transact);
 
         }
-
-
-
 
     }
 

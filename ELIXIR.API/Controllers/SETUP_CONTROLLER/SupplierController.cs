@@ -91,8 +91,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok(supplierResult);
         }
 
-
-
         [HttpGet]
         [Route("GetAllActiveSupplier")]
         public async Task<IActionResult> GetAllActiveSupplier()
@@ -110,7 +108,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
             return Ok(supplier);
         }
-
 
         [HttpPost]
         [Route("AddNewSupplier")]
@@ -135,9 +132,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         {
             if (id != supplier.Id)
                 return BadRequest();
-
-            //if (await _unitOfWork.Suppliers.SupplierCodeExist(supplier.SupplierCode))
-            //    return BadRequest("Supplier code already exist!, please try something else!");
 
             await _unitOfWork.Suppliers.UpdateSupplierInfo(supplier);
             await _unitOfWork.CompleteAsync();
@@ -170,7 +164,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
             return new JsonResult("Successfully Activate Supplier!");
         }
-
 
 
     }

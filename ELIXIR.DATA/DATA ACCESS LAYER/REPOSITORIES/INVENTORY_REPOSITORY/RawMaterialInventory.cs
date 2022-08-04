@@ -31,7 +31,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                             x.LotCategory,
                                                             x.Uom,
                                                             x.IsWarehouseReceive,
-
                                                         })
                                                          .Select(inventory => new RawmaterialInventory
                                                          {
@@ -42,7 +41,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                              SOH = inventory.Sum(x => x.ActualGood),
                                                              ReceiveIn = inventory.Sum(x => x.ActualGood),
                                                              IsWarehouseReceived = inventory.Key.IsWarehouseReceive
-
 
                                                          })
                                                           .OrderBy(x => x.ItemCode)
@@ -586,7 +584,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 });
 
             var getTransformation = _context.Transformation_Preparation.Where(x => x.IsActive == true)
-                                                                       .Where(x => x.IsMixed == true)
+                                                                   //    .Where(x => x.IsMixed == true)
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -737,7 +735,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
             var getTransformOutPerMonth = _context.Transformation_Preparation.Where(x => x.PreparedDate >= StartDate && x.PreparedDate <= EndDate)
                                                                              .Where(x => x.IsActive == true)
-                                                                             .Where(x => x.IsMixed == true)
+                                                                            // .Where(x => x.IsMixed == true)
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -1021,7 +1019,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 });
 
             var getTransformation = _context.Transformation_Preparation.Where(x => x.IsActive == true)
-                                                                       .Where(x => x.IsMixed == true)
+                                                                       //.Where(x => x.IsMixed == true)
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -1172,7 +1170,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
             var getTransformOutPerMonth = _context.Transformation_Preparation.Where(x => x.PreparedDate >= StartDate && x.PreparedDate <= EndDate)
                                                                              .Where(x => x.IsActive == true)
-                                                                             .Where(x => x.IsMixed == true)
+                                                                    //         .Where(x => x.IsMixed == true)
                 .GroupBy(x => new
                 {
                     x.ItemCode,

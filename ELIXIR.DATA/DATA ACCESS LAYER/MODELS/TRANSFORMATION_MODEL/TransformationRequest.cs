@@ -53,6 +53,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL
             get; 
             set;
         }
+           public bool? IsReject { 
+            get; 
+            set;
+        }
 
     }
 }

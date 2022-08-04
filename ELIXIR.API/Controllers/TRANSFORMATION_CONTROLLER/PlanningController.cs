@@ -28,7 +28,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
             return Ok(version);
         }
 
-
         [HttpPost]
         [Route("AddNewTransformationRequest")]
         public async Task<IActionResult> AddNewTransformationRequest(TransformationPlanning planning)
@@ -138,7 +137,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
             return new JsonResult("Something went Wrong!") { StatusCode = 500 };
         }
 
-
         [HttpGet]
         [Route("GetAllRequirementsByTransformId/{id}")]
         public async Task<IActionResult> GetAllRequirementsByTransformId(int id)
@@ -191,7 +189,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
             return Ok(planning);
 
         }
-
 
         [HttpGet]
         [Route("GetAllPendingRequestWithRequirements/{id}")]
@@ -279,8 +276,7 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
             return Ok("Successfully reject request!");
         }
-
-      
+   
         [HttpPut]
         [Route("RequestRejectTransformationRequest/{id}")]
         public async Task<IActionResult> RequestRejectTransformationRequest(int id, [FromBody] TransformationPlanning planning)
@@ -309,6 +305,7 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
                 return BadRequest("Edit failed, cannot edit approved request");
 
             await _unitOfWork.Planning.EditRejectTransformationPlanning(request);
+            await _unitOfWork.CompleteAsync();
 
             var validateDate = await _unitOfWork.Planning.ValidateInputDate(request.ProdPlan.ToString());
 
@@ -425,7 +422,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
             return Ok(pending);
         }
-
 
         [HttpGet]
         [Route("GetAllRejectRequest")]

@@ -168,9 +168,6 @@ namespace ELIXIR.API.Controllers
             if (id != user.Id)
                 return BadRequest();
 
-            //if (await _unitOfWork.Users.UserAlreadyExists(user.UserName))
-            //    return BadRequest("UserName Already Exist!, Please try something else!");
-
             await _unitOfWork.Users.UpdateUserInfo(user);
             await _unitOfWork.CompleteAsync();
 
@@ -202,7 +199,6 @@ namespace ELIXIR.API.Controllers
 
             return new JsonResult("Successfully Activate User!");
         }
-
 
         [HttpGet]
         [Route("GetAllRoles")]

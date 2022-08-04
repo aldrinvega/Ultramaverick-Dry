@@ -416,7 +416,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
 
         public async Task<IReadOnlyList<ItemStocks>> GetAllRemainingStocksPerReceivingId(string itemcode)
         {
-            var totalout = _context.Transformation_Preparation.GroupBy(x => new
+            var totalout = _context.Transformation_Preparation.Where(x => x.IsActive == true)
+                .GroupBy(x => new
             {
                 x.ItemCode,
                 x.WarehouseId,

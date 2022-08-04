@@ -21,8 +21,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<bool> RejectPreparedDate(Ordering orders);
         Task<bool> AddNewOrders(Ordering orders);
         Task<IReadOnlyList<OrderDto>> OrderSummary(string DateFrom, string DateTo);
-        Task<bool> ValidateFarmType(Ordering orders);
-        Task<bool> ValidateFarmCode(Ordering orders);
+        Task<bool> ValidateCustomerName(Ordering orders);
+        Task<bool> ValidateCustomerCode(Ordering orders);
         Task<bool> ValidateRawMaterial(Ordering orders);
         Task<bool> ValidateUom(Ordering orders);
         Task<bool> ValidateExistingOrders(Ordering orders);
@@ -49,7 +49,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<bool> AddDeliveryStatus(Ordering order);
         Task<bool> ApprovalForMoveOrder(MoveOrder moveorder);
         Task<bool> RejectForMoveOrder(MoveOrder moveorder);
-
+        Task<bool> RejectApproveMoveOrder(MoveOrder moveorder);
         Task<PagedList<MoveOrderDto>> ForApprovalMoveOrderPagination(UserParams userParams);
 
         Task<PagedList<MoveOrderDto>> ForApprovalMoveOrderPaginationOrig(UserParams userParams, string search);

@@ -144,9 +144,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             if (farmId == false)
                 return BadRequest("Farm Type doesn't exist, Please add data first!");
 
-            //if (await _unitOfWork.Customers.CustomerCodeExist(customer.CustomerCode))
-            //    return BadRequest("Customer already Exist!, Please try something else!");
-
             await _unitOfWork.Customers.UpdateCustomerInfo(customer);
             await _unitOfWork.CompleteAsync();
 
@@ -239,9 +236,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         {
             if (id != farm.Id)
                 return BadRequest();
-
-            //if (await _unitOfWork.Customers.FarmCodeExist(farm.FarmCode))
-            //    return BadRequest("Farm already exist!, please try something else.");
 
             await _unitOfWork.Customers.UpdateFarmType(farm);
             await _unitOfWork.CompleteAsync();

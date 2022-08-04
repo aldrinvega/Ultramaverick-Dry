@@ -81,7 +81,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok(rawmaterialResult);
         }
 
-
         [HttpGet]
         [Route("GetRawMaterialsById/{id}")]
         public async Task<IActionResult> GetSupplierById(int id)
@@ -153,9 +152,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
             if (uomId == false)
                 return BadRequest("UOM doesn't exist, Please add data first!");
-
-            //if (await _unitOfWork.RawMaterials.ItemCodeExist(rawmaterial.ItemCode))
-            //    return BadRequest("Item Code already Exist!, Please try something else!");
 
             await _unitOfWork.RawMaterials.UpdateRawMaterialInfo(rawmaterial);
             await _unitOfWork.CompleteAsync();

@@ -100,7 +100,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok(lotname);
         }
 
-
         [HttpGet]
         [Route("GetAllInActiveLotName")]
         public async Task<IActionResult> GetAllInActiveSupplier()
@@ -108,7 +107,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             var lotname = await _unitOfWork.Lots.GetAllInActiveLotName();
             return Ok(lotname);
         }
-
 
         [HttpPost]
         [Route("AddNewLotName")]
@@ -144,14 +142,10 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             if (id != lotname.Id)
                 return BadRequest();
 
-
             var categoryId = await _unitOfWork.Lots.ValidateLotCategoryId(lotname.LotCategoryId);
 
             if (categoryId == false)
                 return BadRequest("Lot category doesn't exist, please add data first!");
-
-            //if (await _unitOfWork.Lots.SectionNameExist(lotname.SectionName))
-            //    return BadRequest("Lot name already exist!, please try something else!");
 
             await _unitOfWork.Lots.UpdateLotName(lotname);
             await _unitOfWork.CompleteAsync();
@@ -195,7 +189,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
             return Ok(category);
         }
-
 
         [HttpGet]
         [Route("GetLotCategoryById/{id}")]

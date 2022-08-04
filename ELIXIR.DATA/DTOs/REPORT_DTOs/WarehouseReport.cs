@@ -10,6 +10,7 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
     {
 
         public int Id { get; set; }
+        public int WarehouseId { get; set; }
         public string ReceiveDate { get; set; }
         public int PONumber { get; set; }
         public string ItemCode { get; set; }

@@ -23,7 +23,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
             _unitOfWork = unitofwork;
         }
 
-
         [HttpGet]
         [Route("GetAllRequirementsByTransformId")]
         public async Task<IActionResult> GetAllRequirementsByTransformId([FromQuery] TransformationPlanning planning)
@@ -165,7 +164,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
         }
 
-  
         [HttpGet]
         [Route("GetRawmaterialDetailsInWarehouse")]
         public async Task<IActionResult> GetRawmaterialDetailsInWarehouse([FromQuery]int id, [FromQuery] string code)
@@ -177,7 +175,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
         }
 
-
         [HttpGet]
         [Route("GetTransformationFormula")]
         public async Task<IActionResult> GetTransformationFormula()
@@ -188,7 +185,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
             return Ok(planning);
 
         }
-
 
         [HttpGet]
         [Route("GetAllStocks")]
@@ -211,7 +207,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
             return Ok(planning);
 
         }
-
 
         [HttpPut]
         [Route("FinishedMixedMaterialsForWarehouse/{id}")]
@@ -239,7 +234,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
         }
 
-
         [HttpGet]
         [Route("GetTransformationFormulaPagination")]
         public async Task<ActionResult<IEnumerable<TransformationPlanningDto>>> GetAllFormulaWithPagination([FromQuery] UserParams userParams)
@@ -262,7 +256,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
             return Ok(preparationResult);
         }
 
-
         [HttpGet]
         [Route("GetAllTransformationForMixing")]
         public async Task<IActionResult> GetAllTransformationForMixing()
@@ -273,7 +266,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
             return Ok(planning);
 
         }
-
 
         [HttpGet]
         [Route("GetAllTransformationForMixingPagination")]
@@ -297,7 +289,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
             return Ok(mixingResult);
         }
 
-
         [HttpGet]
         [Route("GetAllRequirementsForMixing")]
         public async Task<IActionResult> GetAllRequirementsForMixing([FromQuery] int id)
@@ -308,8 +299,6 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
             return Ok(requirement);
 
         }
-
-
 
         [HttpGet]
         [Route("GetAllBatchRemainingPerMixing")]

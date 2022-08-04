@@ -162,6 +162,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                            {
 
                                Id = receiptParent.Id,
+                               WarehouseId = warehouse.Id,
                                ItemCode = warehouse.ItemCode,
                                ItemDescription = warehouse.ItemDescription,
                                TotalQuantity = warehouse.ActualGood,
@@ -440,15 +441,16 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
         public async Task<bool> ValidateMiscellaneousReceiptInIssue(MiscellaneousReceipt receipt)
         {
             var validate = await _context.WarehouseReceived.Where(x => x.MiscellaneousReceiptId == receipt.Id)
-                                                           .FirstOrDefaultAsync();
+                                                           .ToListAsync();
 
+            foreach(var items in validate)
+            {
+                var issue = await _context.MiscellaneousIssueDetails.Where(x => x.WarehouseId == items.Id)
+                                                                    .FirstOrDefaultAsync();
 
-            var issue = await _context.MiscellaneousIssueDetails.Where(x => x.WarehouseId == validate.Id)
-                                                                .ToListAsync();
-
-            if (issue != null)
-                return false;
-
+                if (issue != null)
+                    return false;
+            }
 
             return true;
 

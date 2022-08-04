@@ -27,7 +27,7 @@ namespace ELIXIR.DATA.DTOs.TRANSFORMATION_DTOs
         public int BatchAvailable { get; set; }
         public bool IsMixed { get; set; }
         public int BatchRemaining { get; set; }
-
+        public string RejectRemarks { get; set; }
 
     }
 }

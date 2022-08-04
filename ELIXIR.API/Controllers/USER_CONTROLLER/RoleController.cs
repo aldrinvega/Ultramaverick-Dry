@@ -41,7 +41,6 @@ namespace ELIXIR.API.Controllers
             return Ok(roles);
         }
 
-
         [HttpGet]
         [Route("GetAllRolesWithPagination/{status}")]
         public async Task<ActionResult<IEnumerable<RoleDto>>> GetAllRolesWithPagination([FromRoute] bool status, [FromQuery] UserParams userParams)
@@ -92,7 +91,6 @@ namespace ELIXIR.API.Controllers
             return Ok(roleResult);
         }
 
-
         [HttpGet]
         [Route("GetAllRoleModules")]
         public async Task<IActionResult> GetRoleModules()
@@ -113,7 +111,6 @@ namespace ELIXIR.API.Controllers
 
             return Ok(roles);
         }
-
 
         [HttpGet]
         [Route("GetRolesByStatus/{status}")]
@@ -150,10 +147,6 @@ namespace ELIXIR.API.Controllers
         {
             if (id != role.Id)
                 return BadRequest();
-
-
-            //if (await _unitOfWork.Roles.RoleAlreadyExist(role.RoleName))
-            //    return BadRequest("Role Already Exist!, Please try something else!");
 
             await _unitOfWork.Roles.UpdateRole(role);
             await _unitOfWork.CompleteAsync();
@@ -205,7 +198,6 @@ namespace ELIXIR.API.Controllers
             return Ok(role);
         }
 
-
         [HttpGet]
         [Route("GetRoleModulebyRole/{rolename}")]
         public async Task<IActionResult> GetRoleModulebyRole(string rolename)
@@ -233,8 +225,6 @@ namespace ELIXIR.API.Controllers
             return Ok(rolemodule);
         }
 
-
-
         [HttpPost]
         [Route("TagandModules")]
         public async Task<IActionResult> TagModules([FromBody] UserRole_Modules[] roleModule)
@@ -258,7 +248,6 @@ namespace ELIXIR.API.Controllers
 
             return new JsonResult("Successfully Tag Module!");
         }
-
 
         [HttpPut]
         [Route("UntagModule")]
@@ -301,8 +290,6 @@ namespace ELIXIR.API.Controllers
 
             return Ok(rolemodule);
         }
-
-
 
     }
 }
