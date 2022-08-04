@@ -94,6 +94,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
         {
 
             request.IsActive = true;
+            request.IsReject = null;
 
             await _context.Transformation_Request.AddAsync(request);
             return true;
@@ -392,6 +393,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                                                      .FirstOrDefaultAsync();
 
             var validateRequest = await _context.Transformation_Request.Where(x => x.TransformId == reject.TransformId)
+                                                                       .Where(x => x.IsActive == true)
                                                                        .ToListAsync();
 
             if (existingInfo == null)
@@ -405,6 +407,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
 
             foreach(var items in validateRequest)
             {
+                items.IsActive = false;
                 items.IsReject = true;
             }
 
@@ -459,14 +462,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
             var existingInfo = await _context.Transformation_Planning.Where(x => x.Id == planning.Id)
                                                                      .FirstOrDefaultAsync();
 
-            if (existingInfo == null)
-                return false;
-
+      
             var existingRequirements = await _context.Transformation_Request.Where(x => x.TransformId == existingInfo.Id)
+                                                                            .Where(x => x.IsActive == true)
                                                                             .ToListAsync();
-            if (existingRequirements == null)
-                return false;
-
+  
             existingInfo.Status = false;
             existingInfo.Is_Approved = false;
             existingInfo.StatusRequest = "Cancelled";
@@ -475,6 +475,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
             foreach(var items in existingRequirements)
             {
                 items.IsActive = false;
+                items.IsCancelled = true;
             }
 
             return true;
@@ -546,6 +547,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
 
             var getRequirements = await _context.Transformation_Request.Where(x => x.TransformId == request.TransformId)
                                                                        .Where(x => x.IsReject == true)
+                                                                       .Where(x => x.IsActive == false)
                                                                        .ToListAsync();
 
             var getFormulaInfo = await _context.Formulas.Where(x => x.ItemCode == request.ItemCode)
@@ -566,14 +568,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
             existingInfo.Status = true;
             existingInfo.StatusRequest = "Pending";
 
-
             foreach(var items in getRequirements)
             {
-                items.IsReject = false;
+                items.IsReject = null;
                 items.IsActive = false;
 
             }
-
 
             return true;
 
@@ -709,14 +709,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                                                       .Where(x => x.IsActive == true)
                                                                       .SumAsync(x => x.Quantity);
 
-            //var computePreparation = await _context.Transformation_Preparation.Where(x => x.ItemCode == itemcode)
-            //                                                                  .Where(x => x.IsActive == true)
-            //                                                                  .SumAsync(x => x.WeighingScale);
-
-            //var computeMoveOrder = await _context.MoveOrders.Where(x => x.ItemCode == itemcode)
-            //                                                .Where(x => x.IsActive == true)
-            //                                                .SumAsync(x => x.QuantityOrdered);
-
             var computeOrderReserve = await _context.Orders.Where(x => x.ItemCode == itemcode)
                                                            .Where(x => x.IsActive == true)
                                                            .Where(x => x.PreparedDate != null)
@@ -828,7 +820,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
         public async Task<IReadOnlyList<MaterialRequirements>> GetAllRejectRequirements(int id)
         {
             var requirements = (from request in _context.Transformation_Request
-                                where request.TransformId == id && request.IsReject == true && request.IsActive == true
+                                where request.TransformId == id && request.IsReject == true && request.IsActive == false
                                 join reject in _context.Transformation_Reject             
                                 on request.TransformId equals reject.TransformId into leftJ
 
@@ -872,7 +864,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
         {
 
             var requirements = (from request in _context.Transformation_Request
-                                where request.TransformId == id
+                                where request.TransformId == id && request.IsCancelled == true
                                 join planning in _context.Transformation_Planning
                                 on request.TransformId equals planning.Id into leftJ
 

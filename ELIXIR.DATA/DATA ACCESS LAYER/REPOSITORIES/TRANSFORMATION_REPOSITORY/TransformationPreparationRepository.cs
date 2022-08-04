@@ -187,14 +187,54 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
         public async Task<RawmaterialDetailsFromWarehouseDto> GetReceivingDetailsForRawmaterials(int id, string code)
         {
 
+            var totalPreparation = _context.Transformation_Preparation.Where(x => x.IsActive == true)
+            .GroupBy(x => new
+            {
+                x.ItemCode,
+                x.WarehouseId,
+
+            }).Select(x => new ItemStocks
+            {
+                ItemCode = x.Key.ItemCode,
+                Out = x.Sum(x => x.WeighingScale),
+                WarehouseId = x.Key.WarehouseId
+            });
+
+
+            var totalMoveOrder = _context.MoveOrders.Where(x => x.IsActive == true)
+                                                    .Where(x => x.IsPrepared == true)
+              .GroupBy(x => new
+              {
+                  x.ItemCode,
+                  x.WarehouseId,
+
+              }).Select(x => new ItemStocks
+              {
+                  ItemCode = x.Key.ItemCode,
+                  Out = x.Sum(x => x.QuantityOrdered),
+                  WarehouseId = x.Key.WarehouseId
+              });
+
+
             var warehouseStock = (from warehouse in _context.WarehouseReceived
                                   where warehouse.IsActive == true
-                                  join req in _context.Transformation_Preparation
+                                  join req in totalPreparation
                                   on warehouse.Id equals req.WarehouseId into leftJ
-
                                   from req in leftJ.DefaultIfEmpty()
 
-                                  group req by new
+                                  join totalMoveOut in totalMoveOrder
+                                  on warehouse.ItemCode equals totalMoveOut.ItemCode
+                                  into leftJ2
+                                  from totalMoveOut in leftJ2.DefaultIfEmpty()
+
+                                  group new
+                                  {
+                                      warehouse,
+                                      req,
+                                      totalMoveOut
+                                  }
+
+                                  by new
                                   {
 
                                       warehouse.Id,
@@ -204,7 +244,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                       warehouse.ManufacturingDate,
                                       warehouse.Expiration,
                                       warehouse.ExpirationDays,
-                                      warehouse.ActualGood
+                                      warehouse.ActualGood,
+                                      PreparationOut = req.Out != null ? req.Out : 0,
+                                      MoveOrderOut = totalMoveOut.Out != null ? totalMoveOut.Out : 0
 
                                   } into total
 
@@ -218,7 +260,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                       total.Key.ManufacturingDate,
                                       total.Key.Expiration,
                                       total.Key.ExpirationDays,
-                                      Reserve = total.Sum(x => x.WeighingScale),
+                                      Reserve = total.Key.PreparationOut + total.Key.MoveOrderOut,
                                       total.Key.ActualGood
 
                                   });
@@ -429,25 +471,51 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                 WarehouseId = x.Key.WarehouseId
             });
 
+            var totalMoveOrder = _context.MoveOrders.Where(x => x.IsActive == true)
+                                                    .Where(x => x.IsPrepared == true)
+               .GroupBy(x => new
+               {
+                   x.ItemCode,
+                   x.WarehouseId,
+
+               }).Select(x => new ItemStocks
+               {
+                   ItemCode = x.Key.ItemCode,
+                   Out = x.Sum(x => x.QuantityOrdered),
+                   WarehouseId = x.Key.WarehouseId
+               });
+
             var totalRemaining = (from totalIn in _context.WarehouseReceived
                                   where totalIn.ItemCode == itemcode && totalIn.IsActive == true
                                   join totalOut in totalout
-
                                   on totalIn.Id equals totalOut.WarehouseId
                                   into leftJ
                                   from totalOut in leftJ.DefaultIfEmpty()
 
-                                  group totalOut by new
-                                  {
+                                  join totalMoveOut in totalMoveOrder
+                                  on totalIn.ItemCode equals totalMoveOut.ItemCode
+                                  into leftJ2
+                                  from totalMoveOut in leftJ2.DefaultIfEmpty()
 
+                                  group new
+                                  {
+                                      totalIn,
+                                      totalOut,
+                                      totalMoveOut
+                                  }
+
+                                  by new
+                                  {
                                       totalIn.Id,
                                       totalIn.ItemCode,
                                       totalIn.ItemDescription,
                                       totalIn.ManufacturingDate,
                                       totalIn.Expiration,
                                       totalIn.ActualGood,
-                                      totalIn.ExpirationDays
-                                      
+                                      totalIn.ExpirationDays,
+                                      PreparationOut = totalOut.Out != null ? totalOut.Out : 0,
+                                      MoveOrderOut = totalMoveOut.Out != null ? totalMoveOut.Out : 0
+
                                   } into total
 
                                   orderby total.Key.ExpirationDays ascending
@@ -461,8 +529,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                       ExpirationDate = total.Key.Expiration,
                                       ExpirationDays = total.Key.ExpirationDays,
                                       In = total.Key.ActualGood,
-                                      Out = total.Sum(x => x.Out),
-                                      Remaining = total.Key.ActualGood - total.Sum(x => x.Out)
+                                      Out = total.Key.PreparationOut,
+                                      Remaining = total.Key.ActualGood - total.Key.PreparationOut - total.Key.MoveOrderOut
 
                                   });
 

@@ -1084,7 +1084,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
 
         }
-
         public async Task<bool> RejectApproveMoveOrder(MoveOrder moveorder)
         {
             var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
@@ -1109,7 +1108,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return true;
         }
-
         public async Task<bool> ReturnMoveOrderForApproval(MoveOrder moveorder)
         {
             var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
@@ -1614,7 +1612,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         }
         public async Task<IReadOnlyList<MoveOrderDto>> ListOfMoveOrdersForTransact(int orderid)
         {
-            var orders = _context.MoveOrders.Select(x => new MoveOrderDto
+            var orders = _context.MoveOrders.Where(x => x.IsActive == true)
+                                            .Where(x => x.IsApprove == true)
+                .Select(x => new MoveOrderDto
             {
 
                 OrderNoPKey = x.OrderNoPKey,

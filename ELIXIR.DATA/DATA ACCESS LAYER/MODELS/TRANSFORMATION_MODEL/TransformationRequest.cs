@@ -58,5 +58,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL
             set;
         }
 
+        public bool? IsCancelled
+        {
+            get;
+            set;
+        }
+
     }
 }

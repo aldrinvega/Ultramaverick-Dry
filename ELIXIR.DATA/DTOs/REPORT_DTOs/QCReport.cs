@@ -8,7 +8,6 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
 {
     public class QCReport
     {
-
         public int Id { get; set; }
         public string QcDate { get; set; }
         public int PONumber { get; set; }
@@ -24,6 +23,33 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public decimal Price { get; set; }
         public string QcBy { get; set; }
 
+        public bool TruckApproval1 { get; set; }
+        public bool TruckApproval2 { get; set; }
+        public bool TruckApproval3 { get; set; }
+        public bool TruckApproval4 { get; set; }
 
+        public string TruckApprovalRemarks1 { get; set; }
+        public string TruckApprovalRemarks2 { get; set; }
+        public string TruckApprovalRemarks3 { get; set; }
+        public string TruckApprovalRemarks4 { get; set; }
+
+        public bool UnloadingApproval1 { get; set; }
+        public bool UnloadingApproval2 { get; set; }
+        public bool UnloadingApproval3 { get; set; }
+        public bool UnloadingApproval4 { get; set; }
+
+        public string UnloadingApprovalRemarks1 { get; set; }
+        public string UnloadingApprovalRemarks2 { get; set; }
+        public string UnloadingApprovalRemarks3 { get; set; }
+        public string UnloadingApprovalRemarks4 { get; set; }
+
+        public bool CheckingApproval1 { get; set; }
+        public bool CheckingApproval2 { get; set; }
+
+        public string CheckingApprovalRemarks1 { get; set; }
+        public string CheckingApprovalRemarks2 { get; set; }
+
+        public bool QAApproval { get; set; }
+        public string QAApprovalRemarks { get; set; }
     }
 }
