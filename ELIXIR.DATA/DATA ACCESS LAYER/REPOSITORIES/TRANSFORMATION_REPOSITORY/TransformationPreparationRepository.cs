@@ -215,6 +215,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                   WarehouseId = x.Key.WarehouseId
               });
 
+            var issueOut = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
+                                                             .Where(x => x.IsTransact == true)
+              .GroupBy(x => new
+              {
+                  x.ItemCode,
+                  x.WarehouseId,
+
+              }).Select(x => new ItemStocks
+              {
+                  ItemCode = x.Key.ItemCode,
+                  Out = x.Sum(x => x.Quantity),
+                  WarehouseId = x.Key.WarehouseId
+              });
+
+
 
             var warehouseStock = (from warehouse in _context.WarehouseReceived
                                   where warehouse.IsActive == true
@@ -227,11 +242,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                   into leftJ2
                                   from totalMoveOut in leftJ2.DefaultIfEmpty()
 
+                                  join issue in issueOut
+                                  on warehouse.ItemCode equals issue.ItemCode
+                                  into leftJ3
+                                  from issue in leftJ3.DefaultIfEmpty()
+
                                   group new
                                   {
                                       warehouse,
                                       req,
-                                      totalMoveOut
+                                      totalMoveOut,
+                                      issue
                                   }
 
                                   by new
@@ -246,7 +267,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                       warehouse.ExpirationDays,
                                       warehouse.ActualGood,
                                       PreparationOut = req.Out != null ? req.Out : 0,
-                                      MoveOrderOut = totalMoveOut.Out != null ? totalMoveOut.Out : 0
+                                      MoveOrderOut = totalMoveOut.Out != null ? totalMoveOut.Out : 0,
+                                      IssueOut = issue.Out != null ? issue.Out : 0
+
 
                                   } into total
 
@@ -260,7 +283,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                       total.Key.ManufacturingDate,
                                       total.Key.Expiration,
                                       total.Key.ExpirationDays,
-                                      Reserve = total.Key.PreparationOut + total.Key.MoveOrderOut,
+                                      Reserve = total.Key.PreparationOut + total.Key.MoveOrderOut + total.Key.IssueOut,
                                       total.Key.ActualGood
 
                                   });
@@ -485,6 +508,20 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                    WarehouseId = x.Key.WarehouseId
                });
 
+            var issueOut = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
+                                                        .Where(x => x.IsTransact == true)
+         .GroupBy(x => new
+         {
+             x.ItemCode,
+             x.WarehouseId,
+
+         }).Select(x => new ItemStocks
+         {
+             ItemCode = x.Key.ItemCode,
+             Out = x.Sum(x => x.Quantity),
+             WarehouseId = x.Key.WarehouseId
+         });
+
             var totalRemaining = (from totalIn in _context.WarehouseReceived
                                   where totalIn.ItemCode == itemcode && totalIn.IsActive == true
                                   join totalOut in totalout
@@ -497,11 +534,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                   into leftJ2
                                   from totalMoveOut in leftJ2.DefaultIfEmpty()
 
+                                  join totalIssue in issueOut
+                                  on totalIn.ItemCode equals totalIssue.ItemCode
+                                  into leftJ3
+                                  from totalIssue in leftJ3.DefaultIfEmpty()
+
                                   group new
                                   {
                                       totalIn,
                                       totalOut,
-                                      totalMoveOut
+                                      totalMoveOut,
+                                      totalIssue
                                   }
 
                                   by new
@@ -514,7 +557,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                       totalIn.ActualGood,
                                       totalIn.ExpirationDays,
                                       PreparationOut = totalOut.Out != null ? totalOut.Out : 0,
-                                      MoveOrderOut = totalMoveOut.Out != null ? totalMoveOut.Out : 0
+                                      MoveOrderOut = totalMoveOut.Out != null ? totalMoveOut.Out : 0,
+                                      IssueOut = totalIssue.Out != null ? totalIssue.Out : 0
 
                                   } into total
 
@@ -530,7 +574,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                       ExpirationDays = total.Key.ExpirationDays,
                                       In = total.Key.ActualGood,
                                       Out = total.Key.PreparationOut,
-                                      Remaining = total.Key.ActualGood - total.Key.PreparationOut - total.Key.MoveOrderOut
+                                      Remaining = total.Key.ActualGood - total.Key.PreparationOut - total.Key.MoveOrderOut - total.Key.IssueOut
 
                                   });
 

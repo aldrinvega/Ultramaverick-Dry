@@ -20,10 +20,13 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public decimal Quantity { get; set; }
         public string ManufacturingDate { get; set; }
         public string ExpirationDate { get; set; }
+        public int ExpirationDays { get; set; }
         public decimal TotalReject { get; set; }
         public string SupplierName { get; set; }
         public decimal Price { get; set; }
         public string ReceivedBy { get; set; }
+        public string TransactionType { get; set; }
+
 
 
     }

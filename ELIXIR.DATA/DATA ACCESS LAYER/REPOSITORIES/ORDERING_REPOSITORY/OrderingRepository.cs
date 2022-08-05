@@ -912,7 +912,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                                              .Where(x => x.IsActive == true)
                                                              .Where(x => x.ItemCode == itemcode)
                                                              .SumAsync(x => x.QuantityOrdered);
-             
+
+            var totalIssue = await _context.MiscellaneousIssueDetails.Where(x => x.WarehouseId == id)
+                                                                     .Where(x => x.IsActive == true)
+                                                                     .Where(x => x.IsTransact == true)
+                                                                     .SumAsync(x => x.Quantity);
+
             var totalRemaining = (from totalIn in _context.WarehouseReceived
                                   where totalIn.Id == id && totalIn.ItemCode == itemcode && totalIn.IsActive == true
                                   join totalOut in totalout
@@ -945,7 +950,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                       ExpirationDays = total.Key.ExpirationDays,
                                       In = total.Key.ActualGood,
                                       Out = total.Sum(x => x.Out),
-                                      Remaining = total.Key.ActualGood - total.Sum(x => x.Out) - totaloutMoveorder
+                                      Remaining = total.Key.ActualGood - total.Sum(x => x.Out) - totaloutMoveorder - totalIssue
 
                                   });
 
@@ -1479,7 +1484,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return await orders.FirstOrDefaultAsync();
         }
-
         public async Task<ItemStocks> GetFirstExpiry(string itemcode)
         {
             var getWarehouseIn = _context.WarehouseReceived.Where(x => x.IsActive == true)

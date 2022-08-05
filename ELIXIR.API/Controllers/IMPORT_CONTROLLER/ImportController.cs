@@ -349,9 +349,11 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
             if (ModelState.IsValid)
             {
 
-                List<ImportPOSummary> duplicateList = new List<ImportPOSummary>();
-                List<ImportPOSummary> notExistList = new List<ImportPOSummary>();
+                List<ImportPOSummary> duplicateList = new List<ImportPOSummary>();           
                 List<ImportPOSummary> availableImport = new List<ImportPOSummary>();
+                List<ImportPOSummary> supplierNotExist = new List<ImportPOSummary>();
+                List<ImportPOSummary> itemcodeNotExist = new List<ImportPOSummary>();
+                List<ImportPOSummary> uomCodeNotExist = new List<ImportPOSummary>();
 
                 foreach (ImportPOSummary items in posummary)
                 {
@@ -368,17 +370,17 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                     
                     else if (validateSupplier == false)
                     {
-                        notExistList.Add(items);
+                        supplierNotExist.Add(items);
                     }
 
                     else if (validateUom == false)
                     {
-                        notExistList.Add(items);
+                        uomCodeNotExist.Add(items);
                     }
 
                     else if (validateItemCode == false)
                     {
-                        notExistList.Add(items);
+                        itemcodeNotExist.Add(items);
                     }
 
                     else
@@ -391,11 +393,13 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                 var resultList = new
                 {
                     availableImport,
-                    notExistList,
-                    duplicateList
+                    duplicateList,
+                    supplierNotExist,
+                    itemcodeNotExist,
+                    uomCodeNotExist
                 };
 
-                if(notExistList.Count == 0 && duplicateList.Count == 0)
+                if(duplicateList.Count == 0 && supplierNotExist.Count == 0 && itemcodeNotExist.Count == 0 && uomCodeNotExist.Count == 0)
                 {
                     await _unitOfWork.CompleteAsync();
                     return Ok("Successfully Add!");

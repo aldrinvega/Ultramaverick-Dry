@@ -275,5 +275,57 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
             return new JsonResult("Successfully Activate Lot Category!");
         }
+
+        [HttpGet]
+        [Route("GetAllLotCategoryWithPagination/{status}")]
+        public async Task<ActionResult<IEnumerable<LotNameDto>>> GetAllLotCategoryWithPagination([FromRoute] bool status, [FromQuery] UserParams userParams)
+        {
+            var category = await _unitOfWork.Lots.GetAllLotCategoryWithPagination(status, userParams);
+
+            Response.AddPaginationHeader(category.CurrentPage, category.PageSize, category.TotalCount, category.TotalPages, category.HasNextPage, category.HasPreviousPage);
+
+            var categoryResult = new
+            {
+                category,
+                category.CurrentPage,
+                category.PageSize,
+                category.TotalCount,
+                category.TotalPages,
+                category.HasNextPage,
+                category.HasPreviousPage
+            };
+
+            return Ok(categoryResult);
+        }
+
+        [HttpGet]
+        [Route("GetAllLotCategoryWithPaginationOrig/{status}")]
+        public async Task<ActionResult<IEnumerable<LotNameDto>>> GetAllLotCategoryWithPaginationOrig([FromRoute] bool status, [FromQuery] UserParams userParams, [FromQuery] string search)
+        {
+
+            if (search == null)
+
+                return await GetAllLotCategoryWithPagination(status, userParams);
+
+            var category = await _unitOfWork.Lots.GetAllLotCategoryWithPaginationOrig(userParams, status, search);
+
+
+            Response.AddPaginationHeader(category.CurrentPage, category.PageSize, category.TotalCount, category.TotalPages, category.HasNextPage, category.HasPreviousPage);
+
+
+            var categoryResult = new
+            {
+                category,
+                category.CurrentPage,
+                category.PageSize,
+                category.TotalCount,
+                category.TotalPages,
+                category.HasNextPage,
+                category.HasPreviousPage
+            };
+
+            return Ok(categoryResult);
+        }
+
     }
 }

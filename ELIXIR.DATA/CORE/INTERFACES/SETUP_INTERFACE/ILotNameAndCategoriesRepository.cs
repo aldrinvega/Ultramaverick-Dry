@@ -40,6 +40,10 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<PagedList<LotNameDto>> GetAllLotNameWithPagination(bool status, UserParams userParams);
         Task<PagedList<LotNameDto>> GetLotNameByStatusWithPaginationOrig(UserParams userParams, bool status, string search);
 
+        Task<PagedList<LotCategoryDto>> GetAllLotCategoryWithPagination(bool status, UserParams userParams);
+        Task<PagedList<LotCategoryDto>> GetAllLotCategoryWithPaginationOrig(UserParams userParams, bool status, string search);
+
+
         Task<bool> ValidateLotNameAndSection(LotName lot);
 
     }

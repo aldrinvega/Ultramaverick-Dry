@@ -1,6 +1,7 @@
 ﻿using ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using ELIXIR.DATA.DTOs.REPORT_DTOs;
+using ELIXIR.DATA.DTOs.TRANSFORMATION_DTOs;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -111,7 +112,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 ExpirationDate = x.Expiration.ToString(),
                 TotalReject = x.TotalReject, 
                 SupplierName = x.Supplier,
-                ReceivedBy = x.ReceivedBy
+                ReceivedBy = x.ReceivedBy,
+                TransactionType = x.TransactionType
 
             });
 
@@ -244,6 +246,119 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                           });
 
             return await issues.ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<WarehouseReport>> NearlyExpireItemsReport(int expirydays)
+        {
+            var preparationOut = _context.Transformation_Preparation.Where(x => x.IsActive == true)                                                             
+                .GroupBy(x => new
+            {
+                x.ItemCode,
+                x.WarehouseId,
+
+            }).Select(x => new ItemStocks
+            {
+                ItemCode = x.Key.ItemCode,
+                Out = x.Sum(x => x.WeighingScale),
+                WarehouseId = x.Key.WarehouseId
+            });
+
+            var moveorderOut = _context.MoveOrders.Where(x => x.IsActive == true)
+                                                  .Where(x => x.IsPrepared == true)
+                .GroupBy(x => new
+            {
+                x.ItemCode,
+                x.WarehouseId,
+
+            }).Select(x => new ItemStocks
+            {
+                ItemCode = x.Key.ItemCode,
+                Out = x.Sum(x => x.QuantityOrdered),
+                WarehouseId = x.Key.WarehouseId
+            });
+
+            var issueOut = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
+                                                             .Where(x => x.IsTransact == true)
+                .GroupBy(x => new
+            {
+                x.ItemCode,
+                x.WarehouseId,
+
+            }).Select(x => new ItemStocks
+            {
+                ItemCode = x.Key.ItemCode,
+                Out = x.Sum(x => x.Quantity),
+                WarehouseId = x.Key.WarehouseId
+            });
+
+            var warehouseInventory = (from warehouse in _context.WarehouseReceived
+                                  where warehouse.ExpirationDays <= expirydays
+                                  join preparation in preparationOut
+                                  on warehouse.Id equals preparation.WarehouseId
+                                  into leftJ
+                                  from preparation in leftJ.DefaultIfEmpty()
+
+                                  join moveorder in moveorderOut
+                                  on warehouse.Id equals moveorder.WarehouseId
+                                  into leftJ2
+                                  from moveorder in leftJ2.DefaultIfEmpty()
+
+                                  join issue in issueOut
+                                  on warehouse.Id equals issue.WarehouseId
+                                  into leftJ3
+                                  from issue in leftJ3.DefaultIfEmpty()
+
+                                      group new
+                                  {
+                                      warehouse,
+                                      preparation,
+                                      moveorder,
+                                      issue
+                                  }
+                                  by new 
+                                  {
+                                      warehouse.Id,
+                                      warehouse.PO_Number,
+                                      warehouse.ItemCode,
+                                      warehouse.ItemDescription,
+                                      warehouse.ManufacturingDate,
+                                      warehouse.ReceivingDate,
+                                      warehouse.LotCategory,
+                                      warehouse.Uom,
+                                      warehouse.ActualGood,
+                                      warehouse.Expiration,
+                                      warehouse.ExpirationDays,
+                                      warehouse.Supplier,
+                                      warehouse.ReceivedBy,
+                                      PreparationOut = preparation.Out != null ? preparation.Out : 0,
+                                      MoveOrderOut = moveorder.Out != null ? moveorder.Out : 0,
+                                      IssueOut = issue.Out != null ? issue.Out : 0
+
+
+                                  } into total
+
+                                  orderby total.Key.ItemCode, total.Key.ExpirationDays ascending
+
+                                  select new WarehouseReport
+                                  {
+                                      WarehouseId = total.Key.Id,
+                                      PONumber = total.Key.PO_Number,
+                                      ItemCode = total.Key.ItemCode,
+                                      ItemDescription = total.Key.ItemDescription,
+                                      Uom = total.Key.Uom,
+                                      Category = total.Key.LotCategory,
+                                      ReceiveDate = total.Key.ReceivingDate.ToString(),
+                                      ManufacturingDate = total.Key.ManufacturingDate.ToString(),
+                                      Quantity = total.Key.ActualGood - total.Key.PreparationOut - total.Key.MoveOrderOut - total.Key.IssueOut,
+                                      ExpirationDate = total.Key.Expiration.ToString(),
+                                      ExpirationDays = total.Key.ExpirationDays,
+                                      SupplierName = total.Key.Supplier,
+                                      ReceivedBy = total.Key.ReceivedBy
+
+                                  });
+
+            return await warehouseInventory.ToListAsync();
+                                 
         }
     }
 }

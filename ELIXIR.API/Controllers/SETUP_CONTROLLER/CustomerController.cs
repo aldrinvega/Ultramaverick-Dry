@@ -268,5 +268,55 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
             return new JsonResult("Successfully Activate Farm!");
         }
+
+        [HttpGet]
+        [Route("GetAllFarmWithPagination/{status}")]
+        public async Task<ActionResult<IEnumerable<CustomerDto>>> GetAllFarmWithPagination([FromRoute] bool status, [FromQuery] UserParams userParams)
+        {
+            var farms = await _unitOfWork.Customers.GetAllFarmWithPagination(status, userParams);
+
+            Response.AddPaginationHeader(farms.CurrentPage, farms.PageSize, farms.TotalCount, farms.TotalPages, farms.HasNextPage, farms.HasPreviousPage);
+
+            var farmResult = new
+            {
+                farms,
+                farms.CurrentPage,
+                farms.PageSize,
+                farms.TotalCount,
+                farms.TotalPages,
+                farms.HasNextPage,
+                farms.HasPreviousPage
+            };
+
+            return Ok(farmResult);
+        }
+
+        [HttpGet]
+        [Route("GetAllFarmWithPaginationOrig/{status}")]
+        public async Task<ActionResult<IEnumerable<CustomerDto>>> GetAllFarmWithPaginationOrig([FromRoute] bool status, [FromQuery] UserParams userParams, [FromQuery] string search)
+        {
+
+            if (search == null)
+
+                return await GetAllFarmWithPagination(status, userParams);
+
+            var farms = await _unitOfWork.Customers.GetAllFarmWithPaginationOrig(userParams, status, search);
+
+
+            Response.AddPaginationHeader(farms.CurrentPage, farms.PageSize, farms.TotalCount, farms.TotalPages, farms.HasNextPage, farms.HasPreviousPage);
+
+            var farmResult = new
+            {
+                farms,
+                farms.CurrentPage,
+                farms.PageSize,
+                farms.TotalCount,
+                farms.TotalPages,
+                farms.HasNextPage,
+                farms.HasPreviousPage
+            };
+
+            return Ok(farmResult);
+        }
     }
 }

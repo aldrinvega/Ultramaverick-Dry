@@ -367,5 +367,42 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
             return await PagedList<CustomerDto>.CreateAsync(customer, userParams.PageNumber, userParams.PageSize);
         }
+
+        public async Task<PagedList<FarmDto>> GetAllFarmWithPagination(bool status, UserParams userParams)
+        {
+            var farm = _context.Farms.OrderByDescending(x => x.DateAdded)
+                             .Select(farm => new FarmDto
+                             {
+                                 Id = farm.Id,
+                                 FarmCode = farm.FarmCode,
+                                 FarmName = farm.FarmName,
+                                 DateAdded = farm.DateAdded.ToString("MM/dd/yyyy"),
+                                 AddedBy = farm.AddedBy,
+                                 IsActive = farm.IsActive
+
+                             }).Where(x => x.IsActive == status);
+
+            return await PagedList<FarmDto>.CreateAsync(farm, userParams.PageNumber, userParams.PageSize);
+        }
+
+        public async Task<PagedList<FarmDto>> GetAllFarmWithPaginationOrig(UserParams userParams, bool status, string search)
+        {
+
+            var farm = _context.Farms.OrderByDescending(x => x.DateAdded)
+                             .Select(farm => new FarmDto
+                             {
+                                 Id = farm.Id,
+                                 FarmCode = farm.FarmCode,
+                                 FarmName = farm.FarmName,
+                                 DateAdded = farm.DateAdded.ToString("MM/dd/yyyy"),
+                                 AddedBy = farm.AddedBy,
+                                 IsActive = farm.IsActive
+
+                             }).Where(x => x.IsActive == status)
+                               .Where(x => x.FarmCode.ToLower()
+                               .Contains(search.Trim().ToLower()));
+
+            return await PagedList<FarmDto>.CreateAsync(farm, userParams.PageNumber, userParams.PageSize);
+        }
     }
 }

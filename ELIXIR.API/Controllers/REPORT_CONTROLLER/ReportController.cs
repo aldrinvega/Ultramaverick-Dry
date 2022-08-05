@@ -84,5 +84,16 @@ namespace ELIXIR.API.Controllers.REPORT_CONTROLLER
 
         }
 
+        [HttpGet]
+        [Route("NearlyExpireItemsReport")]
+        public async Task<IActionResult> NearlyExpireItemsReport([FromQuery] int expirydays)
+        {
+
+            var expiry = await _unitOfWork.Report.NearlyExpireItemsReport(expirydays);
+
+            return Ok(expiry);
+
+        }
+
     }
 }

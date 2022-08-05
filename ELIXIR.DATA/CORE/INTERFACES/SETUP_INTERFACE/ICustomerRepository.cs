@@ -32,12 +32,11 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<IReadOnlyList<FarmDto>> GetAllInActiveFarm();
         Task<bool> FarmCodeExist(string farm);
 
-
-
-
         Task<PagedList<CustomerDto>> GetAllCustomerWithPagination(bool status, UserParams userParams);
         Task<PagedList<CustomerDto>> GetCustomerByStatusWithPaginationOrig(UserParams userParams, bool status, string search);
 
+        Task<PagedList<FarmDto>> GetAllFarmWithPagination(bool status, UserParams userParams);
+        Task<PagedList<FarmDto>> GetAllFarmWithPaginationOrig(UserParams userParams, bool status, string search);
 
 
     }

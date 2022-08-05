@@ -386,6 +386,44 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             return await PagedList<RawMaterialDto>.CreateAsync(rawmaterials, userParams.PageNumber, userParams.PageSize);
 
         }
+
+        public async Task<PagedList<ItemCategoryDto>> GetAllItemCategoryWithPagination(bool status, UserParams userParams)
+        {
+            var category = _context.ItemCategories.OrderByDescending(x => x.DateAdded)
+                                                .Select(item => new ItemCategoryDto
+                                                {
+                                                    Id = item.Id,
+                                                    ItemCategoryName = item.ItemCategoryName,
+                                                    DateAdded = item.DateAdded.ToString("MM/dd/yyyy"),
+                                                    AddedBy = item.AddedBy,
+                                                    IsActive = item.IsActive,
+                                                    Reason = item.Reason
+
+                                                })
+                                                  .Where(x => x.IsActive == status);
+
+            return await PagedList<ItemCategoryDto>.CreateAsync(category, userParams.PageNumber, userParams.PageSize);
+        }
+
+        public async Task<PagedList<ItemCategoryDto>> GetAllItemCategoryWithPaginationOrig(UserParams userParams, bool status, string search)
+        {
+            var category = _context.ItemCategories.OrderByDescending(x => x.DateAdded)
+                                               .Select(item => new ItemCategoryDto
+                                               {
+                                                   Id = item.Id,
+                                                   ItemCategoryName = item.ItemCategoryName,
+                                                   DateAdded = item.DateAdded.ToString("MM/dd/yyyy"),
+                                                   AddedBy = item.AddedBy,
+                                                   IsActive = item.IsActive,
+                                                   Reason = item.Reason
+
+                                               })
+                                                 .Where(x => x.IsActive == status)
+                                                 .Where(x => x.ItemCategoryName.ToLower()
+                                                 .Contains(search.Trim().ToLower()));
+
+            return await PagedList<ItemCategoryDto>.CreateAsync(category, userParams.PageNumber, userParams.PageSize);
+        }
     }
 
 }

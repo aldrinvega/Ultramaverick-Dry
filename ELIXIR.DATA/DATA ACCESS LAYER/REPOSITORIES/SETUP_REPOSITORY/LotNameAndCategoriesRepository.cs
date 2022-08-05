@@ -348,6 +348,42 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             return true;
 
         }
+
+        public async Task<PagedList<LotCategoryDto>> GetAllLotCategoryWithPagination(bool status, UserParams userParams)
+        {
+            var category = _context.LotCategories.OrderByDescending(x => x.DateAdded)
+                                               .Select(categories => new LotCategoryDto
+                                               {
+                                                   Id = categories.Id,
+                                                   CategoryName = categories.LotCategoryName,
+                                                   DateAdded = categories.DateAdded.ToString("MM/dd/yyyy"),
+                                                   AddedBy = categories.AddedBy,
+                                                   IsActive = categories.IsActive,
+                                                   Reason = categories.Reason
+
+                                               }).Where(x => x.IsActive == status);
+
+            return await PagedList<LotCategoryDto>.CreateAsync(category, userParams.PageNumber, userParams.PageSize);
+        }
+
+        public async Task<PagedList<LotCategoryDto>> GetAllLotCategoryWithPaginationOrig(UserParams userParams, bool status, string search)
+        {
+            var category = _context.LotCategories.OrderByDescending(x => x.DateAdded)
+                                               .Select(categories => new LotCategoryDto
+                                               {
+                                                   Id = categories.Id,
+                                                   CategoryName = categories.LotCategoryName,
+                                                   DateAdded = categories.DateAdded.ToString("MM/dd/yyyy"),
+                                                   AddedBy = categories.AddedBy,
+                                                   IsActive = categories.IsActive,
+                                                   Reason = categories.Reason
+
+                                               }).Where(x => x.IsActive == status)
+                                                 .Where(x => x.CategoryName.ToLower()
+                                                 .Contains(search.Trim().ToLower()));
+
+            return await PagedList<LotCategoryDto>.CreateAsync(category, userParams.PageNumber, userParams.PageSize);
+        }
     }
 
 }

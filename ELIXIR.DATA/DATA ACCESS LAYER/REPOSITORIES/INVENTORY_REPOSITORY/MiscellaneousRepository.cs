@@ -345,6 +345,22 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                             QuantityOrdered = x.Sum(x => x.QuantityOrdered)
                         });
 
+            var issueOut = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
+                                                    //       .Where(x => x.IsTransact == true)
+            .GroupBy(x => new
+            {
+                x.ItemCode,
+                x.WarehouseId,
+
+            }).Select(x => new ItemStocks
+            {
+                ItemCode = x.Key.ItemCode,
+                Out = x.Sum(x => x.Quantity),
+                WarehouseId = x.Key.WarehouseId
+            });
+
+
+
             var getAvailable = (from warehouse in getWarehouseStocks
                                 join transform in transformOut
                                 on warehouse.WarehouseId equals transform.WarehouseId
@@ -356,11 +372,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                 into leftJ2
                                 from moveorder in leftJ2.DefaultIfEmpty()
 
+                                join issue in issueOut
+                                on warehouse.WarehouseId equals issue.WarehouseId
+                                into leftJ3
+                                from issue in leftJ3.DefaultIfEmpty()
+
                                 group new
                                 {
                                     warehouse,
                                     transform,
-                                    moveorder
+                                    moveorder,
+                                    issue
                                 }
 
                                 by new
@@ -370,7 +392,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                     warehouse.ExpirationDate,
                                     WarehouseActualGood = warehouse.ActualGood != null ? warehouse.ActualGood : 0,
                                     TransformOut = transform.WeighingScale != null ? transform.WeighingScale : 0,
-                                    MoveOrderOut = moveorder.QuantityOrdered != null ? moveorder.QuantityOrdered : 0
+                                    MoveOrderOut = moveorder.QuantityOrdered != null ? moveorder.QuantityOrdered : 0,
+                                    IssueOut = issue.Out != null ? issue.Out : 0
 
                                 } into total
 
@@ -378,7 +401,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                 {
                                     WarehouseId = total.Key.WarehouseId,
                                     ItemCode = total.Key.ItemCode,
-                                    RemainingStocks = total.Key.WarehouseActualGood - total.Key.TransformOut - total.Key.MoveOrderOut,
+                                    RemainingStocks = total.Key.WarehouseActualGood - total.Key.TransformOut - total.Key.MoveOrderOut - total.Key.IssueOut,
                                     ExpirationDate = total.Key.ExpirationDate
 
                                 }).Where(x => x.RemainingStocks != 0)
