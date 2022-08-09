@@ -113,7 +113,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
                    });
 
-            var getQCReceivingIn = _context.QC_Receiving.Where(x => x.IsActive == true)
+            var getQCReceivingIn = _context.QC_Receiving.Where(x => x.ExpiryIsApprove == true)
+                                                        .Where(x => x.IsActive == true)
                    .GroupBy(x => new
                    {
                        x.ItemCode,
@@ -549,6 +550,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                    });
 
             var getQCReceivingIn = _context.QC_Receiving.Where(x => x.IsActive == true)
+                                                        .Where(x => x.ExpiryIsApprove == true)
                    .GroupBy(x => new
                    {
                        x.ItemCode,
@@ -982,7 +984,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
                    });
 
-            var getQCReceivingIn = _context.QC_Receiving.Where(x => x.IsActive == true)
+            var getQCReceivingIn = _context.QC_Receiving.Where(x => x.ExpiryIsApprove == true)
+                                                        .Where(x => x.IsActive == true)
                    .GroupBy(x => new
                    {
                        x.ItemCode,

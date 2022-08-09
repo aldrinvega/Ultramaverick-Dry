@@ -3,6 +3,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DTOs.RECEIVING_DTOs;
+using ELIXIR.DATA.DTOs.REPORT_DTOs;
 using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
 using System;
 using System.Collections.Generic;
@@ -30,34 +31,21 @@ namespace ELIXIR.DATA.CORE.INTERFACES.QC_INTERFACE
         Task<bool> RejectRawMaterialsNearlyExpire(PO_Receiving receiving);
         Task<bool> WarehouseConfirmRejectByQc(WarehouseReceiving warehouse);
         Task<bool> WarehouseReturnRejectByQc(PO_Receiving receiving);
-
-
         Task<bool> ValidateActualRemaining(PO_Receiving receiving);
-
         Task<IReadOnlyList<RejectWarehouseReceivingDto>> GetAllWarehouseConfirmReject();
-
-      //  Task<decimal> ValidateActualRemaining(PO_Receiving receiving);
         Task<bool> ValidateForCancelPo(ImportPOSummary summary);
-
         Task<PagedList<PoSummaryChecklistDto>> GetAllPoSummaryWithPagination(UserParams userParams);
         Task<PagedList<PoSummaryChecklistDto>> GetPoSummaryByStatusWithPaginationOrig(UserParams userParams, string search);
-
         Task<PagedList<WarehouseReceivingDto>> GetAllAvailableForWarehouseWithPagination(UserParams userParams);
         Task<PagedList<WarehouseReceivingDto>> GetAllAvailableForWarehouseWithPaginationOrig(UserParams userParams, string search);
-
         Task<PagedList<CancelledPoDto>> GetAllCancelledPOWithPagination (UserParams userParams);
         Task<PagedList<CancelledPoDto>> GetAllCancelledPOWithPaginationOrig(UserParams userParams, string search);
-
         Task<PagedList<NearlyExpireDto>> GetAllNearlyExpireWithPagination(UserParams userParams);
         Task<PagedList<NearlyExpireDto>> GetAllNearlyExpireWithPaginationOrig(UserParams userParams, string search);
-
-
         Task<PagedList<RejectWarehouseReceivingDto>> GetAllConfirmRejectWithPagination(UserParams userParams);
         Task<PagedList<RejectWarehouseReceivingDto>> GetAllConfirmRejectWithPaginationOrig(UserParams userParams, string search);
 
-
-        //    Task<IReadOnlyList> GetAllCountInQcReceiving();
-
+        Task<IReadOnlyList<NearlyExpireDto>> GetItemDetailsForNearlyExpire(int id);
 
     }
 }

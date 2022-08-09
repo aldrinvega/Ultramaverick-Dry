@@ -13,6 +13,7 @@ using System.Data;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
+using ELIXIR.DATA.DTOs.REPORT_DTOs;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 {
@@ -968,6 +969,59 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                         .Contains(search.Trim().ToLower()));
 
             return await PagedList<RejectWarehouseReceivingDto>.CreateAsync(reject, userParams.PageNumber, userParams.PageSize);
+
+        }
+
+        public async Task<IReadOnlyList<NearlyExpireDto>> GetItemDetailsForNearlyExpire(int id)
+        {
+
+            var summary = (from posummary in _context.POSummary
+                           join receiving in _context.QC_Receiving
+                           on posummary.Id equals receiving.PO_Summary_Id
+                           into leftJ1
+                           from receiving in leftJ1.DefaultIfEmpty()
+
+                           select new NearlyExpireDto
+                           {
+                               Id = receiving.Id, 
+                               PO_Number = posummary.PO_Number,
+                               PO_Date = posummary.PO_Date.ToString(),
+                               PR_Number = posummary.PR_Number, 
+                               PR_Date = posummary.PR_Date.ToString(),
+                               ItemCode = posummary.ItemCode, 
+                               ItemDescription = posummary.ItemDescription,
+                               Supplier = posummary.VendorName, 
+                               QuantityOrdered = receiving.Actual_Delivered,
+                               ManufacturingDate = receiving.Manufacturing_Date.ToString(),
+                               DateOfChecking = receiving.QC_ReceiveDate.ToString(),
+                               ExpiryIsApprove = receiving.ExpiryIsApprove != null ,
+                               ExpiryDate = receiving.Expiry_Date.ToString(),
+                               TruckApproval1 = receiving.Truck_Approval1,
+                               TruckApprovalRemarks1 = receiving.Truck_Approval1_Remarks,
+                               TruckApproval2 = receiving.Truck_Approval2,
+                               TruckApprovalRemarks2 = receiving.Truck_Approval2_Remarks,
+                               TruckApproval3 = receiving.Truck_Approval3,
+                               TruckApprovalRemarks3 = receiving.Truck_Approval3_Remarks,
+                               TruckApproval4 = receiving.Truck_Approval4,
+                               TruckApprovalRemarks4 = receiving.Truck_Approval4_Remarks,
+                               UnloadingApproval1 = receiving.Unloading_Approval1,
+                               UnloadingApprovalRemarks1 = receiving.Unloading_Approval1_Remarks,
+                               UnloadingApproval2 = receiving.Unloading_Approval2,
+                               UnloadingApprovalRemarks2 = receiving.Unloading_Approval2_Remarks,
+                               UnloadingApproval3 = receiving.Unloading_Approval3,
+                               UnloadingApprovalRemarks3 = receiving.Unloading_Approval3_Remarks,
+                               UnloadingApproval4 = receiving.Unloading_Approval4,
+                               UnloadingApprovalRemarks4 = receiving.Unloading_Approval4_Remarks,
+                               CheckingApproval1 = receiving.Checking_Approval1,
+                               CheckingApprovalRemarks1 = receiving.Checking_Approval1_Remarks,
+                               CheckingApproval2 = receiving.Checking_Approval2,
+                               CheckingApprovalRemarks2 = receiving.Checking_Approval2_Remarks,
+                               QAApproval = receiving.QA_Approval,
+                               QAApprovalRemarks = receiving.QA_Approval_Remarks
+                           });
+
+            return await summary.Where(x => x.Id == id)
+                                .ToListAsync();
 
         }
     }

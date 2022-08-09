@@ -283,7 +283,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             if (id != requirement.Id)
                 return BadRequest();
 
-            await _unitOfWork.Transforms.ValidateEntryInRequirement(requirement);
+            await _unitOfWork.Transforms.UpdateQuantity(requirement);
             await _unitOfWork.CompleteAsync();
 
             return Ok(requirement);

@@ -561,5 +561,15 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
         }
 
 
+        [HttpGet]
+        [Route("GetDetailsForNearlyExpire")]
+        public async Task<IActionResult> GetDetailsForNearlyExpire([FromQuery] int id)
+        {
+            var posummary = await _unitOfWork.Receives.GetItemDetailsForNearlyExpire(id);
+
+            return Ok(posummary);
+        }
+
+
     }
 }
