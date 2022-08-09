@@ -705,7 +705,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                                           .Where(x => x.IsActive == true)
                                                           .SumAsync(x => x.ActualGood);
 
-            var computeRequest = await _context.Transformation_Request.Where(x => x.ItemCode == itemcode)                                                     
+            var computeRequest = await _context.Transformation_Request.Where(x => x.ItemCode == itemcode)
                                                                       .Where(x => x.IsActive == true)
                                                                       .SumAsync(x => x.Quantity);
 
@@ -714,21 +714,38 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                                            .Where(x => x.PreparedDate != null)
                                                            .SumAsync(x => x.QuantityOrdered);
 
-            var final = compute - computeRequest - computeOrderReserve;
+            var issueOut = await _context.MiscellaneousIssueDetails.Where(x => x.ItemCode == itemcode)
+                                                                   .Where(x => x.IsActive == true)
+                                                                    .Where(x => x.IsTransact == true)
+                                                                    .SumAsync(x => x.Quantity);
+
+            var final = compute - computeRequest - computeOrderReserve - issueOut;
 
             return final;
         }
 
         public async Task<bool> ValidateRequirement(string itemcode, int batch, decimal quantity)
         {
-           
+
             var computeRequest = await _context.Transformation_Request.Where(x => x.ItemCode == itemcode)
+                                                                      .Where(x => x.IsActive == true)
                                                                       .SumAsync(x => x.Quantity);
 
             var computeStock = await _context.WarehouseReceived.Where(x => x.ItemCode == itemcode)
+                                                               .Where(x => x.IsActive == true)
                                                                .SumAsync(x => x.ActualGood);
 
-            if ((quantity * batch) > (computeStock - computeRequest))
+            var issueOut = await _context.MiscellaneousIssueDetails.Where(x => x.ItemCode == itemcode)
+                                                                   .Where(x => x.IsActive == true)
+                                                                   .Where(x => x.IsTransact == true)
+                                                                   .SumAsync(x => x.Quantity);
+
+            var computeOrderReserve = await _context.Orders.Where(x => x.ItemCode == itemcode)
+                                                           .Where(x => x.IsActive == true)
+                                                           .Where(x => x.PreparedDate != null)
+                                                           .SumAsync(x => x.QuantityOrdered);
+
+            if ((quantity * batch) > (computeStock - computeRequest - computeOrderReserve - issueOut))
                 return false;
 
             return true;

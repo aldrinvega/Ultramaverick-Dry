@@ -238,12 +238,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                   from req in leftJ.DefaultIfEmpty()
 
                                   join totalMoveOut in totalMoveOrder
-                                  on warehouse.ItemCode equals totalMoveOut.ItemCode
+                                  on warehouse.Id equals totalMoveOut.WarehouseId
                                   into leftJ2
                                   from totalMoveOut in leftJ2.DefaultIfEmpty()
 
                                   join issue in issueOut
-                                  on warehouse.ItemCode equals issue.ItemCode
+                                  on warehouse.Id equals issue.WarehouseId
                                   into leftJ3
                                   from issue in leftJ3.DefaultIfEmpty()
 
@@ -284,31 +284,31 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                       total.Key.Expiration,
                                       total.Key.ExpirationDays,
                                       Reserve = total.Key.PreparationOut + total.Key.MoveOrderOut + total.Key.IssueOut,
-                                      total.Key.ActualGood
+                                      total.Key.ActualGood,
+                                      RemainingStocks = total.Key.ActualGood - total.Key.PreparationOut - total.Key.MoveOrderOut - total.Key.IssueOut
 
                                   });
 
             var warehousereceived = (from request in _context.Transformation_Request
-                                     where request.IsActive == true && request.IsPrepared == false && request.TransformId == id                        
+                                     where request.IsActive == true && request.IsPrepared == false && request.TransformId == id
                                      join warehouse in warehouseStock
                                      on request.ItemCode equals warehouse.ItemCode
-                               
+
                                      group warehouse by new
                                      {
-                                        
-                                         warehouse.Id, 
+
+                                         warehouse.Id,
                                          warehouse.Supplier,
                                          warehouse.ItemCode,
                                          warehouse.ItemDescription,
                                          warehouse.ManufacturingDate,
                                          warehouse.Expiration,
                                          warehouse.ExpirationDays,
-                                         warehouse.ActualGood,                                     
                                          request.Quantity,
-                                         request.Batch,                            
+                                         request.Batch,
                                          request.IsPrepared,
-                                         warehouse.Reserve,
-                                         request.TransformId
+                                         request.TransformId,
+                                         warehouse.RemainingStocks
 
                                      } into total
 
@@ -323,17 +323,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                          ItemDescription = total.Key.ItemDescription,
                                          ManufacturingDate = total.Key.ManufacturingDate,
                                          ExpirationDate = total.Key.Expiration,
-                                         ExpirationDays = total.Key.ExpirationDays,                          
+                                         ExpirationDays = total.Key.ExpirationDays,
                                          QuantityNeeded = Math.Round(Convert.ToDecimal(total.Key.Quantity), 2),
                                          Batch = total.Key.Batch,
                                          IsPrepared = total.Key.IsPrepared,
-                                         Balance = total.Key.ActualGood - total.Key.Reserve
+                                         Balance = total.Key.RemainingStocks
 
                                      });
 
-             return await warehousereceived.Where(x => x.ItemCode == code)
-                                           .Where(x => x.Balance != 0)
-                                           .FirstOrDefaultAsync();
+            return await warehousereceived.Where(x => x.ItemCode == code)
+                                          .Where(x => x.Balance != 0)
+                                          .FirstOrDefaultAsync();
 
         }
 
@@ -530,12 +530,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                                   from totalOut in leftJ.DefaultIfEmpty()
 
                                   join totalMoveOut in totalMoveOrder
-                                  on totalIn.ItemCode equals totalMoveOut.ItemCode
+                                  on totalIn.Id equals totalMoveOut.WarehouseId
                                   into leftJ2
                                   from totalMoveOut in leftJ2.DefaultIfEmpty()
 
                                   join totalIssue in issueOut
-                                  on totalIn.ItemCode equals totalIssue.ItemCode
+                                  on totalIn.Id equals totalIssue.WarehouseId
                                   into leftJ3
                                   from totalIssue in leftJ3.DefaultIfEmpty()
 
