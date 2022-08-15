@@ -3,11 +3,8 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DTOs.SETUP_DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
@@ -181,7 +178,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             if (ModelState.IsValid)
             {
 
-                foreach(TransformationRequirement items in requirement)
+                foreach (TransformationRequirement items in requirement)
                 {
 
                     var validateRawMaterial = await _unitOfWork.Transforms.ValidateRawMaterial(items.RawMaterialId);

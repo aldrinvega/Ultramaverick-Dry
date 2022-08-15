@@ -3,13 +3,14 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DTOs.SETUP_DTOs;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 {
+   // [EnableCors("CorsPolicy")]
     public class UomController : BaseApiController
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -123,6 +124,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok(uom);
         }
 
+     //   [EnableCors("CorsPolicy")]
         [HttpPut]
         [Route("InActiveUom/{id}")]
         public async Task<IActionResult> InActiveModule(int id, [FromBody] UOM uom)
@@ -136,6 +138,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return new JsonResult("Successfully InActive UOM!");
         }
 
+      //  [EnableCors("CorsPolicy")]
         [HttpPut]
         [Route("ActivateUom/{id}")]
         public async Task<IActionResult> ActivateUom(int id, [FromBody] UOM uom)

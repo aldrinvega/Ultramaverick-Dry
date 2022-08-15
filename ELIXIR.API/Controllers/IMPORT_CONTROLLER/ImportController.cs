@@ -1,19 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Hosting;
-using System.Threading.Tasks;
+﻿using ELIXIR.DATA.CORE.ICONFIGURATION;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL;
-using OfficeOpenXml;
-using ExcelDataReader;
-using System.Threading;
-using ELIXIR.DATA.CORE.ICONFIGURATION;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
 {
@@ -349,7 +344,7 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
             if (ModelState.IsValid)
             {
 
-                List<ImportPOSummary> duplicateList = new List<ImportPOSummary>();           
+                List<ImportPOSummary> duplicateList = new List<ImportPOSummary>();
                 List<ImportPOSummary> availableImport = new List<ImportPOSummary>();
                 List<ImportPOSummary> supplierNotExist = new List<ImportPOSummary>();
                 List<ImportPOSummary> itemcodeNotExist = new List<ImportPOSummary>();
@@ -367,7 +362,7 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                     {
                         duplicateList.Add(items);
                     }
-                    
+
                     else if (validateSupplier == false)
                     {
                         supplierNotExist.Add(items);
@@ -399,17 +394,17 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                     uomCodeNotExist
                 };
 
-                if(duplicateList.Count == 0 && supplierNotExist.Count == 0 && itemcodeNotExist.Count == 0 && uomCodeNotExist.Count == 0)
+                if (duplicateList.Count == 0 && supplierNotExist.Count == 0 && itemcodeNotExist.Count == 0 && uomCodeNotExist.Count == 0)
                 {
                     await _unitOfWork.CompleteAsync();
                     return Ok("Successfully Add!");
                 }
 
-                else 
+                else
                 {
-        
+
                     return BadRequest(resultList);
-                }              
+                }
             }
             return new JsonResult("Something went Wrong!") { StatusCode = 500 };
         }
@@ -454,7 +449,7 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                         return BadRequest("Item Code already Exist!, Please try something else!");
 
                     await _unitOfWork.Imports.AddNewRawMaterialSummary(items);
-         
+
                 }
 
                 await _unitOfWork.CompleteAsync();
@@ -473,7 +468,7 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                 decimal totalamount = 0;
                 int transformId = 0;
                 int rawmats = 0;
-                int formulacode = 0; 
+                int formulacode = 0;
 
                 foreach (TransformationRequirement items in requirement)
                 {
@@ -517,7 +512,7 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                 if (requirementId != totalamount)
                     return BadRequest("Upload failed! requirement quantity doesn't meet the formula needed.");
 
- 
+
                 await _unitOfWork.CompleteAsync();
 
             }
@@ -531,7 +526,7 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
         public async Task<IActionResult> AddNewSupplierSummary([FromBody] Supplier[] supply)
         {
 
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 foreach (Supplier items in supply)
                 {
@@ -540,7 +535,7 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                         return BadRequest("Supplier name already exist, please try something else!");
 
                     await _unitOfWork.Imports.AddNewSupplierSummary(items);
-              
+
                 }
 
                 await _unitOfWork.CompleteAsync();

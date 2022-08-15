@@ -2,16 +2,13 @@
 using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DTOs.INVENTORY_DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 {
-   
+
     public class InventoryController : BaseApiController
     {
         private IUnitOfWork _unitOfWork;
@@ -21,7 +18,7 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
             _unitOfWork = unitOfWork;
         }
 
-      
+
         [HttpGet]
         [Route("RawmaterialInventory")]
         public async Task<IActionResult> GetAllAvailableRawmaterial()

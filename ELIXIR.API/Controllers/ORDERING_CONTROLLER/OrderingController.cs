@@ -55,13 +55,13 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             await _unitOfWork.Order.GenerateNumber(generate);
             await _unitOfWork.CompleteAsync();
 
-            foreach(Ordering items in order)
+            foreach (Ordering items in order)
             {
 
                 items.OrderNoPKey = generate.Id;
-      
+
                 await _unitOfWork.Order.SchedulePreparedDate(items);
-                
+
             }
 
             await _unitOfWork.CompleteAsync();
@@ -73,9 +73,9 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("ApprovePreparedDate")]
         public async Task<IActionResult> ApprovePreparedDate([FromBody] Ordering order)
         {
-                await _unitOfWork.Order.ApprovePreparedDate(order);
-                await _unitOfWork.CompleteAsync();
-        
+            await _unitOfWork.Order.ApprovePreparedDate(order);
+            await _unitOfWork.CompleteAsync();
+
             return new JsonResult("Successfully approved prepared date!");
         }
 
@@ -114,7 +114,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpPost]
         [Route("AddNewOrders")]
-        public async Task<IActionResult> AddNewOrders([FromBody]Ordering[] order)
+        public async Task<IActionResult> AddNewOrders([FromBody] Ordering[] order)
         {
 
             List<Ordering> notExistFarmName = new List<Ordering>();
@@ -181,7 +181,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             };
 
-            if (notExistFarmName.Count == 0 && notExistFarmCode.Count == 0 && notExistRawMats.Count == 0 
+            if (notExistFarmName.Count == 0 && notExistFarmCode.Count == 0 && notExistRawMats.Count == 0
                                     && notExistUom.Count == 0 && duplicateList.Count == 0)
             {
                 await _unitOfWork.CompleteAsync();
@@ -193,7 +193,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             {
                 return BadRequest(resultList);
             }
-         
+
         }
 
         [HttpGet]
@@ -390,12 +390,12 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             var orders = await _unitOfWork.Order.GetActualItemQuantityInWarehouse(id, itemcode);
 
             var getFirstExpiry = await _unitOfWork.Order.GetFirstExpiry(itemcode);
-            
-                var resultList = new
-                {
-                    orders,
-                    getFirstExpiry.WarehouseId
-                };
+
+            var resultList = new
+            {
+                orders,
+                getFirstExpiry.WarehouseId
+            };
 
             return Ok(resultList);
         }
@@ -715,7 +715,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         public async Task<IActionResult> TransactListOfMoveOrders([FromBody] TransactMoveOrder[] transact)
         {
 
-            foreach(TransactMoveOrder items in transact)
+            foreach (TransactMoveOrder items in transact)
             {
 
                 items.IsActive = true;
@@ -724,7 +724,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
                 await _unitOfWork.Order.TransanctListOfMoveOrders(items);
             }
-   
+
             await _unitOfWork.CompleteAsync();
 
             return Ok(transact);

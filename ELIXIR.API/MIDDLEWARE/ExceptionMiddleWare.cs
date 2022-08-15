@@ -15,9 +15,9 @@ namespace ELIXIR.API.MIDDLEWARE
         private readonly ILogger<ExceptionMiddleWare> _logger;
         private readonly IHostEnvironment _env;
 
-        public ExceptionMiddleWare(RequestDelegate next, 
+        public ExceptionMiddleWare(RequestDelegate next,
                                    ILogger<ExceptionMiddleWare> logger,
-                                   IHostEnvironment env )
+                                   IHostEnvironment env)
         {
             _env = env;
             _logger = logger;
@@ -41,8 +41,11 @@ namespace ELIXIR.API.MIDDLEWARE
                     ex.StackTrace.ToString())
                     : new ApiResponse((int)HttpStatusCode.InternalServerError);
 
-                var options = new JsonSerializerOptions { PropertyNamingPolicy =
-                                  JsonNamingPolicy.CamelCase};
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy =
+                                  JsonNamingPolicy.CamelCase
+                };
 
                 var json = JsonSerializer.Serialize(response, options);
 

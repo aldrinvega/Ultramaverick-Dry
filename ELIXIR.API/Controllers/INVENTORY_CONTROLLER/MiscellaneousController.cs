@@ -4,11 +4,9 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DTOs.MISCELLANEOUS_DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
@@ -77,7 +75,7 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
                 return BadRequest("Inactive failed, you already use the receiving id");
 
 
-            await _unitOfWork.Miscellaneous.InActivateMiscellaenousReceipt(receipt);    
+            await _unitOfWork.Miscellaneous.InActivateMiscellaenousReceipt(receipt);
             await _unitOfWork.CompleteAsync();
 
             return new JsonResult("Successfully inactive receipt!");
@@ -189,16 +187,16 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 
         [HttpPut]
         [Route("UpdateMiscellaneousIssuePKey")]
-        public async Task<IActionResult> UpdateMiscellaneousIssuePKey([FromBody] MiscellaneousIssueDetails [] details)
+        public async Task<IActionResult> UpdateMiscellaneousIssuePKey([FromBody] MiscellaneousIssueDetails[] details)
         {
 
 
-            foreach(MiscellaneousIssueDetails items in details)
+            foreach (MiscellaneousIssueDetails items in details)
             {
                 items.IsActive = true;
                 items.PreparedDate = DateTime.Now;
 
-                await _unitOfWork.Miscellaneous.UpdateIssuePKey(items);         
+                await _unitOfWork.Miscellaneous.UpdateIssuePKey(items);
             }
 
             await _unitOfWork.CompleteAsync();
@@ -303,7 +301,7 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 
         [HttpGet]
         [Route("GetAllActiveMiscellaneousIssueTransaction")]
-        public async Task<IActionResult> GetAllActiveMiscellaneousIssueTransaction([FromQuery]int empid)
+        public async Task<IActionResult> GetAllActiveMiscellaneousIssueTransaction([FromQuery] int empid)
         {
 
             var issue = await _unitOfWork.Miscellaneous.GetAllAvailableIssue(empid);
@@ -314,10 +312,10 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 
         [HttpPut]
         [Route("CancelItemCodeInMiscellaneousIssue")]
-        public async Task<IActionResult> CancelItemCodeInMiscellaneousIssue([FromBody] MiscellaneousIssueDetails [] issue)
+        public async Task<IActionResult> CancelItemCodeInMiscellaneousIssue([FromBody] MiscellaneousIssueDetails[] issue)
         {
 
-            foreach(MiscellaneousIssueDetails items in issue)
+            foreach (MiscellaneousIssueDetails items in issue)
             {
                 await _unitOfWork.Miscellaneous.CancelIssuePerItemCode(items);
                 await _unitOfWork.CompleteAsync();

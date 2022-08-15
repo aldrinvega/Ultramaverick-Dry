@@ -4,16 +4,14 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DTOs.TRANSFORMATION_DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 {
-  
+
     public class PreparationController : BaseApiController
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -36,13 +34,13 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
         [HttpPut]
         [Route("PrepareMaterialsForRequest/{id}")]
-        public async Task<IActionResult> PrepareMaterialsForRequest(int id,  [FromBody] TransformationPreparation preparation)
+        public async Task<IActionResult> PrepareMaterialsForRequest(int id, [FromBody] TransformationPreparation preparation)
         {
 
             List<TransformationPreparation> PrepList = new List<TransformationPreparation>();
             TransformationPreparation usr = null;
 
- 
+
             decimal tempWeighingScale = 0;
 
 
@@ -50,7 +48,7 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
                 return BadRequest();
 
 
-            var validate =  await _unitOfWork.Preparation.ValidatePreparedMaterials(preparation.TransformId, preparation.ItemCode);
+            var validate = await _unitOfWork.Preparation.ValidatePreparedMaterials(preparation.TransformId, preparation.ItemCode);
 
             if (validate == false)
                 return BadRequest("Already prepared this material!");
@@ -91,7 +89,7 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
                         usr.PreparedBy = preparation.PreparedBy;
 
                         PrepList.Add(usr);
-                                                                 
+
                         tempWeighingScale = preparation.WeighingScale - items.Remaining;
                         preparation.WeighingScale = preparation.WeighingScale - items.Remaining;
 
@@ -123,7 +121,7 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
             }
 
-            if(preparation.WeighingScale == 0)
+            if (preparation.WeighingScale == 0)
             {
 
                 if (PrepList.Count != 0)
@@ -132,7 +130,7 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
                     {
 
                         await _unitOfWork.Preparation.PrepareTransformationMaterials(item);
-                     
+
                     }
 
                     await _unitOfWork.Preparation.UpdateRequestStatus(preparation);
@@ -149,7 +147,7 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
 
             return Ok(PrepList);
-      
+
 
         }
 
@@ -166,7 +164,7 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
         [HttpGet]
         [Route("GetRawmaterialDetailsInWarehouse")]
-        public async Task<IActionResult> GetRawmaterialDetailsInWarehouse([FromQuery]int id, [FromQuery] string code)
+        public async Task<IActionResult> GetRawmaterialDetailsInWarehouse([FromQuery] int id, [FromQuery] string code)
         {
 
             var requirement = await _unitOfWork.Preparation.GetReceivingDetailsForRawmaterials(id, code);
@@ -219,7 +217,7 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
             if (validate == false)
                 return BadRequest("Mixing failed, you have materials left to prepared!");
 
-           var validateMixing =  await _unitOfWork.Preparation.FinishedMixedMaterialsForWarehouse(warehouse, id);
+            var validateMixing = await _unitOfWork.Preparation.FinishedMixedMaterialsForWarehouse(warehouse, id);
 
             if (validateMixing == false)
                 return BadRequest("Already mixed all available batch for this request!");

@@ -4,17 +4,15 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using ELIXIR.DATA.DTOs;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ELIXIR.API.Controllers
 {
     [ApiExplorerSettings(IgnoreApi = true)]
-    
+
     //[Authorize]
     public class UserController : BaseApiController
     {
@@ -33,7 +31,7 @@ namespace ELIXIR.API.Controllers
             _unitOfWork = unitOfWork;
         }
 
-       //------USER--------
+        //------USER--------
 
         [HttpGet]
         [Route("GetAllUsers")]
@@ -46,7 +44,7 @@ namespace ELIXIR.API.Controllers
 
         [HttpGet]
         [Route("GetAllUsersWithPagination/{status}")]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsersWithPagination([FromRoute] bool status,[FromQuery]UserParams userParams)
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsersWithPagination([FromRoute] bool status, [FromQuery] UserParams userParams)
         {
             var user = await _unitOfWork.Users.GetAllUsersWithPagination(status, userParams);
 
@@ -309,33 +307,33 @@ namespace ELIXIR.API.Controllers
             return new JsonResult("Successfully Updated!");
         }
 
-            [HttpPut]
-            [Route("InActiveDepartment/{id}")]
-            public async Task<IActionResult> InActiveDepartment(int id, [FromBody] Department dep)
-            {
-                if (id != dep.Id)
-                    return BadRequest();
+        [HttpPut]
+        [Route("InActiveDepartment/{id}")]
+        public async Task<IActionResult> InActiveDepartment(int id, [FromBody] Department dep)
+        {
+            if (id != dep.Id)
+                return BadRequest();
 
-                await _unitOfWork.Users.InActiveDepartment(dep);
-                await _unitOfWork.CompleteAsync();
+            await _unitOfWork.Users.InActiveDepartment(dep);
+            await _unitOfWork.CompleteAsync();
 
-                return new JsonResult("Successfully InActive Department!");
-            }
+            return new JsonResult("Successfully InActive Department!");
+        }
 
-            [HttpPut]
-            [Route("ActivateDepartment/{id}")]
-            public async Task<IActionResult> ActivateDepartment(int id, [FromBody] Department dep)
-            {
-                if (id != dep.Id)
-                    return BadRequest();
+        [HttpPut]
+        [Route("ActivateDepartment/{id}")]
+        public async Task<IActionResult> ActivateDepartment(int id, [FromBody] Department dep)
+        {
+            if (id != dep.Id)
+                return BadRequest();
 
-                await _unitOfWork.Users.ActivateDepartment(dep);
-                await _unitOfWork.CompleteAsync();
+            await _unitOfWork.Users.ActivateDepartment(dep);
+            await _unitOfWork.CompleteAsync();
 
-                return new JsonResult("Successfully Activate Department!");
-            }
+            return new JsonResult("Successfully Activate Department!");
+        }
 
 
-        
+
     }
 }

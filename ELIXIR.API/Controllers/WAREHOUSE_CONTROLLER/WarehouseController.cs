@@ -20,7 +20,7 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
             _unitOfWork = unitofwork;
         }
 
-   
+
         [HttpGet]
         [Route("GetAllAvailableForWarehouseReceiving")]
         public async Task<IActionResult> GetAllAvailablePo()
@@ -97,10 +97,10 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
 
         [HttpPut]
         [Route("RejectMaterialFromWarehouse")]
-        public async Task<IActionResult> RejectMaterialFromWarehouse([FromBody] Warehouse_Reject [] reject)
+        public async Task<IActionResult> RejectMaterialFromWarehouse([FromBody] Warehouse_Reject[] reject)
         {
-        
-            foreach(Warehouse_Reject items in reject)
+
+            foreach (Warehouse_Reject items in reject)
             {
                 var validate = await _unitOfWork.Warehouse.RejectRawMaterialsByWarehouse(items);
 
@@ -157,7 +157,7 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
 
         [HttpGet]
         [Route("GetAllWarehouseReceived")]
-        public async Task<IActionResult> GetAllWarehouseReceived([FromQuery]string DateFrom, [FromQuery] string DateTo)
+        public async Task<IActionResult> GetAllWarehouseReceived([FromQuery] string DateFrom, [FromQuery] string DateTo)
         {
             var warehouse = await _unitOfWork.Warehouse.GetAllWarehouseReceived(DateFrom, DateTo);
 

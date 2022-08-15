@@ -6,9 +6,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DTOs.RECEIVING_DTOs;
 using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,18 +39,18 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
 
         [HttpPost]
         [Route("AddNewRejectInPo")]
-        public async Task<IActionResult> AddNewRejectInPo([FromBody]PO_Reject[] reject)
+        public async Task<IActionResult> AddNewRejectInPo([FromBody] PO_Reject[] reject)
         {
             if (ModelState.IsValid)
             {
 
-                foreach(PO_Reject items in reject)
+                foreach (PO_Reject items in reject)
                 {
 
                     await _unitOfWork.Receives.AddNewRejectInfo(items);
 
                 }
-              
+
                 await _unitOfWork.CompleteAsync();
 
                 return Ok("Successfully add reject materials!");
@@ -87,16 +85,16 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
 
             await _unitOfWork.Receives.UpdateReceivingInfo(receiving);
             await _unitOfWork.CompleteAsync();
-             
+
             return Ok(receiving);
         }
 
         [HttpPut]
         [Route("RejectRawMaterialsByReceivingId")]
-        public async Task<IActionResult> UpdateRejectInfo([FromBody] PO_Reject [] reject)
+        public async Task<IActionResult> UpdateRejectInfo([FromBody] PO_Reject[] reject)
         {
-       
-            foreach(PO_Reject items in reject)
+
+            foreach (PO_Reject items in reject)
             {
                 var validate = await _unitOfWork.Receives.UpdateRejectInfo(items);
 

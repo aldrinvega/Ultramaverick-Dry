@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ELIXIR.API.ERRORS
+﻿namespace ELIXIR.API.ERRORS
 {
     public class ApiResponse
     {
@@ -24,7 +19,7 @@ namespace ELIXIR.API.ERRORS
                 401 => "Your are not Authorized!",
                 404 => "Resouce not found!",
                 500 => "Please contact your Administrator!",
-                        _=> null
+                _ => null
             };
         }
     }

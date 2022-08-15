@@ -3,16 +3,16 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
 using ELIXIR.DATA.DTOs;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ELIXIR.API.Controllers
 {
     [ApiExplorerSettings(IgnoreApi = true)]
+   // [EnableCors("CorsPolicy")]
+
     public class RoleController : BaseApiController
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -36,7 +36,7 @@ namespace ELIXIR.API.Controllers
         public async Task<IActionResult> GetAllAvailableModule(int id, int menuid)
 
         {
-            var roles =   await _unitOfWork.Roles.GetUntagModuleByRoleId(id, menuid);
+            var roles = await _unitOfWork.Roles.GetUntagModuleByRoleId(id, menuid);
 
             return Ok(roles);
         }
@@ -224,6 +224,7 @@ namespace ELIXIR.API.Controllers
 
             return Ok(rolemodule);
         }
+
 
         [HttpPost]
         [Route("TagandModules")]

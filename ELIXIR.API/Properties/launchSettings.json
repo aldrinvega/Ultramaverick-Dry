@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:57629/",
+      "applicationUrl": "http://localhost:57629",
       "sslPort": 44342
     }
   },
@@ -14,10 +14,10 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Production"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "ELIXIR.API": {
+    "WebAPIHosting": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

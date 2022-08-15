@@ -1,12 +1,9 @@
 ﻿using ELIXIR.DATA.CORE.ICONFIGURATION;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DTOs.TRANSFORMATION_DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
@@ -40,7 +37,7 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
                 if (planning.Batch <= 0)
                     return BadRequest("Request failed! Please check your input in batch.");
 
-               var validateDate =  await _unitOfWork.Planning.ValidateInputDate(planning.ProdPlan.ToString());
+                var validateDate = await _unitOfWork.Planning.ValidateInputDate(planning.ProdPlan.ToString());
 
                 if (validateDate == false)
                     return BadRequest("Request failed! please check your input in prod plan date.");
@@ -55,7 +52,7 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
                     if (validateStocks == false)
                     {
                         var validateStock = await _unitOfWork.Planning.GetAllItemsWithStock(items.ItemCode);
-      
+
                         items.WarehouseStock = validateStock;
                         items.QuantityNeeded = items.Quantity * planning.Batch;
                         outofStock.Add(items);
@@ -233,7 +230,7 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
         [HttpPut]
         [Route("RejectTransformationRequest/{id}")]
-        public async Task<IActionResult> RejectTransformationRequest( int id, [FromBody] TransformationReject reject)
+        public async Task<IActionResult> RejectTransformationRequest(int id, [FromBody] TransformationReject reject)
         {
 
             if (id != reject.TransformId)
@@ -276,7 +273,7 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
             return Ok("Successfully reject request!");
         }
-   
+
         [HttpPut]
         [Route("RequestRejectTransformationRequest/{id}")]
         public async Task<IActionResult> RequestRejectTransformationRequest(int id, [FromBody] TransformationPlanning planning)
@@ -286,7 +283,7 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
             await _unitOfWork.Planning.RequestRejectTransformationRequest(planning);
             await _unitOfWork.CompleteAsync();
-                     
+
             return Ok("Successfully requested a material from reject list!");
         }
 
@@ -347,43 +344,43 @@ namespace ELIXIR.API.Controllers.TRANSFORMATION_CONTROLLER
 
             }
 
-                var resultList = new
-                {
-                    outofStock
-                };
+            var resultList = new
+            {
+                outofStock
+            };
 
 
-                if (outofStock.Count == 0)
-                {         
-                    return Ok(request);
-                }
-                else
-                {
-                    return BadRequest(resultList);
-                }
+            if (outofStock.Count == 0)
+            {
+                return Ok(request);
+            }
+            else
+            {
+                return BadRequest(resultList);
+            }
 
 
 
-                //foreach (var items in getRequirement)
-                //{
+            //foreach (var items in getRequirement)
+            //{
 
-                //    request.Id = 0;
+            //    request.Id = 0;
 
-                //    var validateRequest = await _unitOfWork.Planning.ValidateTransformationPlanning(request.TransformId);
-                //    request.ProdPlan = DateTime.Parse(validateRequest.ProdPlan);
-                //    request.Version = validateRequest.Version;
-                //    request.ItemCode = items.ItemCode;
-                //    request.ItemDescription = items.ItemDescription;
-                //    request.Uom = items.Uom;
-                //    request.Quantity = items.Quantity * request.Batch;
+            //    var validateRequest = await _unitOfWork.Planning.ValidateTransformationPlanning(request.TransformId);
+            //    request.ProdPlan = DateTime.Parse(validateRequest.ProdPlan);
+            //    request.Version = validateRequest.Version;
+            //    request.ItemCode = items.ItemCode;
+            //    request.ItemDescription = items.ItemDescription;
+            //    request.Uom = items.Uom;
+            //    request.Quantity = items.Quantity * request.Batch;
 
-                //    await _unitOfWork.Planning.AddNewTransformationRequirements(request);
-                //    await _unitOfWork.CompleteAsync();
+            //    await _unitOfWork.Planning.AddNewTransformationRequirements(request);
+            //    await _unitOfWork.CompleteAsync();
 
-                //}
+            //}
 
-                //return Ok("Sucessfully updated!");
-  
+            //return Ok("Sucessfully updated!");
+
 
         }
 

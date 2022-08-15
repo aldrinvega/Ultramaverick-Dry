@@ -6,7 +6,7 @@ namespace ELIXIR.API.EXTENSIONS
 {
     public static class ApplicationServiceExtensions
     {
-   
+
         public static IServiceCollection AddApplicationServices(
                                this IServiceCollection services)
         {

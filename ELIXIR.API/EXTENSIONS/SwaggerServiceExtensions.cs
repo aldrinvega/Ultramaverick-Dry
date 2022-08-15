@@ -10,7 +10,7 @@ namespace ELIXIR.API.EXTENSIONS
         public static IServiceCollection AddSwaggerDocumentation(
                                 this IServiceCollection services)
         {
-         
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
@@ -22,9 +22,9 @@ namespace ELIXIR.API.EXTENSIONS
         public static IApplicationBuilder UserSwaggerDocumentation(
                                       this IApplicationBuilder app)
         {
-                app.UseMiddleware<ExceptionMiddleWare>();
+            app.UseMiddleware<ExceptionMiddleWare>();
 
-                app.UseDeveloperExceptionPage();
+            app.UseDeveloperExceptionPage();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -36,11 +36,12 @@ namespace ELIXIR.API.EXTENSIONS
 
             app.UseHttpsRedirection();
 
-                app.UseAuthentication();
-                app.UseAuthorization();
+       
+            app.UseAuthentication();
 
 
-            return app; 
+
+            return app;
         }
     }
 }

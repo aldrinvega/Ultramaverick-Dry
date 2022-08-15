@@ -16,6 +16,7 @@ using System.Linq;
 using ELIXIR.API.ERRORS;
 using System.Net;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Cors;
 
 namespace ELIXIR.API
 {
@@ -27,12 +28,16 @@ namespace ELIXIR.API
         }
 
         public IConfiguration Configuration { get; }
+        private readonly string _policyName = "CorsPolicy";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
 
-          services.AddControllers();
+
+         
+        //  services.AddMvc();
+
           services.AddAuthentication(authOptions =>
             {
                 authOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -78,29 +83,28 @@ namespace ELIXIR.API
                 };
             });
 
-            services.AddHttpsRedirection(options =>
-            {
-                options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
-                options.HttpsPort = 5001;
-            });
-            
-            services.AddApplicationServices();
-            //services.AddSwaggerGen(c =>
+            //services.AddHttpsRedirection(options =>
             //{
-            //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            //    options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
+            //    options.HttpsPort = 82;
             //});
+
+            services.AddApplicationServices();
 
             services.AddSwaggerDocumentation();
 
             services.AddCors(opt =>
             {
-                opt.AddPolicy("CorsPolicy", policy =>
+                opt.AddPolicy(name : _policyName, builder =>
                 {
-                    policy.AllowAnyOrigin()
-                                .AllowAnyHeader()
-                                .AllowAnyMethod();
+                    builder.AllowAnyOrigin()
+                           .AllowAnyHeader()
+                           .AllowAnyMethod();
                 });
+              
             });
+
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -111,20 +115,17 @@ namespace ELIXIR.API
 
             app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
-            app.UseHttpsRedirection();
+            app.UseHsts();
 
             app.UseRouting();
 
-            app.UseCors("CorsPolicy");
+            app.UseCors(_policyName);
+
+            app.UseAuthorization();
 
             app.UserSwaggerDocumentation();
-
-            //app.UseSwagger();
-            //app.UseSwaggerUI(c =>
-            //{
-            //    c.SwaggerEndpoint("v1/swagger.json", "My API V1");
-            //});
-
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {
