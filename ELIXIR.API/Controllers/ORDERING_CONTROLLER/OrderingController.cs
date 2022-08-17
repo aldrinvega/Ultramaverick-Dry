@@ -122,6 +122,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             List<Ordering> notExistRawMats = new List<Ordering>();
             List<Ordering> notExistUom = new List<Ordering>();
             List<Ordering> duplicateList = new List<Ordering>();
+            List<Ordering> previousdateNeeded = new List<Ordering>();
 
 
             List<Ordering> filteredOrders = new List<Ordering>();
@@ -135,7 +136,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 var validateFarmCode = await _unitOfWork.Order.ValidateCustomerCode(items);
                 var validateRawMaterial = await _unitOfWork.Order.ValidateRawMaterial(items);
                 var validateUom = await _unitOfWork.Order.ValidateUom(items);
-
+                var validateDateNeeded = await _unitOfWork.Order.ValidateOrderAndDateNeeded(items);
 
                 if (validateDuplicate == false)
                 {
@@ -161,6 +162,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 {
                     notExistUom.Add(items);
                 }
+                else if (validateDateNeeded == false)
+                {
+                    previousdateNeeded.Add(items);
+                }
 
                 else
                     filteredOrders.Add(items);
@@ -178,11 +183,12 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 notExistFarmCode,
                 notExistRawMats,
                 notExistUom,
+                previousdateNeeded
 
             };
 
             if (notExistFarmName.Count == 0 && notExistFarmCode.Count == 0 && notExistRawMats.Count == 0
-                                    && notExistUom.Count == 0 && duplicateList.Count == 0)
+                                    && notExistUom.Count == 0 && duplicateList.Count == 0 && previousdateNeeded.Count == 0)
             {
                 await _unitOfWork.CompleteAsync();
 
@@ -690,10 +696,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpGet]
         [Route("GetTotalListForMoveOrder")]
-        public async Task<IActionResult> GetTotalListForMoveOrder()
+        public async Task<IActionResult> GetTotalListForMoveOrder([FromQuery] bool status)
         {
 
-            var orders = await _unitOfWork.Order.TotalListForTransactMoveOrder();
+            var orders = await _unitOfWork.Order.TotalListForTransactMoveOrder(status);
 
             return Ok(orders);
 
@@ -730,7 +736,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             return Ok(transact);
 
         }
-
     }
 
 }

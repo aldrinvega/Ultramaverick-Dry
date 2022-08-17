@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 {
     public class OrderingRepository : IOrdering
+
     {
 
        private readonly StoreContext _context;
@@ -442,6 +443,26 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
 
         }
+        public async Task<IReadOnlyList<OrderDto>> GetOrdersForNotification()
+        {
+            var orders = _context.Orders.OrderBy(x => x.OrderDate)
+                                    .GroupBy(x => new
+                                    {
+                                        x.FarmName,
+                                        x.IsActive,
+                                        x.PreparedDate
+
+                                    }).Where(x => x.Key.IsActive == true)
+                                      .Where(x => x.Key.PreparedDate == null)
+
+                                      .Select(x => new OrderDto
+                                      {
+                                          Farm = x.Key.FarmName,
+                                          IsActive = x.Key.IsActive
+                                      });
+
+            return await orders.ToListAsync();
+        }
         public async Task<bool> ValidateOrderAndDateNeeded(Ordering orders)
         {
             var dateNow = DateTime.Now;
@@ -541,7 +562,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.FarmName,
                 x.FarmCode,
                 x.FarmType,
-                x.OrderDate,
+     //           x.OrderDate,
                 x.PreparedDate,
                 x.IsApproved,
                 x.IsActive
@@ -556,7 +577,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                    FarmCode = x.Key.FarmCode,
                    Category = x.Key.FarmType,
                    TotalOrders = x.Sum(x => x.QuantityOrdered),
-                   OrderDate = x.Key.OrderDate.ToString("MM/dd/yyyy"),
+              //     OrderDate = x.Key.OrderDate.ToString("MM/dd/yyyy"),
                    PreparedDate = x.Key.PreparedDate.ToString()
 
                });
@@ -640,7 +661,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.FarmName,
                 x.FarmCode,
                 x.FarmType,
-                x.OrderDate,
                 x.PreparedDate,
                 x.IsApproved,
                 x.IsMove,
@@ -660,7 +680,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 FarmCode = x.Key.FarmCode,
                 Category = x.Key.FarmType,
                 TotalOrders = x.Sum(x => x.QuantityOrdered),
-                OrderDate = x.Key.OrderDate.ToString("MM/dd/yyyy"),
                 PreparedDate = x.Key.PreparedDate.ToString(),
                 IsMove = x.Key.IsMove,
                 IsReject = x.Key.IsReject != null,
@@ -1282,7 +1301,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                  IsPrepared = x.Key.IsPrepared,
                  ApprovedDate = x.Key.ApproveDateTempo.ToString(),
                  IsPrint = x.Key.IsPrint != null,
-                 IsTransact = x.Key.IsTransact != null
+                 IsTransact = x.Key.IsTransact 
 
              });
 
@@ -1326,7 +1345,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                  IsPrepared = x.Key.IsPrepared,
                  ApprovedDate = x.Key.ApproveDateTempo.ToString(),
                  IsPrint = x.Key.IsPrint != null,
-                 IsTransact = x.Key.IsTransact != null
+                 IsTransact = x.Key.IsTransact
 
              }).Where(x => Convert.ToString(x.OrderNo).ToLower()
                .Contains(search.Trim().ToLower()));
@@ -1353,7 +1372,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             })
               .Where(x => x.Key.DeliveryStatus != null)
-          //    .Where(x => x.Key.IsReject == true)
          
         .Select(x => new MoveOrderDto
         {
@@ -1573,13 +1591,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
 
         //-----------------TRANSACT MOVE ORDER------------------------
-        public async Task<IReadOnlyList<OrderDto>> TotalListForTransactMoveOrder()
+        public async Task<IReadOnlyList<OrderDto>> TotalListForTransactMoveOrder(bool status)
         {
 
-            var orders = _context.MoveOrders.GroupBy(x => new
+            var orders = _context.MoveOrders.Where(x => x.IsActive == true)
+                                            .Where(x => x.IsTransact == status)
+                .GroupBy(x => new
             {
                 x.OrderNo,
-                x.OrderNoPKey,
                 x.FarmName,
                 x.FarmCode,
                 x.FarmType,
@@ -1590,14 +1609,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.IsApprove,
                 x.IsTransact,
                 
-
             }).Where(x => x.Key.IsApprove == true)
-              .Where(x => x.Key.IsTransact != true)
 
            .Select(x => new OrderDto
            {
                OrderNo = x.Key.OrderNo,
-               OrderNoPKey = x.Key.OrderNoPKey,
                Farm = x.Key.FarmName,
                FarmCode = x.Key.FarmCode,
                FarmType = x.Key.FarmType,
@@ -1664,6 +1680,144 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
         }
 
-     
+        public async Task<IReadOnlyList<OrderDto>> GetMoveOrdersForNotification()
+        {
+            var orders = _context.Orders
+                                  .GroupBy(x => new
+                                  {
+                                      x.FarmName,
+                                      x.IsActive,
+                                      x.IsApproved,
+                                      x.IsMove
+
+                                  }).Where(x => x.Key.IsActive == true)
+                                    .Where(x => x.Key.IsApproved == true)
+                                    .Where(x => x.Key.IsMove == false)
+                                    .Select(x => new OrderDto
+                                    {
+                                        Farm = x.Key.FarmName,
+                                        IsActive = x.Key.IsActive,
+                                        IsApproved = x.Key.IsApproved != null
+                                    });
+
+            return await orders.ToListAsync();
+
+        }
+
+        public async Task<IReadOnlyList<OrderDto>> GetAllForTransactMoveOrderNotification()
+        {
+            var orders = _context.MoveOrders.Where(x => x.IsActive == true)
+                                          .Where(x => x.IsTransact == false)
+              .GroupBy(x => new
+              {
+                  x.OrderNo,
+                  x.FarmName,
+                  x.FarmCode,
+                  x.FarmType,
+                  x.OrderDate,
+                  x.DateNeeded,
+                  x.PreparedDate,
+                  x.DeliveryStatus,
+                  x.IsApprove,
+                  x.IsTransact,
+
+              }).Where(x => x.Key.IsApprove == true)
+
+         .Select(x => new OrderDto
+         {
+             OrderNo = x.Key.OrderNo,
+             Farm = x.Key.FarmName,
+             FarmCode = x.Key.FarmCode,
+             FarmType = x.Key.FarmType,
+             Category = x.Key.FarmType,
+             TotalOrders = x.Sum(x => x.QuantityOrdered),
+             OrderDate = x.Key.OrderDate.ToString("MM/dd/yyyy"),
+             DateNeeded = x.Key.DateNeeded.ToString("MM/dd/yyyy"),
+             PreparedDate = x.Key.PreparedDate.ToString(),
+             DeliveryStatus = x.Key.DeliveryStatus,
+             IsApproved = x.Key.IsApprove != null
+
+         });
+
+            return await orders.ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<MoveOrderDto>> GetForApprovalMoveOrderNotification()
+        {
+            var orders = _context.MoveOrders.Where(x => x.IsApproveReject == null)
+             .GroupBy(x => new
+             {
+
+                 x.OrderNo,
+                 x.FarmName,
+                 x.FarmCode,
+                 x.FarmType,
+                 x.OrderDate,
+                 x.PreparedDate,
+                 x.IsApprove,
+                 x.DeliveryStatus,
+                 x.IsPrepared
+
+             }).Where(x => x.Key.IsApprove != true)
+           .Where(x => x.Key.DeliveryStatus != null)
+           .Where(x => x.Key.IsPrepared == true)
+
+        .Select(x => new MoveOrderDto
+        {
+            OrderNo = x.Key.OrderNo,
+            FarmName = x.Key.FarmName,
+            FarmCode = x.Key.FarmCode,
+            Category = x.Key.FarmType,
+            Quantity = x.Sum(x => x.QuantityOrdered),
+            OrderDate = x.Key.OrderDate.ToString(),
+            PreparedDate = x.Key.PreparedDate.ToString(),
+            DeliveryStatus = x.Key.DeliveryStatus
+
+        });
+
+            return await orders.ToListAsync();
+
+        }
+
+        public async Task<IReadOnlyList<MoveOrderDto>> GetRejectMoveOrderNotification()
+        {
+            var orders = _context.MoveOrders.Where(x => x.IsApproveReject == true)
+            .GroupBy(x => new
+            {
+
+                x.OrderNo,
+                x.FarmName,
+                x.FarmCode,
+                x.FarmType,
+                x.OrderDate,
+                x.PreparedDate,
+                x.IsApprove,
+                x.DeliveryStatus,
+                x.IsReject,
+                x.RejectedDateTempo,
+                x.Remarks
+
+            })
+          .Where(x => x.Key.DeliveryStatus != null)
+
+        .Select(x => new MoveOrderDto
+        {
+            OrderNo = x.Key.OrderNo,
+            FarmName = x.Key.FarmName,
+            FarmCode = x.Key.FarmCode,
+            Category = x.Key.FarmType,
+            Quantity = x.Sum(x => x.QuantityOrdered),
+            OrderDate = x.Key.OrderDate.ToString(),
+            PreparedDate = x.Key.PreparedDate.ToString(),
+            DeliveryStatus = x.Key.DeliveryStatus,
+            IsReject = x.Key.IsReject != null,
+            RejectedDate = x.Key.RejectedDateTempo.ToString(),
+            Remarks = x.Key.Remarks
+
+        });
+
+            return await orders.ToListAsync();
+
+        }
     }
 }

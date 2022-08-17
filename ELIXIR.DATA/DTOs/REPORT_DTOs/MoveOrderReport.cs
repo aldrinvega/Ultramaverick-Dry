@@ -9,8 +9,10 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
     public class MoveOrderReport
     {
         public int MoveOrderId { get; set; }
+        public int OrderNo { get; set; }
         public string CustomerCode { get; set; }
         public string CustomerName { get; set; }
+        public string FarmType { get; set; }
         public string ItemCode { get; set; }
         public string ItemDescription { get; set; }
         public string Uom { get; set; }
@@ -20,6 +22,11 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public string TransactionType { get; set; }
         public string MoveOrderBy { get; set; }
         public string MoveOrderDate { get; set; }
+        public string TransactedDate { get; set; }
+        public string DateNeeded { get; set; }
+        public string TransactedBy { get; set; }
+
+
 
     }
 }

@@ -50,7 +50,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
             get; 
             set; 
         }
-        public bool? IsTransact { 
+        public bool IsTransact { 
             get; 
             set;
         }

@@ -27,6 +27,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<bool> ValidateUom(Ordering orders);
         Task<bool> ValidateExistingOrders(Ordering orders);
         Task<PagedList<OrderDto>> GetAllListofOrdersPagination(UserParams userParams);
+      
         Task<bool> ValidateOrderAndDateNeeded(Ordering orders);
         Task<bool> CancelOrders(Ordering orders);
         Task<IReadOnlyList<OrderDto>> GetAllListOfCancelledOrders();
@@ -75,12 +76,20 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 
 
         //--------------------Transact Move Order--------------------
-
-
-        Task<IReadOnlyList<OrderDto>> TotalListForTransactMoveOrder();
+        Task<IReadOnlyList<OrderDto>> TotalListForTransactMoveOrder(bool status);
         Task<IReadOnlyList<MoveOrderDto>> ListOfMoveOrdersForTransact(int orderid);
         Task<bool> TransanctListOfMoveOrders(TransactMoveOrder transact);
 
+
+
+
+
+        //-----------------Notifaction---------------------
+        Task<IReadOnlyList<OrderDto>> GetOrdersForNotification();
+        Task<IReadOnlyList<OrderDto>> GetMoveOrdersForNotification();
+        Task<IReadOnlyList<OrderDto>> GetAllForTransactMoveOrderNotification();
+        Task<IReadOnlyList<MoveOrderDto>> GetForApprovalMoveOrderNotification();
+        Task<IReadOnlyList<MoveOrderDto>> GetRejectMoveOrderNotification();
 
     }
 }

@@ -34,10 +34,6 @@ namespace ELIXIR.API
         public void ConfigureServices(IServiceCollection services)
         {
 
-
-         
-        //  services.AddMvc();
-
           services.AddAuthentication(authOptions =>
             {
                 authOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

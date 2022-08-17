@@ -1,4 +1,6 @@
-﻿using ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE;
+﻿
+
+using ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using ELIXIR.DATA.DTOs.INVENTORY_DTOs;
@@ -358,6 +360,39 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                        total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered)) / 30
                                       });
 
+
+            var getReserveUsage = (from warehouse in getWarehouseStock
+                              join request in getTransformationReserve
+                              on warehouse.ItemCode equals request.ItemCode
+                              into leftJ1
+                              from request in leftJ1.DefaultIfEmpty()
+
+                              join ordering in getOrderingReserve
+                              on warehouse.ItemCode equals ordering.ItemCode
+                              into leftJ2
+                              from ordering in leftJ2.DefaultIfEmpty()
+
+                              group new
+                              {
+                                  warehouse,
+                                  request,
+                                  ordering
+                              }
+                              by new
+                              {
+                                  warehouse.ItemCode,
+
+                              } into total
+
+                              select new ReserveInventory
+                              {
+                                  ItemCode = total.Key.ItemCode,
+                                  Reserve = (total.Sum(x => x.request.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
+                                            total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))
+                              });
+
+
+
             //var getLastUsed = (from transform in _context.Transformation_Preparation
             //                   where transform.IsActive == true && transform.IsMixed == true
             //                   select new
@@ -374,8 +409,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
             //                         PreparedDate = moveorder.PreparedDate
 
             //                     });
-                                //.OrderByDescending(x => x.PreparedDate);
-              
+            //.OrderByDescending(x => x.PreparedDate);
+
 
             //var x = getLastUsed.ToLookup(x => new
             //{ 
@@ -383,7 +418,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
             //    x.ItemCode
             //}).Distinct();
 
-           // var xx = getLastUsed;
+            // var xx = getLastUsed;
 
             var inventory = (from rawmaterial in _context.RawMaterials
                              join posummary in getPoSummary
@@ -436,10 +471,16 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                              into leftJ10
                              from averageissuance in leftJ10.DefaultIfEmpty()
 
-                        //     join lastUsed in x
-                             //on rawmaterial.ItemCode equals lastUsed.ItemCode
-                             //into leftJ11
-                             //from lastUsed in leftJ11.DefaultIfEmpty()
+                             join reserveusage in getReserveUsage
+                             on rawmaterial.ItemCode equals reserveusage.ItemCode
+                             into leftJ11
+                             from reserveusage in leftJ11.DefaultIfEmpty()
+
+
+                                 //     join lastUsed in x
+                                 //on rawmaterial.ItemCode equals lastUsed.ItemCode
+                                 //into leftJ11
+                                 //from lastUsed in leftJ11.DefaultIfEmpty()
 
                              group new { 
 
@@ -453,7 +494,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                          Reserve,
                                          suggestedpo,
                                          averageissuance,
-                                      //   lastUsed
+                                         reserveusage
+                                 //   lastUsed
                              }
                              by new
                              {
@@ -473,6 +515,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  SOH = SOH.SOH != null ? SOH.SOH : 0,
                                  Reserve = Reserve.Reserve != null ? Reserve.Reserve : 0,
                                  AverageIssuance = averageissuance.ActualGood != null ? averageissuance.ActualGood : 0,
+                                 ReserveUsage = reserveusage.Reserve != null ? reserveusage.Reserve : 0
                                //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
 
                              } into total
@@ -496,6 +539,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  SuggestedPo = total.Key.SuggestedPo,
                                  AverageIssuance = Math.Round(Convert.ToDecimal(total.Key.AverageIssuance), 2),
                                  DaysLevel = Math.Round(Convert.ToDecimal(total.Key.Reserve / (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)),2),
+                                 ReserveUsage = total.Key.ReserveUsage
                             //     LastUsed = total.Key.LastUsed.ToString()
 
                              });
@@ -791,6 +835,37 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                        total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered)) / 30
                                       });
 
+
+            var getReserveUsage = (from warehouse in getWarehouseStock
+                                   join request in getTransformationReserve
+                                   on warehouse.ItemCode equals request.ItemCode
+                                   into leftJ1
+                                   from request in leftJ1.DefaultIfEmpty()
+
+                                   join ordering in getOrderingReserve
+                                   on warehouse.ItemCode equals ordering.ItemCode
+                                   into leftJ2
+                                   from ordering in leftJ2.DefaultIfEmpty()
+
+                                   group new
+                                   {
+                                       warehouse,
+                                       request,
+                                       ordering
+                                   }
+                                   by new
+                                   {
+                                       warehouse.ItemCode,
+
+                                   } into total
+
+                                   select new ReserveInventory
+                                   {
+                                       ItemCode = total.Key.ItemCode,
+                                       Reserve = (total.Sum(x => x.request.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
+                                                 total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))
+                                   });
+
             //var getLastUsed = (from transform in _context.Transformation_Preparation
             //                   where transform.IsActive == true && transform.IsMixed == true
             //                   select new
@@ -869,6 +944,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                              into leftJ10
                              from averageissuance in leftJ10.DefaultIfEmpty()
 
+                             join reserveusage in getReserveUsage
+                             on rawmaterial.ItemCode equals reserveusage.ItemCode
+                             into leftJ11
+                             from reserveusage in leftJ11.DefaultIfEmpty()
+
+
                                  //     join lastUsed in x
                                  //on rawmaterial.ItemCode equals lastUsed.ItemCode
                                  //into leftJ11
@@ -887,7 +968,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  Reserve,
                                  suggestedpo,
                                  averageissuance,
-                                 //   lastUsed
+                                 reserveusage
                              }
                              by new
                              {
@@ -907,6 +988,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  SOH = SOH.SOH != null ? SOH.SOH : 0,
                                  Reserve = Reserve.Reserve != null ? Reserve.Reserve : 0,
                                  AverageIssuance = averageissuance.ActualGood != null ? averageissuance.ActualGood : 0,
+                                 ReserveUsage = reserveusage.Reserve != null ? reserveusage.Reserve : 0
                                  //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
 
                              } into total
@@ -930,6 +1012,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  SuggestedPo = total.Key.SuggestedPo,
                                  AverageIssuance = Math.Round(Convert.ToDecimal(total.Key.AverageIssuance), 2),
                                  DaysLevel = Math.Round(Convert.ToDecimal(total.Key.Reserve / (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)), 2),
+                                 ReserveUsage = total.Key.ReserveUsage
                                  //     LastUsed = total.Key.LastUsed.ToString()
 
                              });
@@ -1227,6 +1310,36 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                        total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered)) / 30
                                       });
 
+
+            var getReserveUsage = (from warehouse in getWarehouseStock
+                                   join request in getTransformationReserve
+                                   on warehouse.ItemCode equals request.ItemCode
+                                   into leftJ1
+                                   from request in leftJ1.DefaultIfEmpty()
+
+                                   join ordering in getOrderingReserve
+                                   on warehouse.ItemCode equals ordering.ItemCode
+                                   into leftJ2
+                                   from ordering in leftJ2.DefaultIfEmpty()
+
+                                   group new
+                                   {
+                                       warehouse,
+                                       request,
+                                       ordering
+                                   }
+                                   by new
+                                   {
+                                       warehouse.ItemCode,
+
+                                   } into total
+
+                                   select new ReserveInventory
+                                   {
+                                       ItemCode = total.Key.ItemCode,
+                                       Reserve = (total.Sum(x => x.request.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
+                                                 total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))
+                                   });
             //var getLastUsed = (from transform in _context.Transformation_Preparation
             //                   where transform.IsActive == true && transform.IsMixed == true
             //                   select new
@@ -1305,6 +1418,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                              into leftJ10
                              from averageissuance in leftJ10.DefaultIfEmpty()
 
+                             join reserveusage in getReserveUsage
+                             on rawmaterial.ItemCode equals reserveusage.ItemCode
+                             into leftJ11
+                             from reserveusage in leftJ11.DefaultIfEmpty()
+
+
+
                                  //     join lastUsed in x
                                  //on rawmaterial.ItemCode equals lastUsed.ItemCode
                                  //into leftJ11
@@ -1323,6 +1443,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  Reserve,
                                  suggestedpo,
                                  averageissuance,
+                                 reserveusage
                                  //   lastUsed
                              }
                              by new
@@ -1343,6 +1464,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  SOH = SOH.SOH != null ? SOH.SOH : 0,
                                  Reserve = Reserve.Reserve != null ? Reserve.Reserve : 0,
                                  AverageIssuance = averageissuance.ActualGood != null ? averageissuance.ActualGood : 0,
+                                 ReserveUsage = reserveusage.Reserve != null ? reserveusage.Reserve : 0
                                  //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
 
                              } into total
@@ -1366,6 +1488,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  SuggestedPo = total.Key.SuggestedPo,
                                  AverageIssuance = Math.Round(Convert.ToDecimal(total.Key.AverageIssuance), 2),
                                  DaysLevel = Math.Round(Convert.ToDecimal(total.Key.Reserve / (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)), 2),
+                                 ReserveUsage = total.Key.ReserveUsage
                                  //     LastUsed = total.Key.LastUsed.ToString()
 
                              }).Where(x => x.ItemCode.ToLower()

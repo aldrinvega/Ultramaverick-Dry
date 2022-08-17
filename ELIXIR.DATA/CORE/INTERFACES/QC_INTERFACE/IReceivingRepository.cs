@@ -47,5 +47,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.QC_INTERFACE
 
         Task<IReadOnlyList<NearlyExpireDto>> GetItemDetailsForNearlyExpire(int id);
 
+        Task<bool> ValidatePOForCancellation(int id);
+
     }
 }

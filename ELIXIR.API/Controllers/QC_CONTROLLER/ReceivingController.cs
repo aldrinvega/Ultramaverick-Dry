@@ -142,10 +142,10 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
                 return BadRequest();
 
 
-            var validate = await _unitOfWork.Receives.ValidateForCancelPo(summary);
+            var validate = await _unitOfWork.Receives.ValidatePOForCancellation(summary.Id);
 
             if (validate == false)
-                return BadRequest("Cancel failed!, You have materials for receiving in warehouse!");
+                return BadRequest("Cancel failed, you have materials for receiving in warehouse!");
 
             await _unitOfWork.Receives.CancelPo(summary);
             await _unitOfWork.CompleteAsync();
@@ -443,8 +443,15 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
             var listofpreparation = await _unitOfWork.Preparation.GetAllTransformationFormulaInformation();
             var listofmixing = await _unitOfWork.Preparation.GetAllTransformationForMixing();
 
+            //Ordering
+            var orderingfarm = await _unitOfWork.Order.GetOrdersForNotification();
+            var orderingapproval = await _unitOfWork.Order.GetAllListForApprovalOfSchedule();
+            var moveorderlist = await _unitOfWork.Order.GetMoveOrdersForNotification();
+            var transactmoveorderlist = await _unitOfWork.Order.GetAllForTransactMoveOrderNotification();
+            var forapprovallist = await _unitOfWork.Order.GetForApprovalMoveOrderNotification();
+            var rejectlist = await _unitOfWork.Order.GetRejectMoveOrderNotification();
 
-            //QC Receiving
+            //QC ReceivingCount
             var posummarycount = posummary.Count();
             var warehousecount = warehouse.Count();
             var nearexpirecount = nearlyexpire.Count();
@@ -452,12 +459,19 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
             var approvalrejectcount = approvalreject.Count();
             var confirmrejectcount = confirmreject.Count();
 
-            //Transformation
+            //TransformationCount
             var approvalrequestcount = listOfRequest.Count();
             var requestrejectcount = listofReject.Count();
             var preparationcount = listofpreparation.Count();
             var mixingcount = listofmixing.Count();
 
+            //OrderingCount
+            var orderingfarmcount = orderingfarm.Count();
+            var orderingapprovalcount = orderingapproval.Count();
+            var moveordercount = moveorderlist.Count();
+            var transactmoveordercount = transactmoveorderlist.Count();
+            var forapprovallistcount = forapprovallist.Count();
+            var rejectlistcount = rejectlist.Count();
 
 
             var countList = new
@@ -501,8 +515,32 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
                 Mixing = new
                 {
                     mixingcount
+                },
+                OrderingFarm = new 
+                {
+                    orderingfarmcount
+                },
+                OrderingApproval = new
+                {
+                    orderingapprovalcount
+                },
+                MoveOrderList = new
+                {
+                    moveordercount
+                },
+                TransactMoveOrderList = new
+                {
+                    transactmoveordercount
+                },
+                ForApprovalMoveOrder = new
+                {
+                    forapprovallistcount
+                },
+                RejectMoveOrder = new
+                {
+                    rejectlistcount
                 }
-
+                
             };
 
             return Ok(countList);

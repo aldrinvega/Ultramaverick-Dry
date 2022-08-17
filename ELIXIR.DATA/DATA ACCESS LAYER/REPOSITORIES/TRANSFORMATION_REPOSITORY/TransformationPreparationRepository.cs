@@ -229,8 +229,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
                   WarehouseId = x.Key.WarehouseId
               });
 
-
-
             var warehouseStock = (from warehouse in _context.WarehouseReceived
                                   where warehouse.IsActive == true
                                   join req in totalPreparation

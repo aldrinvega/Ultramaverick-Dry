@@ -1024,6 +1024,19 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                 .ToListAsync();
 
         }
+
+        public async Task<bool> ValidatePOForCancellation(int id)
+        {
+            var validatePo = await _context.QC_Receiving.Where(x => x.PO_Summary_Id == id)
+                                                        .Where(x => x.IsActive == true)
+                                                        .Where(x => x.IsWareHouseReceive != true)
+                                                        .ToListAsync();
+
+            if (validatePo.Count != 0)
+                return false;
+
+            return true;
+        }
     }
 }   
   

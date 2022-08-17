@@ -1,11 +1,13 @@
-﻿using ELIXIR.DATA.CORE.ICONFIGURATION;
+﻿ using ELIXIR.DATA.CORE.ICONFIGURATION;
 using ELIXIR.DATA.JWT.AUTHENTICATION;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ELIXIR.API.Controllers
 {
-    public class LoginController : BaseApiController
+    [Route("api/[controller]")]
+    [ApiController]
+    public class LoginController : ControllerBase
     {
         private readonly IUserService _userService;
         public LoginController(IUserService userService)

@@ -91,5 +91,16 @@ namespace ELIXIR.API.Controllers.REPORT_CONTROLLER
 
         }
 
+        [HttpGet]
+        [Route("TransactedMoveOrderReport")]
+        public async Task<IActionResult> TransactedMoveOrderReport([FromQuery] string DateFrom, [FromQuery] string DateTo)
+        {
+
+            var transact = await _unitOfWork.Report.TransactedMoveOrderReport(DateFrom, DateTo);
+
+            return Ok(transact);
+
+        }
+
     }
 }

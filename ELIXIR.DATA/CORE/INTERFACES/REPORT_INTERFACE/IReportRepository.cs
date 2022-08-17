@@ -17,6 +17,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE
         Task<IReadOnlyList<MiscellaneousReceiptReport>> MReceiptReport(string DateFrom, string DateTo);
         Task<IReadOnlyList<MiscellaneousIssueReport>> MIssueReport(string DateFrom, string DateTo);
 
+        Task<IReadOnlyList<MoveOrderReport>> TransactedMoveOrderReport(string DateFrom, string DateTo);
+
         Task<IReadOnlyList<WarehouseReport>> NearlyExpireItemsReport(int expirydays);
 
     }

@@ -151,7 +151,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
             set;
         }
 
-        public bool? IsTransact {
+        public bool IsTransact {
             get; 
             set; 
         }

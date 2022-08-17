@@ -30,6 +30,9 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs
 
         public string LastUsed { get; set; }
 
+        public decimal ReserveUsage { get; set; }
+
+
 
 
 
