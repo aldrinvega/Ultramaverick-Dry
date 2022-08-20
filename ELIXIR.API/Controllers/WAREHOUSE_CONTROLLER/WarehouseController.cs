@@ -288,5 +288,14 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
             return Ok(rejectResult);
         }
 
+        [HttpGet]
+        [Route("GetAllListOfWarehouseReceivingId")]
+        public async Task<IActionResult> GetAllListOfWarehouseReceivingId()
+        {
+            var warehouse = await _unitOfWork.Warehouse.ListOfWarehouseReceivingId();
+
+            return Ok(warehouse);
+        }
+
     }
 }

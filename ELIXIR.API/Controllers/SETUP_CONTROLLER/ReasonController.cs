@@ -115,8 +115,10 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             {
                 var moduleId = await _unitOfWork.Reasons.ValidateModuleId(reason.MenuId);
 
-                if (await _unitOfWork.Reasons.ReasonNameExist(reason.ReasonName))
-                    return BadRequest("Reason already Exist!, Please try something else!");
+                var validate = await _unitOfWork.Reasons.ValidateReasonEntry(reason);
+
+                if (validate == false)
+                    return BadRequest("Menu and reason already exist!");
 
                 if (moduleId == false)
                     return BadRequest("Module doesn't exist, Please add data first!");

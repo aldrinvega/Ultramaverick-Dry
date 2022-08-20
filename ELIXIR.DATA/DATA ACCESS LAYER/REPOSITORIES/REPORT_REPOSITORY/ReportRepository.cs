@@ -369,29 +369,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                           on transact.OrderNo equals moveorder.OrderNo into leftJ
                           from moveorder in leftJ.DefaultIfEmpty()
 
-                          group moveorder by new
-                          {
-                              moveorder.OrderNo,
-                              moveorder.FarmName,
-                              moveorder.FarmCode,
-                              moveorder.FarmType,
-                              transact.PreparedBy,
-                              moveorder.DeliveryStatus,
-                              transact.PreparedDate
-                                                                         
-                          } into total
-
                           select new MoveOrderReport
                           {
-                              OrderNo = total.Key.OrderNo,
-                              CustomerName = total.Key.FarmName,
-                              CustomerCode = total.Key.FarmCode,
-                              FarmType = total.Key.FarmType,
-                              TransactedBy = total.Key.PreparedBy,
-                              TransactionType = total.Key.DeliveryStatus,
-                              TransactedDate = total.Key.PreparedDate.ToString(),
-                              Quantity = total.Sum(x => x.QuantityOrdered)
-
+                              OrderNo = moveorder.OrderNo,
+                              CustomerName = moveorder.FarmName,
+                              CustomerCode = moveorder.FarmCode,
+                              FarmCode = moveorder.FarmCode,
+                              FarmName = moveorder.FarmName,
+                              FarmType = moveorder.FarmType,
+                              ItemCode = moveorder.ItemCode, 
+                              ItemDescription = moveorder.ItemDescription, 
+                              Uom = moveorder.Uom,
+                              Quantity = moveorder.QuantityOrdered, 
+                              TransactedBy = transact.PreparedBy,
+                              TransactionType = moveorder.DeliveryStatus,
+                              TransactedDate = transact.PreparedDate.ToString(),                           
                           });
 
             return await orders.ToListAsync();

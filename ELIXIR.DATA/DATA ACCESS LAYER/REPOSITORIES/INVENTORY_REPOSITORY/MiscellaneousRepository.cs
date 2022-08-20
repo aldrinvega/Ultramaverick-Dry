@@ -319,7 +319,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
          });
 
             var transformOut = _context.Transformation_Preparation.Where(x => x.IsActive == true)
-                                                                  .Where(x => x.IsMixed == true)
+                                                               //   .Where(x => x.IsMixed == true)
                         .GroupBy(x => new
                         {
                             x.WarehouseId,

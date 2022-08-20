@@ -200,5 +200,16 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
             return await PagedList<ReasonDto>.CreateAsync(reason, userParams.PageNumber, userParams.PageSize);
         }
+
+        public async Task<bool> ValidateReasonEntry(Reason reason)
+        {
+            var validate = await _context.Reasons.Where(x => x.MenuId == reason.MenuId)
+                                           .Where(x => x.ReasonName == reason.ReasonName)
+                                           .ToListAsync();
+            if (validate.Count != 0)
+                return false;
+
+            return true;
+        }
     }
 }

@@ -23,6 +23,6 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<PagedList<ReasonDto>> GetAllReasonWithPagination(bool status, UserParams userParams);
         Task<PagedList<ReasonDto>> GetReasonByStatusWithPaginationOrig(UserParams userParams, bool status, string search);
 
-
+        Task<bool> ValidateReasonEntry(Reason reason);
     }
 }

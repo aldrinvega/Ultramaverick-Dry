@@ -22,13 +22,12 @@ namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
         public decimal ActualGood { get; set; }
         public decimal Reject { get; set; }
         public string ExpirationDate { get; set; }
+        public int ExpirationDay { get; set; }
         public string QC_ReceivedDate { get; set; }
         public bool IsActive { get; set; }
         public bool IsWareHouseReceive { get; set; }
         public bool IsExpiryApprove { get; set; }
         public string ManufacturingDate { get; set; }
-
-
 
 
 

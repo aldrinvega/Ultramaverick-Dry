@@ -617,6 +617,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
             else
             {
                 existingList.IsPrepared = true;
+                existingList.Quantity = preparation.WeighingScale;
             }
 
            

@@ -664,5 +664,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
             return await PagedList<RejectWarehouseReceivingDto>.CreateAsync(warehousereject, userParams.PageNumber, userParams.PageSize);
 
         }
+
+        public async Task<IReadOnlyList<WarehouseReceivingDto>> ListOfWarehouseReceivingId()
+        {
+
+            var warehouse = _context.WarehouseReceived.Where(x => x.IsActive == true)
+                                                      .Select(x => new WarehouseReceivingDto
+                                                      {
+                                                          Id = x.Id,
+                                                          ItemCode = x.ItemCode,
+                                                          ItemDescription = x.ItemDescription,                                                      
+                                                          ExpirationDate = x.Expiration.ToString("MM/dd/yyyy"),
+                                                          ExpirationDay = x.ExpirationDays
+                                                      });
+            return await warehouse.ToListAsync();
+
+        }
     }
 }

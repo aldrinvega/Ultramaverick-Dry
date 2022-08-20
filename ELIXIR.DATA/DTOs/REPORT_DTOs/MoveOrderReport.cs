@@ -13,6 +13,8 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public string CustomerCode { get; set; }
         public string CustomerName { get; set; }
         public string FarmType { get; set; }
+        public string FarmCode { get; set; }
+        public string FarmName { get; set; }
         public string ItemCode { get; set; }
         public string ItemDescription { get; set; }
         public string Uom { get; set; }
