@@ -34,7 +34,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                                                .SumAsync(x => x.ActualGood);
 
             var summary = (from receive in _context.QC_Receiving
-                           where receive.IsActive == true && (receive.IsWareHouseReceive == false || receive.IsWareHouseReceive == null)
+                           where receive.IsActive == true && (receive.IsWareHouseReceive == false || receive.IsWareHouseReceive == null) && receive.ExpiryIsApprove == true
                            join posummary in _context.POSummary
                            on receive.PO_Summary_Id equals posummary.Id into leftJ
                            from posummary in leftJ.DefaultIfEmpty()
@@ -667,17 +667,63 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
 
         public async Task<IReadOnlyList<WarehouseReceivingDto>> ListOfWarehouseReceivingId()
         {
-
-            var warehouse = _context.WarehouseReceived.Where(x => x.IsActive == true)
+            var warehouse = _context.WarehouseReceived.OrderByDescending(x => x.ReceivingDate)
+                                                      .Where(x => x.IsActive == true)
                                                       .Select(x => new WarehouseReceivingDto
                                                       {
                                                           Id = x.Id,
                                                           ItemCode = x.ItemCode,
-                                                          ItemDescription = x.ItemDescription,                                                      
+                                                          ItemDescription = x.ItemDescription,    
+                                                          PO_Number = x.PO_Number, 
+                                                          Supplier = x.Supplier, 
+                                                          ActualGood = x.ActualGood, 
+                                                          ManufacturingDate = x.ManufacturingDate.ToString("MM/dd/yyyy"),
                                                           ExpirationDate = x.Expiration.ToString("MM/dd/yyyy"),
                                                           ExpirationDay = x.ExpirationDays
                                                       });
             return await warehouse.ToListAsync();
+
+        }
+
+        public async Task<PagedList<WarehouseReceivingDto>> GetAllWarehouseIdWithPagination(UserParams userParams)
+        {
+            var warehouse = _context.WarehouseReceived.OrderByDescending(x => x.ReceivingDate)
+                                                      .Where(x => x.IsActive == true)
+                                                      .Select(x => new WarehouseReceivingDto
+                                                      {
+                                                          Id = x.Id,
+                                                          ItemCode = x.ItemCode,
+                                                          ItemDescription = x.ItemDescription,
+                                                          PO_Number = x.PO_Number,
+                                                          Supplier = x.Supplier,
+                                                          ActualGood = x.ActualGood,
+                                                          ManufacturingDate = x.ManufacturingDate.ToString("MM/dd/yyyy"),
+                                                          ExpirationDate = x.Expiration.ToString("MM/dd/yyyy"),
+                                                          ExpirationDay = x.ExpirationDays
+                                                      });
+
+            return await PagedList<WarehouseReceivingDto>.CreateAsync(warehouse, userParams.PageNumber, userParams.PageSize);
+        }
+
+        public async Task<PagedList<WarehouseReceivingDto>> GetAllWarehouseIdWithPaginationOrig(UserParams userParams, string search)
+        {
+            var warehouse = _context.WarehouseReceived.OrderByDescending(x => x.ReceivingDate)
+                                                     .Where(x => x.IsActive == true)
+                                                     .Select(x => new WarehouseReceivingDto
+                                                     {
+                                                         Id = x.Id,
+                                                         ItemCode = x.ItemCode,
+                                                         ItemDescription = x.ItemDescription,
+                                                         PO_Number = x.PO_Number,
+                                                         Supplier = x.Supplier,
+                                                         ActualGood = x.ActualGood,
+                                                         ManufacturingDate = x.ManufacturingDate.ToString("MM/dd/yyyy"),
+                                                         ExpirationDate = x.Expiration.ToString("MM/dd/yyyy"),
+                                                         ExpirationDay = x.ExpirationDays
+                                                     }).Where(x => x.ItemCode.ToLower()
+                                                       .Contains(search.Trim().ToLower()));
+
+            return await PagedList<WarehouseReceivingDto>.CreateAsync(warehouse, userParams.PageNumber, userParams.PageSize);
 
         }
     }

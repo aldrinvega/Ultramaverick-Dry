@@ -297,5 +297,58 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
             return Ok(warehouse);
         }
 
+        [HttpGet]
+        [Route("GetAllListOfWarehouseIdPagination")]
+        public async Task<ActionResult<IEnumerable<WarehouseReceivingDto>>> GetAllListOfWarehouseIdPagination([FromQuery] UserParams userParams)
+        {
+            var warehouse = await _unitOfWork.Warehouse.GetAllWarehouseIdWithPagination(userParams);
+
+            Response.AddPaginationHeader(warehouse.CurrentPage, warehouse.PageSize, warehouse.TotalCount, warehouse.TotalPages, warehouse.HasNextPage, warehouse.HasPreviousPage);
+
+            var warehouseResult = new
+            {
+                warehouse,
+                warehouse.CurrentPage,
+                warehouse.PageSize,
+                warehouse.TotalCount,
+                warehouse.TotalPages,
+                warehouse.HasNextPage,
+                warehouse.HasPreviousPage
+            };
+
+            return Ok(warehouseResult);
+        }
+
+        [HttpGet]
+        [Route("GetAllListOfWarehouseIdPaginationOrig")]
+        public async Task<ActionResult<IEnumerable<WarehouseReceivingDto>>> GetAllListOfWarehouseIdPaginationOrig([FromQuery] UserParams userParams, [FromQuery] string search)
+        {
+
+            if (search == null)
+
+                return await GetAllListOfWarehouseIdPagination(userParams);
+
+            var warehouse = await _unitOfWork.Warehouse.GetAllWarehouseIdWithPaginationOrig(userParams, search);
+
+            Response.AddPaginationHeader(warehouse.CurrentPage, warehouse.PageSize, warehouse.TotalCount, warehouse.TotalPages, warehouse.HasNextPage, warehouse.HasPreviousPage);
+
+            var warehouseResult = new
+            {
+                warehouse,
+                warehouse.CurrentPage,
+                warehouse.PageSize,
+                warehouse.TotalCount,
+                warehouse.TotalPages,
+                warehouse.HasNextPage,
+                warehouse.HasPreviousPage
+            };
+
+            return Ok(warehouseResult);
+        }
+
+
+
+
+
     }
 }

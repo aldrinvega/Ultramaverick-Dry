@@ -1,9 +1,8 @@
-﻿
-
-using ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE;
+﻿using ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using ELIXIR.DATA.DTOs.INVENTORY_DTOs;
+using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -48,7 +47,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                           .OrderBy(x => x.ItemCode)
                                                           .Where(x => x.IsWarehouseReceived == true)
                                                           .ToListAsync();
-
         }
 
         public Task<PoSummaryInventory> GetPOSummary()
@@ -67,8 +65,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                });
 
             return (Task<PoSummaryInventory>)getPoSummary;
-             
+
+
         }
+
+
 
 
         public async Task<IReadOnlyList<MRPDto>> GetAllItemForInventory()
@@ -391,34 +392,56 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                             total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))
                               });
 
+            
+            var getTransformTo = _context.WarehouseReceived.Where(x => x.IsActive == true)
+                                                           .Where(x => x.TransactionType == "Transformation")
+              .GroupBy(x => new
+
+              {
+                  x.ItemCode,
+
+              }).Select(x => new ReceiptInventory
+              {
+                  ItemCode = x.Key.ItemCode,
+                  Quantity = x.Sum(x => x.ActualGood)
+              });
 
 
-            //var getLastUsed = (from transform in _context.Transformation_Preparation
-            //                   where transform.IsActive == true && transform.IsMixed == true
-            //                   select new
-            //                   {
-            //                       ItemCode = transform.ItemCode,
-            //                       PreparedDate = (DateTime?)transform.PreparedDate
-            //                   }).Distinct()
-            //                   .Union
-            //                    (from moveorder in _context.MoveOrders
-            //                     where moveorder.IsActive == true && moveorder.IsPrepared == true
-            //                     select new
-            //                     {
-            //                         ItemCode = moveorder.ItemCode,
-            //                         PreparedDate = moveorder.PreparedDate
 
-            //                     });
-            //.OrderByDescending(x => x.PreparedDate);
+            //var lastUsed = (from warehouse in getWarehouseStock
+            //                join moveorder in getMoveOrderOut
+            //                on warehouse.ItemCode equals moveorder.ItemCode
+            //                into leftJ1
+            //                from moveorder in leftJ1.DefaultIfEmpty()
 
+            //                group new
+            //                {
+            //                    warehouse,
+            //                    moveorder
+            //                }
+            //             by new
+            //             {
+            //                 warehouse.ItemCode, 
 
-            //var x = getLastUsed.ToLookup(x => new
-            //{ 
-            //    x.PreparedDate,
-            //    x.ItemCode
-            //}).Distinct();
+            //             } into total
 
-            // var xx = getLastUsed;
+            //var getLastUsed = from a in getWarehouseStock
+            //                join b in _context.MoveOrders
+            //                on a.ItemCode equals b.ItemCode
+            //                into leftJ
+            //                from b in leftJ.DefaultIfEmpty()
+            //                orderby b.PreparedDate descending
+            //                group b by a.ItemCode
+            //                into groupA
+            //                select new
+            //                {
+            //                    ItemCode = groupA.Key,
+            //                    LastUsed = (from a in groupA                                 
+            //                                 select a.PreparedDate.ToString()
+            //                                ).FirstOrDefault()
+            //                };
+
+            //var x = getLastUsed;
 
             var inventory = (from rawmaterial in _context.RawMaterials
                              join posummary in getPoSummary
@@ -476,6 +499,29 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                              into leftJ11
                              from reserveusage in leftJ11.DefaultIfEmpty()
 
+                             join transformto in getTransformTo
+                             on rawmaterial.ItemCode equals transformto.ItemCode
+                             into leftJ12
+                             from transformto in leftJ12.DefaultIfEmpty()
+
+                             join transformfrom in getTransformation
+                             on rawmaterial.ItemCode equals transformfrom.ItemCode
+                             into leftJ13
+                             from transformfrom in leftJ13.DefaultIfEmpty()
+
+
+                             //join lastused in getLastUsed
+                             //on rawmaterial.ItemCode equals lastused.ItemCode
+                             //into leftJ14
+                             //from lastused in leftJ14.DefaultIfEmpty()
+
+
+                                 //join lastused in last_used
+                                 //on rawmaterial.ItemCode equals lastused.item_code
+                                 //into leftJ14
+                                 //from lastused in leftJ14.DefaultIfEmpty()
+
+
 
                                  //     join lastUsed in x
                                  //on rawmaterial.ItemCode equals lastUsed.ItemCode
@@ -494,7 +540,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                          Reserve,
                                          suggestedpo,
                                          averageissuance,
-                                         reserveusage
+                                         reserveusage,
+                                         transformto,
+                                         transformfrom,
+                                     //    lastused
+                                         //lastused
                                  //   lastUsed
                              }
                              by new
@@ -515,8 +565,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  SOH = SOH.SOH != null ? SOH.SOH : 0,
                                  Reserve = Reserve.Reserve != null ? Reserve.Reserve : 0,
                                  AverageIssuance = averageissuance.ActualGood != null ? averageissuance.ActualGood : 0,
-                                 ReserveUsage = reserveusage.Reserve != null ? reserveusage.Reserve : 0
-                               //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
+                                 ReserveUsage = reserveusage.Reserve != null ? reserveusage.Reserve : 0,
+                                 TransformTo = transformto.Quantity != null ? transformto.Quantity : 0,
+                                 TransformFrom = transformfrom.WeighingScale != null ? transformfrom.WeighingScale : 0,
+                                 //LastUsed
+                              //   LastUsed = lastused.last_used != null ? lastused.last_used : null
+                                 //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
 
                              } into total
 
@@ -539,9 +593,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  SuggestedPo = total.Key.SuggestedPo,
                                  AverageIssuance = Math.Round(Convert.ToDecimal(total.Key.AverageIssuance), 2),
                                  DaysLevel = Math.Round(Convert.ToDecimal(total.Key.Reserve / (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)),2),
-                                 ReserveUsage = total.Key.ReserveUsage
-                            //     LastUsed = total.Key.LastUsed.ToString()
-
+                                 ReserveUsage = total.Key.ReserveUsage,
+                                 TransformFrom = total.Key.TransformFrom,
+                                 TransformTo = total.Key.TransformTo
+                                 //LastUsed = total.Key.LastUsed.ToString()                       
                              });
 
             return await inventory.ToListAsync();
@@ -752,7 +807,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                             total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))
                               });
 
-
             var getSuggestedPo = (from posummary in getPoSummary
                                   join receive in getQCReceivingIn
                                   on posummary.ItemCode equals receive.ItemCode
@@ -866,6 +920,19 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                  total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))
                                    });
 
+            var getTransformTo = _context.WarehouseReceived.Where(x => x.IsActive == true)
+                                                       .Where(x => x.TransactionType == "Transformation")
+          .GroupBy(x => new
+
+          {
+              x.ItemCode,
+
+          }).Select(x => new ReceiptInventory
+          {
+              ItemCode = x.Key.ItemCode,
+              Quantity = x.Sum(x => x.ActualGood)
+          });
+
             //var getLastUsed = (from transform in _context.Transformation_Preparation
             //                   where transform.IsActive == true && transform.IsMixed == true
             //                   select new
@@ -949,11 +1016,15 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                              into leftJ11
                              from reserveusage in leftJ11.DefaultIfEmpty()
 
+                             join transformto in getTransformTo
+                             on rawmaterial.ItemCode equals transformto.ItemCode
+                             into leftJ12
+                             from transformto in leftJ12.DefaultIfEmpty()
 
-                                 //     join lastUsed in x
-                                 //on rawmaterial.ItemCode equals lastUsed.ItemCode
-                                 //into leftJ11
-                                 //from lastUsed in leftJ11.DefaultIfEmpty()
+                             join transformfrom in getTransformation
+                             on rawmaterial.ItemCode equals transformfrom.ItemCode
+                             into leftJ13
+                             from transformfrom in leftJ13.DefaultIfEmpty()
 
                              group new
                              {
@@ -968,7 +1039,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  Reserve,
                                  suggestedpo,
                                  averageissuance,
-                                 reserveusage
+                                 reserveusage,
+                                 transformto,
+                                 transformfrom
                              }
                              by new
                              {
@@ -988,7 +1061,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  SOH = SOH.SOH != null ? SOH.SOH : 0,
                                  Reserve = Reserve.Reserve != null ? Reserve.Reserve : 0,
                                  AverageIssuance = averageissuance.ActualGood != null ? averageissuance.ActualGood : 0,
-                                 ReserveUsage = reserveusage.Reserve != null ? reserveusage.Reserve : 0
+                                 ReserveUsage = reserveusage.Reserve != null ? reserveusage.Reserve : 0,
+                                 TransformFrom = transformfrom.WeighingScale != null ? transformfrom.WeighingScale : 0,
+                                 TransformTo = transformto.Quantity != null ? transformto.Quantity : 0
                                  //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
 
                              } into total
@@ -1012,8 +1087,15 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  SuggestedPo = total.Key.SuggestedPo,
                                  AverageIssuance = Math.Round(Convert.ToDecimal(total.Key.AverageIssuance), 2),
                                  DaysLevel = Math.Round(Convert.ToDecimal(total.Key.Reserve / (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)), 2),
-                                 ReserveUsage = total.Key.ReserveUsage
-                                 //     LastUsed = total.Key.LastUsed.ToString()
+                                 ReserveUsage = total.Key.ReserveUsage,
+                                 TransformFrom = total.Key.TransformFrom,
+                                 TransformTo = total.Key.TransformTo
+                                 //LastUsed = (from a in _context.MoveOrders
+                                 //            orderby a.PreparedDate descending
+                                 //            select new MoveOrderDto
+                                 //            {
+                                 //              PreparedDate = a.PreparedDate.ToString()
+                                 //            }).FirstOrDefault()
 
                              });
 
@@ -1340,6 +1422,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                        Reserve = (total.Sum(x => x.request.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
                                                  total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))
                                    });
+
+
+          var getTransformTo = _context.WarehouseReceived.Where(x => x.IsActive == true)
+                                                       .Where(x => x.TransactionType == "Transformation")
+          .GroupBy(x => new
+
+          {
+              x.ItemCode,
+
+          }).Select(x => new ReceiptInventory
+          {
+              ItemCode = x.Key.ItemCode,
+              Quantity = x.Sum(x => x.ActualGood)
+          });
+
             //var getLastUsed = (from transform in _context.Transformation_Preparation
             //                   where transform.IsActive == true && transform.IsMixed == true
             //                   select new
@@ -1423,12 +1520,15 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                              into leftJ11
                              from reserveusage in leftJ11.DefaultIfEmpty()
 
+                             join transformto in getTransformTo
+                             on rawmaterial.ItemCode equals transformto.ItemCode
+                             into leftJ12
+                             from transformto in leftJ12.DefaultIfEmpty()
 
-
-                                 //     join lastUsed in x
-                                 //on rawmaterial.ItemCode equals lastUsed.ItemCode
-                                 //into leftJ11
-                                 //from lastUsed in leftJ11.DefaultIfEmpty()
+                             join transformfrom in getTransformation
+                             on rawmaterial.ItemCode equals transformfrom.ItemCode
+                             into leftJ13
+                             from transformfrom in leftJ13.DefaultIfEmpty()
 
                              group new
                              {
@@ -1443,7 +1543,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  Reserve,
                                  suggestedpo,
                                  averageissuance,
-                                 reserveusage
+                                 reserveusage,
+                                 transformto,
+                                 transformfrom
                                  //   lastUsed
                              }
                              by new
@@ -1464,7 +1566,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  SOH = SOH.SOH != null ? SOH.SOH : 0,
                                  Reserve = Reserve.Reserve != null ? Reserve.Reserve : 0,
                                  AverageIssuance = averageissuance.ActualGood != null ? averageissuance.ActualGood : 0,
-                                 ReserveUsage = reserveusage.Reserve != null ? reserveusage.Reserve : 0
+                                 ReserveUsage = reserveusage.Reserve != null ? reserveusage.Reserve : 0,
+                                 TransformFrom = transformfrom.WeighingScale != null ? transformfrom.WeighingScale : 0,
+                                 TransformTo = transformto.Quantity != null ? transformto.Quantity : 0
                                  //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
 
                              } into total
@@ -1488,7 +1592,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  SuggestedPo = total.Key.SuggestedPo,
                                  AverageIssuance = Math.Round(Convert.ToDecimal(total.Key.AverageIssuance), 2),
                                  DaysLevel = Math.Round(Convert.ToDecimal(total.Key.Reserve / (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)), 2),
-                                 ReserveUsage = total.Key.ReserveUsage
+                                 ReserveUsage = total.Key.ReserveUsage,
+                                 TransformFrom = total.Key.TransformFrom,
+                                 TransformTo = total.Key.TransformTo
                                  //     LastUsed = total.Key.LastUsed.ToString()
 
                              }).Where(x => x.ItemCode.ToLower()

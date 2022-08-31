@@ -43,6 +43,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.WAREHOUSE_INTERFACE
 
         Task<IReadOnlyList<WarehouseReceivingDto>> ListOfWarehouseReceivingId();
 
+        Task<PagedList<WarehouseReceivingDto>> GetAllWarehouseIdWithPagination(UserParams userParams);
+        Task<PagedList<WarehouseReceivingDto>> GetAllWarehouseIdWithPaginationOrig(UserParams userParams, string search);
 
     }
 }

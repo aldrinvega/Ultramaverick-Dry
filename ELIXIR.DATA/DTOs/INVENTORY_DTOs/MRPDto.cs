@@ -32,6 +32,10 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs
 
         public decimal ReserveUsage { get; set; }
 
+        public decimal TransformFrom { get; set; }
+        public decimal TransformTo { get; set; }
+
+
 
 
 

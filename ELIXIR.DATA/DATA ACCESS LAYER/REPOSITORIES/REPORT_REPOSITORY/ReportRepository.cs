@@ -357,7 +357,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
                                   });
 
-            return await warehouseInventory.ToListAsync();
+            return await warehouseInventory.Where(x => x.Quantity != 0)
+                                           .ToListAsync();
                                  
         }
 

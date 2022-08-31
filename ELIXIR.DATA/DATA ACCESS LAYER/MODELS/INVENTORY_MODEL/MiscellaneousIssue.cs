@@ -34,6 +34,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL
             set;
         }
 
+        public string Details
+        {
+            get;
+            set;
+        }
+
         public string Remarks {
             get; 
             set; 
