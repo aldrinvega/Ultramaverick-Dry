@@ -522,6 +522,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.IMPORT_REPOSITORY
         {
 
             materials.IsActive = true;
+            materials.DateAdded = DateTime.Now;
 
             await _context.RawMaterials.AddAsync(materials);
             return true;

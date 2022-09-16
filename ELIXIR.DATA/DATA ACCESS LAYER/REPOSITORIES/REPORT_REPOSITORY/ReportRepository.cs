@@ -19,7 +19,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
         {
             _context = context;
 
-
         }
 
         public async Task<IReadOnlyList<QCReport>> QcRecevingReport(string DateFrom, string DateTo)
@@ -156,30 +155,30 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
         public async Task<IReadOnlyList<MoveOrderReport>> MoveOrderReport(string DateFrom, string DateTo)
         {
-            var orders = (from ordering in _context.Orders              
-                         join moveorders in _context.MoveOrders
-                         on ordering.Id equals moveorders.OrderNoPKey into leftJ
-                         from moveorders in leftJ.DefaultIfEmpty()
+            var orders = (from ordering in _context.Orders
+                          join moveorders in _context.MoveOrders
+                          on ordering.Id equals moveorders.OrderNoPKey into leftJ
+                          from moveorders in leftJ.DefaultIfEmpty()
 
-                         where moveorders.PreparedDate >= DateTime.Parse(DateFrom) && moveorders.PreparedDate <= DateTime.Parse(DateTo) && moveorders.IsActive == true
+                          where moveorders.PreparedDate >= DateTime.Parse(DateFrom) && moveorders.PreparedDate <= DateTime.Parse(DateTo) && moveorders.IsActive == true
 
                           select new MoveOrderReport
-                         {
+                          {
 
-                             MoveOrderId = moveorders.OrderNo,
-                             CustomerCode = ordering.FarmCode,
-                             CustomerName = ordering.CustomerName, 
-                             ItemCode = ordering.ItemCode, 
-                             ItemDescription = ordering.ItemDescription, 
-                             Uom = ordering.Uom, 
-                             Category = ordering.Category, 
-                             Quantity = moveorders.QuantityOrdered, 
-                             ExpirationDate = moveorders.ExpirationDate.ToString(),
-                             TransactionType = moveorders.DeliveryStatus, 
-                             MoveOrderBy = moveorders.PreparedBy,
-                             MoveOrderDate = moveorders.PreparedDate.ToString()
+                              MoveOrderId = moveorders.OrderNo,
+                              CustomerCode = ordering.FarmCode,
+                              CustomerName = ordering.CustomerName,
+                              ItemCode = ordering.ItemCode,
+                              ItemDescription = ordering.ItemDescription,
+                              Uom = ordering.Uom,
+                              Category = ordering.Category,
+                              Quantity = moveorders.QuantityOrdered,
+                              ExpirationDate = moveorders.ExpirationDate.ToString(),
+                              TransactionType = moveorders.DeliveryStatus,
+                              MoveOrderBy = moveorders.PreparedBy,
+                              MoveOrderDate = moveorders.PreparedDate.ToString()
 
-                         });
+                          });
 
             return await orders.ToListAsync();
 
@@ -388,6 +387,33 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                           });
 
             return await orders.ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<CancelledOrderReport>> CancelledOrderedReports(string DateFrom, string DateTo)
+        {
+
+            var orders = (from ordering in _context.Orders
+                          where ordering.OrderDate >= DateTime.Parse(DateFrom) && ordering.OrderDate <= DateTime.Parse(DateTo) &&
+                          ordering.IsCancel == true && ordering.IsActive == false
+
+                          select new CancelledOrderReport
+                          {
+
+                              OrderId = ordering.Id,
+                              DateNeeded = ordering.DateNeeded.ToString(),
+                              DateOrdered = ordering.OrderDate.ToString(),
+                              CustomerCode = ordering.FarmCode,
+                              CustomerName = ordering.FarmName,
+                              ItemCode = ordering.ItemCode,
+                              ItemDescription = ordering.ItemDescription,
+                              QuantityOrdered = ordering.QuantityOrdered,
+                              CancelledDate = ordering.CancelDate.ToString(),
+                              CancelledBy = ordering.IsCancelBy,
+                              Reason = ordering.Remarks
+                          });
+
+            return await orders.ToListAsync();
+
         }
     }
 }

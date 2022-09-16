@@ -26,6 +26,8 @@ namespace ELIXIR.DATA.CORE.ICONFIGURATION
         IRawMaterialRepository RawMaterials { get; }
         IReasonRepository Reasons { get; }
         ITransformationRepository Transforms { get; }
+        ITransactionRepository Transactions { get; }
+
 
       //Import
         IImportRepository Imports { get;  }
@@ -53,8 +55,9 @@ namespace ELIXIR.DATA.CORE.ICONFIGURATION
 
         IReportRepository Report { get;  }
 
-        Task CompleteAsync();
 
+
+        Task CompleteAsync();
 
 
     }

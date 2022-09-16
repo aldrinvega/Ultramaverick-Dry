@@ -42,6 +42,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.WAREHOUSE_INTERFACE
         Task<PagedList<RejectWarehouseReceivingDto>> RejectRawMaterialsByWarehousePaginationOrig(UserParams userParams, string search);
 
         Task<IReadOnlyList<WarehouseReceivingDto>> ListOfWarehouseReceivingId();
+        Task<IReadOnlyList<WarehouseReceivingDto>> ListOfWarehouseReceivingId(string search);
 
         Task<PagedList<WarehouseReceivingDto>> GetAllWarehouseIdWithPagination(UserParams userParams);
         Task<PagedList<WarehouseReceivingDto>> GetAllWarehouseIdWithPaginationOrig(UserParams userParams, string search);

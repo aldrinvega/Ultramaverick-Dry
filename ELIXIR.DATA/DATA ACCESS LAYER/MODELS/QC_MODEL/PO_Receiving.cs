@@ -39,8 +39,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
             get;
             set; 
         }
-        public int Batch_No { 
-            get; 
+        public string Batch_No
+        {
+            get;
             set;
         }
 

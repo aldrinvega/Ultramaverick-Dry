@@ -73,6 +73,9 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 
         Task<ItemStocks> GetFirstExpiry(string itemcode);
 
+        Task<bool> CancelControlInMoveOrder(Ordering order);
+
+        Task<IReadOnlyList<OrderDto>> GetAllApprovedOrdersForCalendar();
 
 
         //--------------------Transact Move Order--------------------
@@ -90,6 +93,11 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<IReadOnlyList<OrderDto>> GetAllForTransactMoveOrderNotification();
         Task<IReadOnlyList<MoveOrderDto>> GetForApprovalMoveOrderNotification();
         Task<IReadOnlyList<MoveOrderDto>> GetRejectMoveOrderNotification();
+
+
+
+
+
 
     }
 }

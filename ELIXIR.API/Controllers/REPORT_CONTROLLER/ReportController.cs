@@ -102,5 +102,16 @@ namespace ELIXIR.API.Controllers.REPORT_CONTROLLER
 
         }
 
+        [HttpGet]
+        [Route("CancelledOrderReport")]
+        public async Task<IActionResult> CancelledOrderReport([FromQuery] string DateFrom, [FromQuery] string DateTo)
+        {
+
+            var cancel = await _unitOfWork.Report.CancelledOrderedReports(DateFrom, DateTo);
+
+            return Ok(cancel);
+
+        }
+
     }
 }

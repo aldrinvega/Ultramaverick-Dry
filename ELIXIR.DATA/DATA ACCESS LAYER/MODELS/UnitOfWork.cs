@@ -70,6 +70,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
 
         public IReportRepository Report { get; set; }
 
+        public ITransactionRepository Transactions { get; set; }
 
         public UnitOfWork(
             StoreContext context,
@@ -93,6 +94,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
             RawMaterials = new RawMaterialRepository(_context);
             Reasons = new ReasonRepository(_context);
             Transforms = new TransformationRepository(_context);
+            Transactions = new TransactionRepository(_context);
 
             //Import
             Imports = new ImportRepository(_context);

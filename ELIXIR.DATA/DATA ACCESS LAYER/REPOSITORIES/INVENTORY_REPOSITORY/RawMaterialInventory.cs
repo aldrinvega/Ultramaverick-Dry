@@ -1597,7 +1597,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  TransformTo = total.Key.TransformTo
                                  //     LastUsed = total.Key.LastUsed.ToString()
 
-                             }).Where(x => x.ItemCode.ToLower()
+                             }).Where(x => x.ItemDescription.ToLower()
                                .Contains(search.Trim().ToLower()));
 
             return await PagedList<MRPDto>.CreateAsync(inventory, userParams.PageNumber, userParams.PageSize);

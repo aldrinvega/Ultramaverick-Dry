@@ -692,6 +692,30 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         }
 
+        [HttpPut]
+        [Route("CancelOrdersInMoveOrder")]
+        public async Task<IActionResult> CancelOrdersInMoveOrder([FromBody] Ordering order)
+        {
+
+            await _unitOfWork.Order.CancelControlInMoveOrder(order);
+
+            await _unitOfWork.CompleteAsync();
+
+            return Ok("Successfully cancel orders");
+
+        }
+
+        [HttpGet]
+        [Route("GetAllApprovedOrderCalendar")]
+        public async Task<IActionResult> GetAllApprovedOrderCalendar()
+        {
+
+            var orders = await _unitOfWork.Order.GetAllApprovedOrdersForCalendar();
+
+            return Ok(orders);
+
+        }
+
         //------------------TRANSACT MOVE ORDER-------------------------
 
         [HttpGet]

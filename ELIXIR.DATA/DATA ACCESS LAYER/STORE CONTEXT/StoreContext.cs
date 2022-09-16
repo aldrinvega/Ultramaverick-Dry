@@ -119,8 +119,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
             get;
             set; 
         }
-        public virtual DbSet<Ordering> Orders { 
-            get; 
+        public virtual DbSet<Ordering> Orders
+        {
+            get;
             set;
         }
         public virtual DbSet<MoveOrder> MoveOrders { 
@@ -147,6 +148,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
             get;
             set;
         }
+
+        public virtual DbSet<Transaction> Transactions
+        {
+            get;
+            set;
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

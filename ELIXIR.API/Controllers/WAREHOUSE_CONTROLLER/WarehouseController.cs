@@ -289,10 +289,26 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
         }
 
         [HttpGet]
-        [Route("GetAllListOfWarehouseReceivingId")]
-        public async Task<IActionResult> GetAllListOfWarehouseReceivingId()
+        [Route("GetAllListOfWarehouseReceivingIdNull")]
+        public async Task<IActionResult> GetAllListOfWarehouseReceivingIdNull()
         {
             var warehouse = await _unitOfWork.Warehouse.ListOfWarehouseReceivingId();
+
+            return Ok(warehouse);
+        }
+
+
+        [HttpGet]
+        [Route("GetAllListOfWarehouseReceivingId")]
+        public async Task<IActionResult> GetAllListOfWarehouseReceivingId([FromQuery] string search)
+        {
+
+            if (search == null)
+
+                return await GetAllListOfWarehouseReceivingIdNull();
+
+
+            var warehouse = await _unitOfWork.Warehouse.ListOfWarehouseReceivingId(search);
 
             return Ok(warehouse);
         }

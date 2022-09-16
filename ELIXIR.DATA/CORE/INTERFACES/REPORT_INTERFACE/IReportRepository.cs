@@ -21,5 +21,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE
 
         Task<IReadOnlyList<WarehouseReport>> NearlyExpireItemsReport(int expirydays);
 
+        Task<IReadOnlyList<CancelledOrderReport>> CancelledOrderedReports(string DateFrom, string DateTo);
+
     }
 }
