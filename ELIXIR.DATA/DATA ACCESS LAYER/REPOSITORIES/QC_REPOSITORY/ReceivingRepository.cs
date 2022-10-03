@@ -689,7 +689,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                                       .OrderBy(x => x.PO_Number)
                                                       .Where(x => x.ActualRemaining != 0 && (x.ActualRemaining > 0))
                                                       .Where(x => x.IsActive == true)
-                                                      .Where(x => Convert.ToString(x.PO_Number).ToLower()
+                                                      .Where(x => Convert.ToString(x.ItemDescription).ToLower()
                                                       .Contains(search.Trim().ToLower()));
 
             return await PagedList<PoSummaryChecklistDto>.CreateAsync(poSummary, userParams.PageNumber, userParams.PageSize);

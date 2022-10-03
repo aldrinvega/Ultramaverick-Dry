@@ -27,7 +27,8 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public string TransactedDate { get; set; }
         public string DateNeeded { get; set; }
         public string TransactedBy { get; set; }
-
+        public string BatchNo { get; set; }
+        public string DeliveryDate { get; set; }
 
 
     }

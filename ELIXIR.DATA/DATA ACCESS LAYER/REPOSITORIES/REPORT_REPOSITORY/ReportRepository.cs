@@ -155,29 +155,29 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
         public async Task<IReadOnlyList<MoveOrderReport>> MoveOrderReport(string DateFrom, string DateTo)
         {
-            var orders = (from ordering in _context.Orders
-                          join moveorders in _context.MoveOrders
-                          on ordering.Id equals moveorders.OrderNoPKey into leftJ
-                          from moveorders in leftJ.DefaultIfEmpty()
-
-                          where moveorders.PreparedDate >= DateTime.Parse(DateFrom) && moveorders.PreparedDate <= DateTime.Parse(DateTo) && moveorders.IsActive == true
-
+            var orders = (from moveorder in _context.MoveOrders
+                          where moveorder.PreparedDate >= DateTime.Parse(DateFrom) && moveorder.PreparedDate <= DateTime.Parse(DateTo) && moveorder.IsActive == true
+                          join transactmoveorder in _context.TransactMoveOrder
+                          on moveorder.OrderNo equals transactmoveorder.OrderNo into leftJ
+                          from transactmoveorder in leftJ.DefaultIfEmpty()
+                        
                           select new MoveOrderReport
                           {
-
-                              MoveOrderId = moveorders.OrderNo,
-                              CustomerCode = ordering.FarmCode,
-                              CustomerName = ordering.CustomerName,
-                              ItemCode = ordering.ItemCode,
-                              ItemDescription = ordering.ItemDescription,
-                              Uom = ordering.Uom,
-                              Category = ordering.Category,
-                              Quantity = moveorders.QuantityOrdered,
-                              ExpirationDate = moveorders.ExpirationDate.ToString(),
-                              TransactionType = moveorders.DeliveryStatus,
-                              MoveOrderBy = moveorders.PreparedBy,
-                              MoveOrderDate = moveorders.PreparedDate.ToString()
-
+                              MoveOrderId = moveorder.OrderNo,
+                              CustomerCode = moveorder.FarmCode,
+                              CustomerName = moveorder.FarmName,
+                              ItemCode = moveorder.ItemCode,
+                              ItemDescription = moveorder.ItemDescription,
+                              Uom = moveorder.Uom,
+                              Category = moveorder.Category,
+                              Quantity = moveorder.QuantityOrdered,
+                              ExpirationDate = moveorder.ExpirationDate.ToString(),
+                              TransactionType = moveorder.DeliveryStatus,
+                              MoveOrderBy = moveorder.PreparedBy,
+                              MoveOrderDate = moveorder.PreparedDate.ToString(),
+                              BatchNo = moveorder.BatchNo,
+                              TransactedBy = transactmoveorder.PreparedBy,
+                              TransactedDate = transactmoveorder.PreparedDate.ToString()
                           });
 
             return await orders.ToListAsync();
@@ -381,9 +381,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                               ItemDescription = moveorder.ItemDescription, 
                               Uom = moveorder.Uom,
                               Quantity = moveorder.QuantityOrdered, 
+                              MoveOrderDate = moveorder.ApprovedDate.ToString(),
                               TransactedBy = transact.PreparedBy,
                               TransactionType = moveorder.DeliveryStatus,
-                              TransactedDate = transact.PreparedDate.ToString(),                           
+                              TransactedDate = transact.PreparedDate.ToString(),          
+                              BatchNo = moveorder.BatchNo,
+                              DeliveryDate = transact.DeliveryDate.ToString()                         
                           });
 
             return await orders.ToListAsync();

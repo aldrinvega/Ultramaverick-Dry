@@ -49,6 +49,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
         {
 
             var validateFormula = await _context.Formulas.Where(x => x.ItemCode == planning.ItemCode)
+                                                         .Where(x => x.Version == planning.Version)
                                                          .FirstOrDefaultAsync();
 
 

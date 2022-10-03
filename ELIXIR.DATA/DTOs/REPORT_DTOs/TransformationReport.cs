@@ -20,6 +20,6 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public string ItemDescription_Recipe { get; set; }
         public decimal Recipe_Quantity { get; set; }
         public string DateTransformed { get; set; }
-
+        public string DeliveryDate { get; set; }
     }
 }

@@ -42,6 +42,8 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
 
         public string DeliveryStatus { get; set; }
 
+        public string BatchNo { get; set; }
+
 
 
     }

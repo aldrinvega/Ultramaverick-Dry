@@ -43,7 +43,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
             get;
             set;
         }
-        public int BatchNo
+        public string BatchNo
         {
             get;
             set;
