@@ -142,9 +142,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                                  Version = planning.Version,
                                  Batch = planning.Batch,
                                  Formula_Quantity = planning.Quantity,
-                                 ItemCode_Recipe = preparation.ItemCode,
-                                 ItemDescription_Recipe = preparation.ItemDescription,
-                                 Recipe_Quantity = preparation.WeighingScale,
+                                 ItemCode_Recipe = preparation.ItemCode != null ? preparation.ItemCode : null,
+                                 ItemDescription_Recipe = preparation.ItemDescription != null ? preparation.ItemDescription : null,
+                                 Recipe_Quantity = preparation.WeighingScale != null ? preparation.WeighingScale : 0,
                                  DateTransformed = warehouse.ManufacturingDate.ToString()
 
                              });
