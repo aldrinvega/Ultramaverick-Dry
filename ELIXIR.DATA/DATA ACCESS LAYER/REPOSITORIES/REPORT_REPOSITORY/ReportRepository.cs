@@ -1,5 +1,6 @@
 ﻿using ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
+using ELIXIR.DATA.DTOs.INVENTORY_DTOs;
 using ELIXIR.DATA.DTOs.REPORT_DTOs;
 using ELIXIR.DATA.DTOs.TRANSFORMATION_DTOs;
 using Microsoft.EntityFrameworkCore;
@@ -361,33 +362,82 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                                  
         }
 
-        public async Task<IReadOnlyList<MoveOrderReport>> TransactedMoveOrderReport(string DateFrom, string DateTo)
+        public async Task<IReadOnlyList<MoveOrderReport>> TransactedMoveOrderReport(string DateFrom, string DateTo) 
         {
             var orders = (from transact in _context.TransactMoveOrder
                           where transact.IsActive == true && transact.IsTransact == true && transact.PreparedDate >= DateTime.Parse(DateFrom) && transact.PreparedDate <= DateTime.Parse(DateTo)
                           join moveorder in _context.MoveOrders
                           on transact.OrderNo equals moveorder.OrderNo into leftJ
                           from moveorder in leftJ.DefaultIfEmpty()
+                          where moveorder.IsActive == true
+
+                          join customer in _context.Customers
+                          on moveorder.FarmCode equals customer.CustomerCode
+                          into leftJ2
+                          from customer in leftJ2.DefaultIfEmpty()
+
+                          group new
+                          {
+                              transact,
+                              moveorder,
+                              customer
+                          }
+
+                          by new
+                          {
+                              moveorder.OrderNo,
+                              customer.CustomerName,
+                              customer.CustomerCode,
+                              moveorder.ItemCode,
+                              moveorder.ItemDescription,
+                              moveorder.Uom,
+                              moveorder.QuantityOrdered,
+                              MoveOrderDate = moveorder.ApprovedDate.ToString(),
+                              transact.PreparedBy,
+                              moveorder.DeliveryStatus,
+                              TransactedDate = transact.PreparedDate.ToString(),
+                              moveorder.BatchNo,
+                              DeliveryDate = transact.DeliveryDate.ToString()
+
+                          } into total
 
                           select new MoveOrderReport
                           {
-                              OrderNo = moveorder.OrderNo,
-                              CustomerName = moveorder.FarmName,
-                              CustomerCode = moveorder.FarmCode,
-                              FarmCode = moveorder.FarmCode,
-                              FarmName = moveorder.FarmName,
-                              FarmType = moveorder.FarmType,
-                              ItemCode = moveorder.ItemCode, 
-                              ItemDescription = moveorder.ItemDescription, 
-                              Uom = moveorder.Uom,
-                              Quantity = moveorder.QuantityOrdered, 
-                              MoveOrderDate = moveorder.ApprovedDate.ToString(),
-                              TransactedBy = transact.PreparedBy,
-                              TransactionType = moveorder.DeliveryStatus,
-                              TransactedDate = transact.PreparedDate.ToString(),          
-                              BatchNo = moveorder.BatchNo,
-                              DeliveryDate = transact.DeliveryDate.ToString()                         
+
+                              OrderNo = total.Key.OrderNo,
+                              CustomerName = total.Key.CustomerName,
+                              CustomerCode = total.Key.CustomerCode,
+                              ItemCode = total.Key.ItemCode,
+                              ItemDescription = total.Key.ItemDescription,
+                              Uom = total.Key.Uom,
+                              Quantity = total.Key.QuantityOrdered,
+                              MoveOrderDate = total.Key.MoveOrderDate,
+                              TransactedBy = total.Key.PreparedBy,
+                              TransactionType = total.Key.DeliveryStatus,
+                              TransactedDate = total.Key.TransactedDate,
+                              BatchNo = total.Key.BatchNo,
+                              DeliveryDate = total.Key.DeliveryDate
+
                           });
+                          //select new MoveOrderReport
+                          //{
+                          //    OrderNo = moveorder.OrderNo,
+                          //    CustomerName = moveorder.FarmName,
+                          //    CustomerCode = moveorder.FarmCode,
+                          //    FarmCode = moveorder.FarmCode,
+                          //    FarmName = moveorder.FarmName,
+                          //    FarmType = moveorder.FarmType,
+                          //    ItemCode = moveorder.ItemCode, 
+                          //    ItemDescription = moveorder.ItemDescription, 
+                          //    Uom = moveorder.Uom,
+                          //    Quantity = moveorder.QuantityOrdered, 
+                          //    MoveOrderDate = moveorder.ApprovedDate.ToString(),
+                          //    TransactedBy = transact.PreparedBy,
+                          //    TransactionType = moveorder.DeliveryStatus,
+                          //    TransactedDate = transact.PreparedDate.ToString(),          
+                          //    BatchNo = moveorder.BatchNo,
+                          //    DeliveryDate = transact.DeliveryDate.ToString()                         
+                          //});
 
             return await orders.ToListAsync();
         }
@@ -416,6 +466,260 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                           });
 
             return await orders.ToListAsync();
+
+        }
+
+        public async Task<IReadOnlyList<InventoryMovementReport>> InventoryMovementReport(string DateFrom, string DateTo)
+        {
+
+            var getWarehouseStock = _context.WarehouseReceived.Where(x => x.IsActive == true)
+       .GroupBy(x => new
+       {
+           x.ItemCode,
+
+       }).Select(x => new WarehouseInventory
+       {
+           ItemCode = x.Key.ItemCode,
+           ActualGood = x.Sum(x => x.ActualGood)
+       });
+
+            var getMoveOrderOutByDate = _context.MoveOrders.Where(x => x.IsActive == true)
+                                                           .Where(x => x.IsPrepared == true)
+                                                           .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(DateTo) && x.ApprovedDate != null)
+        .GroupBy(x => new
+        {
+            x.ItemCode,
+
+        }).Select(x => new MoveOrderInventory
+        {
+            ItemCode = x.Key.ItemCode,
+            QuantityOrdered = x.Sum(x => x.QuantityOrdered)
+
+        });
+
+            var getTransformationByDate = _context.Transformation_Preparation.Where(x => x.IsActive == true)
+                                                                             .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(DateTo))
+              .GroupBy(x => new
+              {
+                  x.ItemCode,
+
+              }).Select(x => new TransformationInventory
+              {
+                  ItemCode = x.Key.ItemCode,
+                  WeighingScale = x.Sum(x => x.WeighingScale)
+              });
+
+
+            var getIssueOutByDate= _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
+                                                                     .Where(x => x.IsTransact == true)
+                                                                     .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(DateTo))
+             .GroupBy(x => new
+             {
+                 x.ItemCode,
+
+             }).Select(x => new IssueInventory
+             {
+                 ItemCode = x.Key.ItemCode,
+                 Quantity = x.Sum(x => x.Quantity)
+             });
+
+            var getReceivetIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
+                                                          .Where(x => x.TransactionType == "Receiving")
+                                                          .Where(x => x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo))
+      .GroupBy(x => new 
+      {
+          x.ItemCode,
+
+      }).Select(x => new ReceiptInventory
+      {
+          ItemCode = x.Key.ItemCode,
+          Quantity = x.Sum(x => x.ActualGood)
+      });
+
+            var getTransformIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
+                                                           .Where(x => x.TransactionType == "Transformation")
+                                                           .Where(x => x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo))
+   .GroupBy(x => new
+   {
+       x.ItemCode,
+
+   }).Select(x => new ReceiptInventory
+   {
+       ItemCode = x.Key.ItemCode,
+       Quantity = x.Sum(x => x.ActualGood)
+   });
+
+
+            var getReceiptIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
+                                                         .Where(x => x.TransactionType == "MiscellaneousReceipt")
+                                                         .Where(x => x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo))
+       .GroupBy(x => new
+       {
+           x.ItemCode,
+
+       }).Select(x => new ReceiptInventory
+       {
+           ItemCode = x.Key.ItemCode,
+           Quantity = x.Sum(x => x.ActualGood)
+       });
+
+            var getMoveOrderOut = _context.MoveOrders.Where(x => x.IsActive == true)
+                                                     .Where(x => x.IsPrepared == true)
+                   .GroupBy(x => new
+                   {
+                       x.ItemCode,
+
+                   }).Select(x => new MoveOrderInventory
+                   {
+                       ItemCode = x.Key.ItemCode,
+                       QuantityOrdered = x.Sum(x => x.QuantityOrdered)
+
+                   });
+
+
+            var getTransformation = _context.Transformation_Preparation.Where(x => x.IsActive == true)
+              .GroupBy(x => new
+              {
+                  x.ItemCode,
+
+              }).Select(x => new TransformationInventory
+              {
+                  ItemCode = x.Key.ItemCode,
+                  WeighingScale = x.Sum(x => x.WeighingScale)
+              });
+
+            var getIssueOut = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
+                                                              .Where(x => x.IsTransact == true)
+              .GroupBy(x => new
+              {
+                  x.ItemCode,
+
+              }).Select(x => new IssueInventory
+              {
+                  ItemCode = x.Key.ItemCode,
+                  Quantity = x.Sum(x => x.Quantity)
+              });
+
+            var getSOH = (from warehouse in getWarehouseStock
+                          join preparation in getTransformation
+                          on warehouse.ItemCode equals preparation.ItemCode
+                          into leftJ1
+                          from preparation in leftJ1.DefaultIfEmpty()
+
+                          join issue in getIssueOut
+                          on warehouse.ItemCode equals issue.ItemCode
+                          into leftJ2
+                          from issue in leftJ2.DefaultIfEmpty()
+
+                          join moveorder in getMoveOrderOut
+                          on warehouse.ItemCode equals moveorder.ItemCode
+                          into leftJ3
+                          from moveorder in leftJ3.DefaultIfEmpty()
+
+                          join receipt in getReceiptIn
+                          on warehouse.ItemCode equals receipt.ItemCode
+                          into leftJ4
+                          from receipt in leftJ4.DefaultIfEmpty()
+
+
+                          group new
+                          {
+                              warehouse,
+                              preparation,
+                              moveorder,
+                              receipt,
+                              issue
+                          }
+
+                          by new
+                          {
+                              warehouse.ItemCode
+
+                          } into total
+
+                          select new SOHInventory
+                          {
+                              ItemCode = total.Key.ItemCode,
+                              SOH = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
+                                    total.Sum(x => x.preparation.WeighingScale == null ? 0 : x.preparation.WeighingScale) -
+                                    total.Sum(x => x.moveorder.QuantityOrdered == null ? 0 : x.moveorder.QuantityOrdered)
+
+                          });
+
+            var movementInventory = (from rawmaterial in _context.RawMaterials
+                                     join moveorder in getMoveOrderOutByDate
+                                     on rawmaterial.ItemCode equals moveorder.ItemCode
+                                     into leftJ
+                                     from moveorder in leftJ.DefaultIfEmpty()
+
+                                     join transformation in getTransformationByDate
+                                     on rawmaterial.ItemCode equals transformation.ItemCode
+                                     into leftJ2
+                                     from transformation in leftJ2.DefaultIfEmpty()
+
+                                     join issue in getIssueOutByDate
+                                     on rawmaterial.ItemCode equals issue.ItemCode
+                                     into leftJ3
+                                     from issue in leftJ3.DefaultIfEmpty()
+
+                                     join receive in getReceivetIn
+                                     on rawmaterial.ItemCode equals receive.ItemCode
+                                     into leftJ4
+                                     from receive in leftJ4.DefaultIfEmpty()
+
+                                     join transformIn in getTransformIn
+                                     on rawmaterial.ItemCode equals transformIn.ItemCode
+                                    into leftJ5
+                                     from transformIn in leftJ5.DefaultIfEmpty()
+
+                                     join receipt in getReceiptIn
+                                     on rawmaterial.ItemCode equals receipt.ItemCode
+                                     into leftJ6 
+                                     from receipt in leftJ6.DefaultIfEmpty()
+
+                                     join SOH in getSOH 
+                                     on rawmaterial.ItemCode equals SOH.ItemCode 
+                                     into leftJ7
+                                     from SOH in leftJ7.DefaultIfEmpty()
+
+                                     group new
+                                     {
+                                         rawmaterial,
+                                         moveorder,
+                                         transformation,
+                                         issue,
+                                         receive,
+                                         transformIn,
+                                         receipt,
+                                         SOH
+                                     }
+                                     by new
+                                     {
+                                         rawmaterial.ItemCode,
+                                         rawmaterial.ItemDescription,
+                                         rawmaterial.ItemCategory.ItemCategoryName,
+                                         MoveOrder = moveorder.QuantityOrdered != null ? moveorder.QuantityOrdered : 0,
+                                         Transformation = transformation.WeighingScale != null ? transformation.WeighingScale : 0,
+                                         Issue = issue.Quantity != null ? issue.Quantity : 0,
+                                         ReceiptIn = receipt.Quantity != null ? receipt.Quantity : 0,
+                                         ReceiveIn = receive.Quantity != null ? receive.Quantity : 0,
+                                         TransformIn = transformIn.Quantity != null ? transformIn.Quantity : 0,
+                                         SOH = SOH.SOH != null ? SOH.SOH : 0
+
+                                     } into total
+
+                                     select new InventoryMovementReport
+                                     {
+                                         ItemCode = total.Key.ItemCode,
+                                         ItemDescription = total.Key.ItemDescription,
+                                         ItemCategory = total.Key.ItemCategoryName,
+                                         TotalOut = total.Key.MoveOrder + total.Key.Transformation + total.Key.Issue,
+                                         TotalIn = total.Key.ReceiveIn + total.Key.ReceiptIn + total.Key.TransformIn,
+                                         Ending = (total.Key.ReceiveIn + total.Key.ReceiptIn + total.Key.TransformIn) - (total.Key.MoveOrder + total.Key.Transformation + total.Key.Issue),
+                                         CurrentStock = total.Key.SOH
+                                     });
+
+            return await movementInventory.ToListAsync();
 
         }
     }
