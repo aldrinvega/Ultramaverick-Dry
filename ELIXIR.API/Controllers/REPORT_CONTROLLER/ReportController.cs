@@ -115,10 +115,10 @@ namespace ELIXIR.API.Controllers.REPORT_CONTROLLER
 
         [HttpGet]
         [Route("InventoryMovementReport")]
-        public async Task<IActionResult> InventoryMovementReport([FromQuery] string DateFrom, [FromQuery] string DateTo)
+        public async Task<IActionResult> InventoryMovementReport([FromQuery] string DateFrom, [FromQuery] string DateTo, [FromQuery] string PlusOne)
         {
 
-            var cancel = await _unitOfWork.Report.InventoryMovementReport(DateFrom, DateTo);
+            var cancel = await _unitOfWork.Report.InventoryMovementReport(DateFrom, DateTo, PlusOne);
 
             return Ok(cancel);
 

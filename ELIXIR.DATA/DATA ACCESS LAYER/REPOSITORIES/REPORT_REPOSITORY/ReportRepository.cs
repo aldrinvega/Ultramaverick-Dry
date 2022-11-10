@@ -469,8 +469,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
         }
 
-        public async Task<IReadOnlyList<InventoryMovementReport>> InventoryMovementReport(string DateFrom, string DateTo)
+        public async Task<IReadOnlyList<InventoryMovementReport>> InventoryMovementReport(string DateFrom, string DateTo, string PlusOne)
         {
+            var dateToday = DateTime.Now.ToString("MM/dd/yyyy");
+            
 
             var getWarehouseStock = _context.WarehouseReceived.Where(x => x.IsActive == true)
        .GroupBy(x => new
@@ -536,6 +538,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
           Quantity = x.Sum(x => x.ActualGood)
       });
 
+            var getReceivetInPlus = _context.WarehouseReceived.Where(x => x.IsActive == true)
+                                                               .Where(x => x.TransactionType == "Receiving")
+                                                               .Where(x => x.ReceivingDate >= DateTime.Parse(PlusOne) && x.ReceivingDate <= DateTime.Parse(dateToday))
+           .GroupBy(x => new
+           {
+               x.ItemCode,
+
+           }).Select(x => new ReceiptInventory
+           {
+               ItemCode = x.Key.ItemCode,
+               Quantity = x.Sum(x => x.ActualGood)
+           });
+
+
+
             var getTransformIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
                                                            .Where(x => x.TransactionType == "Transformation")
                                                            .Where(x => x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo))
@@ -548,6 +565,19 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
        ItemCode = x.Key.ItemCode,
        Quantity = x.Sum(x => x.ActualGood)
    });
+
+            var getTransformInPlus = _context.WarehouseReceived.Where(x => x.IsActive == true)
+                                                         .Where(x => x.TransactionType == "Transformation")
+                                                         .Where(x => x.ReceivingDate >= DateTime.Parse(PlusOne) && x.ReceivingDate <= DateTime.Parse(dateToday))
+ .GroupBy(x => new
+ {
+     x.ItemCode,
+
+ }).Select(x => new ReceiptInventory
+ {
+     ItemCode = x.Key.ItemCode,
+     Quantity = x.Sum(x => x.ActualGood)
+ });
 
 
             var getReceiptIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
@@ -562,6 +592,19 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
            ItemCode = x.Key.ItemCode,
            Quantity = x.Sum(x => x.ActualGood)
        });
+
+            var getReceiptInPlus = _context.WarehouseReceived.Where(x => x.IsActive == true)
+                                                    .Where(x => x.TransactionType == "MiscellaneousReceipt")
+                                                    .Where(x => x.ReceivingDate >= DateTime.Parse(PlusOne) && x.ReceivingDate <= DateTime.Parse(dateToday))
+  .GroupBy(x => new
+  {
+      x.ItemCode,
+
+  }).Select(x => new ReceiptInventory
+  {
+      ItemCode = x.Key.ItemCode,
+      Quantity = x.Sum(x => x.ActualGood)
+  });
 
             var getMoveOrderOut = _context.MoveOrders.Where(x => x.IsActive == true)
                                                      .Where(x => x.IsPrepared == true)
@@ -682,6 +725,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                                      into leftJ7
                                      from SOH in leftJ7.DefaultIfEmpty()
 
+                                     join receivePlus in getReceivetInPlus
+                                      on rawmaterial.ItemCode equals receivePlus.ItemCode
+                                     into leftJ8
+                                     from receivePlus in leftJ8.DefaultIfEmpty()
+
+                                     join transformPlus in getTransformInPlus
+                                     on rawmaterial.ItemCode equals transformPlus.ItemCode
+                                     into leftJ9
+                                     from transformPlus in leftJ9.DefaultIfEmpty()
+
+                                     join receiptPlus in getReceiptInPlus
+                                     on rawmaterial.ItemCode equals receiptPlus.ItemCode
+                                     into leftJ10
+                                     from receiptPlus in leftJ10.DefaultIfEmpty()
+
                                      group new
                                      {
                                          rawmaterial,
@@ -691,7 +749,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                                          receive,
                                          transformIn,
                                          receipt,
-                                         SOH
+                                         SOH,
+                                         receivePlus,
+                                         transformPlus,
+                                         receiptPlus
                                      }
                                      by new
                                      {
@@ -704,7 +765,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                                          ReceiptIn = receipt.Quantity != null ? receipt.Quantity : 0,
                                          ReceiveIn = receive.Quantity != null ? receive.Quantity : 0,
                                          TransformIn = transformIn.Quantity != null ? transformIn.Quantity : 0,
-                                         SOH = SOH.SOH != null ? SOH.SOH : 0
+                                         SOH = SOH.SOH != null ? SOH.SOH : 0, 
+                                         ReceivePlus = receivePlus.Quantity != null ? receivePlus.Quantity : 0,
+                                         TransformPlus = transformPlus.Quantity != null ? transformPlus.Quantity : 0,
+                                         ReceiptPlus = receiptPlus.Quantity != null ? receiptPlus.Quantity : 0
 
                                      } into total
 
@@ -716,7 +780,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                                          TotalOut = total.Key.MoveOrder + total.Key.Transformation + total.Key.Issue,
                                          TotalIn = total.Key.ReceiveIn + total.Key.ReceiptIn + total.Key.TransformIn,
                                          Ending = (total.Key.ReceiveIn + total.Key.ReceiptIn + total.Key.TransformIn) - (total.Key.MoveOrder + total.Key.Transformation + total.Key.Issue),
-                                         CurrentStock = total.Key.SOH
+                                         CurrentStock = total.Key.SOH,
+                                         PurchasedOrder = total.Key.ReceivePlus + total.Key.TransformPlus + total.Key.ReceiptPlus
+
                                      });
 
             return await movementInventory.ToListAsync();

@@ -65,6 +65,18 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                QuantityOrdered = x.Sum(x => x.Quantity)
            });
 
+            var getIssueOut = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
+                                                            .Where(x => x.IsTransact == true)
+            .GroupBy(x => new
+            {
+                x.ItemCode,
+
+            }).Select(x => new IssueInventory
+            {
+                ItemCode = x.Key.ItemCode,
+                Quantity = x.Sum(x => x.Quantity)
+            });
+
             var getReserve = (from warehouse in getWarehouseStock
                               join request in getTransformationReserve
                               on warehouse.ItemCode equals request.ItemCode
@@ -76,11 +88,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                               into leftJ2
                               from ordering in leftJ2.DefaultIfEmpty()
 
+                              join issue in getIssueOut 
+                              on warehouse.ItemCode equals issue.ItemCode
+                              into leftJ3
+                              from issue in leftJ3.DefaultIfEmpty()
+
                               group new
                               {
                                   warehouse,
                                   request,
-                                  ordering
+                                  ordering,
+                                  issue
                               }
                               by new
                               {
@@ -94,7 +112,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                   ItemCode = total.Key.ItemCode,
                                   Reserve = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
                                            (total.Sum(x => x.request.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
-                                            total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))
+                                            total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered) +
+                                            total.Sum(x => x.issue.Quantity == null ? 0 : x.issue.Quantity))
                               });
 
 

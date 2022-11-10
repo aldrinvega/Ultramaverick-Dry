@@ -23,7 +23,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE
 
         Task<IReadOnlyList<CancelledOrderReport>> CancelledOrderedReports(string DateFrom, string DateTo);
 
-          Task<IReadOnlyList<InventoryMovementReport>> InventoryMovementReport(string DateFrom, string DateTo);
+        Task<IReadOnlyList<InventoryMovementReport>> InventoryMovementReport(string DateFrom, string DateTo, string PlusOne);
 
 
     }
