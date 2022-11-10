@@ -499,6 +499,20 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
         });
 
+            var getMoveOrderOutByDatePlus = _context.MoveOrders.Where(x => x.IsActive == true)
+                                                         .Where(x => x.IsPrepared == true)
+                                                         .Where(x => x.PreparedDate >= DateTime.Parse(PlusOne) && x.PreparedDate <= DateTime.Parse(dateToday) && x.ApprovedDate != null)
+      .GroupBy(x => new
+      {
+          x.ItemCode,
+
+      }).Select(x => new MoveOrderInventory
+      {
+          ItemCode = x.Key.ItemCode,
+          QuantityOrdered = x.Sum(x => x.QuantityOrdered)
+
+      });
+
             var getTransformationByDate = _context.Transformation_Preparation.Where(x => x.IsActive == true)
                                                                              .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(DateTo))
               .GroupBy(x => new
@@ -512,6 +526,18 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
               });
 
 
+            var getTransformationByDatePlus = _context.Transformation_Preparation.Where(x => x.IsActive == true)
+                                                                                 .Where(x => x.PreparedDate >= DateTime.Parse(PlusOne) && x.PreparedDate <= DateTime.Parse(dateToday))
+              .GroupBy(x => new
+              {
+                  x.ItemCode,
+
+              }).Select(x => new TransformationInventory
+              {
+                  ItemCode = x.Key.ItemCode,
+                  WeighingScale = x.Sum(x => x.WeighingScale)
+              });
+
             var getIssueOutByDate= _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
                                                                      .Where(x => x.IsTransact == true)
                                                                      .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(DateTo))
@@ -524,6 +550,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                  ItemCode = x.Key.ItemCode,
                  Quantity = x.Sum(x => x.Quantity)
              });
+
+
+            var getIssueOutByDatePlus = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
+                                                                     .Where(x => x.IsTransact == true)
+                                                                     .Where(x => x.PreparedDate >= DateTime.Parse(PlusOne) && x.PreparedDate <= DateTime.Parse(dateToday))
+             .GroupBy(x => new
+             {
+                 x.ItemCode,
+
+             }).Select(x => new IssueInventory
+             {
+                 ItemCode = x.Key.ItemCode,
+                 Quantity = x.Sum(x => x.Quantity)
+             });
+
 
             var getReceivetIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
                                                           .Where(x => x.TransactionType == "Receiving")
@@ -740,6 +781,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                                      into leftJ10
                                      from receiptPlus in leftJ10.DefaultIfEmpty()
 
+                                     join moveorderPlus in getMoveOrderOutByDatePlus
+                                      on rawmaterial.ItemCode equals moveorderPlus.ItemCode
+                                     into leftJ11
+                                     from moveorderPlus in leftJ11.DefaultIfEmpty()
+
+                                     join  transformoutPlus in getTransformationByDatePlus
+                                      on rawmaterial.ItemCode equals transformoutPlus.ItemCode
+                                     into leftJ12
+                                     from transformoutPlus in leftJ12.DefaultIfEmpty()
+
+                                     join issuePlus in getIssueOutByDatePlus
+                                      on rawmaterial.ItemCode equals issuePlus.ItemCode
+                                     into leftJ13
+                                     from issuePlus in leftJ13.DefaultIfEmpty()
+
                                      group new
                                      {
                                          rawmaterial,
@@ -752,7 +808,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                                          SOH,
                                          receivePlus,
                                          transformPlus,
-                                         receiptPlus
+                                         receiptPlus,
+                                         moveorderPlus,
+                                         transformoutPlus,
+                                         issuePlus
                                      }
                                      by new
                                      {
@@ -768,7 +827,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                                          SOH = SOH.SOH != null ? SOH.SOH : 0, 
                                          ReceivePlus = receivePlus.Quantity != null ? receivePlus.Quantity : 0,
                                          TransformPlus = transformPlus.Quantity != null ? transformPlus.Quantity : 0,
-                                         ReceiptPlus = receiptPlus.Quantity != null ? receiptPlus.Quantity : 0
+                                         ReceiptPlus = receiptPlus.Quantity != null ? receiptPlus.Quantity : 0,
+                                         MoveOrderPlus = moveorderPlus.QuantityOrdered != null ? moveorderPlus.QuantityOrdered : 0,
+                                         TransformOutPlus = transformoutPlus.WeighingScale != null ? transformoutPlus.WeighingScale : 0,
+                                         IssuePlus = issuePlus.Quantity != null ? issuePlus.Quantity : 0,
+
+
 
                                      } into total
 
@@ -781,7 +845,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                                          TotalIn = total.Key.ReceiveIn + total.Key.ReceiptIn + total.Key.TransformIn,
                                          Ending = (total.Key.ReceiveIn + total.Key.ReceiptIn + total.Key.TransformIn) - (total.Key.MoveOrder + total.Key.Transformation + total.Key.Issue),
                                          CurrentStock = total.Key.SOH,
-                                         PurchasedOrder = total.Key.ReceivePlus + total.Key.TransformPlus + total.Key.ReceiptPlus
+                                         PurchasedOrder = total.Key.ReceivePlus + total.Key.TransformPlus + total.Key.ReceiptPlus,
+                                         Others = total.Key.MoveOrderPlus + total.Key.TransformOutPlus + total.Key.IssuePlus
 
                                      });
 

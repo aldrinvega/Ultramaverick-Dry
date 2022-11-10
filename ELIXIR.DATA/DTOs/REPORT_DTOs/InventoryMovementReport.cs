@@ -16,8 +16,8 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public decimal TotalIn { get; set; }
         public decimal Ending { get; set; }
         public decimal CurrentStock { get; set; }
-
         public decimal PurchasedOrder { get; set; }
+        public decimal Others { get; set; }
 
 
 
