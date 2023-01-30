@@ -349,7 +349,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES
                                             module => module.MainMenuId,
                                            (menu, module) => new ModuleDto
                                            {
-
                                                Id = module.Id,
                                                MainMenu = menu.ModuleName,
                                                MainMenuId = menu.Id,
