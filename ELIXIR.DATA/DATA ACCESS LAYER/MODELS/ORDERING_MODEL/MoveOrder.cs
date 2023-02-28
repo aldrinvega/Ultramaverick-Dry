@@ -9,39 +9,39 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
 {
     public class MoveOrder : BaseEntity
     {
-        public int OrderNo { 
-            get; 
+        public int OrderNo {
+            get;
             set;
         }
-        public string FarmType { 
+        public string FarmType {
             get;
-            set; 
+            set;
         }
-        public string FarmCode { 
+        public string FarmCode {
             get;
-            set; 
+            set;
         }
         public string FarmName {
             get;
-            set; 
+            set;
         }
 
         public string ItemCode {
-            get; 
+            get;
             set;
         }
         public string ItemDescription {
-            get; 
+            get;
             set;
         }
         public string Uom {
-            get; 
-            set; 
+            get;
+            set;
         }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal QuantityOrdered {
-            get; 
+            get;
             set;
         }
         public string Category {
@@ -51,111 +51,109 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
 
         [Column(TypeName = "Date")]
         public DateTime OrderDate {
-            get; 
+            get;
             set;
         }
 
         [Column(TypeName = "Date")]
-        public DateTime DateNeeded { 
-            get; 
+        public DateTime DateNeeded {
+            get;
             set;
         }
 
-        public int WarehouseId { 
+        public int WarehouseId {
             get;
-            set; 
+            set;
         }
-        public bool IsActive { 
-            get; 
-            set; 
-        }
-        public bool? IsApprove { 
+        public bool IsActive {
             get;
-            set; 
+            set;
+        }
+        public bool? IsApprove {
+            get;
+            set;
         }
 
         public DateTime? ApprovedDate {
-            get; 
-            set; 
-        }
-
-        [Column(TypeName = "Date")]
-        public DateTime? ApproveDateTempo { 
             get;
             set;
         }
-        
-        public bool IsPrepared { 
-            get; 
-            set; 
+
+        [Column(TypeName = "Date")]
+        public DateTime? ApproveDateTempo {
+            get;
+            set;
         }
-        public string PreparedBy { 
-            get; 
+
+        public bool IsPrepared {
+            get;
+            set;
+        }
+        public string PreparedBy {
+            get;
             set;
         }
         public DateTime? PreparedDate {
-            get; 
-            set; 
+            get;
+            set;
         }
 
         public bool? IsCancel {
-            get; 
-            set; 
-        }
-        public string CancelBy { 
             get;
-            set; 
+            set;
+        }
+        public string CancelBy {
+            get;
+            set;
         }
         public DateTime? CancelledDate {
             get;
-            set; 
+            set;
         }
 
-        public int OrderNoPKey { 
-            get; 
-            set; 
+        public int OrderNoPKey {
+            get;
+            set;
         }
         public DateTime? ExpirationDate {
-            get; 
+            get;
             set;
         }
         public string PlateNumber {
-            get; 
-            set; 
-        }
-        public string DeliveryStatus {
-            get; 
+            get;
             set;
         }
-        public bool? IsReject {
-            get; 
-            set; 
+        public string DeliveryStatus {
+            get;
+            set;
         }
+
+        public bool? IsReject { get; set; } = null;
         public string RejectBy {
             get;
-            set; 
+            set;
         }
         public DateTime? RejectedDate {
-            get; 
-            set; 
+            get;
+            set;
         }
 
         [Column(TypeName = "Date")]
-        public DateTime? RejectedDateTempo { 
-            get; 
-            set; 
+        public DateTime? RejectedDateTempo {
+            get;
+            set;
         }
 
-        public string Remarks { 
-            get; 
+        public string Remarks {
+            get;
             set;
         }
 
         public bool IsTransact {
-            get; 
-            set; 
+            get;
+            set;
         }
-        public bool? IsPrint { 
+        public bool? IsPrint {
             get;
             set;
         }
@@ -166,11 +164,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
             set;
         }
 
-        public string BatchNo
+        public bool? IsRejectForPreparation
         {
             get;
             set;
         }
-
     }
 }

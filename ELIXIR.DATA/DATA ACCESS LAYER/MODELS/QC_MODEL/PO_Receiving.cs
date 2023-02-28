@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
 {
@@ -68,103 +70,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
             get;
             set; 
         }
-
-        public bool Truck_Approval1 {
-            get; 
-            set; 
-        }
-
-        public bool Truck_Approval2 {
-            get; 
-            set;
-        }
-        public bool Truck_Approval3 {
-            get;
-            set; 
-        }
-        public bool Truck_Approval4 { 
-            get; 
-            set;
-        }
-        public string Truck_Approval1_Remarks { 
-            get;
-            set;
-        }
-        public string Truck_Approval2_Remarks {
-            get;
-            set; 
-        }
-        public string Truck_Approval3_Remarks {
-            get;
-            set; 
-        }
-        public string Truck_Approval4_Remarks {
-            get;
-            set; 
-        }
-
-        public bool Unloading_Approval1 { 
-            get; 
-            set; 
-        }
-        public bool Unloading_Approval2 { 
-            get; 
-            set;
-        }
-        public bool Unloading_Approval3 {
-            get; 
-            set;
-        }
-        public bool Unloading_Approval4 {
-            get;
-            set;
-        }
-        public string Unloading_Approval1_Remarks {
-            get; 
-            set;
-        }
-        public string Unloading_Approval2_Remarks { 
-            get; 
-            set; 
-        }
-        public string Unloading_Approval3_Remarks { 
-            get; 
-            set; 
-        }
-        public string Unloading_Approval4_Remarks { 
-            get;
-            set; 
-        }
-
-        public bool Checking_Approval1 { 
-            get;
-            set;
-        }
-
-        public bool Checking_Approval2 {
-            get; 
-            set; 
-        }
-
-        public string Checking_Approval1_Remarks { 
-            get; 
-            set; 
-        }
-
-        public string Checking_Approval2_Remarks { 
-            get; 
-            set;
-        }
-
-        public bool QA_Approval { 
-            get;
-            set; 
-        }
-
-        public string QA_Approval_Remarks {
-            get;
-            set;
-        }
+        
 
         public bool? ExpiryIsApprove {
             get; 
@@ -209,7 +115,5 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
             get; 
             set;
         }
-
-
     }
 }

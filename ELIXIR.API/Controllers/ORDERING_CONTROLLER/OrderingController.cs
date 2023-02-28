@@ -6,19 +6,24 @@ using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-
-namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
+using ELIXIR.DATA.CORE.INTERFACES.ORDER_HUB;
+using ELIXIR.DATA.DTOs;
+using ELIXIR.DATA.SERVICES;
+using Microsoft.AspNetCore.SignalR;
+namespace ELIXIR.API.Controllers.ORDERING_CONTROLLERGetAll
 {
     [ApiController]
     public class OrderingController : BaseApiController
     {
         private readonly IUnitOfWork _unitOfWork;
-        public OrderingController(IUnitOfWork unitofwork)
+        private readonly IHubContext<OrderHub, IOrderHub> _hub;
+
+        public OrderingController(IUnitOfWork unitofwork, IHubContext<OrderHub, IOrderHub> hub)
         {
-
             _unitOfWork = unitofwork;
-
+            _hub = hub;
         }
 
         [HttpGet]
@@ -123,9 +128,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             List<Ordering> notExistUom = new List<Ordering>();
             List<Ordering> duplicateList = new List<Ordering>();
             List<Ordering> previousdateNeeded = new List<Ordering>();
-
-
             List<Ordering> filteredOrders = new List<Ordering>();
+            List<Ordering> orderList = new List<Ordering>();
 
 
             foreach (Ordering items in order)
@@ -137,6 +141,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 var validateRawMaterial = await _unitOfWork.Order.ValidateRawMaterial(items);
                 var validateUom = await _unitOfWork.Order.ValidateUom(items);
                 var validateDateNeeded = await _unitOfWork.Order.ValidateOrderAndDateNeeded(items);
+               
 
                 if (validateDuplicate == false)
                 {
@@ -167,10 +172,11 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                     previousdateNeeded.Add(items);
                 }
 
-                else
+                else 
                     filteredOrders.Add(items);
+                orderList.Add(items);
 
-
+                
                 await _unitOfWork.Order.AddNewOrders(items);
             }
 
@@ -188,8 +194,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             };
 
             if (notExistFarmName.Count == 0 && notExistFarmCode.Count == 0 && notExistRawMats.Count == 0
-                                    && notExistUom.Count == 0 && duplicateList.Count == 0 && previousdateNeeded.Count == 0)
+                && notExistUom.Count == 0 && duplicateList.Count == 0 && previousdateNeeded.Count == 0)
             {
+                await _unitOfWork.Order.ValidateIfForAllocation(orderList);
+                await _unitOfWork.CompleteAsync();
                 await _unitOfWork.CompleteAsync();
 
                 return Ok("Successfully add new orders!");
@@ -204,12 +212,14 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpGet]
         [Route("GetAllListOfOrdersPagination")]
-        public async Task<ActionResult<IEnumerable<OrderDto>>> GetAllListOfOrdersPagination([FromQuery] UserParams userParams)
+        public async Task<ActionResult<IEnumerable<OrderDto>>> GetAllListOfOrdersPagination(
+            [FromQuery] UserParams userParams)
         {
 
             var orders = await _unitOfWork.Order.GetAllListofOrdersPagination(userParams);
 
-            Response.AddPaginationHeader(orders.CurrentPage, orders.PageSize, orders.TotalCount, orders.TotalPages, orders.HasNextPage, orders.HasPreviousPage);
+            Response.AddPaginationHeader(orders.CurrentPage, orders.PageSize, orders.TotalCount, orders.TotalPages,
+                orders.HasNextPage, orders.HasPreviousPage);
 
             var orderResult = new
             {
@@ -271,12 +281,14 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpGet]
         [Route("GetAllListForMoveOrderPagination")]
-        public async Task<ActionResult<IEnumerable<OrderDto>>> GetAllListForMoveOrderPagination([FromQuery] UserParams userParams)
+        public async Task<ActionResult<IEnumerable<OrderDto>>> GetAllListForMoveOrderPagination(
+            [FromQuery] UserParams userParams)
         {
 
             var orders = await _unitOfWork.Order.GetAllListForMoveOrderPagination(userParams);
 
-            Response.AddPaginationHeader(orders.CurrentPage, orders.PageSize, orders.TotalCount, orders.TotalPages, orders.HasNextPage, orders.HasPreviousPage);
+            Response.AddPaginationHeader(orders.CurrentPage, orders.PageSize, orders.TotalCount, orders.TotalPages,
+                orders.HasNextPage, orders.HasPreviousPage);
 
             var orderResult = new
             {
@@ -339,7 +351,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpGet]
         [Route("GetAllOutOfStockByItemCodeAndOrderDate")]
-        public async Task<IActionResult> GetAllOutOfStockByItemCodeAndOrderDate([FromQuery] string itemcode, [FromQuery] string orderdate)
+        public async Task<IActionResult> GetAllOutOfStockByItemCodeAndOrderDate([FromQuery] string itemcode,
+            [FromQuery] string orderdate)
         {
 
             var orders = await _unitOfWork.Order.GetAllOutOfStockByItemCodeAndOrderDate(itemcode, orderdate);
@@ -372,7 +385,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             await _unitOfWork.Order.PrepareItemForMoveOrder(order);
             await _unitOfWork.CompleteAsync();
-
+            
             return Ok(order);
 
         }
@@ -382,11 +395,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("GetAllListOfOrdersForMoveOrder")]
         public async Task<IActionResult> GetAllListOfOrdersForMoveOrder([FromQuery] int id)
         {
-
             var orders = await _unitOfWork.Order.ListOfOrdersForMoveOrder(id);
-
             return Ok(orders);
-
         }
 
         [HttpGet]
@@ -523,11 +533,13 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpGet]
         [Route("GetAllForApprovalMoveOrderPagination")]
-        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> GetAllForApprovalMoveOrderPagination([FromQuery] UserParams userParams)
+        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> GetAllForApprovalMoveOrderPagination(
+            [FromQuery] UserParams userParams)
         {
             var moveorder = await _unitOfWork.Order.ForApprovalMoveOrderPagination(userParams);
 
-            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount, moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
+            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount,
+                moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
 
             var moveorderResult = new
             {
@@ -545,7 +557,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpGet]
         [Route("GetAllForApprovalMoveOrderPaginationOrig")]
-        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> GetAllForApprovalMoveOrderPaginationOrig([FromQuery] UserParams userParams, [FromQuery] string search)
+        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> GetAllForApprovalMoveOrderPaginationOrig(
+            [FromQuery] UserParams userParams, [FromQuery] string search)
         {
 
             if (search == null)
@@ -554,7 +567,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             var moveorder = await _unitOfWork.Order.ForApprovalMoveOrderPaginationOrig(userParams, search);
 
-            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount, moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
+            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount,
+                moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
 
             var moveorderResult = new
             {
@@ -575,20 +589,19 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("ViewMoveOrderForApproval")]
         public async Task<IActionResult> ViewMoveOrderForApproval([FromQuery] int id)
         {
-
             var orders = await _unitOfWork.Order.ViewMoveOrderForApproval(id);
-
             return Ok(orders);
-
         }
 
         [HttpGet]
         [Route("ApprovedMoveOrderPagination")]
-        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> ApprovedMoveOrderPagination([FromQuery] UserParams userParams)
+        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> ApprovedMoveOrderPagination(
+            [FromQuery] UserParams userParams)
         {
             var moveorder = await _unitOfWork.Order.ApprovedMoveOrderPagination(userParams);
 
-            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount, moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
+            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount,
+                moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
 
             var moveorderResult = new
             {
@@ -606,7 +619,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpGet]
         [Route("ApprovedMoveOrderPaginationOrig")]
-        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> ApprovedMoveOrderPaginationOrig([FromQuery] UserParams userParams, [FromQuery] string search)
+        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> ApprovedMoveOrderPaginationOrig(
+            [FromQuery] UserParams userParams, [FromQuery] string search)
         {
 
             if (search == null)
@@ -615,7 +629,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             var moveorder = await _unitOfWork.Order.ApprovedMoveOrderPaginationOrig(userParams, search);
 
-            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount, moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
+            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount,
+                moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
 
             var moveorderResult = new
             {
@@ -634,11 +649,13 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpGet]
         [Route("RejectedMoveOrderPagination")]
-        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> RejectedMoveOrderPagination([FromQuery] UserParams userParams)
+        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> RejectedMoveOrderPagination(
+            [FromQuery] UserParams userParams)
         {
             var moveorder = await _unitOfWork.Order.RejectedMoveOrderPagination(userParams);
 
-            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount, moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
+            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount,
+                moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
 
             var moveorderResult = new
             {
@@ -656,7 +673,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpGet]
         [Route("RejectedMoveOrderPaginationOrig")]
-        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> RejectedMoveOrderPaginationOrig([FromQuery] UserParams userParams, [FromQuery] string search)
+        public async Task<ActionResult<IEnumerable<MoveOrderDto>>> RejectedMoveOrderPaginationOrig(
+            [FromQuery] UserParams userParams, [FromQuery] string search)
         {
 
             if (search == null)
@@ -665,7 +683,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             var moveorder = await _unitOfWork.Order.RejectedMoveOrderPaginationOrig(userParams, search);
 
-            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount, moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
+            Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount,
+                moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
 
             var moveorderResult = new
             {
@@ -760,6 +779,92 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             return Ok(transact);
 
         }
-    }
 
+        ////NEW METHODS////
+
+        [HttpPost]
+        [Route("SetBeingPrepared")]
+        public async Task<IActionResult> SetBeingPrepared([FromBody] List<Ordering> moveOrders)
+        {
+            var result = await _unitOfWork.Order.SetBeingPrepared(moveOrders);
+
+            if (result)
+            {
+                // Call the SignalR hub method to broadcast the update
+                await _hub.Clients.All.SetBeingPrepared(moveOrders);
+                return Ok();
+            }
+
+            return new JsonResult("Someone is already preparing!");
+
+        }
+
+        [HttpPost]
+        [Route("UnsetBeingPrepared")]
+        public async Task<IActionResult> UnsetBeingPrepared([FromBody] List<Ordering> orderNos)
+        {
+
+            var result = await _unitOfWork.Order.UnsetBeingPrepared(orderNos);
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return new JsonResult("Something Wrong");
+        }
+
+        //========Allocation========//
+
+        [HttpPut("Allocate")]
+        public async Task<bool> AllocateOrderPerItem([FromBody] List<AllocationDTO> itemCode)
+        {
+            return await _unitOfWork.Order.AllocateOrdersPerItems(itemCode);
+        }
+        [HttpGet]
+        [Route("GetAllListOfOrdersForAllocationPagination")]
+        public async Task<ActionResult<IEnumerable<OrderDto>>> GetAllListOfOrdersForAllocationPagination(
+            [FromQuery] UserParams userParams)
+        {
+
+            var orders = await _unitOfWork.Order.GetAllListofOrdersForAllocationPagination(userParams);
+
+            Response.AddPaginationHeader(orders.CurrentPage, orders.PageSize, orders.TotalCount, orders.TotalPages,
+                orders.HasNextPage, orders.HasPreviousPage);
+
+            var orderResult = new
+            {
+                orders,
+                orders.CurrentPage,
+                orders.PageSize,
+                orders.TotalCount,
+                orders.TotalPages,
+                orders.HasNextPage,
+                orders.HasPreviousPage
+            };
+
+            return Ok(orderResult);
+        }
+        [HttpGet("GetAllListofOrdersForAllocation")]
+        public async Task<IActionResult> GetAllListofOrdersForAllocation([FromQuery] string itemCode)
+        {
+
+            var orders = await _unitOfWork.Order.GetAllListofOrdersAllocation(itemCode);
+
+            return Ok(orders);
+
+        }
+
+        [HttpPost("CancelForPendingAllocation")]
+        public async Task<ActionResult> CancelForAllocation([FromQuery] string customer)
+        {
+            var order = await _unitOfWork.Order.CancelForPendingAllocation(customer);
+
+            if (!order)
+                return BadRequest("Something went wrong");
+            
+            return Ok();
+        }
+
+    }
 }

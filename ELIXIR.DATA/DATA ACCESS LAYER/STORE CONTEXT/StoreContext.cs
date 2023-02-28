@@ -2,6 +2,7 @@
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL;
@@ -154,10 +155,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
             get;
             set;
         }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-        }
+        
+        public DbSet<ChecklistForCompliants> ChecklistForCompliant { get; set; }
+        public DbSet<CheckListInputs> CheckListInput { get; set; }
+        public DbSet<CheckListString> CheckListStrings { get; set; }
     }
 } 

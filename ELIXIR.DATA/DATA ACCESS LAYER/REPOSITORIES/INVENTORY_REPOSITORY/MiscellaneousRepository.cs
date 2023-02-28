@@ -427,14 +427,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
         }
 
-        public async Task<IReadOnlyList<MIssueDto>> GetAllAvailableIssue(int empid)
+        public async Task<IReadOnlyList<MIssueDto>> GetAllAvailableIssue(string fullname)
         {
-            var employee = await _context.Users.Where(x => x.Id == empid)
+            var employee = await _context.Users.Where(x => x.FullName == fullname)
                                          .FirstOrDefaultAsync();
 
             var items = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
                                                           .Where(x => x.IsTransact != true)
-                                                          .Where(x => x.PreparedBy == employee.UserName)
+                                                          .Where(x => x.PreparedBy == employee.FullName)
                 .Select(x => new MIssueDto
                 {
                     Id = x.Id,

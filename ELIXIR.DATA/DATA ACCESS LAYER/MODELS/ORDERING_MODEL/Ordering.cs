@@ -193,6 +193,34 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
             get;
             set;
         }
+        public bool? IsBeingPrepared
+        {
+            get;
+            set;
+        }
 
+        public string? SetBy
+        {
+            get;
+            set;
+        }
+
+        public int? AllocatedQuantity
+        {
+            get;
+            set;
+        }
+        public bool? ForAllocation
+        {
+            get;
+            set;
+        }
+
+        public bool? ForPendingAllocation
+        {
+            get;
+            set;
+        }
+        
     }
 }

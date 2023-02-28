@@ -21,12 +21,16 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
+using ELIXIR.DATA.SERVICES;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
 {
     public class UnitOfWork : IUnitOfWork, IDisposable
     {
         private readonly StoreContext _context;
+        private readonly IHubContext<OrderHub> _clients;
 
         private readonly ILogger _logger;
 
@@ -66,11 +70,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
 
         //Ordering
         public IOrdering Order { get; set; }
-
-
-        public IReportRepository Report { get; set; }
-
+        public IReportRepository Report { get; }
         public ITransactionRepository Transactions { get; set; }
+        
+        //Checklist
+        public IQCChecklist QcChecklist { get; set; }
+
+        //public IOrderHub Hub { get; set; }
 
         public UnitOfWork(
             StoreContext context,
@@ -110,7 +116,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
             Preparation = new TransformationPreparationRepository(_context);
 
             //Ordering
-            Order = new OrderingRepository(_context);
+            Order = new OrderingRepository(_context, _clients);
 
 
             //Inventory
@@ -119,6 +125,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
 
             //Reports
             Report = new ReportRepository(_context);
+            
+            //Checklist 
+            QcChecklist = new ChecklistRepository(_context);
+
 
         }
         public async Task CompleteAsync()

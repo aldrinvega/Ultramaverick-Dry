@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using ELIXIR.API.ERRORS;
 using System.Net;
+using ELIXIR.DATA.SERVICES;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Cors;
 
@@ -101,6 +102,7 @@ namespace ELIXIR.API
             });
 
             services.AddControllers();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -127,6 +129,7 @@ namespace ELIXIR.API
             {
                 endpoints.MapSwagger();
                 endpoints.MapControllers();
+                endpoints.MapHub<OrderHub>("/moveOrder");
             });
         }
     }

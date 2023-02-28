@@ -301,10 +301,10 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 
         [HttpGet]
         [Route("GetAllActiveMiscellaneousIssueTransaction")]
-        public async Task<IActionResult> GetAllActiveMiscellaneousIssueTransaction([FromQuery] int empid)
+        public async Task<IActionResult> GetAllActiveMiscellaneousIssueTransaction([FromQuery] string fullname)
         {
 
-            var issue = await _unitOfWork.Miscellaneous.GetAllAvailableIssue(empid);
+            var issue = await _unitOfWork.Miscellaneous.GetAllAvailableIssue(fullname);
 
             return Ok(issue);
 

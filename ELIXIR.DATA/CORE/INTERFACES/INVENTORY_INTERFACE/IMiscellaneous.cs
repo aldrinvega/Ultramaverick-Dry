@@ -38,7 +38,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE
 
         Task<bool> UpdateIssuePKey(MiscellaneousIssueDetails details);
 
-        Task<IReadOnlyList<MIssueDto>> GetAllAvailableIssue(int empid);
+        Task<IReadOnlyList<MIssueDto>> GetAllAvailableIssue(string fullname);
 
         Task<bool> CancelIssuePerItemCode(MiscellaneousIssueDetails issue);
 

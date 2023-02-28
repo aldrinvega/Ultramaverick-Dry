@@ -9,7 +9,10 @@ using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.Xml;
 using System.Threading.Tasks;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY;
 
 namespace ELIXIR.API.Controllers.QC_CONTROLLER
 {
@@ -24,18 +27,21 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
 
         [HttpPost]
         [Route("AddNewReceivingInformationInPO")]
-        public async Task<IActionResult> CreateNewCustomer(PO_Receiving receive)
+        public async Task<IActionResult> CreateNewReceivingInformation(Checklists input)
         {
             if (ModelState.IsValid)
             {
-
-                await _unitOfWork.Receives.AddNewReceivingInformation(receive);
+                await _unitOfWork.QcChecklist.AddChecklists(input);
+                await _unitOfWork.Receives.AddNewReceivingInformation(input.PO_Receiving);
+                // Save all changes to the database
                 await _unitOfWork.CompleteAsync();
-
-                return Ok("Successfully Add!");
+                return Ok("Successfully added new receiving information!");
             }
-            return new JsonResult("Something went Wrong!") { StatusCode = 500 };
+
+            return new JsonResult("Something went wrong!") { StatusCode = 500 };
+
         }
+    
 
         [HttpPost]
         [Route("AddNewRejectInPo")]
@@ -450,6 +456,7 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
             var transactmoveorderlist = await _unitOfWork.Order.GetAllForTransactMoveOrderNotification();
             var forapprovallist = await _unitOfWork.Order.GetForApprovalMoveOrderNotification();
             var rejectlist = await _unitOfWork.Order.GetRejectMoveOrderNotification();
+            var forallocation = await _unitOfWork.Order.GetForAllocationOrdersForNotification();
 
             //QC ReceivingCount
             var posummarycount = posummary.Count();
@@ -472,6 +479,7 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
             var transactmoveordercount = transactmoveorderlist.Count();
             var forapprovallistcount = forapprovallist.Count();
             var rejectlistcount = rejectlist.Count();
+            var forallocationcount = forallocation.Count();
 
 
             var countList = new
@@ -539,8 +547,11 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
                 RejectMoveOrder = new
                 {
                     rejectlistcount
+                },
+                Allocation = new
+                {
+                    forallocationcount
                 }
-                
             };
 
             return Ok(countList);

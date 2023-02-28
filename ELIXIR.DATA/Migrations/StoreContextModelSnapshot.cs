@@ -307,9 +307,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("BatchNo")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CancelBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -356,6 +353,9 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool?>("IsReject")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsRejectForPreparation")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsTransact")
@@ -418,6 +418,9 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<int?>("AllocatedQuantity")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime2");
 
@@ -451,10 +454,16 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("FarmType")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool?>("ForAllocation")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("IsApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsBeingPrepared")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("IsCancel")
@@ -509,6 +518,9 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SetBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TimeNeeded")
@@ -573,6 +585,75 @@ namespace ELIXIR.DATA.Migrations
                     b.ToTable("TransactMoveOrder");
                 });
 
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.CheckListInputs", b =>
+                {
+                    b.Property<int>("ChecklistInputId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Checlist_Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PO_ReceivingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Parameter")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ChecklistInputId");
+
+                    b.ToTable("CheckListInput");
+                });
+
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.CheckListString", b =>
+                {
+                    b.Property<int>("ChecklistStringId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Checlist_Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PO_ReceivingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ChecklistStringId");
+
+                    b.ToTable("CheckListStrings");
+                });
+
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistForCompliants", b =>
+                {
+                    b.Property<int>("ChecklistCompliantId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Checklist_Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsCompliant")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PO_ReceivingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ChecklistCompliantId");
+
+                    b.ToTable("ChecklistForCompliant");
+                });
+
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL.PO_Receiving", b =>
                 {
                     b.Property<int>("Id")
@@ -593,18 +674,6 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("Date");
 
                     b.Property<string>("CancelRemarks")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Checking_Approval1")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Checking_Approval1_Remarks")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Checking_Approval2")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Checking_Approval2_Remarks")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("ConfirmRejectByQc")
@@ -643,12 +712,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<int>("PO_Summary_Id")
                         .HasColumnType("int");
 
-                    b.Property<bool>("QA_Approval")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("QA_Approval_Remarks")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("QC_ReceiveDate")
                         .HasColumnType("Date");
 
@@ -660,54 +723,6 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<decimal>("TotalReject")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("Truck_Approval1")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Truck_Approval1_Remarks")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Truck_Approval2")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Truck_Approval2_Remarks")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Truck_Approval3")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Truck_Approval3_Remarks")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Truck_Approval4")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Truck_Approval4_Remarks")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Unloading_Approval1")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Unloading_Approval1_Remarks")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Unloading_Approval2")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Unloading_Approval2_Remarks")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Unloading_Approval3")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Unloading_Approval3_Remarks")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Unloading_Approval4")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Unloading_Approval4_Remarks")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

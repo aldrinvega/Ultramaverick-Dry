@@ -49,49 +49,49 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             receiving.QC_ReceiveDate = DateTime.Now;
           
             return await AddNewReceivingInformation(receiving);
-
-             var totalreject = await _context.QC_Reject.Where(x => x.PO_ReceivingId == existingInfo.Id)
-                                                       .Select(x => x.Quantity).SumAsync();
-
-            existingInfo.Manufacturing_Date = receiving.Manufacturing_Date;
-            existingInfo.Expected_Delivery = receiving.Expected_Delivery;
-            existingInfo.Expiry_Date = receiving.Expiry_Date;
-            existingInfo.Actual_Delivered = receiving.Actual_Delivered;
-            existingInfo.Batch_No = receiving.Batch_No;
-
-            existingInfo.Truck_Approval1 = receiving.Truck_Approval1;
-            existingInfo.Truck_Approval2 = receiving.Truck_Approval2;
-            existingInfo.Truck_Approval3 = receiving.Truck_Approval3;
-            existingInfo.Truck_Approval4 = receiving.Truck_Approval4;
-
-            existingInfo.Truck_Approval1_Remarks = receiving.Truck_Approval1_Remarks;
-            existingInfo.Truck_Approval2_Remarks = receiving.Truck_Approval2_Remarks;
-            existingInfo.Truck_Approval3_Remarks = receiving.Truck_Approval3_Remarks;
-            existingInfo.Truck_Approval4_Remarks = receiving.Truck_Approval4_Remarks;
-
-            existingInfo.Unloading_Approval1 = receiving.Unloading_Approval1;
-            existingInfo.Unloading_Approval2 = receiving.Unloading_Approval2;
-            existingInfo.Unloading_Approval3 = receiving.Unloading_Approval3;
-            existingInfo.Unloading_Approval4 = receiving.Unloading_Approval4;
-
-            existingInfo.Unloading_Approval1_Remarks = receiving.Unloading_Approval1_Remarks;
-            existingInfo.Unloading_Approval2_Remarks = receiving.Unloading_Approval2_Remarks;
-            existingInfo.Unloading_Approval3_Remarks = receiving.Unloading_Approval3_Remarks;
-            existingInfo.Unloading_Approval4_Remarks = receiving.Unloading_Approval4_Remarks;
-
-            existingInfo.Checking_Approval1 = receiving.Checking_Approval1;
-            existingInfo.Checking_Approval2 = receiving.Checking_Approval2;
-
-            existingInfo.Checking_Approval1_Remarks = receiving.Checking_Approval1_Remarks;
-            existingInfo.Checking_Approval2_Remarks = receiving.Checking_Approval2_Remarks;
-
-            existingInfo.QA_Approval = receiving.QA_Approval;
-            existingInfo.QA_Approval_Remarks = receiving.QA_Approval_Remarks;
-
-            existingInfo.TotalReject = totalreject;
-            existingInfo.IsWareHouseReceive = false;
-
-            return true;
+            
+            // var totalreject = await _context.QC_Reject.Where(x => x.PO_ReceivingId == existingInfo.Id)
+            //                                            .Select(x => x.Quantity).SumAsync();
+            //
+            // existingInfo.Manufacturing_Date = receiving.Manufacturing_Date;
+            // existingInfo.Expected_Delivery = receiving.Expected_Delivery;
+            // existingInfo.Expiry_Date = receiving.Expiry_Date;
+            // existingInfo.Actual_Delivered = receiving.Actual_Delivered;
+            // existingInfo.Batch_No = receiving.Batch_No;
+            //
+            // existingInfo.Truck_Approval1 = receiving.Truck_Approval1;
+            // existingInfo.Truck_Approval2 = receiving.Truck_Approval2;
+            // existingInfo.Truck_Approval3 = receiving.Truck_Approval3;
+            // existingInfo.Truck_Approval4 = receiving.Truck_Approval4;
+            //
+            // existingInfo.Truck_Approval1_Remarks = receiving.Truck_Approval1_Remarks;
+            // existingInfo.Truck_Approval2_Remarks = receiving.Truck_Approval2_Remarks;
+            // existingInfo.Truck_Approval3_Remarks = receiving.Truck_Approval3_Remarks;
+            // existingInfo.Truck_Approval4_Remarks = receiving.Truck_Approval4_Remarks;
+            //
+            // existingInfo.Unloading_Approval1 = receiving.Unloading_Approval1;
+            // existingInfo.Unloading_Approval2 = receiving.Unloading_Approval2;
+            // existingInfo.Unloading_Approval3 = receiving.Unloading_Approval3;
+            // existingInfo.Unloading_Approval4 = receiving.Unloading_Approval4;
+            //
+            // existingInfo.Unloading_Approval1_Remarks = receiving.Unloading_Approval1_Remarks;
+            // existingInfo.Unloading_Approval2_Remarks = receiving.Unloading_Approval2_Remarks;
+            // existingInfo.Unloading_Approval3_Remarks = receiving.Unloading_Approval3_Remarks;
+            // existingInfo.Unloading_Approval4_Remarks = receiving.Unloading_Approval4_Remarks;
+            //
+            // existingInfo.Checking_Approval1 = receiving.Checking_Approval1;
+            // existingInfo.Checking_Approval2 = receiving.Checking_Approval2;
+            //
+            // existingInfo.Checking_Approval1_Remarks = receiving.Checking_Approval1_Remarks;
+            // existingInfo.Checking_Approval2_Remarks = receiving.Checking_Approval2_Remarks;
+            //
+            // existingInfo.QA_Approval = receiving.QA_Approval;
+            // existingInfo.QA_Approval_Remarks = receiving.QA_Approval_Remarks;
+            //
+            // existingInfo.TotalReject = totalreject;
+            // existingInfo.IsWareHouseReceive = false;
+            //
+            // return true;
         }
         public async Task<bool> AddNewRejectInfo(PO_Reject reject)
         {
@@ -996,28 +996,28 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                DateOfChecking = receiving.QC_ReceiveDate.ToString(),
                                ExpiryIsApprove = receiving.ExpiryIsApprove != null ,
                                ExpiryDate = receiving.Expiry_Date.ToString(),
-                               TruckApproval1 = receiving.Truck_Approval1,
-                               TruckApprovalRemarks1 = receiving.Truck_Approval1_Remarks,
-                               TruckApproval2 = receiving.Truck_Approval2,
-                               TruckApprovalRemarks2 = receiving.Truck_Approval2_Remarks,
-                               TruckApproval3 = receiving.Truck_Approval3,
-                               TruckApprovalRemarks3 = receiving.Truck_Approval3_Remarks,
-                               TruckApproval4 = receiving.Truck_Approval4,
-                               TruckApprovalRemarks4 = receiving.Truck_Approval4_Remarks,
-                               UnloadingApproval1 = receiving.Unloading_Approval1,
-                               UnloadingApprovalRemarks1 = receiving.Unloading_Approval1_Remarks,
-                               UnloadingApproval2 = receiving.Unloading_Approval2,
-                               UnloadingApprovalRemarks2 = receiving.Unloading_Approval2_Remarks,
-                               UnloadingApproval3 = receiving.Unloading_Approval3,
-                               UnloadingApprovalRemarks3 = receiving.Unloading_Approval3_Remarks,
-                               UnloadingApproval4 = receiving.Unloading_Approval4,
-                               UnloadingApprovalRemarks4 = receiving.Unloading_Approval4_Remarks,
-                               CheckingApproval1 = receiving.Checking_Approval1,
-                               CheckingApprovalRemarks1 = receiving.Checking_Approval1_Remarks,
-                               CheckingApproval2 = receiving.Checking_Approval2,
-                               CheckingApprovalRemarks2 = receiving.Checking_Approval2_Remarks,
-                               QAApproval = receiving.QA_Approval,
-                               QAApprovalRemarks = receiving.QA_Approval_Remarks
+                               // TruckApproval1 = receiving.Truck_Approval1,
+                               // TruckApprovalRemarks1 = receiving.Truck_Approval1_Remarks,
+                               // TruckApproval2 = receiving.Truck_Approval2,
+                               // TruckApprovalRemarks2 = receiving.Truck_Approval2_Remarks,
+                               // TruckApproval3 = receiving.Truck_Approval3,
+                               // TruckApprovalRemarks3 = receiving.Truck_Approval3_Remarks,
+                               // TruckApproval4 = receiving.Truck_Approval4,
+                               // TruckApprovalRemarks4 = receiving.Truck_Approval4_Remarks,
+                               // UnloadingApproval1 = receiving.Unloading_Approval1,
+                               // UnloadingApprovalRemarks1 = receiving.Unloading_Approval1_Remarks,
+                               // UnloadingApproval2 = receiving.Unloading_Approval2,
+                               // UnloadingApprovalRemarks2 = receiving.Unloading_Approval2_Remarks,
+                               // UnloadingApproval3 = receiving.Unloading_Approval3,
+                               // UnloadingApprovalRemarks3 = receiving.Unloading_Approval3_Remarks,
+                               // UnloadingApproval4 = receiving.Unloading_Approval4,
+                               // UnloadingApprovalRemarks4 = receiving.Unloading_Approval4_Remarks,
+                               // CheckingApproval1 = receiving.Checking_Approval1,
+                               // CheckingApprovalRemarks1 = receiving.Checking_Approval1_Remarks,
+                               // CheckingApproval2 = receiving.Checking_Approval2,
+                               // CheckingApprovalRemarks2 = receiving.Checking_Approval2_Remarks,
+                               // QAApproval = receiving.QA_Approval,
+                               // QAApprovalRemarks = receiving.QA_Approval_Remarks
                            });
 
             return await summary.Where(x => x.Id == id)

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ELIXIR.DATA.DTOs;
 
 namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 {
@@ -93,11 +94,17 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<IReadOnlyList<OrderDto>> GetAllForTransactMoveOrderNotification();
         Task<IReadOnlyList<MoveOrderDto>> GetForApprovalMoveOrderNotification();
         Task<IReadOnlyList<MoveOrderDto>> GetRejectMoveOrderNotification();
-
-
-
-
-
-
+        Task<bool> SetBeingPrepared(List<Ordering> moveOrders);
+        Task<bool> UnsetBeingPrepared(List<Ordering> orderNos);
+        
+        
+        //==========Allocation=========//
+        Task<bool> AllocateOrdersPerItems(List<AllocationDTO> itemCodes);
+        // Task<IReadOnlyList<OrderDto>> GetAllOrdersForAllocation();
+        Task<PagedList<OrderDto>> GetAllListofOrdersForAllocationPagination(UserParams userParams);
+        Task<IReadOnlyList<OrderDto>> GetAllListofOrdersAllocation(string itemCode);
+        Task<IReadOnlyList<OrderDto>> GetForAllocationOrdersForNotification();
+        Task<bool> ValidateIfForAllocation(List<Ordering> orders);
+        Task<bool> CancelForPendingAllocation(string customer);
     }
 }

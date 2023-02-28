@@ -133,7 +133,7 @@ namespace ELIXIR.API.Controllers
         }
 
         [HttpPost]
-        [Route("AddNewUser")]
+        [Route("AddeNwUser")]
         public async Task<IActionResult> CreateUser(User user)
         {
             if (ModelState.IsValid)
