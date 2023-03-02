@@ -75,7 +75,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpPut]
         [Route("ApprovePreparedDate")]
-        public async Task<IActionResult> ApprovePreparedDate([FromBody] Ordering order)
+        public async Task<IActionResult> ApprovePreparedDate([FromBody] List<Ordering> order)
         {
             await _unitOfWork.Order.ApprovePreparedDate(order);
             await _unitOfWork.CompleteAsync();

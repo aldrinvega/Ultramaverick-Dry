@@ -712,7 +712,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
            }).Select(x => new OrderingInventory
            {
                ItemCode = x.Key.ItemCode,
-               QuantityOrdered = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
+               QuantityOrdered = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity)
            });
 
             var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)
@@ -1209,11 +1209,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
            .GroupBy(x => new
            {
                x.ItemCode,
+               x.AllocatedQuantity
 
            }).Select(x => new OrderingInventory
            {
                ItemCode = x.Key.ItemCode,
-               QuantityOrdered = x.Sum(x => x.QuantityOrdered)
+               QuantityOrdered = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity)
            });
 
             var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)

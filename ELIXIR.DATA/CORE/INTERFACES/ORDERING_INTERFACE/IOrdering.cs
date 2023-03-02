@@ -18,7 +18,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<bool> EditQuantityOrder(Ordering orders);
         Task<bool> SchedulePreparedDate(Ordering orders);
         Task<IReadOnlyList<OrderDto>> GetAllListOfPreparedDate();
-        Task<bool> ApprovePreparedDate(Ordering orders);
+        Task<bool> ApprovePreparedDate(List<Ordering> orders);
         Task<bool> RejectPreparedDate(Ordering orders);
         Task<bool> AddNewOrders(Ordering orders);
         Task<IReadOnlyList<OrderDto>> OrderSummary(string DateFrom, string DateTo);

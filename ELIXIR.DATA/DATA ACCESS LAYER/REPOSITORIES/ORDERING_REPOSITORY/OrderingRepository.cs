@@ -270,25 +270,25 @@ using System.Collections.Generic;
                                .ToListAsync();
 
         }
-        public async Task<bool> ApprovePreparedDate(Ordering orders)
+        public async Task<bool> ApprovePreparedDate(List<Ordering> orders)
         {
+            var orderNos = orders.Select(o => o.OrderNoPKey);
+            var activeOrders = await _context.Orders
+                .Where(o => orderNos.Contains(o.OrderNoPKey) && o.IsActive)
+                .ToListAsync();
 
-            var order = await _context.Orders.Where(x => x.OrderNoPKey == orders.OrderNoPKey)
-                                             .Where(x => x.IsActive == true)
-                                              .ToListAsync();
-
-            foreach(var items in order)
+            foreach (var order in activeOrders)
             {
-                items.IsApproved = true;
-                items.ApprovedDate = DateTime.Now;
-                items.RejectBy = null;
-                items.RejectedDate = null;
-                items.Remarks = null;
+                order.IsApproved = true;
+                order.ApprovedDate = DateTime.Now;
+                order.RejectBy = null;
+                order.RejectedDate = null;
+                order.Remarks = null;
             }
-
+            
             return true;
-
         }
+
         public async Task<bool> RejectPreparedDate(Ordering orders)
         {
 
