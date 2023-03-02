@@ -1,7 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.INTERFACES.QC_INTERFACE;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
+using ELIXIR.DATA.DTOs.RECEIVING_DTOs;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 {
@@ -18,10 +24,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         {
             
             var checklistForCompliance = new ChecklistForCompliants();
-            var checklistString = new CheckListString();
             var checklistInput = new CheckListInputs();
-            
-            
+
             foreach (var compliance in input.ChecklistForCompliants)
             {
                 switch (compliance.Value)
@@ -234,50 +238,29 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             
             foreach (var checklistStrings in input.ChecklistsString)
             {
+                CheckListString checklistString = new CheckListString
+                {
+                    PO_ReceivingId = input.PO_Receiving.PO_Summary_Id,
+                    Checlist_Type = checklistStrings.Checlist_Type,
+                    Values = checklistStrings.Values
+                };
+    
                 switch (checklistStrings.Checlist_Type)
                 {
                     case "Color":
-                        checklistString.PO_ReceivingId = input.PO_Receiving.PO_Summary_Id;
-                        checklistString.Checlist_Type = checklistStrings.Checlist_Type;
-                        checklistString.Value = checklistStrings.Value;
-                        break;
                     case "Odor":
-                        checklistString.PO_ReceivingId = input.PO_Receiving.PO_Summary_Id;
-                        checklistString.Checlist_Type = checklistStrings.Checlist_Type;
-                        checklistString.Value = checklistStrings.Value;
-                        break;
                     case "Appearance":
-                        checklistString.PO_ReceivingId = input.PO_Receiving.PO_Summary_Id;
-                        checklistString.Checlist_Type = checklistStrings.Checlist_Type;
-                        checklistString.Value = checklistStrings.Value;
-                        break;
                     case "Texture":
-                        checklistString.PO_ReceivingId = input.PO_Receiving.PO_Summary_Id;
-                        checklistString.Checlist_Type = checklistStrings.Checlist_Type;
-                        checklistString.Value = checklistStrings.Value;
-                        break;
                     case "Absence Of Contaminants":
-                        checklistString.PO_ReceivingId = input.PO_Receiving.PO_Summary_Id;
-                        checklistString.Checlist_Type = checklistStrings.Checlist_Type;
-                        checklistString.Value = checklistStrings.Value;
-                        break;
                     case "Product Condition":
-                        checklistString.PO_ReceivingId = input.PO_Receiving.PO_Summary_Id;
-                        checklistString.Checlist_Type = checklistStrings.Checlist_Type;
-                        checklistString.Value = checklistStrings.Value;
-                        break;
                     case "Product / Commodity Type":
-                        checklistString.PO_ReceivingId = input.PO_Receiving.PO_Summary_Id;
-                        checklistStrings.Checlist_Type = checklistStrings.Checlist_Type;
-                        checklistString.Value = checklistStrings.Value;
+                        await _context.CheckListStrings.AddAsync(checklistString);
                         break;
                     default:
-                        checklistStrings.Checlist_Type = null;
-                        checklistString.Value = null;
                         break;
                 }
             }
-            
+
             foreach (var checklistInputs in input.CheckListInput)
             {
                 switch (checklistInputs.Parameter)
@@ -363,10 +346,79 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             }
             
             await _context.QC_Receiving.AddAsync(input.PO_Receiving);
-            await _context.ChecklistForCompliant.AddRangeAsync(checklistForCompliance);
-            await _context.CheckListStrings.AddAsync(checklistString);
+            await _context.ChecklistForCompliant.AddAsync(checklistForCompliance);
             await _context.CheckListInput.AddAsync(checklistInput);
             return true;
+        }
+        public async Task<List<ChecklistParent>> GetAllChecklist()
+        {
+            var checklistStrings = await _context.CheckListStrings.ToListAsync();
+            var checklistInputs = await _context.CheckListInput.ToListAsync();
+            var checklistComplaints = await _context.ChecklistForCompliant.ToListAsync();
+
+            var checklists = from cls in checklistStrings
+                join cli in checklistInputs on cls.PO_ReceivingId equals cli.PO_ReceivingId into cliGroup
+                join clc in checklistComplaints on cls.PO_ReceivingId equals clc.PO_ReceivingId into clcGroup
+                from cli in cliGroup.DefaultIfEmpty()
+                from clc in clcGroup.DefaultIfEmpty()
+                group new { cls, cli, clc } by cls.PO_ReceivingId into g
+                select new ChecklistParent
+                {
+                    PO_Summary_Id = g.Key,
+                    ChecklistString = g.Select(x => new ChecklistStringDTO
+                    {
+                        Checklist_Type = x.cls.Checlist_Type,
+                        Values = JsonConvert.DeserializeObject<List<string>>(x.cls.Value)
+                    }).ToList(),
+                    ChecklistInput = g.Select(x => new CheclistInputDTO
+                    {
+                        Checklist_Type = x.cli?.Checlist_Type,
+                        Parameter = x.cli?.Parameter,
+                        Value = x.cli?.Value
+                    }).Where(x => x != null).ToList(),
+                    ChecklistCompliants = g.Select(x => new ChecklistCompliantsDTO
+                    {
+                        Checklist_Type = x.clc?.Checklist_Type,
+                        Values = x.clc?.Values,
+                        IsCompliant = x.clc.IsCompliant
+                    }).Where(x => x != null).ToList()
+                };
+
+            return checklists.ToList();
+        }
+
+        
+        public async Task<List<ChecklistParent>> GetAllChecklistbyPOSummaryId(int po_SummaryId)
+        {
+            var checkListStrings = await _context.CheckListStrings
+                .Where(x => x.PO_ReceivingId == po_SummaryId)
+                .ToListAsync();
+
+            var checklists = new List<ChecklistParent>();
+
+            foreach (var checkListString in checkListStrings)
+            {
+                var checklistParent = checklists.FirstOrDefault(c => c.PO_Summary_Id == checkListString.PO_ReceivingId);
+
+                if (checklistParent == null)
+                {
+                    checklistParent = new ChecklistParent
+                    {
+                        PO_Summary_Id = checkListString.PO_ReceivingId,
+                        ChecklistString = new List<ChecklistStringDTO>()
+                    };
+                    checklists.Add(checklistParent);
+                }
+                
+                var values = JsonConvert.DeserializeObject<List<string>>(checkListString.Value);
+                    var checklistDTO = new ChecklistStringDTO()
+                    {
+                        Checklist_Type = checkListString.Checlist_Type,
+                        Values = values
+                    };
+                    checklistParent.ChecklistString.Add(checklistDTO);
+            }
+            return checklists;
         }
     }
 }

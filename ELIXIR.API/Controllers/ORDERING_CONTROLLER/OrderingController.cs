@@ -6,13 +6,12 @@ using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.INTERFACES.ORDER_HUB;
 using ELIXIR.DATA.DTOs;
 using ELIXIR.DATA.SERVICES;
 using Microsoft.AspNetCore.SignalR;
-namespace ELIXIR.API.Controllers.ORDERING_CONTROLLERGetAll
+namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 {
     [ApiController]
     public class OrderingController : BaseApiController
@@ -108,10 +107,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLERGetAll
 
         [HttpGet]
         [Route("OrderSummary")]
-        public async Task<IActionResult> OrderSummary([FromQuery] string DateFrom, [FromQuery] string DateTo)
+        public async Task<IActionResult> OrderSummary([FromQuery] string dateFrom, [FromQuery] string dateTo)
         {
 
-            var orders = await _unitOfWork.Order.OrderSummary(DateFrom, DateTo);
+            var orders = await _unitOfWork.Order.OrderSummary(dateFrom, dateTo);
 
             return Ok(orders);
 
@@ -864,6 +863,19 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLERGetAll
                 return BadRequest("Something went wrong");
             
             return Ok();
+        }
+        
+        //Checklist
+
+        [HttpGet("GetAllChecklistByPoSummaryId")]
+
+        public async Task<IActionResult> GetAllChecklistByPoSummaryId()
+        {
+            var checklist = await _unitOfWork.QcChecklist.GetAllChecklist();
+
+            if (checklist == null)
+                return BadRequest("No Checklist Found");
+            return Ok(checklist);
         }
 
     }

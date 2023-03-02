@@ -12,6 +12,5 @@ namespace ELIXIR.DATA.SERVICES
         {
             await Clients.Others.SetBeingPrepared(moveList);
         }
-      
     }
 } 

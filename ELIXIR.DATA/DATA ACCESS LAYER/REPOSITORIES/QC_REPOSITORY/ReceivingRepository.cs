@@ -7,13 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Data;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
-using ELIXIR.DATA.DTOs.REPORT_DTOs;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 {
@@ -25,9 +22,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             _context = context;
         }
 
-        public async Task<bool> AddNewReceivingInformation(PO_Receiving receive)
+        public async Task<bool> AddNewReceivingInformation(PO_Receiving receiving)
         {
-            await _context.QC_Receiving.AddAsync(receive);
+            await _context.QC_Receiving.AddAsync(receiving);
+            
+            DateTime dateAdd = DateTime.Now.AddDays(30);
+            
+            receiving.IsActive = true;
+
+            if (receiving.Expiry_Date < dateAdd)
+                receiving.IsNearlyExpire = true;
+
+            if (receiving.Expiry_Date > dateAdd)
+                receiving.ExpiryIsApprove = true;
+ 
+            receiving.QC_ReceiveDate = DateTime.Now;
 
             return true;
         }

@@ -216,11 +216,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
             set;
         }
 
-        public bool? ForPendingAllocation
-        {
-            get;
-            set;
-        }
+        // public bool? ForPendingAllocation
+        // {
+        //     get;
+        //     set;
+        // }
         
     }
 }

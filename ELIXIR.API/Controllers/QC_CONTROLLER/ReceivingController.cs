@@ -9,10 +9,8 @@ using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.Xml;
 using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY;
 
 namespace ELIXIR.API.Controllers.QC_CONTROLLER
 {
@@ -33,16 +31,15 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
             {
                 await _unitOfWork.QcChecklist.AddChecklists(input);
                 await _unitOfWork.Receives.AddNewReceivingInformation(input.PO_Receiving);
+                
                 // Save all changes to the database
                 await _unitOfWork.CompleteAsync();
                 return Ok("Successfully added new receiving information!");
             }
 
             return new JsonResult("Something went wrong!") { StatusCode = 500 };
-
         }
-    
-
+        
         [HttpPost]
         [Route("AddNewRejectInPo")]
         public async Task<IActionResult> AddNewRejectInPo([FromBody] PO_Reject[] reject)
@@ -105,7 +102,7 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
                 var validate = await _unitOfWork.Receives.UpdateRejectInfo(items);
 
                 if (validate == false)
-                    return BadRequest("Reject failed, Receiving Id does'nt exist!");
+                    return BadRequest("Reject failed, Receiving Id doesn't exist!");
 
             }
             await _unitOfWork.CompleteAsync();
@@ -146,8 +143,7 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
         {
             if (id != summary.Id)
                 return BadRequest();
-
-
+            
             var validate = await _unitOfWork.Receives.ValidatePOForCancellation(summary.Id);
 
             if (validate == false)
@@ -178,7 +174,7 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
         {
             if (id != receiving.Id)
                 return BadRequest();
-
+            
             await _unitOfWork.Receives.ApproveNearlyExpireRawMaterials(receiving);
             await _unitOfWork.CompleteAsync();
 
@@ -220,7 +216,6 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
 
             await _unitOfWork.Receives.WarehouseReturnRejectByQc(receiving);
             await _unitOfWork.CompleteAsync();
-
             return new JsonResult("Successfully return reject materials!");
         }
 
@@ -615,6 +610,17 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
             var posummary = await _unitOfWork.Receives.GetItemDetailsForNearlyExpire(id);
 
             return Ok(posummary);
+        }
+
+        [HttpGet("GetChecklistByPoSummaryId")]
+        public async Task<IActionResult> GetChecklistByPoSummaryId([FromQuery] int id)
+        {
+            var checklist = await _unitOfWork.QcChecklist.GetAllChecklistbyPOSummaryId(id);
+
+            if (checklist == null)
+                return BadRequest("No Records Found");
+            
+            return Ok(checklist);
         }
 
 

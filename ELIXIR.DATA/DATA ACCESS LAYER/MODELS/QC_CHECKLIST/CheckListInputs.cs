@@ -11,6 +11,5 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
         public string Checlist_Type { get; set; }
         public string Parameter { get; set; }
         public string Value { get; set; }
-        
     }
 }

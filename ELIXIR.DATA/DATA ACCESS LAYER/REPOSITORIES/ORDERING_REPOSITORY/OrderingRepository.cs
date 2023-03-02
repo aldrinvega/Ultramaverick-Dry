@@ -47,15 +47,15 @@ using System.Collections.Generic;
          .GroupBy(x => new
          {
              x.ItemCode,
+             x.AllocatedQuantity
 
          }).Select(x => new OrderingInventory
          {
              ItemCode = x.Key.ItemCode,
-             QuantityOrdered = x.Sum(x => x.QuantityOrdered)
+             QuantityOrdered = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
          });
 
-
-
+            
             var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)
            .GroupBy(x => new
            {
@@ -114,7 +114,7 @@ using System.Collections.Generic;
                                   ItemCode = total.Key.ItemCode,
                                   Reserve = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
                                            (total.Sum(x => x.request.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
-                                            total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered) +
+                                            total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
                                             total.Sum(x => x.issue.Quantity == null ? 0 : x.issue.Quantity))
                               });
             //var totalRemaining = (from totalIn in _context.WarehouseReceived
@@ -168,7 +168,7 @@ using System.Collections.Generic;
             //                      });
 
             var orders = (from ordering in _context.Orders
-                          where ordering.FarmName == farms && ordering.PreparedDate == null && ordering.IsActive == true && ordering.ForAllocation == null && ordering.ForPendingAllocation == null
+                          where ordering.FarmName == farms && ordering.PreparedDate == null && ordering.IsActive == true && ordering.ForAllocation == null
                           join warehouse in getReserve
                           on ordering.ItemCode equals warehouse.ItemCode
                           into leftJ
@@ -176,7 +176,7 @@ using System.Collections.Generic;
 
                           group new
                           {
-                              ordering, 
+                              ordering,
                               warehouse
                           }
                               by new
@@ -258,7 +258,7 @@ using System.Collections.Generic;
 
                 FarmCode = x.FarmCode,
                 Category = x.Category,
-                QuantityOrder = x.QuantityOrdered,
+                QuantityOrder = x.AllocatedQuantity == null ? x.QuantityOrdered : (decimal)x.AllocatedQuantity,
                 OrderDate = x.OrderDate.ToString("MM/dd/yyyy"),
                 DateNeeded = x.DateNeeded.ToString("MM/dd/yyyy"),
                 PreparedDate = x.PreparedDate.ToString(),
@@ -361,11 +361,12 @@ using System.Collections.Generic;
             {
                 x.ItemCode,
                 x.IsPrepared,
-                x.IsActive
+                x.IsActive,
+                x.AllocatedQuantity
             }).Select(x => new OrderDto
             {
                 ItemCode = x.Key.ItemCode,
-                TotalOrders = x.Sum(x => x.QuantityOrdered),
+                TotalOrders = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
                 IsPrepared = x.Key.IsPrepared
 
             }).Where(x => x.IsPrepared == false);
@@ -395,7 +396,8 @@ using System.Collections.Generic;
                               ordering.IsActive,
                               ordering.IsPrepared,
                               ordering.PreparedDate,
-                              ordering.IsApproved
+                              ordering.IsApproved,
+                              ordering.AllocatedQuantity
                              
 
                           } into total
@@ -412,7 +414,7 @@ using System.Collections.Generic;
                               ItemCode = total.Key.ItemCode,
                               ItemDescription = total.Key.ItemDescription,
                               Uom = total.Key.Uom,
-                              QuantityOrder = total.Key.QuantityOrdered,
+                              QuantityOrder = total.Key.AllocatedQuantity == null ? total.Key.QuantityOrdered : (decimal)total.Key.AllocatedQuantity,
                               IsActive = total.Key.IsActive,
                               IsPrepared = total.Key.IsPrepared,
                               StockOnHand = total.Sum(x => x.Remaining),
@@ -608,7 +610,7 @@ using System.Collections.Generic;
                 Id = x.Id,
                 FarmCode = x.FarmCode,
                 Category = x.Category,
-                QuantityOrder = x.QuantityOrdered,
+                QuantityOrder = x.AllocatedQuantity == null ? x.QuantityOrdered : (decimal)x.AllocatedQuantity,
                 OrderDate = x.OrderDate.ToString("MM/dd/yyyy"),
                 DateNeeded = x.DateNeeded.ToString("MM/dd/yyyy"),
                 PreparedDate = x.PreparedDate.ToString(),
@@ -652,7 +654,7 @@ using System.Collections.Generic;
                 ItemCode = x.ItemCode,
                 ItemDescription = x.ItemDescription,
                 Uom = x.Uom,
-                QuantityOrder = x.QuantityOrdered
+                QuantityOrder = x.AllocatedQuantity == null ? x.QuantityOrdered : (decimal)x.AllocatedQuantity
 
             });
 
@@ -672,7 +674,9 @@ using System.Collections.Generic;
      //           x.OrderDate,
                 x.PreparedDate,
                 x.IsApproved,
-                x.IsActive
+                x.IsActive,
+                x.AllocatedQuantity
+                
 
             }).Where(x => x.Key.IsApproved == null)
               .Where(x => x.Key.PreparedDate != null)
@@ -683,10 +687,9 @@ using System.Collections.Generic;
                    Farm = x.Key.FarmName,
                    FarmCode = x.Key.FarmCode,
                    Category = x.Key.FarmType,
-                   TotalAllocatedOrder = x.Sum(x => x.AllocatedQuantity),
+                   TotalAllocatedOrder = x.Key.AllocatedQuantity == null ? (int)x.Sum(x => x.QuantityOrdered) : (int)x.Sum(x => x.AllocatedQuantity),
               //     OrderDate = x.Key.OrderDate.ToString("MM/dd/yyyy"),
                    PreparedDate = x.Key.PreparedDate.ToString()
-
                });
 
             return await orders.ToListAsync();
@@ -737,26 +740,26 @@ using System.Collections.Generic;
         {
 
             var orders = _context.Orders
-                                      .GroupBy(x => new
-                                      {
-                                          x.FarmName,
-                                          x.IsActive,
-                                          x.IsApproved,
-                                          x.IsMove,
-                                          x.IsBeingPrepared,
-                                          x.SetBy
+                .GroupBy(x => new
+                {
+                    x.FarmName,
+                    x.IsActive,
+                    x.IsApproved,
+                    x.IsMove,
+                    x.IsBeingPrepared,
+                    x.SetBy
 
-                                      }).Where(x => x.Key.IsActive == true)
-                                        .Where(x => x.Key.IsApproved == true)
-                                        .Where(x => x.Key.IsMove == false)
-                                        .Select(x => new OrderDto
-                                        {
-                                            Farm = x.Key.FarmName,
-                                            IsActive = x.Key.IsActive,
-                                            IsApproved = x.Key.IsApproved != null,
-                                            IsBeingPrepared = x.Key.IsBeingPrepared != null
-                                        }).OrderBy(X => X.IsBeingPrepared)
-                                        .ThenByDescending(x => x.IsBeingPrepared);
+                }).Where(x => x.Key.IsActive == true)
+                .Where(x => x.Key.IsApproved == true)
+                .Where(x => x.Key.IsMove == false)
+                .Select(x => new OrderDto
+                {
+                    Farm = x.Key.FarmName,
+                    IsActive = x.Key.IsActive,
+                    IsApproved = x.Key.IsApproved != null,
+                    IsBeingPrepared = x.Key.IsBeingPrepared != null,
+                    SetBy = x.Key.SetBy
+                });
 
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
 
@@ -866,11 +869,12 @@ using System.Collections.Generic;
             {
                 x.ItemCode,
                 x.IsPrepared,
-                x.IsActive
+                x.IsActive,
+                x.AllocatedQuantity
             }).Select(x => new OrderDto
             {
                 ItemCode = x.Key.ItemCode,
-                TotalOrders = x.Sum(x => x.QuantityOrdered),
+                TotalOrders = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
                 IsPrepared = x.Key.IsPrepared
 
             }).Where(x => x.IsPrepared == false);
@@ -901,7 +905,8 @@ using System.Collections.Generic;
                               ordering.IsActive,
                               ordering.IsPrepared,
                               ordering.PreparedDate,
-                              ordering.IsApproved
+                              ordering.IsApproved,
+                              ordering.AllocatedQuantity
 
 
                           } into total
@@ -918,7 +923,7 @@ using System.Collections.Generic;
                               ItemCode = total.Key.ItemCode,
                               ItemDescription = total.Key.ItemDescription,
                               Uom = total.Key.Uom,
-                              QuantityOrder = total.Key.QuantityOrdered,
+                              QuantityOrder = total.Key.AllocatedQuantity == null ? total.Key.QuantityOrdered : (decimal)total.Key.AllocatedQuantity,
                               IsActive = total.Key.IsActive,
                               IsPrepared = total.Key.IsPrepared,
                               StockOnHand = total.Sum(x => x.Remaining),
@@ -989,7 +994,7 @@ using System.Collections.Generic;
                               ItemCode = total.Key.ItemCode,
                               ItemDescription = total.Key.ItemDescription,
                               Uom = total.Key.Uom,
-                              AllocatedQuantity = total.Key.AllocatedQuantity,
+                              QuantityOrder = total.Key.AllocatedQuantity == null ? total.Key.QuantityOrdered : (decimal)total.Key.AllocatedQuantity,
                               IsApproved = total.Key.IsApproved != null,
                               PreparedQuantity = total.Sum(x => x.QuantityPrepared),
                               SetBy = total.Key.SetBy
@@ -1011,7 +1016,7 @@ using System.Collections.Generic;
                     ItemCode = x.ItemCode, 
                     ItemDescription = x.ItemDescription, 
                     Uom = x.Uom,
-                    QuantityOrder = (decimal)x.AllocatedQuantity, 
+                    QuantityOrder = x.AllocatedQuantity == null ? x.QuantityOrdered : (decimal) x.AllocatedQuantity, 
                     Category = x.Category,
                     OrderDate = x.OrderDate.ToString("MM/dd/yyyy"),
                     DateNeeded = x.DateNeeded.ToString("MM/dd/yyyy"),
@@ -1990,7 +1995,8 @@ using System.Collections.Generic;
                 x.IsApproved,
                 x.IsMove,
                 x.IsReject,
-                x.Remarks
+                x.Remarks,
+                x.AllocatedQuantity
 
             })
          .Where(x => x.Key.IsApproved == true)
@@ -2004,7 +2010,7 @@ using System.Collections.Generic;
            Farm = x.Key.FarmName,
            FarmCode = x.Key.FarmCode,
            Category = x.Key.FarmType,
-           TotalOrders = x.Sum(x => x.QuantityOrdered),
+           TotalOrders = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
            PreparedDate = x.Key.PreparedDate.ToString(),
            IsMove = x.Key.IsMove,
            IsReject = x.Key.IsReject != null,
@@ -2076,7 +2082,7 @@ using System.Collections.Generic;
                .Where(x => x.IsActive)
                .Where(x => x.ItemCode == order.ItemCode)
                .SumAsync(x => x.Quantity);
-
+               
                // Get the sum of received stocks for the current order's item code
                var receivedStocks = await _context.WarehouseReceived
                    .Where(x => x.ItemCode == order.ItemCode)
@@ -2087,11 +2093,17 @@ using System.Collections.Generic;
                var totalOrdersPerItemAndStore = await _context.Orders
                    .Where(x => x.ItemCode == order.ItemCode)
                    .Where(x => x.AllocatedQuantity == null)
+                   .Where(x => x.IsActive == true)
                    .SumAsync(x => x.QuantityOrdered);
 
                 var totalStocks = receivedStocks - issueOut;
 
-               var percentagetoallocate = totalOrdersPerItemAndStore / totalStocks;
+                if (totalStocks <= 0)
+                {
+                    totalStocks = 0;
+                }
+
+                var percentagetoallocate = totalOrdersPerItemAndStore / totalStocks;
 
                if (totalOrdersPerItemAndStore <= totalStocks)
                {
@@ -2160,12 +2172,11 @@ using System.Collections.Generic;
                    x.IsActive,
                    x.PreparedDate,
                    x.ForAllocation,
-                   x.ForPendingAllocation
+                  
 
                }).Where(x => x.Key.IsActive == true)
                .Where(x => x.Key.PreparedDate == null)
                .Where(x => x.Key.ForAllocation != null)
-               .Where(x => x.Key.ForPendingAllocation == null)
                .Select(x => new OrderDto
                {
                    ItemCode = x.Key.ItemCode,
@@ -2380,10 +2391,13 @@ using System.Collections.Generic;
                     x.IsActive,
                     x.IsApproved,
                     x.IsMove,
-                    x.AllocatedQuantity
+                    x.AllocatedQuantity,
+                    x.ForAllocation
 
-                }).Where(x => x.Key.IsActive == true)
+                })
+                .Where(x => x.Key.IsActive == true)
                 .Where(x => x.Key.AllocatedQuantity == null)
+                .Where(x => x.Key.ForAllocation == true)
                 .Select(x => new OrderDto
                 {
                     ItemCode = x.Key.ItemCode,
@@ -2403,8 +2417,6 @@ using System.Collections.Generic;
 
             if (existing == null)
                 return false;
-
-            existing.ForPendingAllocation = true;
 
             return true;
         }
