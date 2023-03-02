@@ -289,25 +289,24 @@ using System.Collections.Generic;
             return true;
         }
 
-        public async Task<bool> RejectPreparedDate(Ordering orders)
+        public async Task<bool> RejectPreparedDate(List<Ordering> orders)
         {
+            var orderNos = orders.Select(o => o.OrderNoPKey);
+            var activeOrders = await _context.Orders
+                .Where(o => orderNos.Contains(o.OrderNoPKey) && o.IsActive)
+                .ToListAsync();
 
-            var order = await _context.Orders.Where(x => x.OrderNoPKey == orders.OrderNoPKey)
-                                             .Where(x => x.IsActive == true)
-                                             .ToListAsync();
-
-            foreach (var items in order)
+            foreach (var item in activeOrders)
             {
-
-                items.IsReject = true;
-                items.RejectBy = orders.RejectBy;
-                items.IsActive = true;
-                items.Remarks = orders.Remarks;
-                items.RejectedDate = DateTime.Now;
-                items.PreparedDate = null;
-                items.OrderNoPKey = 0;
+                item.IsReject = true;
+                item.RejectBy = item.RejectBy;
+                item.Remarks = item.Remarks;
+                item.RejectedDate = DateTime.Now;
+                item.PreparedDate = null;
+                item.OrderNoPKey = 0;
+                item.IsActive = true;
             }
-
+            
             return true;
         }
         public async Task<IReadOnlyList<OrderDto>> OrderSummary(string DateFrom, string DateTo)

@@ -85,7 +85,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpPut]
         [Route("RejectPreparedDate")]
-        public async Task<IActionResult> RejectPreparedDate([FromBody] Ordering order)
+        public async Task<IActionResult> RejectPreparedDate([FromBody] List<Ordering> order)
         {
 
             await _unitOfWork.Order.RejectPreparedDate(order);
