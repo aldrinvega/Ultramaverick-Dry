@@ -34,7 +34,7 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
                 
                 // Save all changes to the database
                 await _unitOfWork.CompleteAsync();
-                return Ok("Successfully added new receiving information!");
+                return Ok(input.PO_Receiving);
             }
 
             return new JsonResult("Something went wrong!") { StatusCode = 500 };
