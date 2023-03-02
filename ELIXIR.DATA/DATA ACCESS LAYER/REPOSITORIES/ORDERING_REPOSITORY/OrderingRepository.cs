@@ -2185,76 +2185,78 @@ using System.Collections.Generic;
             
            return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
        }
+       
+       
         public async Task<IReadOnlyList<OrderDto>> GetAllListofOrdersAllocation(string itemCode)
         {
             var datenow = DateTime.Now;
-
-
+        
+        
             var getWarehouseStock = _context.WarehouseReceived.Where(x => x.IsActive == true)
              .GroupBy(x => new
              {
                  x.ItemCode,
-
+        
              }).Select(x => new WarehouseInventory
              {
                  ItemCode = x.Key.ItemCode,
                  ActualGood = x.Sum(x => x.ActualGood)
              });
-
-
+        
+        
             var getOrderingReserve = _context.Orders.Where(x => x.IsActive == true)
                                                   .Where(x => x.PreparedDate != null)
          .GroupBy(x => new
          {
              x.ItemCode,
-
+        
          }).Select(x => new OrderingInventory
          {
              ItemCode = x.Key.ItemCode,
              QuantityOrdered = x.Sum(x => x.QuantityOrdered)
          });
-
-
-
+        
+        
+        
             var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)
            .GroupBy(x => new
            {
                x.ItemCode,
-
+        
            }).Select(x => new OrderingInventory
            {
                ItemCode = x.Key.ItemCode,
                QuantityOrdered = x.Sum(x => x.Quantity)
            });
-
+        
             var getIssueOut = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
                                                             .Where(x => x.IsTransact == true)
             .GroupBy(x => new
             {
                 x.ItemCode,
-
+        
             }).Select(x => new IssueInventory
             {
                 ItemCode = x.Key.ItemCode,
                 Quantity = x.Sum(x => x.Quantity)
             });
-
+        
             var getReserve = (from warehouse in getWarehouseStock
                               join request in getTransformationReserve
                               on warehouse.ItemCode equals request.ItemCode
                               into leftJ1
                               from request in leftJ1.DefaultIfEmpty()
-
+        
                               join ordering in getOrderingReserve
                               on warehouse.ItemCode equals ordering.ItemCode
                               into leftJ2
                               from ordering in leftJ2.DefaultIfEmpty()
-
+        
                               join issue in getIssueOut 
                               on warehouse.ItemCode equals issue.ItemCode
                               into leftJ3
                               from issue in leftJ3.DefaultIfEmpty()
-
+        
                               group new
                               {
                                   warehouse,
@@ -2265,12 +2267,12 @@ using System.Collections.Generic;
                               by new
                               {
                                   warehouse.ItemCode,
-
+        
                               } into total
-
+        
                               select new ReserveInventory
                               {
-
+        
                                   ItemCode = total.Key.ItemCode,
                                   Reserve = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
                                            (total.Sum(x => x.request.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
@@ -2280,25 +2282,25 @@ using System.Collections.Generic;
             //var totalRemaining = (from totalIn in _context.WarehouseReceived
             //                      where totalIn.IsActive == true
             //                      join totalOut in totalout
-
+        
             //                      on totalIn.ItemCode equals totalOut.ItemCode
             //                      into leftJ
             //                      from totalOut in leftJ.DefaultIfEmpty()
-
+        
             //                      join orderout in totalOrders on totalIn.ItemCode equals orderout.ItemCode
             //                      into leftJ2
             //                      from orderout in leftJ2.DefaultIfEmpty()
-
+        
             //                      group new
             //                      {
             //                          totalIn,
             //                          totalOut, 
             //                          orderout
-
+        
             //                      }
             //                      by new 
             //                      {
-
+        
             //            //              totalIn.Id,
             //                          totalIn.ItemCode,
             //                          totalIn.ItemDescription,
@@ -2307,11 +2309,11 @@ using System.Collections.Generic;
             //                          totalIn.ActualGood,
             //                          totalIn.ExpirationDays,
             //                        //  orderout.TotalOrders
-
+        
             //                      } into total
-
+        
             //                      orderby total.Key.ExpirationDays ascending
-
+        
             //                      select new ItemStocks
             //                      {
             //             //             WarehouseId = total.Key.Id,
@@ -2324,16 +2326,16 @@ using System.Collections.Generic;
             //                    //      Out = total.Sum(x => x.Out),
             //                          Remaining = total.Key.ActualGood - 
             //                        //  TotalMoveOrder = total.Key.TotalOrders
-
+        
             //                      });
-
+        
             var orders = (from ordering in _context.Orders
                           where ordering.ItemCode == itemCode && ordering.PreparedDate == null && ordering.IsActive == true
                           join warehouse in getReserve
                           on ordering.ItemCode equals warehouse.ItemCode
                           into leftJ
                           from warehouse in leftJ.DefaultIfEmpty()
-
+        
                           group new
                           {
                               ordering, 
@@ -2354,15 +2356,15 @@ using System.Collections.Generic;
                               ordering.IsActive,
                               ordering.IsPrepared,
                               Reserve = warehouse.Reserve != null ? warehouse.Reserve : 0,
-
-
+        
+        
                               } into total
-
+        
                           orderby total.Key.DateNeeded ascending
-
+        
                           select new OrderDto
                           {
-
+        
                               Id = total.Key.Id,
                               OrderDate = total.Key.OrderDate.ToString("MM/dd/yyyy"),
                               DateNeeded = total.Key.DateNeeded.ToString("MM/dd/yyyy"),
@@ -2378,9 +2380,9 @@ using System.Collections.Generic;
                               StockOnHand = total.Key.Reserve
                      //         Days = total.Key.DateNeeded.Subtract(datenow).Days                         
                           });
-
+        
             return await orders.ToListAsync();
-
+        
         }
         public async Task<IReadOnlyList<OrderDto>> GetForAllocationOrdersForNotification()
         {
@@ -2393,7 +2395,7 @@ using System.Collections.Generic;
                     x.IsMove,
                     x.AllocatedQuantity,
                     x.ForAllocation
-
+        
                 })
                 .Where(x => x.Key.IsActive == true)
                 .Where(x => x.Key.AllocatedQuantity == null)
@@ -2404,20 +2406,20 @@ using System.Collections.Generic;
                     IsActive = x.Key.IsActive,
                     AllocatedQuantity = x.Key.AllocatedQuantity
                 });
-
+        
             return await orders.ToListAsync();
-
+        
         }
-
+        
         public async Task<bool> CancelForPendingAllocation(string customer)
         {
             var existing = await _context.Orders.Where(x => x.CustomerName == customer)
                 .Where(x => x.IsActive == true)
                 .FirstOrDefaultAsync();
-
+        
             if (existing == null)
                 return false;
-
+        
             return true;
         }
 

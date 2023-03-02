@@ -68,10 +68,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
 
         }
-
-
-
-
         public async Task<IReadOnlyList<MRPDto>> GetAllItemForInventory()
         {
             var EndDate = DateTime.Now;

@@ -612,16 +612,16 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
             return Ok(posummary);
         }
 
-        [HttpGet("GetChecklistByPoSummaryId")]
-        public async Task<IActionResult> GetChecklistByPoSummaryId([FromQuery] int id)
-        {
-            var checklist = await _unitOfWork.QcChecklist.GetAllChecklistbyPOSummaryId(id);
-
-            if (checklist == null)
-                return BadRequest("No Records Found");
-            
-            return Ok(checklist);
-        }
+        // [HttpGet("GetChecklistByPoSummaryId")]
+        // public async Task<IActionResult> GetChecklistByPoSummaryId([FromQuery] int id)
+        // {
+        //     var checklist = await _unitOfWork.QcChecklist.GetAllChecklistbyPOSummaryId(id);
+        //
+        //     if (checklist == null)
+        //         return BadRequest("No Records Found");
+        //     
+        //     return Ok(checklist);
+        // }
 
 
     }

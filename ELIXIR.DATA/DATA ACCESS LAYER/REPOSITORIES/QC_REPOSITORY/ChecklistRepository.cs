@@ -242,7 +242,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 {
                     PO_ReceivingId = input.PO_Receiving.PO_Summary_Id,
                     Checlist_Type = checklistStrings.Checlist_Type,
-                    Values = checklistStrings.Values
+                    Value = checklistStrings.Value
                 };
     
                 switch (checklistStrings.Checlist_Type)
@@ -350,75 +350,76 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             await _context.CheckListInput.AddAsync(checklistInput);
             return true;
         }
-        public async Task<List<ChecklistParent>> GetAllChecklist()
-        {
-            var checklistStrings = await _context.CheckListStrings.ToListAsync();
-            var checklistInputs = await _context.CheckListInput.ToListAsync();
-            var checklistComplaints = await _context.ChecklistForCompliant.ToListAsync();
-
-            var checklists = from cls in checklistStrings
-                join cli in checklistInputs on cls.PO_ReceivingId equals cli.PO_ReceivingId into cliGroup
-                join clc in checklistComplaints on cls.PO_ReceivingId equals clc.PO_ReceivingId into clcGroup
-                from cli in cliGroup.DefaultIfEmpty()
-                from clc in clcGroup.DefaultIfEmpty()
-                group new { cls, cli, clc } by cls.PO_ReceivingId into g
-                select new ChecklistParent
-                {
-                    PO_Summary_Id = g.Key,
-                    ChecklistString = g.Select(x => new ChecklistStringDTO
-                    {
-                        Checklist_Type = x.cls.Checlist_Type,
-                        Values = JsonConvert.DeserializeObject<List<string>>(x.cls.Value)
-                    }).ToList(),
-                    ChecklistInput = g.Select(x => new CheclistInputDTO
-                    {
-                        Checklist_Type = x.cli?.Checlist_Type,
-                        Parameter = x.cli?.Parameter,
-                        Value = x.cli?.Value
-                    }).Where(x => x != null).ToList(),
-                    ChecklistCompliants = g.Select(x => new ChecklistCompliantsDTO
-                    {
-                        Checklist_Type = x.clc?.Checklist_Type,
-                        Values = x.clc?.Values,
-                        IsCompliant = x.clc.IsCompliant
-                    }).Where(x => x != null).ToList()
-                };
-
-            return checklists.ToList();
-        }
-
         
-        public async Task<List<ChecklistParent>> GetAllChecklistbyPOSummaryId(int po_SummaryId)
-        {
-            var checkListStrings = await _context.CheckListStrings
-                .Where(x => x.PO_ReceivingId == po_SummaryId)
-                .ToListAsync();
-
-            var checklists = new List<ChecklistParent>();
-
-            foreach (var checkListString in checkListStrings)
-            {
-                var checklistParent = checklists.FirstOrDefault(c => c.PO_Summary_Id == checkListString.PO_ReceivingId);
-
-                if (checklistParent == null)
-                {
-                    checklistParent = new ChecklistParent
-                    {
-                        PO_Summary_Id = checkListString.PO_ReceivingId,
-                        ChecklistString = new List<ChecklistStringDTO>()
-                    };
-                    checklists.Add(checklistParent);
-                }
-                
-                var values = JsonConvert.DeserializeObject<List<string>>(checkListString.Value);
-                    var checklistDTO = new ChecklistStringDTO()
-                    {
-                        Checklist_Type = checkListString.Checlist_Type,
-                        Values = values
-                    };
-                    checklistParent.ChecklistString.Add(checklistDTO);
-            }
-            return checklists;
-        }
+        // public async Task<List<ChecklistParent>> GetAllChecklist()
+        // {
+        //     var checklistStrings = await _context.CheckListStrings.ToListAsync();
+        //     var checklistInputs = await _context.CheckListInput.ToListAsync();
+        //     var checklistComplaints = await _context.ChecklistForCompliant.ToListAsync();
+        //
+        //     var checklists = from cls in checklistStrings
+        //         join cli in checklistInputs on cls.PO_ReceivingId equals cli.PO_ReceivingId into cliGroup
+        //         join clc in checklistComplaints on cls.PO_ReceivingId equals clc.PO_ReceivingId into clcGroup
+        //         from cli in cliGroup.DefaultIfEmpty()
+        //         from clc in clcGroup.DefaultIfEmpty()
+        //         group new { cls, cli, clc } by cls.PO_ReceivingId into g
+        //         select new ChecklistParent
+        //         {
+        //             PO_Summary_Id = g.Key,
+        //             ChecklistString = g.Select(x => new ChecklistStringDTO
+        //             {
+        //                 Checklist_Type = x.cls.Checlist_Type,
+        //                 Values = JsonConvert.DeserializeObject<List<string>>(x.cls.Value)
+        //             }).ToList(),
+        //             ChecklistInput = g.Select(x => new CheclistInputDTO
+        //             {
+        //                 Checklist_Type = x.cli?.Checlist_Type,
+        //                 Parameter = x.cli?.Parameter,
+        //                 Value = x.cli?.Value
+        //             }).Where(x => x != null).ToList(),
+        //             ChecklistCompliants = g.Select(x => new ChecklistCompliantsDTO
+        //             {
+        //                 Checklist_Type = x.clc?.Checklist_Type,
+        //                 Values = x.clc?.Values,
+        //                 IsCompliant = x.clc.IsCompliant
+        //             }).Where(x => x != null).ToList()
+        //         };
+        //
+        //     return checklists.ToList();
+        // }
+        //
+        //
+        // public async Task<List<ChecklistParent>> GetAllChecklistbyPOSummaryId(int po_SummaryId)
+        // {
+        //     var checkListStrings = await _context.CheckListStrings
+        //         .Where(x => x.PO_ReceivingId == po_SummaryId)
+        //         .ToListAsync();
+        //
+        //     var checklists = new List<ChecklistParent>();
+        //
+        //     foreach (var checkListString in checkListStrings)
+        //     {
+        //         var checklistParent = checklists.FirstOrDefault(c => c.PO_Summary_Id == checkListString.PO_ReceivingId);
+        //
+        //         if (checklistParent == null)
+        //         {
+        //             checklistParent = new ChecklistParent
+        //             {
+        //                 PO_Summary_Id = checkListString.PO_ReceivingId,
+        //                 ChecklistString = new List<ChecklistStringDTO>()
+        //             };
+        //             checklists.Add(checklistParent);
+        //         }
+        //         
+        //         var values = JsonConvert.DeserializeObject<List<string>>(checkListString.Value);
+        //             var checklistDTO = new ChecklistStringDTO()
+        //             {
+        //                 Checklist_Type = checkListString.Checlist_Type,
+        //                 Values = values
+        //             };
+        //             checklistParent.ChecklistString.Add(checklistDTO);
+        //     }
+        //     return checklists;
+        // }
     }
 }

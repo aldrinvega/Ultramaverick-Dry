@@ -14,12 +14,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
         
         public string Checlist_Type { get; set; }
 
-        [NotMapped]
-        public List<string> Values
-        {
-            get => JsonSerializer.Deserialize<List<string>>(Value);
-            set => Value = JsonSerializer.Serialize(value);
-        }
+        // [NotMapped]
+        // public List<string> Values
+        // {
+        //     get => JsonSerializer.Deserialize<List<string>>(Value);
+        //     set => Value = JsonSerializer.Serialize(value);
+        // }
         public string Value { get; set; }
     }
 }
