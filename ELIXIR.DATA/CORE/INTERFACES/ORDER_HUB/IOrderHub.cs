@@ -7,6 +7,5 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDER_HUB
     public interface IOrderHub
     {
         Task SetBeingPrepared(List<Ordering> moveList);
-        Task Refetch(string refetch);
     }
 }
