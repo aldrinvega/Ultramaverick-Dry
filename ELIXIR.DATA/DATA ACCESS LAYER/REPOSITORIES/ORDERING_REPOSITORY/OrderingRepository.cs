@@ -523,22 +523,24 @@ using System.Collections.Generic;
         }
         public async Task<IReadOnlyList<OrderDto>> GetOrdersForNotification()
         {
-            var orders = _context.Orders.OrderBy(x => x.OrderDate)
-                                    .GroupBy(x => new
-                                    {
-                                        x.FarmName,
-                                        x.IsActive,
-                                        x.PreparedDate,
-                                        x.AllocatedQuantity
-                                    }).Where(x => x.Key.IsActive == true)
-                                      .Where(x => x.Key.PreparedDate == null)
-                                      .Where(x => x.Key.AllocatedQuantity.HasValue)
-                                      .Select(x => new OrderDto
-                                      {
-                                          Farm = x.Key.FarmName,
-                                          IsActive = x.Key.IsActive
-                                      });
-
+            var orders = _context.Orders
+                .OrderBy(x => x.OrderDate)
+                .Where(x => x.IsActive == true)
+                .Where(x => x.PreparedDate == null)
+                .Where(x => x.AllocatedQuantity != null || x.QuantityOrdered != null)
+                .GroupBy(x => new
+                {
+                    x.FarmName,
+                    x.IsActive,
+                    x.PreparedDate,
+                    x.AllocatedQuantity,
+                    x.QuantityOrdered
+                })
+                .Select(x => new OrderDto
+                {
+                    Farm = x.Key.FarmName,
+                    IsActive = x.Key.IsActive
+                });
             return await orders.ToListAsync();
         }
         public async Task<bool> ValidateOrderAndDateNeeded(Ordering orders)
