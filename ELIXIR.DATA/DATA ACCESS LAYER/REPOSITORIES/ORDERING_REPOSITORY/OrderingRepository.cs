@@ -527,7 +527,7 @@ using System.Collections.Generic;
                 .OrderBy(x => x.OrderDate)
                 .Where(x => x.IsActive == true)
                 .Where(x => x.PreparedDate == null)
-                .Where(x => x.AllocatedQuantity != null || x.QuantityOrdered != null)
+                .Where(x => x.AllocatedQuantity != null && x.QuantityOrdered != null)
                 .GroupBy(x => new
                 {
                     x.FarmName,
