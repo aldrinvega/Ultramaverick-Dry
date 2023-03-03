@@ -394,17 +394,10 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                     uomCodeNotExist
                 };
 
-                if (duplicateList.Count == 0 && supplierNotExist.Count == 0 && itemcodeNotExist.Count == 0 && uomCodeNotExist.Count == 0)
-                {
-                    await _unitOfWork.CompleteAsync();
-                    return Ok("Successfully Add!");
-                }
-
-                else
-                {
-
-                    return BadRequest(resultList);
-                }
+                if (duplicateList.Count != 0 || supplierNotExist.Count != 0 || itemcodeNotExist.Count != 0 ||
+                    uomCodeNotExist.Count != 0) return BadRequest(resultList);
+                await _unitOfWork.CompleteAsync();
+                return Ok("Successfully Add!");
             }
             return new JsonResult("Something went Wrong!") { StatusCode = 500 };
         }
@@ -451,7 +444,6 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                     await _unitOfWork.Imports.AddNewRawMaterialSummary(items);
 
                 }
-
                 await _unitOfWork.CompleteAsync();
 
             }
@@ -478,8 +470,7 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
 
                     if (formulacode == items.TransformationFormulaId && rawmats == items.RawMaterialId)
                         return BadRequest("Import failed! There is duplicate data in your excel.");
-
-
+                    
                     if (formulacode != items.TransformationFormulaId && formulacode != 0)
                         return BadRequest("Import failed! Cannot import different formula code at the same time.");
 
@@ -503,7 +494,6 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
 
                     formulacode = items.TransformationFormulaId;
                     rawmats = items.RawMaterialId;
-
                 }
 
                 var validateQuantity = await _unitOfWork.Imports.GetFormulaCodeQuantity(transformId);

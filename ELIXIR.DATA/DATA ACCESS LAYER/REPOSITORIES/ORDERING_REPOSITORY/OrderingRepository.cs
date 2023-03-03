@@ -194,7 +194,7 @@ using System.Collections.Generic;
                               ordering.AllocatedQuantity,
                               ordering.IsActive,
                               ordering.IsPrepared,
-                              Reserve = warehouse.Reserve != null ? warehouse.Reserve : 0,
+                              Reserves = warehouse.Reserve
 
 
                               } into total
@@ -216,7 +216,7 @@ using System.Collections.Generic;
                               QuantityOrder = total.Key.AllocatedQuantity == null ? total.Key.QuantityOrdered : (decimal)total.Key.AllocatedQuantity,
                               IsActive = total.Key.IsActive,
                               IsPrepared = total.Key.IsPrepared,
-                              StockOnHand = total.Key.Reserve
+                              StockOnHand = total.Key.Reserves
                      //         Days = total.Key.DateNeeded.Subtract(datenow).Days                         
                           });
 
@@ -2329,7 +2329,7 @@ using System.Collections.Generic;
             //                      });
         
             var orders = (from ordering in _context.Orders
-                          where ordering.ItemCode == itemCode && ordering.PreparedDate == null && ordering.IsActive == true
+                          where ordering.ItemCode == itemCode && ordering.PreparedDate == null && ordering.IsActive == true && ordering.ForAllocation != null
                           join warehouse in getReserve
                           on ordering.ItemCode equals warehouse.ItemCode
                           into leftJ
@@ -2393,12 +2393,13 @@ using System.Collections.Generic;
                     x.IsApproved,
                     x.IsMove,
                     x.AllocatedQuantity,
-                    x.ForAllocation
+                    x.ForAllocation,
+                    x.PreparedDate
         
                 })
                 .Where(x => x.Key.IsActive == true)
-                .Where(x => x.Key.AllocatedQuantity == null)
-                .Where(x => x.Key.ForAllocation == true)
+                .Where(x => x.Key.PreparedDate == null)
+                .Where(x => x.Key.ForAllocation != null)
                 .Select(x => new OrderDto
                 {
                     ItemCode = x.Key.ItemCode,
