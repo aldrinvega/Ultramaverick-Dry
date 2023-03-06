@@ -807,6 +807,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             if (result)
             {
+                await _hub.Clients.All.SetBeingPrepared(orderNos);
                 return Ok();
             }
 
@@ -867,7 +868,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         }
         
         //Checklist
-
+        
         // [HttpGet("GetAllChecklistByPoSummaryId")]
         //
         // public async Task<IActionResult> GetAllChecklistByPoSummaryId()
