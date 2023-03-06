@@ -1853,7 +1853,7 @@ using System.Collections.Generic;
                   x.PreparedDate,
                   x.DeliveryStatus,
                   x.IsApprove,
-                  x.IsTransact,
+                  x.IsTransact
 
               }).Where(x => x.Key.IsApprove == true)
 
@@ -1875,7 +1875,7 @@ using System.Collections.Generic;
 
             return await orders.ToListAsync();
         }
-
+        
         public async Task<IReadOnlyList<MoveOrderDto>> GetForApprovalMoveOrderNotification()
         {
             var orders = _context.MoveOrders.Where(x => x.IsApproveReject == null)
@@ -2016,10 +2016,7 @@ using System.Collections.Generic;
            IsReject = x.Key.IsReject != null,
            Remarks = x.Key.Remarks
        });
-
             return await orders.ToListAsync();
-
-
         }
         
         //////// ALLOCATION OF ORDERS PER ORDER (ITEMS BASIS) //////////
@@ -2068,7 +2065,7 @@ using System.Collections.Generic;
        
        
        
-       public async Task<bool> AllocateOrdersPerItems(List<AllocationDTO> itemCodes)
+       public async Task<IEnumerable<AllocationResult>> AllocateOrdersPerItems(List<AllocationDTO> itemCodes)
        {
             // Get a list of orders that have an item code in the `itemCodes` list
             var orders = await _context.Orders.Where(x => x.IsActive == true)
@@ -2076,6 +2073,8 @@ using System.Collections.Generic;
                .Where(x => x.IsActive == true)
                .ToListAsync();
 
+            var results = new List<AllocationResult>();
+            
            foreach (var order in orders)
            {
                var issueOut = await _context.MiscellaneousIssueDetails
@@ -2114,54 +2113,36 @@ using System.Collections.Generic;
                    int allocatedStocks = (int)(order.QuantityOrdered/percentagetoallocate);
                    order.AllocatedQuantity = allocatedStocks;
                }
-
-               order.ForAllocation = null;
+               
+               results.Add(new AllocationResult
+               {
+                   AllocatedQuantity = order.AllocatedQuantity,
+                   CustomerName = order.CustomerName,
+                   OrderNo = order.OrderNo
+               });
            }
 
            // Save the changes to the database
            await _context.SaveChangesAsync();
+
+           return results;
+       }
+
+       public async Task<bool> ManualAllocationForOrders(List<ManualAllocation> manualAllocations)
+       {
+           var orders = manualAllocations.Select(x => x.OrderNoPKey);
+           var orderForAllocation = _context.Orders.Where(x => orders.Contains(x.OrderNoPKey) && x.IsActive);
+
+           foreach (var order in orderForAllocation)
+           {
+               var manualAllocation = manualAllocations.FirstOrDefault(x => x.OrderNoPKey == order.OrderNoPKey);
+               order.AllocatedQuantity = manualAllocation.QuantityOrdered;
+               order.ForAllocation = null;
+           }
+
+           await _context.SaveChangesAsync();
            return true;
        }
-       // public async Task<IReadOnlyList<OrderDto>> GetAllOrdersForAllocation()
-       // {
-       //
-       //     var orders = _context.Orders.GroupBy(x => new
-       //         {
-       //
-       //             x.OrderNoPKey,
-       //             x.ItemCode,
-       //             x.FarmName,
-       //             x.FarmCode,
-       //             x.FarmType,
-       //             x.PreparedDate,
-       //             x.IsApproved,
-       //             x.IsMove,
-       //             x.IsReject,
-       //             x.Remarks,
-       //             x.AllocatedQuantity
-       //         })
-       //         .Where(x => x.Key.IsApproved == true)
-       //         .Where(x => x.Key.PreparedDate != null)
-       //         .Where(x => x.Key.IsMove == false)
-       //         .Where(x => x.Key.AllocatedQuantity == null)
-       //
-       //
-       //         .Select(x => new OrderDto
-       //         {
-       //             Id = x.Key.OrderNoPKey,
-       //             ItemCode = x.Key.ItemCode,
-       //             Farm = x.Key.FarmName,
-       //             FarmCode = x.Key.FarmCode,
-       //             Category = x.Key.FarmType,
-       //             TotalOrders = x.Sum(x => x.QuantityOrdered),
-       //             PreparedDate = x.Key.PreparedDate.ToString(),
-       //             IsMove = x.Key.IsMove,
-       //             IsReject = x.Key.IsReject != null,
-       //             Remarks = x.Key.Remarks
-       //         });
-       //
-       //     return await orders.ToListAsync();
-       // }
        public async Task<PagedList<OrderDto>> GetAllListofOrdersForAllocationPagination(UserParams userParams)
        {
      
@@ -2185,9 +2166,7 @@ using System.Collections.Generic;
             
            return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
        }
-       
-       
-        public async Task<IReadOnlyList<OrderDto>> GetAllListofOrdersAllocation(string itemCode)
+       public async Task<IReadOnlyList<OrderDto>> GetAllListofOrdersAllocation(string itemCode)
         {
             var datenow = DateTime.Now;
         
@@ -2215,9 +2194,7 @@ using System.Collections.Generic;
              ItemCode = x.Key.ItemCode,
              QuantityOrdered = x.Sum(x => x.QuantityOrdered)
          });
-        
-        
-        
+            
             var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)
            .GroupBy(x => new
            {
@@ -2411,7 +2388,6 @@ using System.Collections.Generic;
             return await orders.ToListAsync();
         
         }
-        
         public async Task<bool> CancelForPendingAllocation(string customer)
         {
             var existing = await _context.Orders.Where(x => x.CustomerName == customer)
@@ -2423,6 +2399,5 @@ using System.Collections.Generic;
         
             return true;
         }
-
     }
 }
