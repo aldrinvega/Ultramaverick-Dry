@@ -2061,7 +2061,7 @@ using System.Collections.Generic;
        {
             // Get a list of orders that have an item code in the `itemCodes` list
             var orders = await _context.Orders.Where(x => x.IsActive == true)
-               .Where(x => itemCodes.Select(y => y.ItemCode).Contains(x.ItemCode))
+               .Where(x => itemCodes.Select(y => y.CustomerName + y.ItemCode + y.OrderNo).Contains(x.ItemCode))
                .Where(x => x.IsActive == true)
                .ToListAsync();
 
