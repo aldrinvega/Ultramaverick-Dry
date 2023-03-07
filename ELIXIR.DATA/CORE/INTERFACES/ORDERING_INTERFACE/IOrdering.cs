@@ -99,12 +99,13 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         
         
         //==========Allocation=========//
-        Task<bool> AllocateOrdersPerItems(List<AllocationDTO> itemCodes);
+        Task<IEnumerable<AllocationResult>> AllocateOrdersPerItems(List<AllocationDTO> itemCodes);
         // Task<IReadOnlyList<OrderDto>> GetAllOrdersForAllocation();
         Task<PagedList<OrderDto>> GetAllListofOrdersForAllocationPagination(UserParams userParams);
         Task<IReadOnlyList<OrderDto>> GetAllListofOrdersAllocation(string itemCode);
         Task<IReadOnlyList<OrderDto>> GetForAllocationOrdersForNotification();
         Task<bool> ValidateIfForAllocation(List<Ordering> orders);
         Task<bool> CancelForPendingAllocation(string customer);
+        Task<bool> ManualAllocationForOrders(List<ManualAllocation> manualAllocations);
     }
 }

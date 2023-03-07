@@ -807,6 +807,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             if (result)
             {
+                await _hub.Clients.All.SetBeingPrepared(orderNos);
                 return Ok();
             }
 
@@ -816,9 +817,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         //========Allocation========//
 
         [HttpPut("Allocate")]
-        public async Task<bool> AllocateOrderPerItem([FromBody] List<AllocationDTO> itemCode)
+        public async Task<IActionResult> AllocateOrderPerItem([FromBody] List<AllocationDTO> itemCode)
         {
-            return await _unitOfWork.Order.AllocateOrdersPerItems(itemCode);
+            var orders = await _unitOfWork.Order.AllocateOrdersPerItems(itemCode);
+            return Ok(orders);
         }
         [HttpGet]
         [Route("GetAllListOfOrdersForAllocationPagination")]
@@ -866,7 +868,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         }
         
         //Checklist
-
+        
         // [HttpGet("GetAllChecklistByPoSummaryId")]
         //
         // public async Task<IActionResult> GetAllChecklistByPoSummaryId()
@@ -877,6 +879,16 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         //         return BadRequest("No Checklist Found");
         //     return Ok(checklist);
         // }
+
+        [HttpPut("ManualAllocation")]
+
+        public async Task<IActionResult> ManualAllocateOrders(List<ManualAllocation> order)
+        {
+            var isSuccess = await _unitOfWork.Order.ManualAllocationForOrders(order);
+            if(isSuccess)
+                return Ok();
+            return new JsonResult("Something Wrong");
+        }
 
     }
 }
