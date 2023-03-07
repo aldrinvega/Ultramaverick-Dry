@@ -422,11 +422,7 @@ using System.Collections.Generic;
                               IsApproved = total.Key.IsApproved != null
 
                           });
-
             return await orders.ToListAsync();
-
-
-
         }
         public async Task<bool> AddNewOrders(Ordering orders)
         {
@@ -2177,9 +2173,9 @@ using System.Collections.Generic;
                        : 0
                })
                .OrderBy(x => x.ItemCode)
-               .AsQueryable();
+               .ToList();
            
-           return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
+           return await PagedList<OrderDto>.CreateAsync(orders.AsQueryable(), userParams.PageNumber, userParams.PageSize);
        }
        public async Task<IReadOnlyList<OrderDto>> GetAllListofOrdersAllocation(string itemCode)
         {
