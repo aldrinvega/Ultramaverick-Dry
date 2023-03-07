@@ -2149,7 +2149,7 @@ using System.Collections.Generic;
                 }).Where(x => x.Key.IsActive == true)
                 .Where(x => x.Key.PreparedDate == null)
                 .Where(x => x.Key.AllocatedQuantity == null)
-                .Where(x => x.Key.ForAllocation == null)
+                .Where(x => x.Key.ForAllocation != null)
                 .Select(x => new OrderDto
                 {
                     ItemCode = x.Key.ItemCode,
