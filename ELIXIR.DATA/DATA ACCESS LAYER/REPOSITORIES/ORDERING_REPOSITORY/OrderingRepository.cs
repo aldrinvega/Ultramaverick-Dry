@@ -616,13 +616,9 @@ using System.Collections.Generic;
                 PreparedDate = x.PreparedDate.ToString(),
                 CancelDate = x.CancelDate.ToString(),
                 CancelBy = x.IsCancelBy
-
-
             });
 
             return await cancelled.ToListAsync();
-
-
         }
         public async Task<bool> ReturnCancellOrdersInList(Ordering orders)
         {
@@ -676,8 +672,6 @@ using System.Collections.Generic;
                 x.IsApproved,
                 x.IsActive,
                 x.AllocatedQuantity
-                
-
             }).Where(x => x.Key.IsApproved == null)
               .Where(x => x.Key.PreparedDate != null)
               .Where(x => x.Key.IsActive == true)
@@ -2139,31 +2133,52 @@ using System.Collections.Generic;
                order.AllocatedQuantity = manualAllocation.QuantityOrdered;
                order.ForAllocation = null;
            }
-
            await _context.SaveChangesAsync();
            return true;
        }
        public async Task<PagedList<OrderDto>> GetAllListofOrdersForAllocationPagination(UserParams userParams)
        {
-     
-           var orders = _context.Orders.OrderBy(x => x.OrderDate)              
-               .GroupBy(x => new
+           var stocks = await _context.WarehouseReceived
+               .Where(x => x.IsActive)
+               .GroupBy(x => x.ItemCode)
+               .Select(g => new
                {
-                   x.ItemCode,
-                   x.IsActive,
-                   x.PreparedDate,
-                   x.ForAllocation,
-                  
+                   ItemCode = g.Key,
+                   ReceivedStocks = g.Sum(x => x.ActualGood)
+               })
+               .ToListAsync();
 
-               }).Where(x => x.Key.IsActive == true)
-               .Where(x => x.Key.PreparedDate == null)
-               .Where(x => x.Key.ForAllocation != null)
-               .Select(x => new OrderDto
+           var issues = await _context.MiscellaneousIssueDetails
+               .Where(x => x.IsActive)
+               .GroupBy(x => x.ItemCode)
+               .Select(g => new
                {
-                   ItemCode = x.Key.ItemCode,
-                   IsActive = x.Key.IsActive
-               });
-            
+                   ItemCode = g.Key,
+                   IssuedStocks = g.Sum(x => x.Quantity)
+               })
+               .ToListAsync();
+
+           var totalStocks = stocks.Join(
+               issues,
+               s => s.ItemCode,
+               i => i.ItemCode,
+               (s, i) => new { ItemCode = s.ItemCode, TotalStocks = s.ReceivedStocks - i.IssuedStocks }
+           ).Select(x => new { x.ItemCode, x.TotalStocks }).ToList();
+
+           var orders = _context.Orders
+               .Where(x => x.IsActive && x.PreparedDate == null && x.ForAllocation != null)
+               .GroupBy(x => x.ItemCode)
+               .Select(g => new OrderDto
+               {
+                   ItemCode = g.Key,
+                   IsActive = true,
+                   StockOnHand = totalStocks.FirstOrDefault(x => x.ItemCode == g.Key) != null
+                       ? totalStocks.FirstOrDefault(x => x.ItemCode == g.Key).TotalStocks
+                       : 0
+               })
+               .OrderBy(x => x.ItemCode)
+               .AsQueryable();
+           
            return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
        }
        public async Task<IReadOnlyList<OrderDto>> GetAllListofOrdersAllocation(string itemCode)
@@ -2278,7 +2293,7 @@ using System.Collections.Generic;
             //                      by new 
             //                      {
         
-            //            //              totalIn.Id,
+            //            //            totalIn.Id,
             //                          totalIn.ItemCode,
             //                          totalIn.ItemDescription,
             //                          totalIn.ManufacturingDate,
