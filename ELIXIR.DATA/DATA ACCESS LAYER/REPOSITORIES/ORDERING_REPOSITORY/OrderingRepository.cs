@@ -117,6 +117,8 @@ using System.Collections.Generic;
                                             total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
                                             total.Sum(x => x.issue.Quantity == null ? 0 : x.issue.Quantity))
                               });
+
+    
             //var totalRemaining = (from totalIn in _context.WarehouseReceived
             //                      where totalIn.IsActive == true
             //                      join totalOut in totalout
