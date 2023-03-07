@@ -2176,7 +2176,6 @@ using System.Collections.Generic;
                })
                .OrderBy(x => x.ItemCode)
                .ToList();
-           
            return await PagedList<OrderDto>.CreateAsync(orders.AsQueryable(), userParams.PageNumber, userParams.PageSize);
        }
        public async Task<IReadOnlyList<OrderDto>> GetAllListofOrdersAllocation(string itemCode)
