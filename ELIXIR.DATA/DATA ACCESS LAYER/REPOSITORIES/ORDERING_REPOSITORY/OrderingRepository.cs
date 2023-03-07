@@ -2136,18 +2136,20 @@ using System.Collections.Generic;
        }
       public async Task<PagedList<OrderDto>> GetAllListofOrdersForAllocationPagination(UserParams userParams)
         {
+            
             var orders = _context.Orders.OrderBy(x => x.OrderDate)              
                 .GroupBy(x => new
                 {
                     x.ItemCode,
                     x.IsActive,
                     x.PreparedDate,
-                    x.AllocatedQuantity
+                    x.AllocatedQuantity,
+                    x.ForAllocation
 
                 }).Where(x => x.Key.IsActive == true)
                 .Where(x => x.Key.PreparedDate == null)
                 .Where(x => x.Key.AllocatedQuantity == null)
-
+                .Where(x => x.Key.ForAllocation == null)
                 .Select(x => new OrderDto
                 {
                     ItemCode = x.Key.ItemCode,
@@ -2156,7 +2158,6 @@ using System.Collections.Generic;
             
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
-      
       public async Task<IReadOnlyList<OrderDto>> GetAllListofOrdersAllocation(string itemCode)
         {
             var datenow = DateTime.Now;
