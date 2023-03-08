@@ -2114,11 +2114,11 @@ using System.Collections.Generic;
        public async Task<bool> ManualAllocationForOrders(List<ManualAllocation> manualAllocations)
        {
            var orders = manualAllocations.Select(x => x.Id);
-           var orderForAllocation = _context.Orders.Where(x => orders.Contains(x.Id) && x.IsActive);
+           var orderForAllocation = _context.Orders.Where(x => orders.Contains(x.OrderNoPKey) && x.IsActive);
 
            foreach (var order in orderForAllocation)
            {
-               var manualAllocation = manualAllocations.FirstOrDefault(x => x.Id == order.Id);
+               var manualAllocation = manualAllocations.FirstOrDefault(x => x.Id == order.OrderNoPKey);
                order.AllocatedQuantity = manualAllocation.QuantityOrdered;
                order.ForAllocation = null;
            }
