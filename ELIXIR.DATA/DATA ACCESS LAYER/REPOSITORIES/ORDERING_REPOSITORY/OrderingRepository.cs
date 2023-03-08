@@ -1599,8 +1599,7 @@ using System.Collections.Generic;
         }
         public async Task<ItemStocks> GetFirstExpiry(string itemcode)
         {
-            var getWarehouseIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
-                                                           .GroupBy(x => new
+            var getWarehouseIn = _context.WarehouseReceived.Where(x => x.IsActive == true).GroupBy(x => new
           {
               x.Id,
               x.ItemCode,
@@ -1615,8 +1614,7 @@ using System.Collections.Generic;
               
           });
 
-            var getTransformationPreparation = _context.Transformation_Preparation.Where(x => x.IsActive == true)
-                                                                                  .GroupBy(x => new
+            var getTransformationPreparation = _context.Transformation_Preparation.Where(x => x.IsActive == true).GroupBy(x => new
             {
                 x.ItemCode,
                 x.WarehouseId,
@@ -1628,8 +1626,7 @@ using System.Collections.Generic;
                 WarehouseId = x.Key.WarehouseId
             });
 
-            var getMoveorder = _context.MoveOrders.Where(x => x.IsActive == true)
-                                                  .GroupBy(x => new
+            var getMoveorder = _context.MoveOrders.Where(x => x.IsActive == true).GroupBy(x => new
             {
                 x.ItemCode,
                 x.WarehouseId,
@@ -1785,15 +1782,12 @@ using System.Collections.Generic;
                 IsApprove = x.IsApprove != null
             });
 
-            return await orders.Where(x => x.OrderNo == orderid)
-                               .ToListAsync();
+            return await orders.Where(x => x.OrderNo == orderid).ToListAsync();
         }
         public async Task<bool> TransanctListOfMoveOrders(TransactMoveOrder transact)
         {
-
-            var existing = await _context.MoveOrders.Where(x => x.OrderNo == transact.OrderNo)
-                                                    .ToListAsync();
-
+            var existing = await _context.MoveOrders.Where(x => x.OrderNo == transact.OrderNo).ToListAsync();
+            
             await _context.TransactMoveOrder.AddAsync(transact);
 
 
@@ -2057,11 +2051,11 @@ using System.Collections.Generic;
        
        
        
-       public async Task<IEnumerable<AllocationResult>> AllocateOrdersPerItems(List<AllocationDTO> itemCodes)
+       public async Task<IReadOnlyList<AllocationResult>> AllocateOrdersPerItems(List<AllocationDTO> itemCodes)
        {
             // Get a list of orders that have an item code in the `itemCodes` list
             var orders = await _context.Orders.Where(x => x.IsActive == true)
-               .Where(x => itemCodes.Select(y => y.CustomerName + y.ItemCode + y.OrderNo).Contains(x.ItemCode))
+               .Where(x => itemCodes.Select(y =>y.ItemCode).Contains(x.ItemCode))
                .Where(x => x.IsActive == true)
                .ToListAsync();
 
@@ -2109,25 +2103,22 @@ using System.Collections.Generic;
                results.Add(new AllocationResult
                {
                    AllocatedQuantity = order.AllocatedQuantity,
-                   CustomerName = order.CustomerName,
+                   CustomerName = order.FarmName,
                    OrderNo = order.OrderNo
                });
            }
-
-           // Save the changes to the database
-           await _context.SaveChangesAsync();
-
+           
            return results;
        }
 
        public async Task<bool> ManualAllocationForOrders(List<ManualAllocation> manualAllocations)
        {
-           var orders = manualAllocations.Select(x => x.OrderNoPKey);
-           var orderForAllocation = _context.Orders.Where(x => orders.Contains(x.OrderNoPKey) && x.IsActive);
+           var orders = manualAllocations.Select(x => x.Id);
+           var orderForAllocation = _context.Orders.Where(x => orders.Contains(x.Id) && x.IsActive);
 
            foreach (var order in orderForAllocation)
            {
-               var manualAllocation = manualAllocations.FirstOrDefault(x => x.OrderNoPKey == order.OrderNoPKey);
+               var manualAllocation = manualAllocations.FirstOrDefault(x => x.Id == order.Id);
                order.AllocatedQuantity = manualAllocation.QuantityOrdered;
                order.ForAllocation = null;
            }

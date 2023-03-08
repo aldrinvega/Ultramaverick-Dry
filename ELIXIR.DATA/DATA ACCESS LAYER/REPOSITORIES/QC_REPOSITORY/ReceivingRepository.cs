@@ -778,7 +778,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                             join receive in _context.QC_Receiving on posummary.Id equals receive.PO_Summary_Id into leftJ
                             from receive in leftJ.DefaultIfEmpty()
 
-    
                             select new CancelledPoDto
                             {
                                 Id = posummary.Id,
