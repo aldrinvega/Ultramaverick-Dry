@@ -886,8 +886,9 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         public async Task<IActionResult> ManualAllocateOrders(List<ManualAllocation> order)
         {
             var isSuccess = await _unitOfWork.Order.ManualAllocationForOrders(order);
+            await _unitOfWork.CompleteAsync();
             if(isSuccess)
-                return Ok();
+                return Ok("Manual Allocation Complete");
             return new JsonResult("Something Wrong");
         }
 

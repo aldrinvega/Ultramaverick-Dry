@@ -2113,16 +2113,17 @@ using System.Collections.Generic;
 
        public async Task<bool> ManualAllocationForOrders(List<ManualAllocation> manualAllocations)
        {
-           var orders = manualAllocations.Select(x => x.Id);
-           var orderForAllocation = _context.Orders.Where(x => orders.Contains(x.OrderNoPKey) && x.IsActive);
+           var orders = await _context.Orders.Where(x => x.IsActive == true)
+               .Where(x => manualAllocations.Select(y =>y.Id).Contains(x.OrderNo))
+               .Where(x => x.IsActive == true)
+               .ToListAsync();
 
-           foreach (var order in orderForAllocation)
+           foreach (var order in orders)
            {
-               var manualAllocation = manualAllocations.FirstOrDefault(x => x.Id == order.OrderNoPKey);
+               var manualAllocation = manualAllocations.FirstOrDefault(x => x.Id == order.OrderNo);
                order.AllocatedQuantity = manualAllocation.QuantityOrdered;
                order.ForAllocation = null;
            }
-           await _context.SaveChangesAsync();
            return true;
        }
       public async Task<PagedList<OrderDto>> GetAllListofOrdersForAllocationPagination(UserParams userParams)
