@@ -757,8 +757,6 @@ using System.Collections.Generic;
 
             var orders = _context.Orders.GroupBy(x => new
             {
-
-                x.OrderNoPKey,
                 x.FarmName,
                 x.FarmCode,
                 x.PreparedDate,
@@ -775,7 +773,6 @@ using System.Collections.Generic;
               .Where(x => x.Key.IsMove == false)
               .Select(x => new OrderDto
             {
-                Id = x.Key.OrderNoPKey,
                 Farm = x.Key.FarmName,
                 FarmCode = x.Key.FarmCode,
                 QuantityOrder = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
