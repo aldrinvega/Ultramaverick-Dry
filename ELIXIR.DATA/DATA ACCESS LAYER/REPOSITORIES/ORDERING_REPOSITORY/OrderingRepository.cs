@@ -743,6 +743,7 @@ using System.Collections.Generic;
                     Farm = x.Key.FarmName,
                     IsActive = x.Key.IsActive,
                     IsApproved = x.Key.IsApproved != null,
+                    IsBeingPrepared = x.Key.IsBeingPrepared != null,
                     SetBy = x.Key.SetBy
                 });
 
