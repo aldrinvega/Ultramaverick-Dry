@@ -649,8 +649,6 @@ using System.Collections.Generic;
                 QuantityOrder = x.AllocatedQuantity == null ? x.QuantityOrdered : (decimal)x.AllocatedQuantity
 
             });
-
-
             return await orders.Where(x => x.Farm == farm)
                                .ToListAsync();
 
@@ -663,7 +661,6 @@ using System.Collections.Generic;
                 x.FarmName,
                 x.FarmCode,
                 x.FarmType,
-     //           x.OrderDate,
                 x.PreparedDate,
                 x.IsApproved,
                 x.IsActive,
@@ -678,7 +675,6 @@ using System.Collections.Generic;
                    FarmCode = x.Key.FarmCode,
                    Category = x.Key.FarmType,
                    TotalAllocatedOrder = x.Key.AllocatedQuantity == null ? (int)x.Sum(x => x.QuantityOrdered) : (int)x.Sum(x => x.AllocatedQuantity),
-              //     OrderDate = x.Key.OrderDate.ToString("MM/dd/yyyy"),
                    PreparedDate = x.Key.PreparedDate.ToString()
                });
 
@@ -737,6 +733,7 @@ using System.Collections.Generic;
                     x.IsApproved,
                     x.IsMove,
                     x.IsBeingPrepared,
+                    x.SetBy
                     
                 }).Where(x => x.Key.IsActive == true)
                 .Where(x => x.Key.IsApproved == true)
@@ -745,7 +742,8 @@ using System.Collections.Generic;
                 {
                     Farm = x.Key.FarmName,
                     IsActive = x.Key.IsActive,
-                    IsApproved = x.Key.IsApproved != null
+                    IsApproved = x.Key.IsApproved != null,
+                    SetBy = x.Key.SetBy
                 });
 
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
@@ -755,7 +753,6 @@ using System.Collections.Generic;
 
             var orders = _context.Orders.GroupBy(x => new
             {
-
                 x.OrderNoPKey,
                 x.FarmName,
                 x.FarmCode,
@@ -1040,7 +1037,6 @@ using System.Collections.Generic;
 
                                   group totalOut by new
                                   {
-
                                       totalIn.Id,
                                       totalIn.ItemCode,
                                       totalIn.ItemDescription,
@@ -1048,7 +1044,6 @@ using System.Collections.Generic;
                                       totalIn.Expiration,
                                       totalIn.ActualGood,
                                       totalIn.ExpirationDays
-                          
                                   } into total
 
                                   orderby total.Key.ExpirationDays ascending
