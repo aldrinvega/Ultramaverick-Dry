@@ -731,8 +731,10 @@ using System.Collections.Generic;
                     x.FarmName,
                     x.IsActive,
                     x.IsApproved,
-                    x.IsMove
-                    
+                    x.IsMove,
+                    x.IsBeingPrepared,
+                    x.SetBy
+
                 }).Where(x => x.Key.IsActive == true)
                 .Where(x => x.Key.IsApproved == true)
                 .Where(x => x.Key.IsMove == false)
@@ -740,8 +742,10 @@ using System.Collections.Generic;
                 {
                     Farm = x.Key.FarmName,
                     IsActive = x.Key.IsActive,
-                    IsApproved = x.Key.IsApproved != null
-                });
+                    IsApproved = x.Key.IsApproved != null,
+                    IsBeingPrepared = x.Key.IsBeingPrepared != null
+                }).OrderBy(X => X.IsBeingPrepared)
+                .ThenByDescending(x => x.IsBeingPrepared);
 
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
