@@ -595,6 +595,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  IsActive = posummary.IsActive,
                                  IsQcReceiveIsActive = receive != null && receive.IsActive != false ? receive.IsActive : true,
                                  ActualRemaining = 0,
+                                 TotalReject = (int)receive.TotalReject
+                                 
 
                              }).GroupBy(x => new
                              {
@@ -609,7 +611,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  x.Supplier,
                                  x.QuantityOrdered,
                                  x.IsActive,
-                                 x.IsQcReceiveIsActive
+                                 x.IsQcReceiveIsActive,
+                                 x.TotalReject
                              })
                                                     .Select(receive => new PoSummaryChecklistDto
                                                     {
@@ -624,7 +627,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                                         Supplier = receive.Key.Supplier,
                                                         QuantityOrdered = receive.Key.QuantityOrdered,
                                                         ActualGood = receive.Sum(x => x.ActualGood),
-                                                        ActualRemaining = receive.Key.QuantityOrdered - (receive.Sum(x => x.ActualGood)),
+                                                        ActualRemaining = receive.Key.QuantityOrdered - (receive.Sum(x => x.ActualGood)) + receive.Key.TotalReject ,
                                                         IsActive = receive.Key.IsActive,
                                                         IsQcReceiveIsActive = receive.Key.IsQcReceiveIsActive
 
@@ -661,6 +664,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  IsActive = posummary.IsActive,
                                  IsQcReceiveIsActive = receive != null && receive.IsActive != false ? receive.IsActive : true,
                                  ActualRemaining = 0,
+                                 TotalReject = (int)receive.TotalReject
 
                              }).GroupBy(x => new
                              {
@@ -675,7 +679,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  x.Supplier,
                                  x.QuantityOrdered,
                                  x.IsActive,
-                                 x.IsQcReceiveIsActive
+                                 x.IsQcReceiveIsActive,
+                                 x.TotalReject
                              })
                                                     .Select(receive => new PoSummaryChecklistDto
                                                     {
@@ -690,7 +695,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                                         Supplier = receive.Key.Supplier,
                                                         QuantityOrdered = receive.Key.QuantityOrdered,
                                                         ActualGood = receive.Sum(x => x.ActualGood),
-                                                        ActualRemaining = receive.Key.QuantityOrdered - (receive.Sum(x => x.ActualGood)),
+                                                        ActualRemaining = receive.Key.QuantityOrdered - (receive.Sum(x => x.ActualGood)) + receive.Key.TotalReject,
                                                         IsActive = receive.Key.IsActive,
                                                         IsQcReceiveIsActive = receive.Key.IsQcReceiveIsActive
 

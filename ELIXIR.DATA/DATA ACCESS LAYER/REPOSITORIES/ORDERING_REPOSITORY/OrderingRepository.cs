@@ -775,10 +775,7 @@ using System.Collections.Generic;
                 QuantityOrder = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
                 PreparedDate = x.Key.PreparedDate.ToString(),
                 IsMove = x.Key.IsMove,
-                IsReject = x.Key.IsReject != null,
-                // Remarks = x.Key.Remarks,
-                // SetBy = x.Key.SetBy,
-                // IsBeingPrepared = x.Key.IsBeingPrepared
+                IsReject = x.Key.IsReject != null
             });
 
             return await orders.ToListAsync();
@@ -1344,7 +1341,6 @@ using System.Collections.Generic;
                 Quantity = x.QuantityOrdered,
                 Expiration = x.ExpirationDate.ToString(),
                 DeliveryStatus = x.DeliveryStatus,
-
             });
 
             return await orders.Where(x => x.OrderNo == orderid)
@@ -1356,7 +1352,6 @@ using System.Collections.Generic;
         {
             var orders = _context.MoveOrders.GroupBy(x => new
                 {
-
                     x.OrderNo,
                     x.FarmName,
                     x.FarmCode,
@@ -1369,12 +1364,9 @@ using System.Collections.Generic;
                     x.ApproveDateTempo,
                     x.IsPrint,
                     x.IsTransact,
-
                 }).Where(x => x.Key.IsApprove == true)
                 .Where(x => x.Key.DeliveryStatus != null)
                 .Where(x => x.Key.IsReject != true)
-
-
                 .Select(x => new MoveOrderDto
                 {
                     OrderNo = x.Key.OrderNo,
@@ -1390,7 +1382,6 @@ using System.Collections.Generic;
                     IsPrint = x.Key.IsPrint != null,
                     IsTransact = x.Key.IsTransact,
                 });
-
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
 
@@ -1398,7 +1389,6 @@ using System.Collections.Generic;
         {
             var orders = _context.MoveOrders.GroupBy(x => new
             {
-
                 x.OrderNo,
                 x.FarmName,
                 x.FarmCode,
@@ -1411,7 +1401,6 @@ using System.Collections.Generic;
                 x.ApproveDateTempo,
                 x.IsPrint,
                 x.IsTransact,
-
             }).Where(x => x.Key.IsApprove == true)
               .Where(x => x.Key.DeliveryStatus != null)
               .Where(x => x.Key.IsReject != true)
@@ -1439,7 +1428,6 @@ using System.Collections.Generic;
         {
             var orders = _context.MoveOrders.GroupBy(x => new
             {
-
                 x.OrderNo,
                 x.FarmName,
                 x.FarmCode,
@@ -1452,7 +1440,6 @@ using System.Collections.Generic;
                 x.ApproveDateTempo,
                 x.IsPrint,
                 x.IsTransact,
-
             })
               .Where(x => x.Key.IsApprove == true)
               .Where(x => x.Key.DeliveryStatus != null)
@@ -1483,7 +1470,6 @@ using System.Collections.Generic;
             var orders = _context.MoveOrders.Where(x => x.IsApproveReject == true)
                 .GroupBy(x => new
             {
-
                 x.OrderNo,
                 x.FarmName,
                 x.FarmCode,
@@ -1495,7 +1481,6 @@ using System.Collections.Generic;
                 x.IsReject,
                 x.RejectedDateTempo,
                 x.Remarks,
-
             })
               .Where(x => x.Key.DeliveryStatus != null)
          
