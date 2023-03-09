@@ -196,7 +196,6 @@ using System.Collections.Generic;
                               ordering.AllocatedQuantity,
                               ordering.IsActive,
                               ordering.IsPrepared,
-                              ordering.SetBy,
                               Reserves = warehouse.Reserve
 
 
@@ -219,8 +218,7 @@ using System.Collections.Generic;
                               QuantityOrder = total.Key.AllocatedQuantity == null ? total.Key.QuantityOrdered : (decimal)total.Key.AllocatedQuantity,
                               IsActive = total.Key.IsActive,
                               IsPrepared = total.Key.IsPrepared,
-                              StockOnHand = total.Key.Reserves,
-                              SetBy = total.Key.SetBy
+                              StockOnHand = total.Key.Reserves
                           });
 
             return await orders.ToListAsync();
@@ -761,7 +759,8 @@ using System.Collections.Generic;
                 x.IsReject,
                 x.Remarks,
                 x.AllocatedQuantity,
-                x.QuantityOrdered
+                x.QuantityOrdered,
+                x.SetBy
                 
             }).Where(x => x.Key.FarmName == farm)
               .Where(x => x.Key.IsApproved == true)
@@ -776,7 +775,8 @@ using System.Collections.Generic;
                 PreparedDate = x.Key.PreparedDate.ToString(),
                 IsMove = x.Key.IsMove,
                 IsReject = x.Key.IsReject != null,
-                Remarks = x.Key.Remarks
+                Remarks = x.Key.Remarks,
+                SetBy = x.Key.SetBy
             });
 
             return await orders.ToListAsync();
