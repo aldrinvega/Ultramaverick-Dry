@@ -627,7 +627,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                                         Supplier = receive.Key.Supplier,
                                                         QuantityOrdered = receive.Key.QuantityOrdered,
                                                         ActualGood = receive.Sum(x => x.ActualGood),
-                                                        ActualRemaining = receive.Key.QuantityOrdered - (receive.Sum(x => x.ActualGood) + receive.Sum(x => x.TotalReject)),
+                                                        ActualRemaining = receive.Key.QuantityOrdered - (receive.Sum(x => x.ActualGood) + receive.Key.TotalReject),
                                                         IsActive = receive.Key.IsActive,
                                                         IsQcReceiveIsActive = receive.Key.IsQcReceiveIsActive
 
@@ -695,7 +695,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                                         Supplier = receive.Key.Supplier,
                                                         QuantityOrdered = receive.Key.QuantityOrdered,
                                                         ActualGood = receive.Sum(x => x.ActualGood),
-                                                        ActualRemaining = receive.Key.QuantityOrdered - (receive.Sum(x => x.ActualGood) + receive.Sum(x => x.TotalReject)),
+                                                        ActualRemaining = receive.Key.QuantityOrdered - (receive.Sum(x => x.ActualGood) + receive.Key.TotalReject),
                                                         IsActive = receive.Key.IsActive,
                                                         IsQcReceiveIsActive = receive.Key.IsQcReceiveIsActive
 
