@@ -766,7 +766,7 @@ using System.Collections.Generic;
                 x.Remarks,
                 x.AllocatedQuantity,
                 x.QuantityOrdered
-
+                
             }).Where(x => x.Key.FarmName == farm)
               .Where(x => x.Key.IsApproved == true)
               .Where(x => x.Key.PreparedDate != null)
