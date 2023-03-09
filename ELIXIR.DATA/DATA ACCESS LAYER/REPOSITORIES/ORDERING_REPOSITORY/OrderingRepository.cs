@@ -749,6 +749,7 @@ using System.Collections.Generic;
                     Farm = x.Key.FarmName,
                     IsActive = x.Key.IsActive,
                     IsApproved = x.Key.IsApproved != null,
+                    IsBeingPrepared = x.Key.IsBeingPrepared != null,
                     SetBy = x.Key.SetBy
                 });
 
@@ -1683,8 +1684,7 @@ using System.Collections.Generic;
         {
             foreach (var moveOrder in moveOrders)
             {
-                var existingOrder = await _context.Orders.Where(x => x.IsBeingPrepared == null)
-                    .Where(x => x.OrderNoPKey == moveOrder.OrderNoPKey)
+                var existingOrder = await _context.Orders.Where(x => x.OrderNoPKey == moveOrder.OrderNoPKey)
                     .FirstOrDefaultAsync();
                     
                 if (existingOrder == null)
