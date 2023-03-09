@@ -731,9 +731,7 @@ using System.Collections.Generic;
                     x.FarmName,
                     x.IsActive,
                     x.IsApproved,
-                    x.IsMove,
-                    x.IsBeingPrepared,
-                    x.SetBy
+                    x.IsMove
                     
                 }).Where(x => x.Key.IsActive == true)
                 .Where(x => x.Key.IsApproved == true)
@@ -742,9 +740,7 @@ using System.Collections.Generic;
                 {
                     Farm = x.Key.FarmName,
                     IsActive = x.Key.IsActive,
-                    IsApproved = x.Key.IsApproved != null,
-                    IsBeingPrepared = x.Key.IsBeingPrepared != null,
-                    SetBy = x.Key.SetBy
+                    IsApproved = x.Key.IsApproved != null
                 });
 
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
@@ -1222,8 +1218,7 @@ using System.Collections.Generic;
         {
             var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
                                                     .ToListAsync();
-
-
+            
             var existingOrders = await _context.Orders.Where(x => x.OrderNoPKey == moveorder.OrderNo)
                                                       .ToListAsync();
 
@@ -1245,11 +1240,8 @@ using System.Collections.Generic;
                 items.IsReject = null;
                 items.RejectBy = null;
                 items.Remarks = moveorder.Remarks;
-
             }
-
             return true;
-
         }
         public async Task<PagedList<MoveOrderDto>> ForApprovalMoveOrderPagination(UserParams userParams)
 
@@ -1271,9 +1263,7 @@ using System.Collections.Generic;
             }).Where(x => x.Key.IsApprove != true)
               .Where(x => x.Key.DeliveryStatus != null)
               .Where(x => x.Key.IsPrepared == true)
- 
-
-           .Select(x => new MoveOrderDto
+                .Select(x => new MoveOrderDto
            {
                OrderNo = x.Key.OrderNo,
                FarmName = x.Key.FarmName,
@@ -1283,7 +1273,6 @@ using System.Collections.Generic;
                OrderDate = x.Key.OrderDate.ToString(),
                PreparedDate = x.Key.PreparedDate.ToString(),
                DeliveryStatus = x.Key.DeliveryStatus,
-
            });
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
