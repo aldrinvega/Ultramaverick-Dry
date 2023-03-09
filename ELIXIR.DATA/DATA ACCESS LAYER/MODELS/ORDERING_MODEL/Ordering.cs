@@ -194,11 +194,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
             set;
         }
 
-        public bool IsBeingPrepared
+        public bool? IsBeingPrepared
         {
             get;
             set;
-        } = false;
+        }
 
         public string? SetBy
         {

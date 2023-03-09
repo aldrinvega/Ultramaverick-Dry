@@ -219,7 +219,6 @@ using System.Collections.Generic;
                               IsActive = total.Key.IsActive,
                               IsPrepared = total.Key.IsPrepared,
                               StockOnHand = total.Key.Reserves
-                     //         Days = total.Key.DateNeeded.Subtract(datenow).Days                         
                           });
 
             return await orders.ToListAsync();
@@ -257,7 +256,6 @@ using System.Collections.Generic;
             {
 
                 Id = x.Id,
-
                 FarmCode = x.FarmCode,
                 Category = x.Category,
                 QuantityOrder = x.AllocatedQuantity == null ? x.QuantityOrdered : (decimal)x.AllocatedQuantity,
@@ -749,7 +747,6 @@ using System.Collections.Generic;
                     Farm = x.Key.FarmName,
                     IsActive = x.Key.IsActive,
                     IsApproved = x.Key.IsApproved != null,
-                    IsBeingPrepared = x.Key.IsBeingPrepared != null,
                     SetBy = x.Key.SetBy
                 });
 
@@ -1344,7 +1341,7 @@ using System.Collections.Generic;
         {
             var orders = _context.MoveOrders.Where(x => x.IsActive == true)
                 .Select(x => new MoveOrderDto
-            {
+            {  
 
                 Id = x.Id,
                 OrderNo = x.OrderNo,
@@ -1685,6 +1682,7 @@ using System.Collections.Generic;
             foreach (var moveOrder in moveOrders)
             {
                 var existingOrder = await _context.Orders.Where(x => x.OrderNoPKey == moveOrder.OrderNoPKey)
+                    .Where(x => x.IsBeingPrepared == null || x.IsBeingPrepared == false)
                     .FirstOrDefaultAsync();
                     
                 if (existingOrder == null)
