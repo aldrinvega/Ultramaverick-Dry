@@ -29,11 +29,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("GetAllListofOrders")]
         public async Task<IActionResult> GetAllListofOrders([FromQuery] string farms)
         {
-
             var orders = await _unitOfWork.Order.GetAllListofOrders(farms);
-
             return Ok(orders);
-
         }
 
         [HttpPut]

@@ -155,7 +155,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                 Supplier = posummary.VendorName,
                                 UOM = posummary.UOM,
                                 QuantityOrdered = posummary.Ordered,
-                                ActualGood = (receive != null && receive.IsActive != false && receive.IsWareHouseReceive != false ? receive.Actual_Delivered : 0) - receive.TotalReject,
+                                ActualGood = (receive != null && receive.IsActive != false && receive.IsWareHouseReceive != false ? receive.Actual_Delivered : 0) + receive.TotalReject,
                                 IsActive = posummary.IsActive,
                                 IsQcReceiveIsActive = receive != null && receive.IsActive != false ? receive.IsActive : true,
                                 ActualRemaining = 0,
