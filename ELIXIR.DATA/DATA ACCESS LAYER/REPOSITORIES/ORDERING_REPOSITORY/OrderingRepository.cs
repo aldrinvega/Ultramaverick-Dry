@@ -744,8 +744,7 @@ using System.Collections.Generic;
                     IsActive = x.Key.IsActive,
                     IsApproved = x.Key.IsApproved != null,
                     IsBeingPrepared = x.Key.IsBeingPrepared != null
-                }).OrderBy(X => X.IsBeingPrepared)
-                .ThenByDescending(x => x.IsBeingPrepared);
+                });
 
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
