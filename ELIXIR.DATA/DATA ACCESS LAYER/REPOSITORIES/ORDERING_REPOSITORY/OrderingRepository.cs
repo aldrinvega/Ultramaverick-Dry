@@ -732,8 +732,7 @@ using System.Collections.Generic;
                     x.IsActive,
                     x.IsApproved,
                     x.IsMove,
-                    x.IsBeingPrepared,
-                    x.SetBy
+                    x.IsBeingPrepared
 
                 }).Where(x => x.Key.IsActive == true)
                 .Where(x => x.Key.IsApproved == true)
@@ -1345,7 +1344,7 @@ using System.Collections.Generic;
                                .ToListAsync();
 
         }
-        public async Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPagination(UserParams userParams)
+        public async Task<PagedList<MoveOrderDto>> Approvedination(UserParams userParams)
         {
             var orders = _context.MoveOrders.GroupBy(x => new
             {
@@ -1665,7 +1664,7 @@ using System.Collections.Generic;
         {
             foreach (var moveOrder in moveOrders)
             {
-                var existingOrder = await _context.Orders.Where(x => x.OrderNoPKey == moveOrder.OrderNoPKey)
+                var existingOrder = await _context.Orders.Where(x => x.OrderNo == moveOrder.OrderNo)
                     .Where(x => x.IsBeingPrepared == null || x.IsBeingPrepared == false)
                     .FirstOrDefaultAsync();
                     
@@ -1685,7 +1684,7 @@ using System.Collections.Generic;
             foreach (var orderNo in orderNos)
             {
                 var existingOrder = await _context.Orders.Where(x => x.IsBeingPrepared == true)
-                    .Where(x => x.OrderNoPKey == orderNo.OrderNoPKey)
+                    .Where(x => x.OrderNoPKey == orderNo.OrderNo)
                     .Where(x => x.SetBy == orderNo.SetBy)
                       .FirstOrDefaultAsync();
 
