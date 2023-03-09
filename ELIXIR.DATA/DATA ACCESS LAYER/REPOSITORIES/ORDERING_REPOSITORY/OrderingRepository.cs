@@ -773,6 +773,7 @@ using System.Collections.Generic;
               .Where(x => x.Key.IsMove == false)
               .Select(x => new OrderDto
             {
+                Id = x.Key.OrderNoPKey,
                 Farm = x.Key.FarmName,
                 FarmCode = x.Key.FarmCode,
                 QuantityOrder = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
@@ -846,7 +847,6 @@ using System.Collections.Generic;
                                       In = total.Key.ActualGood,
                                       Out = total.Sum(x => x.Out),
                                       Remaining = total.Key.ActualGood - total.Sum(x => x.Out)
-
                                   });
 
             var totalOrders = _context.Orders.GroupBy(x => new
@@ -860,7 +860,6 @@ using System.Collections.Generic;
                 ItemCode = x.Key.ItemCode,
                 TotalOrders = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
                 IsPrepared = x.Key.IsPrepared
-
             }).Where(x => x.IsPrepared == false);
 
 
@@ -875,7 +874,6 @@ using System.Collections.Generic;
 
                           group warehouse by new
                           {
-
                               ordering.Id,
                               ordering.OrderDate,
                               ordering.DateNeeded,
@@ -891,13 +889,10 @@ using System.Collections.Generic;
                               ordering.PreparedDate,
                               ordering.IsApproved,
                               ordering.AllocatedQuantity
-
-
                           } into total
 
                           select new OrderDto
                           {
-
                               Id = total.Key.Id,
                               OrderDate = total.Key.OrderDate.ToString("MM/dd/yyyy"),
                               DateNeeded = total.Key.DateNeeded.ToString("MM/dd/yyyy"),
