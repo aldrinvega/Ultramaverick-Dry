@@ -196,6 +196,7 @@ using System.Collections.Generic;
                               ordering.AllocatedQuantity,
                               ordering.IsActive,
                               ordering.IsPrepared,
+                              ordering.SetBy,
                               Reserves = warehouse.Reserve
 
 
@@ -218,7 +219,8 @@ using System.Collections.Generic;
                               QuantityOrder = total.Key.AllocatedQuantity == null ? total.Key.QuantityOrdered : (decimal)total.Key.AllocatedQuantity,
                               IsActive = total.Key.IsActive,
                               IsPrepared = total.Key.IsPrepared,
-                              StockOnHand = total.Key.Reserves
+                              StockOnHand = total.Key.Reserves,
+                              SetBy = total.Key.SetBy
                           });
 
             return await orders.ToListAsync();
