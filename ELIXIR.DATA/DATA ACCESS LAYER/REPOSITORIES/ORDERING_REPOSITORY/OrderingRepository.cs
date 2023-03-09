@@ -737,8 +737,7 @@ using System.Collections.Generic;
                     x.IsApproved,
                     x.IsMove,
                     x.IsBeingPrepared,
-                    x.SetBy
-
+                    
                 }).Where(x => x.Key.IsActive == true)
                 .Where(x => x.Key.IsApproved == true)
                 .Where(x => x.Key.IsMove == false)
@@ -746,8 +745,7 @@ using System.Collections.Generic;
                 {
                     Farm = x.Key.FarmName,
                     IsActive = x.Key.IsActive,
-                    IsApproved = x.Key.IsApproved != null,
-                    SetBy = x.Key.SetBy
+                    IsApproved = x.Key.IsApproved != null
                 });
 
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
@@ -757,6 +755,8 @@ using System.Collections.Generic;
 
             var orders = _context.Orders.GroupBy(x => new
             {
+
+                x.OrderNoPKey,
                 x.FarmName,
                 x.FarmCode,
                 x.PreparedDate,
