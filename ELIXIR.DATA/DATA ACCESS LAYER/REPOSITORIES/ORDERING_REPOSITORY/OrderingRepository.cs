@@ -956,7 +956,8 @@ using System.Collections.Generic;
                               ordering.QuantityOrdered,
                               ordering.IsApproved,
                               ordering.AllocatedQuantity,
-                              ordering.SetBy
+                              ordering.SetBy,
+                              ordering.IsBeingPrepared
 
                           } into total
 
@@ -976,7 +977,8 @@ using System.Collections.Generic;
                               QuantityOrder = total.Key.AllocatedQuantity == null ? total.Key.QuantityOrdered : (decimal)total.Key.AllocatedQuantity,
                               IsApproved = total.Key.IsApproved != null,
                               PreparedQuantity = total.Sum(x => x.QuantityPrepared),
-                              SetBy = total.Key.SetBy
+                              SetBy = total.Key.SetBy,
+                              IsBeingPrepared = total.Key.IsBeingPrepared
                           });
 
             return await orders.ToListAsync();
