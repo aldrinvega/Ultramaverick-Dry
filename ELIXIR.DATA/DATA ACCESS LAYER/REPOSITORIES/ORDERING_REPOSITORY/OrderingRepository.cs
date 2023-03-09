@@ -761,9 +761,9 @@ using System.Collections.Generic;
                 x.IsReject,
                 x.Remarks,
                 x.AllocatedQuantity,
-                x.QuantityOrdered,
-                x.SetBy,
-                x.IsBeingPrepared
+                // x.QuantityOrdered,
+                // x.SetBy,
+                // x.IsBeingPrepared
                 
             }).Where(x => x.Key.FarmName == farm)
               .Where(x => x.Key.IsApproved == true)
@@ -778,9 +778,9 @@ using System.Collections.Generic;
                 PreparedDate = x.Key.PreparedDate.ToString(),
                 IsMove = x.Key.IsMove,
                 IsReject = x.Key.IsReject != null,
-                Remarks = x.Key.Remarks,
-                SetBy = x.Key.SetBy,
-                IsBeingPrepared = x.Key.IsBeingPrepared
+                // Remarks = x.Key.Remarks,
+                // SetBy = x.Key.SetBy,
+                // IsBeingPrepared = x.Key.IsBeingPrepared
             });
 
             return await orders.ToListAsync();
