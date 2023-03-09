@@ -1344,6 +1344,49 @@ using System.Collections.Generic;
                                .ToListAsync();
 
         }
+
+        public async Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPagination(UserParams userParams)
+        {
+            var orders = _context.MoveOrders.GroupBy(x => new
+                {
+
+                    x.OrderNo,
+                    x.FarmName,
+                    x.FarmCode,
+                    x.FarmType,
+                    x.PreparedDate,
+                    x.IsApprove,
+                    x.DeliveryStatus,
+                    x.IsPrepared,
+                    x.IsReject,
+                    x.ApproveDateTempo,
+                    x.IsPrint,
+                    x.IsTransact,
+
+                }).Where(x => x.Key.IsApprove == true)
+                .Where(x => x.Key.DeliveryStatus != null)
+                .Where(x => x.Key.IsReject != true)
+
+
+                .Select(x => new MoveOrderDto
+                {
+                    OrderNo = x.Key.OrderNo,
+                    FarmName = x.Key.FarmName,
+                    FarmCode = x.Key.FarmCode,
+                    Category = x.Key.FarmType,
+                    Quantity = x.Sum(x => x.QuantityOrdered),
+                    PreparedDate = x.Key.PreparedDate.ToString(),
+                    DeliveryStatus = x.Key.DeliveryStatus,
+                    IsApprove = x.Key.IsApprove != null,
+                    IsPrepared = x.Key.IsPrepared,
+                    ApprovedDate = x.Key.ApproveDateTempo.ToString(),
+                    IsPrint = x.Key.IsPrint != null,
+                    IsTransact = x.Key.IsTransact,
+                });
+
+            return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
+        }
+
         public async Task<PagedList<MoveOrderDto>> Approvedination(UserParams userParams)
         {
             var orders = _context.MoveOrders.GroupBy(x => new
