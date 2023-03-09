@@ -1220,6 +1220,9 @@ using System.Collections.Generic;
 
             return true;
         }
+
+       
+
         public async Task<bool> ReturnMoveOrderForApproval(MoveOrder moveorder)
         {
             var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
@@ -1249,37 +1252,41 @@ using System.Collections.Generic;
             }
             return true;
         }
+        
         public async Task<PagedList<MoveOrderDto>> ForApprovalMoveOrderPagination(UserParams userParams)
 
         {
             var orders = _context.MoveOrders.Where(x => x.IsApproveReject == null )
                 .GroupBy(x => new
-            {
+                {
 
-                x.OrderNo,
-                x.FarmName,
-                x.FarmCode,
-                x.FarmType,
-                x.OrderDate,
-                x.PreparedDate,
-                x.IsApprove,
-                x.DeliveryStatus,
-                x.IsPrepared,
+                    x.OrderNo,
+                    x.FarmName,
+                    x.FarmCode,
+                    x.FarmType,
+                    x.OrderDate,
+                    x.PreparedDate,
+                    x.IsApprove,
+                    x.DeliveryStatus,
+                    x.IsPrepared,
 
-            }).Where(x => x.Key.IsApprove != true)
-              .Where(x => x.Key.DeliveryStatus != null)
-              .Where(x => x.Key.IsPrepared == true)
+                }).Where(x => x.Key.IsApprove != true)
+                .Where(x => x.Key.DeliveryStatus != null)
+                .Where(x => x.Key.IsPrepared == true)
+ 
+
                 .Select(x => new MoveOrderDto
-           {
-               OrderNo = x.Key.OrderNo,
-               FarmName = x.Key.FarmName,
-               FarmCode = x.Key.FarmCode,
-               Category = x.Key.FarmType,
-               Quantity = x.Sum(x => x.QuantityOrdered),
-               OrderDate = x.Key.OrderDate.ToString(),
-               PreparedDate = x.Key.PreparedDate.ToString(),
-               DeliveryStatus = x.Key.DeliveryStatus,
-           });
+                {
+                    OrderNo = x.Key.OrderNo,
+                    FarmName = x.Key.FarmName,
+                    FarmCode = x.Key.FarmCode,
+                    Category = x.Key.FarmType,
+                    Quantity = x.Sum(x => x.QuantityOrdered),
+                    OrderDate = x.Key.OrderDate.ToString(),
+                    PreparedDate = x.Key.PreparedDate.ToString(),
+                    DeliveryStatus = x.Key.DeliveryStatus,
+
+                });
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
 
@@ -1707,7 +1714,7 @@ using System.Collections.Generic;
         {
             foreach (var moveOrder in moveOrders)
             {
-                var existingOrder = await _context.Orders.Where(x => x.OrderNo == moveOrder.OrderNo)
+                var existingOrder = await _context.Orders.Where(x => x.OrderNoPKey == moveOrder.OrderNoPKey)
                     .Where(x => x.IsBeingPrepared == null || x.IsBeingPrepared == false)
                     .FirstOrDefaultAsync();
                     
@@ -1727,7 +1734,7 @@ using System.Collections.Generic;
             foreach (var orderNo in orderNos)
             {
                 var existingOrder = await _context.Orders.Where(x => x.IsBeingPrepared == true)
-                    .Where(x => x.OrderNoPKey == orderNo.OrderNo)
+                    .Where(x => x.OrderNoPKey == orderNo.OrderNoPKey)
                     .Where(x => x.SetBy == orderNo.SetBy)
                       .FirstOrDefaultAsync();
 
