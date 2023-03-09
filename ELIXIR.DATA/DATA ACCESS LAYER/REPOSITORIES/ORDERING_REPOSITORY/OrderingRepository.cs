@@ -749,13 +749,10 @@ using System.Collections.Generic;
                     Farm = x.Key.FarmName,
                     IsActive = x.Key.IsActive,
                     IsApproved = x.Key.IsApproved != null,
-                    IsBeingPrepared = x.Key.IsBeingPrepared != null,
                     SetBy = x.Key.SetBy
                 });
 
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
-
-
         }
         public async Task<IReadOnlyList<OrderDto>> TotalListOfApprovedPreparedDate(string farm)
         {
