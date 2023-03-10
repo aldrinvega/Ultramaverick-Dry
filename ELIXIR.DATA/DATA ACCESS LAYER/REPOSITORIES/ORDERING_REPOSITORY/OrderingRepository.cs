@@ -771,7 +771,7 @@ using System.Collections.Generic;
                 Id = x.Key.OrderNoPKey,
                 Farm = x.Key.FarmName,
                 FarmCode = x.Key.FarmCode,
-                QuantityOrder = x.Any(o => o.AllocatedQuantity != null) ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
+                QuantityOrder = x.Any(o => o.AllocatedQuantity != null) ? (decimal)x.Sum(o => o.AllocatedQuantity) : x.Sum(o => o.QuantityOrdered),
                 PreparedDate = x.Key.PreparedDate.ToString(),
                 IsMove = x.Key.IsMove,
                 IsReject = x.Key.IsReject != null
