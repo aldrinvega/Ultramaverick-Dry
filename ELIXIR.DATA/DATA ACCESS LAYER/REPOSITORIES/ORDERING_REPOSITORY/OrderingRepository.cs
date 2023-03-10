@@ -757,7 +757,7 @@ using System.Collections.Generic;
                 x.IsApproved,
                 x.IsMove,
                 x.IsReject,
-                x.Remarks,
+                x.Remarks
                 // x.QuantityOrdered,
                 // x.SetBy,
                 // x.IsBeingPrepared
@@ -771,7 +771,7 @@ using System.Collections.Generic;
                 Id = x.Key.OrderNoPKey,
                 Farm = x.Key.FarmName,
                 FarmCode = x.Key.FarmCode,
-                QuantityOrder = x.Any(o => o.AllocatedQuantity != null) ? (decimal)x.Sum(o => o.AllocatedQuantity) : x.Sum(o => o.QuantityOrdered),
+                QuantityOrder = x.Sum(o => o.AllocatedQuantity ?? o.QuantityOrdered),
                 PreparedDate = x.Key.PreparedDate.ToString(),
                 IsMove = x.Key.IsMove,
                 IsReject = x.Key.IsReject != null
