@@ -43,6 +43,8 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         public int Days { get; set; }
         public bool? ForAllocation { get; set; }
         public string? SetBy { get; set; }
+        
+        public int casting { get; set; }
 
 
     }

@@ -760,7 +760,8 @@ using System.Collections.Generic;
                         x.IsReject, 
                         x.Remarks, 
                         x.AllocatedQuantity, 
-                        x.QuantityOrdered 
+                        x.QuantityOrdered,
+                        Casting = x.AllocatedQuantity == null ? x.QuantityOrdered : (decimal)x.AllocatedQuantity
                     })
                     .ToListAsync();
 
@@ -773,13 +774,13 @@ using System.Collections.Generic;
                     x.IsApproved, 
                     x.IsMove, 
                     x.IsReject, 
-                    x.Remarks 
+                    x.Remarks
                 }).Select(x => new OrderDto
                 {
                     Id = x.Key.OrderNoPKey,
                     Farm = x.Key.FarmName,
                     FarmCode = x.Key.FarmCode,
-                    QuantityOrder = x.Any(o => o.AllocatedQuantity != null) ? (int)x.Sum(o => o.AllocatedQuantity) : (int)x.Sum(o => o.QuantityOrdered),
+                    QuantityOrder = x.Sum(x => x.Casting),
                     PreparedDate = x.Key.PreparedDate.ToString(),
                     IsMove = x.Key.IsMove,
                     IsReject = x.Key.IsReject != null
