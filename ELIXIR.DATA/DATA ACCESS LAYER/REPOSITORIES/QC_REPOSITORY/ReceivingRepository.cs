@@ -937,7 +937,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                          .Where(x => x.ConfirmRejectByQc == true);
                                        
             return await PagedList<RejectWarehouseReceivingDto>.CreateAsync(reject, userParams.PageNumber, userParams.PageSize);
-
         }
 
         public async Task<PagedList<RejectWarehouseReceivingDto>> GetAllConfirmRejectWithPaginationOrig(UserParams userParams, string search)
