@@ -758,7 +758,11 @@ using System.Collections.Generic;
                     x.IsMove,
                     x.IsReject,
                     x.Remarks,
-                    x.AllocatedQuantity
+                    x.AllocatedQuantity,
+                    x.QuantityOrdered
+                    // x.SetBy,
+                    // x.IsBeingPrepared
+                    
                 }).Where(x => x.Key.FarmName == farm)
                   .Where(x => x.Key.IsApproved == true)
                   .Where(x => x.Key.PreparedDate != null)
@@ -768,7 +772,7 @@ using System.Collections.Generic;
                     Id = x.Key.OrderNoPKey,
                     Farm = x.Key.FarmName,
                     FarmCode = x.Key.FarmCode,
-                    QuantityOrder = x.Sum(o => o.AllocatedQuantity ?? (int)o.QuantityOrdered),
+                    QuantityOrder = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
                     PreparedDate = x.Key.PreparedDate.ToString(),
                     IsMove = x.Key.IsMove,
                     IsReject = x.Key.IsReject != null
