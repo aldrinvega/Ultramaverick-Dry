@@ -745,42 +745,38 @@ using System.Collections.Generic;
 
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
-        public async Task<IReadOnlyList<OrderDto>> TotalListOfApprovedPreparedDate(string farm)
-        {
-
-            var orders = _context.Orders.GroupBy(x => new
+            public async Task<IReadOnlyList<OrderDto>> TotalListOfApprovedPreparedDate(string farm)
             {
-                x.OrderNoPKey,
-                x.FarmName,
-                x.FarmCode,
-                x.PreparedDate,
-                x.IsApproved,
-                x.IsMove,
-                x.IsReject,
-                x.Remarks,
-                x.AllocatedQuantity
-                // x.QuantityOrdered,
-                // x.SetBy,
-                // x.IsBeingPrepared
-                
-            }).Where(x => x.Key.FarmName == farm)
-              .Where(x => x.Key.IsApproved == true)
-              .Where(x => x.Key.PreparedDate != null)
-              .Where(x => x.Key.IsMove == false)
-              .Select(x => new OrderDto
-            {
-                Id = x.Key.OrderNoPKey,
-                Farm = x.Key.FarmName,
-                FarmCode = x.Key.FarmCode,
-                QuantityOrder = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
-                PreparedDate = x.Key.PreparedDate.ToString(),
-                IsMove = x.Key.IsMove,
-                IsReject = x.Key.IsReject != null
-            });
 
-            return await orders.ToListAsync();
+                var orders = _context.Orders.GroupBy(x => new
+                {
+                    x.OrderNoPKey,
+                    x.FarmName,
+                    x.FarmCode,
+                    x.PreparedDate,
+                    x.IsApproved,
+                    x.IsMove,
+                    x.IsReject,
+                    x.Remarks,
+                    x.AllocatedQuantity
+                }).Where(x => x.Key.FarmName == farm)
+                  .Where(x => x.Key.IsApproved == true)
+                  .Where(x => x.Key.PreparedDate != null)
+                  .Where(x => x.Key.IsMove == false)
+                  .Select(x => new OrderDto
+                {
+                    Id = x.Key.OrderNoPKey,
+                    Farm = x.Key.FarmName,
+                    FarmCode = x.Key.FarmCode,
+                    QuantityOrder = x.Sum(o => o.AllocatedQuantity ?? o.QuantityOrdered),
+                    PreparedDate = x.Key.PreparedDate.ToString(),
+                    IsMove = x.Key.IsMove,
+                    IsReject = x.Key.IsReject != null
+                });
 
-        }
+                return await orders.ToListAsync();
+
+            }
         public async Task<bool> GenerateNumber(GenerateOrderNo generate)
         {
             await _context.GenerateOrderNos.AddAsync(generate);
