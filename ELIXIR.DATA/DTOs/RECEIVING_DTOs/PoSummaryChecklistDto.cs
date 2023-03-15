@@ -25,6 +25,7 @@ namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
         public bool IsWarehouseReceived { get; set; }
         
         public int TotalReject { get; set; }
+        public bool  IsExpirable { get; set; }
 
 
     }

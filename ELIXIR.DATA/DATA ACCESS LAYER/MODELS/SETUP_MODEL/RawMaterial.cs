@@ -18,7 +18,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
             get; 
             set; 
         }
-
         public ItemCategory ItemCategory { 
             get; 
             set; 
@@ -49,7 +48,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
             get; 
             set;
         }
-        public bool IsActive { 
+        public bool IsActive {
             get; 
             set;
         }
@@ -57,13 +56,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
             get;
             set;
         }
-
         public bool IsExpirable
         {
             get;
             set;
         }
-
-
     }
 }

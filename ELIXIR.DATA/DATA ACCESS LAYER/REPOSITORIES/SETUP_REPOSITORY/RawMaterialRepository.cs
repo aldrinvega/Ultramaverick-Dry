@@ -372,6 +372,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             var rawmaterials = (from rawmaterial in _context.RawMaterials
                                 join category in _context.ItemCategories on rawmaterial.ItemCategoryId equals category.Id
                                 join uom in _context.UOMS on rawmaterial.UomId equals uom.Id
+                                join rawmats in _context.RawMaterials on rawmaterial.ItemCode equals rawmats.ItemCode 
                                 orderby rawmaterial.DateAdded descending
                                 select new RawMaterialDto
                                 {
@@ -386,7 +387,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                     DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
                                     AddedBy = rawmaterial.AddedBy,
                                     IsActive = rawmaterial.IsActive,
-                                    Reason = rawmaterial.Reason
+                                    Reason = rawmaterial.Reason,
+                                    IsExpirable = rawmats.IsExpirable
                                 }).OrderBy(x => x.ItemCode)
                                   .Where(x => x.IsActive == status)
                                   .Where(x => x.ItemCode.ToLower()

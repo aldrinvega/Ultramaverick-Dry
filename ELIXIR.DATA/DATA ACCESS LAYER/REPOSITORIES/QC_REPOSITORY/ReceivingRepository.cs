@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using Microsoft.JSInterop.Implementation;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
@@ -301,6 +302,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 
             var warehouse = (from posummary in _context.POSummary
                              join receive in _context.QC_Receiving on posummary.Id equals receive.PO_Summary_Id
+                             join rawmats in _context.RawMaterials on posummary.ItemCode equals rawmats.ItemCode
                              select new WarehouseReceivingDto
                              {
                                  Id = receive.Id,
@@ -315,7 +317,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
                                  IsActive = receive.IsActive,
                                  IsWareHouseReceive = receive.IsWareHouseReceive != null,
-                                 IsExpiryApprove = receive.ExpiryIsApprove != null
+                                 IsExpiryApprove = receive.ExpiryIsApprove != null,
+                                 IsExpirable = rawmats.IsExpirable
                              });
 
             return await warehouse.Where(x => x.IsWareHouseReceive == false)
@@ -575,9 +578,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             var poSummary = (from posummary in _context.POSummary
                              where posummary.IsActive == true
                              join receive in _context.QC_Receiving
-                             on posummary.Id equals receive.PO_Summary_Id into leftJ
-                             from receive in leftJ.DefaultIfEmpty()
-
+                             on posummary.Id equals receive.PO_Summary_Id
+                             join rawmats in _context.RawMaterials on posummary.ItemCode equals rawmats.ItemCode
+                             into leftJ from receives in leftJ.DefaultIfEmpty()
                              select new PoSummaryChecklistDto
                              {
                                  Id = posummary.Id,
@@ -594,8 +597,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  IsActive = posummary.IsActive,
                                  IsQcReceiveIsActive = receive != null && receive.IsActive != false ? receive.IsActive : true,
                                  ActualRemaining = 0,
-                                 TotalReject = (int)receive.TotalReject
-
+                                 TotalReject = (int)receive.TotalReject,
+                                 IsExpirable = receives.IsExpirable
                              }).GroupBy(x => new
                              {
                                  x.Id,
@@ -643,8 +646,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             var poSummary = (from posummary in _context.POSummary
                              where posummary.IsActive == true
                              join receive in _context.QC_Receiving
-                             on posummary.Id equals receive.PO_Summary_Id into leftJ
-                             from receive in leftJ.DefaultIfEmpty()
+                             on posummary.Id equals receive.PO_Summary_Id 
+                             join rawmats in _context.RawMaterials on posummary.ItemCode equals rawmats.ItemCode
+                             into leftJ
+                             from receives in leftJ.DefaultIfEmpty()
 
                              select new PoSummaryChecklistDto
                              {
@@ -662,7 +667,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  IsActive = posummary.IsActive,
                                  IsQcReceiveIsActive = receive != null && receive.IsActive != false ? receive.IsActive : true,
                                  ActualRemaining = 0,
-                                 TotalReject = (int)receive.TotalReject
+                                 TotalReject = (int)receive.TotalReject,
+                                 IsExpirable = receives.IsExpirable
 
                              }).GroupBy(x => new
                              {

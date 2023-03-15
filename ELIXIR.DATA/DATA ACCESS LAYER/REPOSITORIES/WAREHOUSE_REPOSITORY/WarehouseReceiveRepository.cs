@@ -518,6 +518,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                  IsActive = receive.IsActive,
                                  IsWareHouseReceive = receive.IsWareHouseReceive != null,
                                  IsExpiryApprove = receive.ExpiryIsApprove != null
+                                 
                              }).Where(x => x.IsWareHouseReceive == false)
                                .Where(x => x.IsExpiryApprove == true)
                                .Where(x => x.IsActive == true)
