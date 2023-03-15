@@ -29,10 +29,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.IMPORT_REPOSITORY
 
         public async Task<bool> AddNewPoSummary(ImportPOSummary posummary)
         {
-
-
-
-
             await _context.POSummary.AddAsync(posummary);
 
             return true;

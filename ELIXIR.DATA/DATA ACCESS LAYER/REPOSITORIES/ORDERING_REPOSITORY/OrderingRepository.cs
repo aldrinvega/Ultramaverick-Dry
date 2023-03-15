@@ -381,7 +381,6 @@ using System.Collections.Generic;
 
                           group warehouse by new
                           {
-
                               ordering.Id,
                               ordering.OrderDate,
                               ordering.DateNeeded,
@@ -397,13 +396,10 @@ using System.Collections.Generic;
                               ordering.PreparedDate,
                               ordering.IsApproved,
                               ordering.AllocatedQuantity
-                             
-
                           } into total
 
                           select new OrderDto
                           {
-
                               Id = total.Key.Id,
                               OrderDate = total.Key.OrderDate.ToString("MM/dd/yyyy"),
                               DateNeeded = total.Key.DateNeeded.ToString("MM/dd/yyyy"),
@@ -767,8 +763,8 @@ using System.Collections.Generic;
 
                 var orderGroups = orders.GroupBy(x => new 
                 { 
-                    x.OrderNoPKey, 
-                    x.FarmName, 
+                    x.OrderNoPKey,
+                    x.FarmName,
                     x.FarmCode, 
                     x.PreparedDate, 
                     x.IsApproved, 
@@ -913,12 +909,7 @@ using System.Collections.Generic;
                               IsApproved = total.Key.IsApproved != null
 
                           });
-
-
             return await orders.ToListAsync();
-
-        
-
         }
         public async Task<IReadOnlyList<OrderDto>> ListOfOrdersForMoveOrder(int id)
         {
@@ -1004,7 +995,6 @@ using System.Collections.Generic;
                     OrderDate = x.OrderDate.ToString("MM/dd/yyyy"),
                     DateNeeded = x.DateNeeded.ToString("MM/dd/yyyy"),
                     PreparedDate = x.PreparedDate.ToString()
-
                 });
 
                 return await orders.Where(x => x.Id == orderid)
@@ -1066,7 +1056,6 @@ using System.Collections.Generic;
                                       In = total.Key.ActualGood,
                                       Out = total.Sum(x => x.Out),
                                       Remaining = total.Key.ActualGood - total.Sum(x => x.Out) - totaloutMoveorder - totalIssue
-
                                   };
 
             return await totalRemaining.Where(x => x.Remaining != 0)
@@ -1158,12 +1147,10 @@ using System.Collections.Generic;
 
             foreach(var items in existing)
             {
-
                 items.ApprovedDate = DateTime.Now;
                 items.ApproveDateTempo = DateTime.Now;
                 items.IsApprove = true;
             }
-
             return true;
         }
         public async Task<bool> RejectForMoveOrder(MoveOrder moveorder)
@@ -1263,7 +1250,6 @@ using System.Collections.Generic;
             var orders = _context.MoveOrders.Where(x => x.IsApproveReject == null )
                 .GroupBy(x => new
                 {
-
                     x.OrderNo,
                     x.FarmName,
                     x.FarmCode,
@@ -1487,7 +1473,7 @@ using System.Collections.Generic;
                 x.DeliveryStatus,
                 x.IsReject,
                 x.RejectedDateTempo,
-                x.Remarks,
+                x.Remarks
             })
               .Where(x => x.Key.DeliveryStatus != null)
          
@@ -1503,8 +1489,7 @@ using System.Collections.Generic;
             DeliveryStatus = x.Key.DeliveryStatus,
             IsReject = x.Key.IsReject != null,
             RejectedDate = x.Key.RejectedDateTempo.ToString(),
-            Remarks = x.Key.Remarks,
-
+            Remarks = x.Key.Remarks
         });
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
@@ -1524,7 +1509,7 @@ using System.Collections.Generic;
                 x.DeliveryStatus,
                 x.IsReject,
                 x.RejectedDateTempo,
-                x.Remarks,
+                x.Remarks
             })
               .Where(x => x.Key.DeliveryStatus != null)
 
@@ -1540,7 +1525,7 @@ using System.Collections.Generic;
            DeliveryStatus = x.Key.DeliveryStatus,
            IsReject = x.Key.IsReject != null,
            RejectedDate = x.Key.RejectedDateTempo.Value.ToString("MM/dd/yyyy"),
-           Remarks = x.Key.Remarks,
+           Remarks = x.Key.Remarks
 
        }).Where(x => Convert.ToString(x.OrderNo).ToLower()
          .Contains(search.Trim().ToLower()));

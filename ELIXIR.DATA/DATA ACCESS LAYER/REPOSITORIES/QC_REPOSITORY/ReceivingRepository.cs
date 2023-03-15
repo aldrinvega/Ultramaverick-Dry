@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
+using Microsoft.JSInterop.Implementation;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 {
@@ -252,6 +253,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         {
             DateTime dateNow = DateTime.Now;
             DateTime dateadd = DateTime.Now.AddDays(30);
+            
  
             var expiry = (from summary in _context.POSummary
                           join receiving in _context.QC_Receiving on summary.Id equals receiving.PO_Summary_Id
@@ -267,8 +269,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                               QuantityOrdered = summary.Ordered,
                               ActualGood = receiving.Actual_Delivered,
                               ActualRemaining = summary.Ordered - receiving.Actual_Delivered,
-                              ExpiryDate = receiving.Expiry_Date.ToString("MM/dd/yyyy"),
-                              Days = receiving.Expiry_Date.Subtract(dateNow).Days,
+                              ExpiryDate = receiving.Expiry_Date != null ? receiving.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                              Days =  receiving.Expiry_Date.HasValue ? receiving.Expiry_Date.Value.Subtract(dateNow).Days : 0,
                               IsActive = receiving.IsActive,
                               IsNearlyExpire = receiving.IsNearlyExpire != null,
                               ExpiryIsApprove = receiving.ExpiryIsApprove != null
@@ -291,9 +293,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             existingInfo.ExpiryIsApprove = true;
             existingInfo.ExpiryApproveBy = receive.ExpiryApproveBy;
             existingInfo.ExpiryDateOfApprove = DateTime.Now;
-
-
-
             return true;
         }
 
@@ -312,7 +311,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  QuantityOrdered = posummary.Ordered,
                                  ActualGood = receive.Actual_Delivered,
                                  Reject = receive.TotalReject,
-                                 ExpirationDate = receive.Expiry_Date.ToString("MM/dd/yyyy"),
+                                 ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
                                  QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
                                  IsActive = receive.IsActive,
                                  IsWareHouseReceive = receive.IsWareHouseReceive != null,
@@ -725,12 +724,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  QuantityOrdered = posummary.Ordered,
                                  ActualGood = receive.Actual_Delivered - receive.TotalReject,
                                  Reject = receive.TotalReject,
-                                 ExpirationDate = receive.Expiry_Date.ToString("MM/dd/yyyy"),
+                                 ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
                                  QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
                                  IsActive = receive.IsActive,
                                  IsWareHouseReceive = receive.IsWareHouseReceive != null,
                                  IsExpiryApprove = receive.ExpiryIsApprove != null,
                                  ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy")
+                                 
 
                              }).OrderBy(x => x.PO_Number)
                                .Where(x => x.IsWareHouseReceive == false)
@@ -745,6 +745,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         {
             var warehouse = (from posummary in _context.POSummary
                              join receive in _context.QC_Receiving on posummary.Id equals receive.PO_Summary_Id
+                             join rawmats in _context.RawMaterials on posummary.ItemCode equals rawmats.ItemCode
                              select new WarehouseReceivingDto
                              {
                                  Id = receive.Id,
@@ -758,12 +759,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  QuantityOrdered = posummary.Ordered,
                                  ActualGood = receive.Actual_Delivered - receive.TotalReject,
                                  Reject = receive.TotalReject,
-                                 ExpirationDate = receive.Expiry_Date.ToString("MM/dd/yyyy"),
+                                 ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
                                  QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
                                  IsActive = receive.IsActive,
                                  IsWareHouseReceive = receive.IsWareHouseReceive != null,
                                  IsExpiryApprove = receive.ExpiryIsApprove != null,
-                                 ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy")
+                                 ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy"),
+                                 IsExpirable = rawmats.IsExpirable
                              }).OrderBy(x => x.PO_Number)
                                .Where(x => x.IsWareHouseReceive == false)
                                .Where(x => x.IsExpiryApprove == true)
@@ -850,8 +852,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                               QuantityOrdered = summary.Ordered,
                               ActualGood = receiving.Actual_Delivered,
                               ActualRemaining = summary.Ordered - receiving.Actual_Delivered,
-                              ExpiryDate = receiving.Expiry_Date.ToString("MM/dd/yyyy"),
-                              Days = receiving.Expiry_Date.Subtract(dateNow).Days,
+                              ExpiryDate = receiving.Expiry_Date != null ? receiving.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                              Days =  receiving.Expiry_Date.HasValue ? receiving.Expiry_Date.Value.Subtract(dateNow).Days : 0,
                               IsActive = receiving.IsActive,
                               IsNearlyExpire = receiving.IsNearlyExpire != null,
                               ExpiryIsApprove = receiving.ExpiryIsApprove != null,
@@ -885,8 +887,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                               QuantityOrdered = summary.Ordered,
                               ActualGood = receiving.Actual_Delivered,
                               ActualRemaining = summary.Ordered - receiving.Actual_Delivered,
-                              ExpiryDate = receiving.Expiry_Date.ToString("MM/dd/yyyy"),
-                              Days = receiving.Expiry_Date.Subtract(dateNow).Days,
+                              ExpiryDate = receiving.Expiry_Date != null ? receiving.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                              Days =  receiving.Expiry_Date.HasValue ? receiving.Expiry_Date.Value.Subtract(dateNow).Days : 0,
                               IsActive = receiving.IsActive,
                               IsNearlyExpire = receiving.IsNearlyExpire != null,
                               ExpiryIsApprove = receiving.ExpiryIsApprove != null,
@@ -1031,7 +1033,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 
             return await summary.Where(x => x.Id == id)
                                 .ToListAsync();
-
         }
 
         public async Task<bool> ValidatePOForCancellation(int id)

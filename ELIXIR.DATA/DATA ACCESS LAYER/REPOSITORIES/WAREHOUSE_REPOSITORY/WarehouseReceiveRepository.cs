@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
 {
@@ -70,8 +71,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                  Supplier = total.Key.VendorName,
                                  ActualDelivered = total.Key.Actual_Delivered,
                                  TotalReject = total.Key.TotalReject,
-                                 Expiration = (total.Key.Expiry_Date).ToString("MM/dd/yyyy"),
-                                 ExpirationDays = total.Key.Expiry_Date.Subtract(dateNow).Days,
+                                 Expiration = total.Key.Expiry_Date != null ? total.Key.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                                 ExpirationDays = total.Key.Expiry_Date != null ? total.Key.Expiry_Date.Value.Subtract(dateNow).Days : 0,
                                  TotalStock = total.Key.computeStock,
                                  IsWarehouseReceived = total.Key.IsWareHouseReceive != null,
                                  ManufacturingDate = total.Key.Manufacturing_Date.ToString("MM/dd/yyyy"),
@@ -102,8 +103,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                    ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy"),
                                    ActualDelivered = receive.Actual_Delivered,
                                    TotalReject = receive.TotalReject,
-                                   Expiration = receive.Expiry_Date.ToString("MM/dd/yyyy"),
-                                   ExpirationDays = receive.Expiry_Date.Subtract(dateNow).Days,
+                                   Expiration = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                                   ExpirationDays = receive.Expiry_Date != null ? receive.Expiry_Date.Value.Subtract(dateNow).Days : 0,
                                    IsActive = receive.IsActive,
                                    IsWarehouseReceived = receive.IsWareHouseReceive != null,
                                    ExpiryIsApprove = receive.ExpiryIsApprove != null
@@ -266,8 +267,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                    Uom = posummary.UOM,
                                    ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy"),
                                    ActualDelivered = receive.Actual_Delivered,
-                                   Expiration = receive.Expiry_Date.ToString("MM/dd/yyyy"),
-                                   ExpirationDays = receive.Expiry_Date.Subtract(dateNow).Days,
+                                   Expiration = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                                   ExpirationDays = receive.Expiry_Date.HasValue ? receive.Expiry_Date.Value.Subtract(dateNow).Days : 0,
                                    IsActive = receive.IsActive,
                                    IsWarehouseReceived = receive.IsWareHouseReceive != null,
                                    ExpiryIsApprove = receive.ExpiryIsApprove != null, 
@@ -299,7 +300,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                  QuantityOrdered = posummary.Ordered,
                                  ActualGood = receive.Actual_Delivered - receive.TotalReject,
                                  Reject = receive.TotalReject,
-                                 ExpirationDate = receive.Expiry_Date.ToString("MM/dd/yyyy"),
+                                 ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
                                  QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
                                  IsActive = receive.IsActive,
                                  IsWareHouseReceive = receive.IsWareHouseReceive != null,
@@ -346,8 +347,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                    Uom = posummary.UOM,
                                    ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy"),
                                    ActualDelivered = receive.Actual_Delivered,
-                                   Expiration = receive.Expiry_Date.ToString("MM/dd/yyyy"),
-                                   ExpirationDays = receive.Expiry_Date.Subtract(dateNow).Days,
+                                   Expiration = receive.Expiry_Date != null ?  receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                                   ExpirationDays = receive.Expiry_Date.HasValue ? receive.Expiry_Date.Value.Subtract(dateNow).Days : 0,
                                    IsActive = receive.IsActive,
                                    IsWarehouseReceived = receive.IsWareHouseReceive != null,
                                    ExpiryIsApprove = receive.ExpiryIsApprove != null
@@ -485,7 +486,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                  QuantityOrdered = posummary.Ordered,
                                  ActualGood = receive.Actual_Delivered,
                                  Reject = receive.TotalReject,
-                                 ExpirationDate = receive.Expiry_Date.ToString("MM/dd/yyyy"),
+                                 ExpirationDate =  receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
                                  QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
                                  IsActive = receive.IsActive,
                                  IsWareHouseReceive = receive.IsWareHouseReceive != null,
@@ -512,7 +513,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                  QuantityOrdered = posummary.Ordered,
                                  ActualGood = receive.Actual_Delivered,
                                  Reject = receive.TotalReject,
-                                 ExpirationDate = receive.Expiry_Date.ToString("MM/dd/yyyy"),
+                                 ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
                                  QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
                                  IsActive = receive.IsActive,
                                  IsWareHouseReceive = receive.IsWareHouseReceive != null,

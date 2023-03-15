@@ -58,6 +58,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
             set;
         }
 
+        public bool IsExpirable
+        {
+            get;
+            set;
+        }
+
 
     }
 }

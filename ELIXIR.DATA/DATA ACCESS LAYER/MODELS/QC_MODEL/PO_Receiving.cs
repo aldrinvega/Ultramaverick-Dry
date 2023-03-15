@@ -27,7 +27,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
         }
 
         [Column(TypeName = "Date")]
-        public DateTime Expiry_Date {
+        public DateTime? Expiry_Date {
             get; 
             set; 
         }

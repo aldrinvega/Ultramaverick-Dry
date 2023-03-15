@@ -20,6 +20,8 @@ namespace ELIXIR.DATA.DTOs.SETUP_DTOs
         public string AddedBy { get; set; }
         public bool IsActive { get; set; }
         public string Reason { get; set; }
+        
+        public bool IsExpirable { get; set; }
 
     }
 }
