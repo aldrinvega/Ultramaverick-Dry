@@ -632,7 +632,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                                         ActualRemaining = receive.Key.QuantityOrdered - (receive.Sum(x => x.ActualGood)),
                                                         IsActive = receive.Key.IsActive,
                                                         IsQcReceiveIsActive = receive.Key.IsQcReceiveIsActive,
-                                                        IsExpirable = receive.Key.IsExpirable
+                                                        IsExpirable = receive.Key.IsExpirable 
                                                     })
                                                     .OrderBy(x => x.PO_Number)
                                                     .Where(x => x.ActualRemaining != 0 && (x.ActualRemaining > 0))
