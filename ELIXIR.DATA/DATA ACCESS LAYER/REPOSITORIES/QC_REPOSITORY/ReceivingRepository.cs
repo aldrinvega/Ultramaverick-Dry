@@ -161,7 +161,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                 IsActive = posummary.IsActive,
                                 IsQcReceiveIsActive = receive != null && receive.IsActive != false ? receive.IsActive : true,
                                 ActualRemaining = 0,
-
                             });
 
             return await summaryx
@@ -271,17 +270,16 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                               ActualGood = receiving.Actual_Delivered,
                               ActualRemaining = summary.Ordered - receiving.Actual_Delivered,
                               ExpiryDate = receiving.Expiry_Date != null ? receiving.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
-                              Days =  receiving.Expiry_Date.HasValue ? receiving.Expiry_Date.Value.Subtract(dateNow).Days : 0,
+                              Days = receiving.Expiry_Date.HasValue ? (int)Math.Round(receiving.Expiry_Date.Value.Subtract(dateNow).TotalDays) : 0,
                               IsActive = receiving.IsActive,
                               IsNearlyExpire = receiving.IsNearlyExpire != null,
-                              ExpiryIsApprove = receiving.ExpiryIsApprove != null
+                              ExpiryIsApprove = receiving.ExpiryIsApprove != null,
+                              
                           });
-
             return await expiry
                                 .Where(x => x.IsNearlyExpire == true)
                                 .Where(x => x.ExpiryIsApprove == false)
                                 .ToListAsync();
-  
         }
 
         public async Task<bool> ApproveNearlyExpireRawMaterials(PO_Receiving receive)
