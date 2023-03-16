@@ -574,69 +574,65 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         public async Task<PagedList<PoSummaryChecklistDto>> GetAllPoSummaryWithPagination(UserParams userParams)
         {
             var poSummary = (from posummary in _context.POSummary
-                             where posummary.IsActive == true
-                             join receive in _context.QC_Receiving
-                             on posummary.Id equals receive.PO_Summary_Id
-                             join rawmats in _context.RawMaterials on posummary.ItemCode equals rawmats.ItemCode
-                             into leftJ from receives in leftJ.DefaultIfEmpty()
-                             select new PoSummaryChecklistDto
-                             {
-                                 Id = posummary.Id,
-                                 PO_Number = posummary.PO_Number,
-                                 PO_Date = posummary.PO_Date,
-                                 PR_Number = posummary.PR_Number,
-                                 PR_Date = posummary.PR_Date,
-                                 ItemCode = posummary.ItemCode,
-                                 ItemDescription = posummary.ItemDescription,
-                                 Supplier = posummary.VendorName,
-                                 UOM = posummary.UOM,
-                                 QuantityOrdered = posummary.Ordered,
-                                 ActualGood = receive != null && receive.IsActive != false ? receive.Actual_Delivered - receive.TotalReject : 0,
-                                 IsActive = posummary.IsActive,
-                                 IsQcReceiveIsActive = receive != null && receive.IsActive != false ? receive.IsActive : true,
-                                 ActualRemaining = 0,
-                                 TotalReject = (int)receive.TotalReject,
-                                 IsExpirable = receives.IsExpirable
-                             }).GroupBy(x => new
-                             {
-                                 x.Id,
-                                 x.PO_Number,
-                                 x.PO_Date,
-                                 x.PR_Number,
-                                 x.PR_Date,
-                                 x.ItemCode,
-                                 x.ItemDescription,
-                                 x.UOM,
-                                 x.Supplier,
-                                 x.QuantityOrdered,
-                                 x.IsActive,
-                                 x.IsQcReceiveIsActive,
-                                 x.TotalReject,
-                                 x.IsExpirable
-                             })
-                                                    .Select(receive => new PoSummaryChecklistDto
-                                                    {
-                                                        Id = receive.Key.Id,
-                                                        PO_Number = receive.Key.PO_Number,
-                                                        PO_Date = receive.Key.PO_Date,
-                                                        PR_Number = receive.Key.PR_Number,
-                                                        PR_Date = receive.Key.PR_Date,
-                                                        ItemCode = receive.Key.ItemCode,
-                                                        ItemDescription = receive.Key.ItemDescription,
-                                                        UOM = receive.Key.UOM,
-                                                        Supplier = receive.Key.Supplier,
-                                                        QuantityOrdered = receive.Key.QuantityOrdered,
-                                                        ActualGood = receive.Sum(x => x.ActualGood),
-                                                        ActualRemaining = receive.Key.QuantityOrdered - (receive.Sum(x => x.ActualGood)),
-                                                        IsActive = receive.Key.IsActive,
-                                                        IsQcReceiveIsActive = receive.Key.IsQcReceiveIsActive,
-                                                        IsExpirable = receive.Key.IsExpirable 
-                                                    })
-                                                    
-                                                    .OrderBy(x => x.PO_Number)
-                                                    .Where(x => x.ActualRemaining != 0 && (x.ActualRemaining > 0))
-                                                    .Where(x => x.IsActive == true);               
+                where posummary.IsActive == true
+                
+                join receive in _context.QC_Receiving
+                    on posummary.Id equals receive.PO_Summary_Id into lejt1
+                from receive in lejt1.DefaultIfEmpty()
 
+                join rawmats in _context.RawMaterials on posummary.ItemCode equals rawmats.ItemCode
+                    into leftJ
+                from rawmats in leftJ.DefaultIfEmpty()
+
+                group new
+                    {
+                        posummary,
+                        rawmats,
+                        receive
+                    }
+                    by new
+                    {
+                        posummary.Id,
+                        posummary.PO_Number,
+                        posummary.PO_Date,
+                        posummary.PR_Number,
+                        posummary.PR_Date,
+                        posummary.ItemCode,
+                        posummary.ItemDescription,
+                        Supplier = posummary.VendorName,
+                        posummary.UOM,
+                        QuantityOrdered = posummary.Ordered,
+                        ActualGood = receive != null && receive.IsActive
+                            ? receive.Actual_Delivered - receive.TotalReject
+                            : 0,
+                        posummary.IsActive,
+                        IsQcReceiveIsActive = receive != null && receive.IsActive != false ? receive.IsActive : true,
+                        ActualRemaining = 0,
+                        TotalReject = receive != null && (int)receive.TotalReject != null ? receive.TotalReject : 0,
+                        Expirable = rawmats != null && rawmats.IsExpirable != null ? rawmats.IsExpirable : false
+                    }
+                into result
+
+                select new PoSummaryChecklistDto
+                {
+                    Id = result.Key.Id,
+                    PO_Number = result.Key.PO_Number,
+                    PO_Date = result.Key.PO_Date,
+                    PR_Number = result.Key.PR_Number,
+                    PR_Date = result.Key.PR_Date,
+                    ItemCode = result.Key.ItemCode,
+                    ItemDescription = result.Key.ItemDescription,
+                    Supplier = result.Key.Supplier,
+                    UOM = result.Key.UOM,
+                    QuantityOrdered = result.Key.QuantityOrdered,
+                    ActualGood = result.Key.ActualGood,
+                    IsActive = result.Key.IsActive,
+                    IsQcReceiveIsActive = result.Key.IsQcReceiveIsActive,
+                    ActualRemaining = 0,
+                    TotalReject = (int)result.Key.TotalReject,
+                    IsExpirable = result.Key.Expirable
+                });
+            
             return await PagedList<PoSummaryChecklistDto>.CreateAsync(poSummary, userParams.PageNumber, userParams.PageSize);
         }
 
@@ -645,67 +641,64 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 
             var poSummary = (from posummary in _context.POSummary
                              where posummary.IsActive == true
+
                              join receive in _context.QC_Receiving
-                             on posummary.Id equals receive.PO_Summary_Id 
+                                 on posummary.Id equals receive.PO_Summary_Id into lejt1
+                             from receive in lejt1.DefaultIfEmpty()
+
                              join rawmats in _context.RawMaterials on posummary.ItemCode equals rawmats.ItemCode
-                             into leftJ
-                             from receives in leftJ.DefaultIfEmpty()
+                                 into leftJ
+                             from rawmats in leftJ.DefaultIfEmpty()
+
+                             group new
+                             {
+                                 posummary,
+                                 rawmats,
+                                 receive
+                             }
+                                 by new
+                                 {
+                                     posummary.Id,
+                                     posummary.PO_Number,
+                                     posummary.PO_Date,
+                                     posummary.PR_Number,
+                                     posummary.PR_Date,
+                                     posummary.ItemCode,
+                                     posummary.ItemDescription,
+                                     Supplier = posummary.VendorName,
+                                     posummary.UOM,
+                                     QuantityOrdered = posummary.Ordered,
+                                     ActualGood = receive != null && receive.IsActive
+                                         ? receive.Actual_Delivered - receive.TotalReject
+                                         : 0,
+                                     posummary.IsActive,
+                                     IsQcReceiveIsActive = receive != null && receive.IsActive != false ? receive.IsActive : true,
+                                     ActualRemaining = 0,
+                                     TotalReject = receive != null && (int)receive.TotalReject != null ? receive.TotalReject : 0,
+                                     Expirable = rawmats != null && rawmats.IsExpirable != null ? rawmats.IsExpirable : false
+                                 }
+               into result
 
                              select new PoSummaryChecklistDto
                              {
-                                 Id = posummary.Id,
-                                 PO_Number = posummary.PO_Number,
-                                 PO_Date = posummary.PO_Date,
-                                 PR_Number = posummary.PR_Number,
-                                 PR_Date = posummary.PR_Date,        
-                                 ItemCode = posummary.ItemCode,
-                                 ItemDescription = posummary.ItemDescription,
-                                 Supplier = posummary.VendorName,
-                                 UOM = posummary.UOM,
-                                 QuantityOrdered = posummary.Ordered,
-                                 ActualGood = receive != null && receive.IsActive != false ? receive.Actual_Delivered - receive.TotalReject : 0,
-                                 IsActive = posummary.IsActive,
-                                 IsQcReceiveIsActive = receive != null && receive.IsActive != false ? receive.IsActive : true,
+                                 Id = result.Key.Id,
+                                 PO_Number = result.Key.PO_Number,
+                                 PO_Date = result.Key.PO_Date,
+                                 PR_Number = result.Key.PR_Number,
+                                 PR_Date = result.Key.PR_Date,
+                                 ItemCode = result.Key.ItemCode,
+                                 ItemDescription = result.Key.ItemDescription,
+                                 Supplier = result.Key.Supplier,
+                                 UOM = result.Key.UOM,
+                                 QuantityOrdered = result.Key.QuantityOrdered,
+                                 ActualGood = result.Key.ActualGood,
+                                 IsActive = result.Key.IsActive,
+                                 IsQcReceiveIsActive = result.Key.IsQcReceiveIsActive,
                                  ActualRemaining = 0,
-                                 TotalReject = (int)receive.TotalReject,
-                                 IsExpirable = receives.IsExpirable
-
-                             }).GroupBy(x => new
-                             {
-                                 x.Id,
-                                 x.PO_Number,
-                                 x.PO_Date,
-                                 x.PR_Number,
-                                 x.PR_Date,
-                                 x.ItemCode,
-                                 x.ItemDescription,
-                                 x.UOM,
-                                 x.Supplier,
-                                 x.QuantityOrdered,
-                                 x.IsActive,
-                                 x.IsQcReceiveIsActive,
-                                 x.TotalReject
-                             })
-                                                    .Select(receive => new PoSummaryChecklistDto
-                                                    {
-                                                        Id = receive.Key.Id,
-                                                        PO_Number = receive.Key.PO_Number,
-                                                        PO_Date = receive.Key.PO_Date,
-                                                        PR_Number = receive.Key.PR_Number,
-                                                        PR_Date = receive.Key.PR_Date,
-                                                        ItemCode = receive.Key.ItemCode,
-                                                        ItemDescription = receive.Key.ItemDescription,
-                                                        UOM = receive.Key.UOM,
-                                                        Supplier = receive.Key.Supplier,
-                                                        QuantityOrdered = receive.Key.QuantityOrdered,
-                                                        ActualGood = receive.Sum(x => x.ActualGood),
-                                                        ActualRemaining = receive.Key.QuantityOrdered - (receive.Sum(x => x.ActualGood)),
-                                                        IsActive = receive.Key.IsActive,
-                                                        IsQcReceiveIsActive = receive.Key.IsQcReceiveIsActive
-
-                                                    })
-                                                      .OrderBy(x => x.PO_Number)
-                                                      .Where(x => x.ActualRemaining != 0 && (x.ActualRemaining > 0))
+                                 TotalReject = (int)result.Key.TotalReject,
+                                 IsExpirable = result.Key.Expirable
+                             }).OrderBy(x => x.PO_Number)
+                                .Where(x => x.ActualRemaining != 0 && (x.ActualRemaining > 0))
                                                       .Where(x => x.IsActive == true)
                                                       .Where(x => Convert.ToString(x.ItemDescription).ToLower()
                                                       .Contains(search.Trim().ToLower()));
