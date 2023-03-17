@@ -29,6 +29,7 @@ namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
         public bool IsExpiryApprove { get; set; }
         public string ManufacturingDate { get; set; }
         public bool IsExpirable { get; set; }
+        public DateTime? ExpirationDate1 { get; set; }
 
 
 

@@ -161,6 +161,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                 IsActive = posummary.IsActive,
                                 IsQcReceiveIsActive = receive != null && receive.IsActive != false ? receive.IsActive : true,
                                 ActualRemaining = 0,
+                                TotalReject = receive != null ? (int)receive.TotalReject : 0
                             });
 
             return await summaryx
@@ -175,6 +176,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                         x.QuantityOrdered,
                                         x.IsActive,
                                         x.IsQcReceiveIsActive,
+                                        x.TotalReject
                                     })
                                                     .Select(receive => new PoSummaryChecklistDto
                                                     {
@@ -188,7 +190,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                                         ActualGood = receive.Sum(x => x.ActualGood),
                                                         ActualRemaining = receive.Key.QuantityOrdered - (receive.Sum(x => x.ActualGood)),
                                                         IsActive = receive.Key.IsActive,
-                                                        IsQcReceiveIsActive = receive.Key.IsQcReceiveIsActive
+                                                        IsQcReceiveIsActive = receive.Key.IsQcReceiveIsActive,
+                                                        TotalReject = receive.Key.TotalReject
                                                     })
                                                     .OrderBy(x => x.PO_Number)
                                                     .Where(x => x.ActualRemaining != 0)
@@ -628,7 +631,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                     ActualGood = result.Key.ActualGood,
                     IsActive = result.Key.IsActive,
                     IsQcReceiveIsActive = result.Key.IsQcReceiveIsActive,
-                    ActualRemaining = 0,
+                    ActualRemaining = result.Key.QuantityOrdered - result.Sum(x => result.Key.ActualGood),
                     TotalReject = (int)result.Key.TotalReject,
                     IsExpirable = result.Key.Expirable
                 });
@@ -656,26 +659,26 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  rawmats,
                                  receive
                              }
-                                 by new
+                                 by new PoSummaryChecklistDto
                                  {
-                                     posummary.Id,
-                                     posummary.PO_Number,
-                                     posummary.PO_Date,
-                                     posummary.PR_Number,
-                                     posummary.PR_Date,
-                                     posummary.ItemCode,
-                                     posummary.ItemDescription,
+                                    Id = posummary.Id,
+                                     PO_Number = posummary.PO_Number,
+                                     PO_Date = posummary.PO_Date,
+                                     PR_Number = posummary.PR_Number,
+                                     PR_Date = posummary.PR_Date,
+                                     ItemCode = posummary.ItemCode,
+                                     ItemDescription = posummary.ItemDescription,
                                      Supplier = posummary.VendorName,
-                                     posummary.UOM,
+                                     UOM = posummary.UOM,
                                      QuantityOrdered = posummary.Ordered,
                                      ActualGood = receive != null && receive.IsActive
                                          ? receive.Actual_Delivered - receive.TotalReject
                                          : 0,
-                                     posummary.IsActive,
+                                     IsActive = posummary.IsActive,
                                      IsQcReceiveIsActive = receive != null && receive.IsActive != false ? receive.IsActive : true,
                                      ActualRemaining = 0,
-                                     TotalReject = receive != null && (int)receive.TotalReject != null ? receive.TotalReject : 0,
-                                     Expirable = rawmats != null && rawmats.IsExpirable != null ? rawmats.IsExpirable : false
+                                     TotalReject = receive != null && (int)receive.TotalReject != null ? (int)receive.TotalReject : 0,
+                                     IsExpirable = rawmats != null && rawmats.IsExpirable != null ? rawmats.IsExpirable : false
                                  }
                into result
 
@@ -691,12 +694,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  Supplier = result.Key.Supplier,
                                  UOM = result.Key.UOM,
                                  QuantityOrdered = result.Key.QuantityOrdered,
-                                 ActualGood = result.Key.ActualGood,
+                                 ActualGood = result.Sum(x => result.Key.ActualGood),
                                  IsActive = result.Key.IsActive,
                                  IsQcReceiveIsActive = result.Key.IsQcReceiveIsActive,
-                                 ActualRemaining = 0,
+                                 ActualRemaining = result.Key.QuantityOrdered - result.Sum(x => result.Key.ActualGood),
                                  TotalReject = (int)result.Key.TotalReject,
-                                 IsExpirable = result.Key.Expirable
+                                 IsExpirable = result.Key.IsExpirable
                              }).OrderBy(x => x.PO_Number)
                                 .Where(x => x.ActualRemaining != 0 && (x.ActualRemaining > 0))
                                                       .Where(x => x.IsActive == true)
@@ -708,33 +711,36 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 
         public async Task<PagedList<WarehouseReceivingDto>> GetAllAvailableForWarehouseWithPagination(UserParams userParams)
         {
-            var warehouse = (from posummary in _context.POSummary 
-                             join receive in _context.QC_Receiving on posummary.Id equals receive.PO_Summary_Id
-                             select new WarehouseReceivingDto
-                             {
-                                 Id = receive.Id,
-                                 PO_Number = posummary.PO_Number,
-                                 PO_Date = posummary.PO_Date.ToString("MM/dd/yyyy"),
-                                 PR_Number = posummary.PR_Number,
-                                 PR_Date = posummary.PR_Date.ToString("MM/dd/yyyy"),
-                                 ItemCode = posummary.ItemCode,
-                                 ItemDescription = posummary.ItemDescription,
-                                 Supplier = posummary.VendorName,
-                                 QuantityOrdered = posummary.Ordered,
-                                 ActualGood = receive.Actual_Delivered - receive.TotalReject,
-                                 Reject = receive.TotalReject,
-                                 ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
-                                 QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
-                                 IsActive = receive.IsActive,
-                                 IsWareHouseReceive = receive.IsWareHouseReceive != null,
-                                 IsExpiryApprove = receive.ExpiryIsApprove != null,
-                                 ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy")
-                                 
+            var warehouse = (from posummary in _context.POSummary
+                    join receive in _context.QC_Receiving on posummary.Id equals receive.PO_Summary_Id
+                    select new WarehouseReceivingDto
+                    {
+                        Id = receive.Id,
+                        PO_Number = posummary.PO_Number,
+                        PO_Date = posummary.PO_Date.ToString("MM/dd/yyyy"),
+                        PR_Number = posummary.PR_Number,
+                        PR_Date = posummary.PR_Date.ToString("MM/dd/yyyy"),
+                        ItemCode = posummary.ItemCode,
+                        ItemDescription = posummary.ItemDescription,
+                        Supplier = posummary.VendorName,
+                        QuantityOrdered = posummary.Ordered,
+                        ActualGood = receive.Actual_Delivered - receive.TotalReject,
+                        Reject = receive.TotalReject,
+                        ExpirationDate1 = receive.Expiry_Date != null
+                            ? receive.Expiry_Date.Value
+                            : null,
+                        ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                        QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
+                        IsActive = receive.IsActive,
+                        IsWareHouseReceive = receive.IsWareHouseReceive != null,
+                        IsExpiryApprove = receive.ExpiryIsApprove != null,
+                        ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy")
 
-                             }).OrderBy(x => x.PO_Number)
-                               .Where(x => x.IsWareHouseReceive == false)
-                               .Where(x => x.IsExpiryApprove == true)
-                               .Where(x => x.IsActive == true);
+
+                    }).OrderBy(x => x.PO_Number)
+                .Where(x => x.IsWareHouseReceive == false)
+                .Where(x => x.IsExpiryApprove == true || x.ExpirationDate1 == null)
+                .Where(x => x.IsActive == true);
 
             return await PagedList<WarehouseReceivingDto>.CreateAsync(warehouse, userParams.PageNumber, userParams.PageSize);
 
