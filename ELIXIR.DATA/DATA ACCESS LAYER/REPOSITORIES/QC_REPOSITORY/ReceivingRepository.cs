@@ -8,10 +8,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.JSInterop.Implementation;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
@@ -27,6 +30,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         public async Task<bool> AddNewReceivingInformation(PO_Receiving receiving)
         {
             await _context.QC_Receiving.AddAsync(receiving);
+            var validateIfExpriable= await _context.RawMaterials.Where(x => x.ItemCode == receiving.ItemCode)
+                .Where(x => x.IsExpirable == false).FirstOrDefaultAsync();
             
             DateTime dateAdd = DateTime.Now.AddDays(30);
             
@@ -37,7 +42,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 
             if (receiving.Expiry_Date > dateAdd)
                 receiving.ExpiryIsApprove = true;
- 
+            
+            if (validateIfExpriable != null)
+                receiving.ExpiryIsApprove = true;
+            
             receiving.QC_ReceiveDate = DateTime.Now;
 
             return true;
@@ -60,49 +68,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             receiving.QC_ReceiveDate = DateTime.Now;
           
             return await AddNewReceivingInformation(receiving);
-            
-            // var totalreject = await _context.QC_Reject.Where(x => x.PO_ReceivingId == existingInfo.Id)
-            //                                            .Select(x => x.Quantity).SumAsync();
-            //
-            // existingInfo.Manufacturing_Date = receiving.Manufacturing_Date;
-            // existingInfo.Expected_Delivery = receiving.Expected_Delivery;
-            // existingInfo.Expiry_Date = receiving.Expiry_Date;
-            // existingInfo.Actual_Delivered = receiving.Actual_Delivered;
-            // existingInfo.Batch_No = receiving.Batch_No;
-            //
-            // existingInfo.Truck_Approval1 = receiving.Truck_Approval1;
-            // existingInfo.Truck_Approval2 = receiving.Truck_Approval2;
-            // existingInfo.Truck_Approval3 = receiving.Truck_Approval3;
-            // existingInfo.Truck_Approval4 = receiving.Truck_Approval4;
-            //
-            // existingInfo.Truck_Approval1_Remarks = receiving.Truck_Approval1_Remarks;
-            // existingInfo.Truck_Approval2_Remarks = receiving.Truck_Approval2_Remarks;
-            // existingInfo.Truck_Approval3_Remarks = receiving.Truck_Approval3_Remarks;
-            // existingInfo.Truck_Approval4_Remarks = receiving.Truck_Approval4_Remarks;
-            //
-            // existingInfo.Unloading_Approval1 = receiving.Unloading_Approval1;
-            // existingInfo.Unloading_Approval2 = receiving.Unloading_Approval2;
-            // existingInfo.Unloading_Approval3 = receiving.Unloading_Approval3;
-            // existingInfo.Unloading_Approval4 = receiving.Unloading_Approval4;
-            //
-            // existingInfo.Unloading_Approval1_Remarks = receiving.Unloading_Approval1_Remarks;
-            // existingInfo.Unloading_Approval2_Remarks = receiving.Unloading_Approval2_Remarks;
-            // existingInfo.Unloading_Approval3_Remarks = receiving.Unloading_Approval3_Remarks;
-            // existingInfo.Unloading_Approval4_Remarks = receiving.Unloading_Approval4_Remarks;
-            //
-            // existingInfo.Checking_Approval1 = receiving.Checking_Approval1;
-            // existingInfo.Checking_Approval2 = receiving.Checking_Approval2;
-            //
-            // existingInfo.Checking_Approval1_Remarks = receiving.Checking_Approval1_Remarks;
-            // existingInfo.Checking_Approval2_Remarks = receiving.Checking_Approval2_Remarks;
-            //
-            // existingInfo.QA_Approval = receiving.QA_Approval;
-            // existingInfo.QA_Approval_Remarks = receiving.QA_Approval_Remarks;
-            //
-            // existingInfo.TotalReject = totalreject;
-            // existingInfo.IsWareHouseReceive = false;
-            //
-            // return true;
         }
         public async Task<bool> AddNewRejectInfo(PO_Reject reject)
         {
@@ -256,33 +221,101 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         {
             DateTime dateNow = DateTime.Now;
             DateTime dateadd = DateTime.Now.AddDays(30);
+
+            var deliveredItem = _context.QC_Receiving.GroupBy(x => new
+            {
+                x.PO_Summary_Id
+            }).Select(x => new
+            {
+                x.Key.PO_Summary_Id,
+                ACtual_Delivered = x.Sum(x => x.Actual_Delivered)
+            });
             
- 
-            var expiry = (from summary in _context.POSummary
-                          join receiving in _context.QC_Receiving on summary.Id equals receiving.PO_Summary_Id
-                          where receiving.Expiry_Date <= dateadd
-                          select new NearlyExpireDto
-                          {
-                              Id = summary.Id,
-                              PO_Number = summary.PO_Number,
-                              ItemCode = summary.ItemCode,
-                              ItemDescription = summary.ItemDescription,
-                              Supplier = summary.VendorName,
-                              Uom = summary.UOM,
-                              QuantityOrdered = summary.Ordered,
-                              ActualGood = receiving.Actual_Delivered,
-                              ActualRemaining = summary.Ordered - receiving.Actual_Delivered,
-                              ExpiryDate = receiving.Expiry_Date != null ? receiving.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
-                              Days = receiving.Expiry_Date.HasValue ? (int)Math.Round(receiving.Expiry_Date.Value.Subtract(dateNow).TotalDays) : 0,
-                              IsActive = receiving.IsActive,
-                              IsNearlyExpire = receiving.IsNearlyExpire != null,
-                              ExpiryIsApprove = receiving.ExpiryIsApprove != null,
-                              
-                          });
-            return await expiry
-                                .Where(x => x.IsNearlyExpire == true)
-                                .Where(x => x.ExpiryIsApprove == false)
-                                .ToListAsync();
+            var posummary1 = _context.POSummary
+                .Select(x => new 
+                {
+                    x.Id,
+                    x.PO_Number,
+                    x.ItemCode,
+                    x.ItemDescription,
+                    x.VendorName,
+                    x.UOM,
+                    x.Ordered,
+                    x.IsActive
+                })
+                .GroupJoin(deliveredItem, 
+                    x => x.Id, 
+                    y => y.PO_Summary_Id,
+                    (x, y) => new { Summary = x, Delivered = y })
+                .SelectMany(
+                    xy => xy.Delivered.DefaultIfEmpty(),
+                    (x, y) => new {
+                        x.Summary.Id,
+                        x.Summary.PO_Number,
+                        x.Summary.ItemCode,
+                        x.Summary.ItemDescription,
+                        x.Summary.VendorName,
+                        x.Summary.UOM,
+                        x.Summary.Ordered,
+                        x.Summary.IsActive,
+                        ActualGood = y.ACtual_Delivered,
+                        ActualRemaining = x.Summary.Ordered - (y.ACtual_Delivered)
+                    });
+            
+            var nearlyExpiryItems = (from posummary in posummary1
+                join received in _context.QC_Receiving on posummary.Id equals received.PO_Summary_Id into leftj2
+                from received in leftj2.DefaultIfEmpty()
+                where received.ExpiryIsApprove == null
+                where received.IsNearlyExpire == true
+                group new
+                    {
+                        posummary,
+                        received
+                    }
+                    by new
+                    {
+                        posummary.Id,
+                        posummary.PO_Number,
+                        posummary.ItemCode,
+                        posummary.ItemDescription,
+                        posummary.VendorName,
+                        posummary.UOM,
+                        QuantityOrdered = posummary.Ordered,
+                        posummary.IsActive,
+                        ActutalGood = received.Actual_Delivered,
+                        posummary.ActualRemaining,
+                        received.TotalReject,
+                        posummary.ActualGood,
+                        received.ExpiryIsApprove,
+                        ReceivingId = received.Id,
+                        received.IsNearlyExpire,
+                        received.Expiry_Date
+                    }
+                into result
+                select new NearlyExpireDto
+                {
+                    Id = result.Key.Id,
+                    PO_Number = result.Key.PO_Number,
+                    ItemCode = result.Key.ItemCode,
+                    ItemDescription = result.Key.ItemDescription,
+                    Supplier = result.Key.VendorName,
+                    Uom = result.Key.UOM,
+                    QuantityOrdered = result.Key.QuantityOrdered,
+                    IsActive = result.Key.IsActive,
+                    ActualGood = result.Key.ActutalGood,
+                    ActualRemaining = result.Key.ActualRemaining,
+                    TotalReject = result.Key.TotalReject,
+                    ExpiryDate = result.Key.Expiry_Date != null ? result.Key.Expiry_Date.ToString() : null,
+                    Days =  result.Key.Expiry_Date.HasValue
+                        ? (int)Math.Round(result.Key.Expiry_Date.Value.Subtract(dateNow).TotalDays)
+                        : 0,
+                    IsNearlyExpire = result.Key.IsNearlyExpire,
+                    ExpiryIsApprove = result.Key.ExpiryIsApprove,
+                    ReceivingId = result.Key.ReceivingId
+                });
+
+
+            return await nearlyExpiryItems.ToListAsync();
         }
 
         public async Task<bool> ApproveNearlyExpireRawMaterials(PO_Receiving receive)
@@ -314,7 +347,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  QuantityOrdered = posummary.Ordered,
                                  ActualGood = receive.Actual_Delivered,
                                  Reject = receive.TotalReject,
-                                 ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                                 ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.ToString() : null,
                                  QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
                                  IsActive = receive.IsActive,
                                  IsWareHouseReceive = receive.IsWareHouseReceive != null,
@@ -326,7 +359,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                   .Where(x => x.IsExpiryApprove == true)
                                   .Where(x => x.IsActive == true)
                                   .ToListAsync();
-
         }
 
         public async Task<bool> CancelPartialRecevingInQC (PO_Receiving receiving)
@@ -505,11 +537,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             if (validateActualRemaining == null)
                 return true;
              
-            if (validateActualRemaining.ActualRemaining < receiving.Actual_Delivered)
-                return false;
-
-            return true;
-
+            return validateActualRemaining.ActualRemaining >= receiving.Actual_Delivered;
         }
 
         public async Task<bool> ValidateForCancelPo(ImportPOSummary summary)
@@ -568,11 +596,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                                    .Where(x => x.IsQcReceiveIsActive == true)
                                                    .FirstOrDefaultAsync(x => x.Id == summary.Id);
 
-            if (forcancel.ActualGood != 0)
-                return false;
-
-            return true;
-
+            return forcancel.ActualGood == 0;
         }
         public async Task<PagedList<PoSummaryChecklistDto>> GetAllPoSummaryWithPagination(UserParams userParams)
         {
@@ -605,14 +629,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                         Supplier = posummary.VendorName,
                         posummary.UOM,
                         QuantityOrdered = posummary.Ordered,
-                        ActualGood = receive != null && receive.IsActive
-                            ? receive.Actual_Delivered - receive.TotalReject
-                            : 0,
                         posummary.IsActive,
-                        IsQcReceiveIsActive = receive != null && receive.IsActive != false ? receive.IsActive : true,
+                        IsQcReceiveIsActive = receive == null || receive.IsActive == false || receive.IsActive,
                         ActualRemaining = 0,
-                        TotalReject = receive != null && (int)receive.TotalReject != null ? receive.TotalReject : 0,
-                        Expirable = rawmats != null && rawmats.IsExpirable != null ? rawmats.IsExpirable : false
+                        Expirable = rawmats != null && rawmats.IsExpirable
                     }
                 into result
 
@@ -628,13 +648,15 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                     Supplier = result.Key.Supplier,
                     UOM = result.Key.UOM,
                     QuantityOrdered = result.Key.QuantityOrdered,
-                    ActualGood = result.Key.ActualGood,
+                    ActualGood =  result.Sum(x => x.receive != null && x.receive.IsActive ? x.receive.Actual_Delivered - x.receive.TotalReject : 0),
                     IsActive = result.Key.IsActive,
                     IsQcReceiveIsActive = result.Key.IsQcReceiveIsActive,
-                    ActualRemaining = result.Key.QuantityOrdered - result.Sum(x => result.Key.ActualGood),
-                    TotalReject = (int)result.Key.TotalReject,
-                    IsExpirable = result.Key.Expirable
-                });
+                    ActualRemaining = result.Key.QuantityOrdered - result.Sum(x => x.receive != null && x.receive.IsActive ? x.receive.Actual_Delivered - x.receive.TotalReject : 0),
+                    IsExpirable = result.Key.Expirable,
+                    
+                }).OrderBy(x => x.PO_Number)
+                .Where(x => x.ActualRemaining != 0 && (x.ActualRemaining > 0))
+                .Where(x => x.IsActive == true);
             
             return await PagedList<PoSummaryChecklistDto>.CreateAsync(poSummary, userParams.PageNumber, userParams.PageSize);
         }
@@ -729,7 +751,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                         ExpirationDate1 = receive.Expiry_Date != null
                             ? receive.Expiry_Date.Value
                             : null,
-                        ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                        ExpirationDate = receive.Expiry_Date != null
+                            ? receive.Expiry_Date.ToString()
+                            : null,
                         QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
                         IsActive = receive.IsActive,
                         IsWareHouseReceive = receive.IsWareHouseReceive != null,
@@ -764,7 +788,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  QuantityOrdered = posummary.Ordered,
                                  ActualGood = receive.Actual_Delivered - receive.TotalReject,
                                  Reject = receive.TotalReject,
-                                 ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                                 ExpirationDate1 = receive.Expiry_Date != null
+                                     ? receive.Expiry_Date.Value
+                                     : null,
+                                 ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.ToString() : null,
                                  QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
                                  IsActive = receive.IsActive,
                                  IsWareHouseReceive = receive.IsWareHouseReceive != null,
@@ -773,7 +800,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  IsExpirable = rawmats.IsExpirable
                              }).OrderBy(x => x.PO_Number)
                                .Where(x => x.IsWareHouseReceive == false)
-                               .Where(x => x.IsExpiryApprove == true)
+                               .Where(x => x.IsExpiryApprove == true || x.ExpirationDate1 == null)
                                .Where(x => x.IsActive == true)
                                .Where(x => Convert.ToString(x.PO_Number).ToLower()
                                .Contains(search.Trim().ToLower()));
@@ -838,41 +865,106 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             return await PagedList<CancelledPoDto>.CreateAsync(cancelpo, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<PagedList<NearlyExpireDto>> GetAllNearlyExpireWithPagination(UserParams userParams)
-        {
-            DateTime dateNow = DateTime.Now;
+     public async Task<PagedList<NearlyExpireDto>> GetAllNearlyExpireWithPagination(UserParams userParams)
+     {
+          DateTime dateNow = DateTime.Now;
             DateTime dateadd = DateTime.Now.AddDays(30);
 
-            var expiry = (from summary in _context.POSummary
-                          join receiving in _context.QC_Receiving on summary.Id equals receiving.PO_Summary_Id
-                          where receiving.Expiry_Date <= dateadd
-                          select new NearlyExpireDto
-                          {
-                              Id = summary.Id,
-                              PO_Number = summary.PO_Number,
-                              ItemCode = summary.ItemCode,
-                              ItemDescription = summary.ItemDescription,
-                              Supplier = summary.VendorName,
-                              Uom = summary.UOM,
-                              QuantityOrdered = summary.Ordered,
-                              ActualGood = receiving.Actual_Delivered,
-                              ActualRemaining = summary.Ordered - receiving.Actual_Delivered,
-                              ExpiryDate = receiving.Expiry_Date != null ? receiving.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
-                              Days =  receiving.Expiry_Date.HasValue ? (int)Math.Round(receiving.Expiry_Date.Value.Subtract(dateNow).TotalDays) : 0,
-                              IsActive = receiving.IsActive,
-                              IsNearlyExpire = receiving.IsNearlyExpire != null,
-                              ExpiryIsApprove = receiving.ExpiryIsApprove != null,
-                              ReceivingId = receiving.Id
+            var deliveredItem = _context.QC_Receiving.GroupBy(x => new
+            {
+                x.PO_Summary_Id
+            }).Select(x => new
+            {
+                x.Key.PO_Summary_Id,
+                ACtual_Delivered = x.Sum(x => x.Actual_Delivered - x.TotalReject)
+            });
+            
+            var posummary1 = _context.POSummary
+                .Select(x => new 
+                {
+                    x.Id,
+                    x.PO_Number,
+                    x.ItemCode,
+                    x.ItemDescription,
+                    x.VendorName,
+                    x.UOM,
+                    x.Ordered,
+                    x.IsActive
+                })
+                .GroupJoin(deliveredItem, 
+                    x => x.Id, 
+                    y => y.PO_Summary_Id,
+                    (x, y) => new { Summary = x, Delivered = y })
+                .SelectMany(
+                    xy => xy.Delivered.DefaultIfEmpty(),
+                    (x, y) => new {
+                        x.Summary.Id,
+                        x.Summary.PO_Number,
+                        x.Summary.ItemCode,
+                        x.Summary.ItemDescription,
+                        x.Summary.VendorName,
+                        x.Summary.UOM,
+                        x.Summary.Ordered,
+                        x.Summary.IsActive,
+                        ActualGood = y.ACtual_Delivered,
+                        ActualRemaining = x.Summary.Ordered - (y.ACtual_Delivered)
+                    });
 
-                          }).Where(x => x.IsNearlyExpire == true)
-                            .Where(x => x.ExpiryIsApprove == false);
-                          
+            var nearlyExpiryItems = (from posummary in posummary1
+                join received in _context.QC_Receiving on posummary.Id equals received.PO_Summary_Id into leftj2
+                from received in leftj2.DefaultIfEmpty()
+                where received.ExpiryIsApprove == null
+                where received.IsNearlyExpire == true
+                group new
+                    {
+                        posummary,
+                        received
+                    }
+                    by new
+                    {
+                        posummary.Id,
+                        posummary.PO_Number,
+                        posummary.ItemCode,
+                        posummary.ItemDescription,
+                        posummary.VendorName,
+                        posummary.UOM,
+                        QuantityOrdered = posummary.Ordered,
+                        posummary.IsActive,
+                        ActutalGood = received.Actual_Delivered,
+                        posummary.ActualRemaining,
+                        received.TotalReject,
+                        posummary.ActualGood,
+                        received.ExpiryIsApprove,
+                        ReceivingId = received.Id,
+                        received.IsNearlyExpire,
+                        received.Expiry_Date
+                    }
+                into result
+                select new NearlyExpireDto
+                {
+                    Id = result.Key.Id,
+                    PO_Number = result.Key.PO_Number,
+                    ItemCode = result.Key.ItemCode,
+                    ItemDescription = result.Key.ItemDescription,
+                    Supplier = result.Key.VendorName,
+                    Uom = result.Key.UOM,
+                    QuantityOrdered = result.Key.QuantityOrdered,
+                    IsActive = result.Key.IsActive,
+                    ActualGood = result.Key.ActutalGood,
+                    ActualRemaining = result.Key.QuantityOrdered - result.Key.ActualGood,
+                    TotalReject = result.Key.TotalReject,
+                    ExpiryDate = result.Key.Expiry_Date != null ? result.Key.Expiry_Date.ToString() : null,
+                    Days = result.Key.Expiry_Date.HasValue
+                        ? (int)Math.Round(result.Key.Expiry_Date.Value.Subtract(dateNow).TotalDays)
+                        : 0,
+                    IsNearlyExpire = result.Key.IsNearlyExpire,
+                    ExpiryIsApprove = result.Key.ExpiryIsApprove,
+                    ReceivingId = result.Key.ReceivingId
+                });
+         return await PagedList<NearlyExpireDto>.CreateAsync(nearlyExpiryItems, userParams.PageNumber, userParams.PageSize);
 
-            return await PagedList<NearlyExpireDto>.CreateAsync(expiry, userParams.PageNumber, userParams.PageSize);
-
-        }
-
-        public async Task<PagedList<NearlyExpireDto>> GetAllNearlyExpireWithPaginationOrig(UserParams userParams, string search)
+}
+     public async Task<PagedList<NearlyExpireDto>> GetAllNearlyExpireWithPaginationOrig(UserParams userParams, string search)
         {
 
             DateTime dateNow = DateTime.Now;

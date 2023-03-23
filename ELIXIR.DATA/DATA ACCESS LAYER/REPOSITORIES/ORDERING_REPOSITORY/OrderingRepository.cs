@@ -519,8 +519,8 @@ using System.Collections.Generic;
                 .OrderBy(x => x.OrderDate)
                 .Where(x => x.IsActive == true)
                 .Where(x => x.PreparedDate == null)
+                .Where(x => x.ForAllocation == null)
                 // .Where(x => x.AllocatedQuantity != null || x.QuantityOrdered != null)
-                // .Where(x => x.ForAllocation == null)
                 .GroupBy(x => new
                 {
                     x.FarmName,
@@ -777,7 +777,7 @@ using System.Collections.Generic;
                     Farm = x.Key.FarmName,
                     FarmCode = x.Key.FarmCode,
                     QuantityOrder = x.Sum(x => x.Casting),
-                    PreparedDate = x.Key.PreparedDate.ToString(),
+                    PreparedDateTime = x.Key.PreparedDate,
                     IsMove = x.Key.IsMove,
                     IsReject = x.Key.IsReject != null
                 });
@@ -939,6 +939,7 @@ using System.Collections.Generic;
                               ordering.Id,
                               ordering.OrderNoPKey,
                               ordering.OrderDate,
+                              ordering.PreparedDate,
                               ordering.DateNeeded,
                               ordering.FarmName,
                               ordering.FarmCode,
@@ -961,6 +962,7 @@ using System.Collections.Generic;
                               OrderNo = total.Key.OrderNoPKey,
                               OrderDate = total.Key.OrderDate.ToString("MM/dd/yyyy"),
                               DateNeeded = total.Key.DateNeeded.ToString("MM/dd/yyyy"),
+                              PreparedDate = total.Key.PreparedDate.ToString(),
                               Farm = total.Key.FarmName,
                               FarmCode = total.Key.FarmCode,
                               Category = total.Key.Category,
@@ -992,9 +994,9 @@ using System.Collections.Generic;
                     Uom = x.Uom,
                     QuantityOrder = x.AllocatedQuantity == null ? x.QuantityOrdered : (decimal) x.AllocatedQuantity, 
                     Category = x.Category,
-                    OrderDate = x.OrderDate.ToString("MM/dd/yyyy"),
-                    DateNeeded = x.DateNeeded.ToString("MM/dd/yyyy"),
-                    PreparedDate = x.PreparedDate.ToString()
+                    OrderDateTime = x.OrderDate,
+                    DateNeededDateTime = x.DateNeeded,
+                    PreparedDateTime = x.PreparedDate
                 });
 
                 return await orders.Where(x => x.Id == orderid)
@@ -1259,12 +1261,9 @@ using System.Collections.Generic;
                     x.IsApprove,
                     x.DeliveryStatus,
                     x.IsPrepared,
-
                 }).Where(x => x.Key.IsApprove != true)
                 .Where(x => x.Key.DeliveryStatus != null)
                 .Where(x => x.Key.IsPrepared == true)
- 
-
                 .Select(x => new MoveOrderDto
                 {
                     OrderNo = x.Key.OrderNo,
@@ -1295,13 +1294,12 @@ using System.Collections.Generic;
                 x.PreparedDate,
                 x.IsApprove,
                 x.DeliveryStatus,
-                x.IsPrepared,
+                x.IsPrepared
 
             }).Where(x => x.Key.IsApprove != true)
               .Where(x => x.Key.DeliveryStatus != null)
               .Where(x => x.Key.IsPrepared == true)
-
-          .Select(x => new MoveOrderDto
+                .Select(x => new MoveOrderDto
           {
               OrderNo = x.Key.OrderNo,
               FarmName = x.Key.FarmName,
@@ -1343,7 +1341,9 @@ using System.Collections.Generic;
 
         public async Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPagination(UserParams userParams)
         {
-            var orders = _context.MoveOrders.GroupBy(x => new
+            var orders = _context.MoveOrders
+                .Where(x => x.IsActive == true)
+                .GroupBy(x => new
                 {
                     x.OrderNo,
                     x.FarmName,
@@ -1394,11 +1394,11 @@ using System.Collections.Generic;
                 x.ApproveDateTempo,
                 x.IsPrint,
                 x.IsTransact,
+                x.IsActive
             }).Where(x => x.Key.IsApprove == true)
               .Where(x => x.Key.DeliveryStatus != null)
               .Where(x => x.Key.IsReject != true)
-
-
+              .Where(X => X.Key.IsActive == true)
              .Select(x => new MoveOrderDto
              {
                  OrderNo = x.Key.OrderNo,
@@ -1419,7 +1419,9 @@ using System.Collections.Generic;
         }
         public async Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPaginationOrig(UserParams userParams, string search)
         {
-            var orders = _context.MoveOrders.GroupBy(x => new
+            var orders = _context.MoveOrders
+              .Where(X => X.IsActive == true)
+              .GroupBy(x => new
             {
                 x.OrderNo,
                 x.FarmName,
@@ -1432,13 +1434,12 @@ using System.Collections.Generic;
                 x.IsReject,
                 x.ApproveDateTempo,
                 x.IsPrint,
-                x.IsTransact,
+                x.IsTransact
             })
               .Where(x => x.Key.IsApprove == true)
               .Where(x => x.Key.DeliveryStatus != null)
               .Where(x => x.Key.IsReject != true)
-
-             .Select(x => new MoveOrderDto
+              .Select(x => new MoveOrderDto
              {
                  OrderNo = x.Key.OrderNo,
                  FarmName = x.Key.FarmName,

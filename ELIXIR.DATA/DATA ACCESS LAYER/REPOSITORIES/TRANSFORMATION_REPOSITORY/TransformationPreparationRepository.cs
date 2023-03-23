@@ -174,7 +174,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
             warehouse.IsWarehouseReceive = true;
             warehouse.IsActive = true;
             warehouse.Expiration = warehouse.Expiration;
-            warehouse.ExpirationDays = warehouse.Expiration.Subtract(dateNow).Days;
+            warehouse.ExpirationDays = warehouse.Expiration.Value.Subtract(dateNow).Days;
             warehouse.TransformId = id;
             warehouse.BatchCount = countBatch.Count + 1;
 

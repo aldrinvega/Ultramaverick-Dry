@@ -39,7 +39,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL
         }
 
         [Column(TypeName = "Date")]
-        public DateTime ExpirationDate {
+        public DateTime? ExpirationDate {
             get;
             set;
         }

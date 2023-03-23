@@ -366,9 +366,9 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             var details = await _unitOfWork.Order.GetMoveOrderDetailsForMoveOrder(order.OrderNoPKey);
 
             order.OrderNoPKey = details.Id;
-            order.OrderDate = Convert.ToDateTime(details.OrderDate);
-            order.DateNeeded = Convert.ToDateTime(details.DateNeeded);
-            order.PreparedDate = Convert.ToDateTime(details.PreparedDate);
+            order.OrderDate = details.OrderDateTime;
+            order.DateNeeded = details.DateNeededDateTime;
+            order.PreparedDate = details.PreparedDateTime;
             order.FarmName = details.Farm;
             order.FarmCode = details.FarmCode;
             order.FarmType = details.FarmType;

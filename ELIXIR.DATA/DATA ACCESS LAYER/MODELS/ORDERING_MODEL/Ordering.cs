@@ -48,15 +48,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
             get;
             set;
         }
-
-        [Column(TypeName = "Date")]
+        
         public DateTime OrderDate
         {
             get;
             set;
         }
-
-        [Column(TypeName = "Date")]
         public DateTime DateNeeded
         {
             get;
@@ -87,8 +84,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
             get;
             set;
         }
-
-        [Column(TypeName = "decimal(18,2)")]
         public decimal QuantityOrdered
         {
             get;

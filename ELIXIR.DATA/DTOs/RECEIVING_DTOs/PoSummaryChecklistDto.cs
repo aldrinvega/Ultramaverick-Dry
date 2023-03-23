@@ -18,15 +18,16 @@ namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
         public string Supplier { get; set; }
         public string UOM { get; set; } 
         public decimal QuantityOrdered { get; set; }
+        
+        public decimal ActualGoodSUM { get; set; }
         public decimal ActualGood { get; set; }
         public decimal ActualRemaining { get; set; }
         public bool IsActive { get; set; }
         public bool IsQcReceiveIsActive { get; set; }
         public bool IsWarehouseReceived { get; set; }
-        
         public int TotalReject { get; set; }
         public bool  IsExpirable { get; set; }
-
-
+        
+        
     }
 }

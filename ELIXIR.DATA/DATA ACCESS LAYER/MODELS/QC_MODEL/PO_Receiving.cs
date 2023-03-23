@@ -16,8 +16,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
 
         [Column(TypeName = "Date")]
         public DateTime Manufacturing_Date {
-            get; 
-            set; 
+            get;
+            set;
         }
 
         [Column(TypeName = "decimal(18,2)")]

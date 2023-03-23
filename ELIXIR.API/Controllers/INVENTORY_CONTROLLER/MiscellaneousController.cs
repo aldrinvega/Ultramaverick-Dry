@@ -52,7 +52,7 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
             {
 
                 items.IsActive = true;
-                items.ExpirationDays = items.Expiration.Subtract(dateNow).Days;
+                items.ExpirationDays = items.Expiration == null ? 0 : items.Expiration.Value.Subtract(dateNow).Days;
                 items.ReceivingDate = DateTime.Now;
                 items.IsWarehouseReceive = true;
                 items.TransactionType = "MiscellaneousReceipt";

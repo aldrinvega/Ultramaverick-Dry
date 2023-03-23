@@ -45,6 +45,10 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         public string? SetBy { get; set; }
         
         public int casting { get; set; }
+        public DateTime OrderDateTime { get; set; }
+        public DateTime? PreparedDateTime { get; set; }
+        public DateTime DateNeededDateTime { get; set; }
+        
 
 
     }

@@ -36,28 +36,30 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                                                .SumAsync(x => x.ActualGood);
 
             var summary = (from receive in _context.QC_Receiving
-                           where receive.IsActive == true && (receive.IsWareHouseReceive == false || receive.IsWareHouseReceive == null) && receive.ExpiryIsApprove == true
-                           join posummary in _context.POSummary
+                where receive.IsActive == true && (receive.IsWareHouseReceive == false || receive.IsWareHouseReceive == null) && receive.ExpiryIsApprove == true
+                join posummary in _context.POSummary
                            on receive.PO_Summary_Id equals posummary.Id into leftJ
                            from posummary in leftJ.DefaultIfEmpty()
                            where posummary.ItemCode == scanbarcode
-
-                           group receive by new
+               
+                group 
+                               receive
+                           by new
                              {
                                  receive.Id,
                                  posummary.ItemCode,
                                  posummary.ItemDescription,
-                                 posummary.PO_Number,
+                                 posummary.PO_Number,    
                                  posummary.UOM,
                                  posummary.VendorName,
                                  receive.Actual_Delivered,
                                  computeStock,
-                                 receive.IsWareHouseReceive,
-                                 receive.Expiry_Date,
-                                 receive.Manufacturing_Date,
-                                 receive.Expected_Delivery,
-                                 receive.IsActive,
-                                 receive.TotalReject
+                                     receive.IsWareHouseReceive,
+                                     receive.Expiry_Date,
+                                     receive.Manufacturing_Date,
+                                     receive.Expected_Delivery,
+                                     receive.IsActive,
+                                     receive.TotalReject
 
                              } into total
 
@@ -69,25 +71,27 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                  PO_Number = total.Key.PO_Number,
                                  Uom = total.Key.UOM,
                                  Supplier = total.Key.VendorName,
-                                 ActualDelivered = total.Key.Actual_Delivered,
+                                 ActualDelivered = total.Key.Actual_Delivered - total.Key.TotalReject,
                                  TotalReject = total.Key.TotalReject,
-                                 Expiration = total.Key.Expiry_Date != null ? total.Key.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
-                                 ExpirationDays = total.Key.Expiry_Date != null ? total.Key.Expiry_Date.Value.Subtract(dateNow).Days : 0,
+                                 Expiration = (total.Key.Expiry_Date).ToString() != null ? (total.Key.Expiry_Date).ToString() : null,
+                                 //ExpirationDays = total.Key.Expiry_Date == null ? 0 : total.Key.Expiry_Date.Value.Subtract(dateNow).Days,
                                  TotalStock = total.Key.computeStock,
                                  IsWarehouseReceived = total.Key.IsWareHouseReceive != null,
                                  ManufacturingDate = total.Key.Manufacturing_Date.ToString("MM/dd/yyyy"),
                                  ExpectedDelivery = total.Key.Expected_Delivery,
                                  IsActive = total.Key.IsActive
-                                 
+
                              });
 
-            return await summary.FirstOrDefaultAsync();
+                return await summary.FirstOrDefaultAsync();
 
         }
 
         public async Task<bool> ReceiveMaterialsFromWarehouse(WarehouseReceiving warehouse)
         {
-            DateTime dateNow = DateTime.Now;
+            //var ActualGood = warehouse.ActualGood - warehouse.TotalReject;
+           
+
 
             var scanbarcode = (from posummary in _context.POSummary
                                join receive in _context.QC_Receiving on posummary.Id equals receive.PO_Summary_Id
@@ -100,11 +104,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                    PO_Number = posummary.PO_Number,
                                    Supplier = posummary.VendorName,
                                    Uom = posummary.UOM,
-                                   ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy"),
+                                   ManufacturingDate = receive.Manufacturing_Date.ToString(),
                                    ActualDelivered = receive.Actual_Delivered,
                                    TotalReject = receive.TotalReject,
-                                   Expiration = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
-                                   ExpirationDays = receive.Expiry_Date != null ? receive.Expiry_Date.Value.Subtract(dateNow).Days : 0,
+                                   Expiration = receive.Expiry_Date != null ? receive.Expiry_Date.ToString() : null,
+                                   ExpirationDays = receive.Expiry_Date.HasValue ? (int)Math.Round(receive.Expiry_Date.Value.Subtract(DateTime.Now).TotalDays) : 0,
                                    IsActive = receive.IsActive,
                                    IsWarehouseReceived = receive.IsWareHouseReceive != null,
                                    ExpiryIsApprove = receive.ExpiryIsApprove != null
@@ -113,10 +117,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                  .Where(x => x.ExpiryIsApprove == true)
                                  .FirstOrDefault(x => x.ItemCode == warehouse.ItemCode);
 
-            if (scanbarcode.ActualDelivered < warehouse.ActualGood)
+            var ActualDelivered = scanbarcode.ActualDelivered - scanbarcode.TotalReject;
+
+            if (ActualDelivered < warehouse.ActualGood)
                 return false;
 
-            warehouse.ItemCode = scanbarcode.ItemCode;
             warehouse.ItemDescription = scanbarcode.ItemDescription;
             warehouse.Supplier = scanbarcode.Supplier;
             warehouse.PO_Number = scanbarcode.PO_Number;
@@ -124,7 +129,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
             warehouse.ActualDelivered = scanbarcode.ActualDelivered;
             warehouse.QuantityGood = scanbarcode.ActualDelivered;
             warehouse.ManufacturingDate = Convert.ToDateTime(scanbarcode.ManufacturingDate);
-            warehouse.Expiration = Convert.ToDateTime(scanbarcode.Expiration);
+            warehouse.Expiration = scanbarcode.Expiration == null ? null : Convert.ToDateTime(scanbarcode.Expiration);
             warehouse.ExpirationDays = scanbarcode.ExpirationDays;
             warehouse.IsWarehouseReceive = true;
             warehouse.IsActive = true;
@@ -268,7 +273,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                    ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy"),
                                    ActualDelivered = receive.Actual_Delivered,
                                    Expiration = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
-                                   ExpirationDays = receive.Expiry_Date.HasValue ? receive.Expiry_Date.Value.Subtract(dateNow).Days : 0,
+                                   // ExpirationDays = receive.Expiry_Date.HasValue ? receive.Expiry_Date.Value.Subtract(dateNow).Days : 0,
                                    IsActive = receive.IsActive,
                                    IsWarehouseReceived = receive.IsWareHouseReceive != null,
                                    ExpiryIsApprove = receive.ExpiryIsApprove != null, 
@@ -300,7 +305,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                  QuantityOrdered = posummary.Ordered,
                                  ActualGood = receive.Actual_Delivered - receive.TotalReject,
                                  Reject = receive.TotalReject,
-                                 ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                                 ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.ToString() : null,
                                  QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
                                  IsActive = receive.IsActive,
                                  IsWareHouseReceive = receive.IsWareHouseReceive != null,
@@ -334,7 +339,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
         {
             DateTime dateNow = DateTime.Now;
 
-            var scanbarcode =  (from posummary in _context.POSummary
+            var scanbarcode = (from posummary in _context.POSummary
                                join receive in _context.QC_Receiving on posummary.Id equals receive.PO_Summary_Id
                                select new WareHouseScanBarcode
                                {
@@ -347,18 +352,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                    Uom = posummary.UOM,
                                    ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy"),
                                    ActualDelivered = receive.Actual_Delivered,
-                                   Expiration = receive.Expiry_Date != null ?  receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
-                                   ExpirationDays = receive.Expiry_Date.HasValue ? receive.Expiry_Date.Value.Subtract(dateNow).Days : 0,
+                                   Expiration = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                                   ExpirationDays = receive.Expiry_Date.HasValue
+                                       ? (int)Math.Round(receive.Expiry_Date.Value.Subtract(dateNow).TotalDays)
+                                       : 0,
                                    IsActive = receive.IsActive,
                                    IsWarehouseReceived = receive.IsWareHouseReceive != null,
-                                   ExpiryIsApprove = receive.ExpiryIsApprove != null
+                                   ExpiryIsApprove = receive.ExpiryIsApprove != null,
+                                   TotalReject = receive.TotalReject
                                }).Where(x => x.IsWarehouseReceived == false)
                                  .Where(x => x.IsActive == true)
                                  .Where(x => x.ExpiryIsApprove == true)
                                  .FirstOrDefault(x => x.ItemCode == warehouse.ItemCode);
 
 
-            if ((warehouse.ActualGood + warehouse.TotalReject) != scanbarcode.ActualDelivered)
+            if ((warehouse.ActualGood + warehouse.TotalReject) != scanbarcode.ActualDelivered - scanbarcode.TotalReject)
                 return false;
 
 
@@ -486,7 +494,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                  QuantityOrdered = posummary.Ordered,
                                  ActualGood = receive.Actual_Delivered,
                                  Reject = receive.TotalReject,
-                                 ExpirationDate =  receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                                 ExpirationDate =  receive.Expiry_Date != null ? receive.Expiry_Date.ToString() : null,
                                  QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
                                  IsActive = receive.IsActive,
                                  IsWareHouseReceive = receive.IsWareHouseReceive != null,
@@ -513,7 +521,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                  QuantityOrdered = posummary.Ordered,
                                  ActualGood = receive.Actual_Delivered,
                                  Reject = receive.TotalReject,
-                                 ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                                 ExpirationDate = receive.Expiry_Date != null ? receive.Expiry_Date.ToString() : null,
                                  QC_ReceivedDate = receive.QC_ReceiveDate.ToString("MM/dd/yyyy"),
                                  IsActive = receive.IsActive,
                                  IsWareHouseReceive = receive.IsWareHouseReceive != null,
@@ -747,13 +755,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                       warehouse.LotCategory,
                                       warehouse.Uom,
                                       warehouse.ActualGood,
-                                      warehouse.Expiration,
+                                      ExpirationDate = warehouse.Expiration != null ? warehouse.Expiration.ToString() : null ,
                                       warehouse.ExpirationDays,
                                       warehouse.Supplier,
                                       warehouse.ReceivedBy,
                                       PreparationOut = preparation.Out != null ? preparation.Out : 0,
                                       MoveOrderOut = moveorder.Out != null ? moveorder.Out : 0,
-                                      IssueOut = issue.Out != null ? issue.Out : 0
+                                      IssueOut = issue.Out != null ? issue.Out : 0 
 
                                   } into total
 
@@ -766,9 +774,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                           ItemDescription = total.Key.ItemDescription,
                                           ManufacturingDate = total.Key.ManufacturingDate.ToString("MM/dd/yyyy"),
                                           ActualGood = total.Key.ActualGood - total.Key.PreparationOut - total.Key.MoveOrderOut - total.Key.IssueOut,
-                                          ExpirationDate = total.Key.Expiration.ToString(),
+                                          ExpirationDate = total.Key.ExpirationDate == null ? null : total.Key.ExpirationDate.ToString(),
                                           ExpirationDay = total.Key.ExpirationDays,
-
                                       });
 
             return await warehouseInventory.ToListAsync();
@@ -854,7 +861,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                       warehouse.LotCategory,
                                       warehouse.Uom,
                                       warehouse.ActualGood,
-                                      warehouse.Expiration,
+                                      ExpirationDate =  warehouse.Expiration == null ? null : warehouse.Expiration.ToString(),
                                       warehouse.ExpirationDays,
                                       warehouse.Supplier,
                                       warehouse.ReceivedBy,
@@ -875,7 +882,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                           ItemDescription = total.Key.ItemDescription,
                                           ManufacturingDate = total.Key.ManufacturingDate.ToString("MM/dd/yyyy"),
                                           ActualGood = total.Key.ActualGood - total.Key.PreparationOut - total.Key.MoveOrderOut - total.Key.IssueOut,
-                                          ExpirationDate = total.Key.Expiration.ToString(),
+                                          ExpirationDate = total.Key.ExpirationDate != null ? total.Key.ExpirationDate.ToString() : null,
                                           ExpirationDay = total.Key.ExpirationDays,
 
                                       });
@@ -897,7 +904,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                                           Supplier = x.Supplier,
                                                           ActualGood = x.ActualGood,
                                                           ManufacturingDate = x.ManufacturingDate.ToString("MM/dd/yyyy"),
-                                                          ExpirationDate = x.Expiration.ToString("MM/dd/yyyy"),
+                                                          ExpirationDate = x.Expiration.ToString(),
                                                           ExpirationDay = x.ExpirationDays
                                                       });
 
@@ -917,7 +924,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                                          Supplier = x.Supplier,
                                                          ActualGood = x.ActualGood,
                                                          ManufacturingDate = x.ManufacturingDate.ToString("MM/dd/yyyy"),
-                                                         ExpirationDate = x.Expiration.ToString("MM/dd/yyyy"),
+                                                         ExpirationDate = x.Expiration.ToString(),
                                                          ExpirationDay = x.ExpirationDays
                                                      }).Where(x => x.ItemCode.ToLower()
                                                        .Contains(search.Trim().ToLower()));
@@ -925,7 +932,5 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
             return await PagedList<WarehouseReceivingDto>.CreateAsync(warehouse, userParams.PageNumber, userParams.PageSize);
 
         }
-
-      
     }
 }

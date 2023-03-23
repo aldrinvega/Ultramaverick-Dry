@@ -25,6 +25,7 @@ namespace ELIXIR.DATA.DTOs.WAREHOUSE_DTOs
         public bool ExpiryIsApprove { get; set; }
         public decimal ExpectedDelivery { get; set; }
         public decimal TotalReject { get; set; }
+        public DateTime ManufacturingDateTime { get; set; }
 
 
     }
