@@ -867,16 +867,16 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         
         //Checklist
         
-        // [HttpGet("GetAllChecklistByPoSummaryId")]
-        //
-        // public async Task<IActionResult> GetAllChecklistByPoSummaryId()
-        // {
-        //     var checklist = await _unitOfWork.QcChecklist.GetAllChecklist();
-        //
-        //     if (checklist == null)
-        //         return BadRequest("No Checklist Found");
-        //     return Ok(checklist);
-        // }
+        [HttpGet("GetAllChecklistByPoSummaryId")]
+        
+        public async Task<IActionResult> GetAllChecklistByPoSummaryId()
+        {
+            var checklist = await _unitOfWork.QcChecklist.GetAllChecklist();
+        
+            if (checklist == null)
+                return BadRequest("No Checklist Found");
+            return Ok(checklist);
+        }
 
         [HttpPut("ManualAllocation")]
 

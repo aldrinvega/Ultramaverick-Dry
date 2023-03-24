@@ -11,7 +11,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
         [Key]
         public int ChecklistStringId { get; set; }
         public int PO_ReceivingId { get; set; }
-        
         public string Checlist_Type { get; set; }
 
         // [NotMapped]

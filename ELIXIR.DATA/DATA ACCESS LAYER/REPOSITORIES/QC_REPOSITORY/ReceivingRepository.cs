@@ -201,7 +201,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                               .Where(x => x.DateCancelled != null)
                               .Where(x => x.Remarks != null);
 
-            return await cancelpo.ToListAsync();   
+            return await cancelpo.ToListAsync();
         }
         public async Task<bool> ReturnPoInAvailableList(ImportPOSummary summary)
         {
