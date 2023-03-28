@@ -1092,13 +1092,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  //            select new MoveOrderDto
                                  //            {
                                  //              PreparedDate = a.PreparedDate.ToString()
-                                 //            }).FirstOrDefault()
-
+                                 // }).FirstOrDefault()
                              });
-
             return await PagedList<MRPDto>.CreateAsync(inventory, userParams.PageNumber, userParams.PageSize);
         }
-
+        
         public async Task<PagedList<MRPDto>> GetAllItemForInventoryPaginationOrig(UserParams userParams, string search)
         {
             var EndDate = DateTime.Now;
@@ -1181,7 +1179,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 });
 
             var getTransformation = _context.Transformation_Preparation.Where(x => x.IsActive == true)
-                                                                      
                 .GroupBy(x => new
                 {
                     x.ItemCode,
