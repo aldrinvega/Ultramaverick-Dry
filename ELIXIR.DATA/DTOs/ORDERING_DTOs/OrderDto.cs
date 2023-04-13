@@ -37,12 +37,18 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         public int OrderNoPKey { get; set; }
         public string DeliveryStatus { get; set; }
 
-        public bool IsBeingPrepared { get; set; }
+        public bool? IsBeingPrepared { get; set; }
         public int? AllocatedQuantity { get; set; }
         public int? TotalAllocatedOrder { get; set; }
         public int Days { get; set; }
         public bool? ForAllocation { get; set; }
         public string? SetBy { get; set; }
+        
+        public int casting { get; set; }
+        public DateTime OrderDateTime { get; set; }
+        public DateTime? PreparedDateTime { get; set; }
+        public DateTime DateNeededDateTime { get; set; }
+        
 
 
     }

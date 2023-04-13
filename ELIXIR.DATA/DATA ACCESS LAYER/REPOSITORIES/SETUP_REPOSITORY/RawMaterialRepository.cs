@@ -6,6 +6,7 @@ using ELIXIR.DATA.DTOs.SETUP_DTOs;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,7 +43,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                         DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
                                         AddedBy = rawmaterial.AddedBy,
                                         IsActive = rawmaterial.IsActive,
-                                        Reason = rawmaterial.Reason
+                                        Reason = rawmaterial.Reason,
+                                        IsExpirable = rawmaterial.IsExpirable
                                     });
                 return await rawmaterials.ToListAsync();
         }
@@ -65,7 +67,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                     DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
                                     AddedBy = rawmaterial.AddedBy,
                                     IsActive = rawmaterial.IsActive,
-                                    Reason = rawmaterial.Reason
+                                    Reason = rawmaterial.Reason,
+                                    IsExpirable = rawmaterial.IsExpirable
                                 });
             return await rawmaterials.FirstOrDefaultAsync(x => x.Id == id);
         }
@@ -86,7 +89,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                     DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
                                     AddedBy = rawmaterial.AddedBy,
                                     IsActive = rawmaterial.IsActive,
-                                    Reason = rawmaterial.Reason
+                                    Reason = rawmaterial.Reason,
+                                    IsExpirable = rawmaterial.IsExpirable
                                 });
 
             return await rawmaterials.OrderBy(x => x.ItemCode)
@@ -110,7 +114,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                     DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
                                     AddedBy = rawmaterial.AddedBy,
                                     IsActive = rawmaterial.IsActive,
-                                    Reason = rawmaterial.Reason
+                                    Reason = rawmaterial.Reason,
+                                    IsExpirable = rawmaterial.IsExpirable
                                 });
 
             return await rawmaterials
@@ -142,6 +147,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             existingRawmaterial.ItemCategoryId = rawmaterial.ItemCategoryId;
             existingRawmaterial.UomId = rawmaterial.UomId;
             existingRawmaterial.BufferLevel = rawmaterial.BufferLevel;
+            existingRawmaterial.IsExpirable = rawmaterial.IsExpirable;
 
             return true;
         }
@@ -157,6 +163,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             existingRawMaterial.BufferLevel = existingRawMaterial.BufferLevel;
             existingRawMaterial.Reason = rawmaterial.Reason;
             existingRawMaterial.IsActive = false;
+            existingRawMaterial.IsExpirable = rawmaterial.IsExpirable;
 
             if (rawmaterial.Reason == null)
                 existingRawMaterial.Reason = "Change Data";
@@ -176,6 +183,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             existingRawMaterial.BufferLevel = existingRawMaterial.BufferLevel;
             existingRawMaterial.Reason = rawmaterial.Reason;
             existingRawMaterial.IsActive = true;
+            existingRawMaterial.IsExpirable = rawmaterial.IsExpirable;
 
             if (rawmaterial.Reason == null)
                 existingRawMaterial.Reason = "Reopened Raw Materrial";
@@ -350,7 +358,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                     DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
                                     AddedBy = rawmaterial.AddedBy,
                                     IsActive = rawmaterial.IsActive,
-                                    Reason = rawmaterial.Reason
+                                    Reason = rawmaterial.Reason,
+                                    IsExpirable = rawmaterial.IsExpirable
                                 }).OrderBy(x => x.ItemCode)
                                   .Where(x => x.IsActive == status);
 
@@ -363,6 +372,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             var rawmaterials = (from rawmaterial in _context.RawMaterials
                                 join category in _context.ItemCategories on rawmaterial.ItemCategoryId equals category.Id
                                 join uom in _context.UOMS on rawmaterial.UomId equals uom.Id
+                                join rawmats in _context.RawMaterials on rawmaterial.ItemCode equals rawmats.ItemCode 
                                 orderby rawmaterial.DateAdded descending
                                 select new RawMaterialDto
                                 {
@@ -377,7 +387,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                     DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
                                     AddedBy = rawmaterial.AddedBy,
                                     IsActive = rawmaterial.IsActive,
-                                    Reason = rawmaterial.Reason
+                                    Reason = rawmaterial.Reason,
+                                    IsExpirable = rawmats.IsExpirable
                                 }).OrderBy(x => x.ItemCode)
                                   .Where(x => x.IsActive == status)
                                   .Where(x => x.ItemCode.ToLower()

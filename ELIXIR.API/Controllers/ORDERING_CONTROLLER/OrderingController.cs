@@ -29,11 +29,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("GetAllListofOrders")]
         public async Task<IActionResult> GetAllListofOrders([FromQuery] string farms)
         {
-
             var orders = await _unitOfWork.Order.GetAllListofOrders(farms);
-
             return Ok(orders);
-
         }
 
         [HttpPut]
@@ -369,9 +366,9 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             var details = await _unitOfWork.Order.GetMoveOrderDetailsForMoveOrder(order.OrderNoPKey);
 
             order.OrderNoPKey = details.Id;
-            order.OrderDate = Convert.ToDateTime(details.OrderDate);
-            order.DateNeeded = Convert.ToDateTime(details.DateNeeded);
-            order.PreparedDate = Convert.ToDateTime(details.PreparedDate);
+            order.OrderDate = details.OrderDateTime;
+            order.DateNeeded = details.DateNeededDateTime;
+            order.PreparedDate = details.PreparedDateTime;
             order.FarmName = details.Farm;
             order.FarmCode = details.FarmCode;
             order.FarmType = details.FarmType;
@@ -820,6 +817,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         public async Task<IActionResult> AllocateOrderPerItem([FromBody] List<AllocationDTO> itemCode)
         {
             var orders = await _unitOfWork.Order.AllocateOrdersPerItems(itemCode);
+            await _unitOfWork.CompleteAsync();
             return Ok(orders);
         }
         [HttpGet]
@@ -869,24 +867,25 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         
         //Checklist
         
-        // [HttpGet("GetAllChecklistByPoSummaryId")]
-        //
-        // public async Task<IActionResult> GetAllChecklistByPoSummaryId()
-        // {
-        //     var checklist = await _unitOfWork.QcChecklist.GetAllChecklist();
-        //
-        //     if (checklist == null)
-        //         return BadRequest("No Checklist Found");
-        //     return Ok(checklist);
-        // }
+        //[HttpGet("GetAllChecklistByPoSummaryId")]
+        
+        //public async Task<IActionResult> GetAllChecklistByPoSummaryId()
+        //{
+        //    var checklist = await _unitOfWork.QcChecklist.GetAllChecklist();
+        
+        //    if (checklist == null)
+        //        return BadRequest("No Checklist Found");
+        //    return Ok(checklist);
+        //}
 
         [HttpPut("ManualAllocation")]
 
         public async Task<IActionResult> ManualAllocateOrders(List<ManualAllocation> order)
         {
             var isSuccess = await _unitOfWork.Order.ManualAllocationForOrders(order);
+            await _unitOfWork.CompleteAsync();
             if(isSuccess)
-                return Ok();
+                return Ok("Manual Allocation Complete");
             return new JsonResult("Something Wrong");
         }
 

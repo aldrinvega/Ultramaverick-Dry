@@ -219,7 +219,6 @@ using System.Collections.Generic;
                               IsActive = total.Key.IsActive,
                               IsPrepared = total.Key.IsPrepared,
                               StockOnHand = total.Key.Reserves
-                     //         Days = total.Key.DateNeeded.Subtract(datenow).Days                         
                           });
 
             return await orders.ToListAsync();
@@ -257,7 +256,6 @@ using System.Collections.Generic;
             {
 
                 Id = x.Id,
-
                 FarmCode = x.FarmCode,
                 Category = x.Category,
                 QuantityOrder = x.AllocatedQuantity == null ? x.QuantityOrdered : (decimal)x.AllocatedQuantity,
@@ -383,7 +381,6 @@ using System.Collections.Generic;
 
                           group warehouse by new
                           {
-
                               ordering.Id,
                               ordering.OrderDate,
                               ordering.DateNeeded,
@@ -399,13 +396,10 @@ using System.Collections.Generic;
                               ordering.PreparedDate,
                               ordering.IsApproved,
                               ordering.AllocatedQuantity
-                             
-
                           } into total
 
                           select new OrderDto
                           {
-
                               Id = total.Key.Id,
                               OrderDate = total.Key.OrderDate.ToString("MM/dd/yyyy"),
                               DateNeeded = total.Key.DateNeeded.ToString("MM/dd/yyyy"),
@@ -424,11 +418,7 @@ using System.Collections.Generic;
                               IsApproved = total.Key.IsApproved != null
 
                           });
-
             return await orders.ToListAsync();
-
-
-
         }
         public async Task<bool> AddNewOrders(Ordering orders)
         {
@@ -529,8 +519,8 @@ using System.Collections.Generic;
                 .OrderBy(x => x.OrderDate)
                 .Where(x => x.IsActive == true)
                 .Where(x => x.PreparedDate == null)
+                .Where(x => x.ForAllocation == null)
                 // .Where(x => x.AllocatedQuantity != null || x.QuantityOrdered != null)
-                // .Where(x => x.ForAllocation == null)
                 .GroupBy(x => new
                 {
                     x.FarmName,
@@ -655,8 +645,6 @@ using System.Collections.Generic;
                 QuantityOrder = x.AllocatedQuantity == null ? x.QuantityOrdered : (decimal)x.AllocatedQuantity
 
             });
-
-
             return await orders.Where(x => x.Farm == farm)
                                .ToListAsync();
 
@@ -669,7 +657,6 @@ using System.Collections.Generic;
                 x.FarmName,
                 x.FarmCode,
                 x.FarmType,
-     //           x.OrderDate,
                 x.PreparedDate,
                 x.IsApproved,
                 x.IsActive,
@@ -684,7 +671,6 @@ using System.Collections.Generic;
                    FarmCode = x.Key.FarmCode,
                    Category = x.Key.FarmType,
                    TotalAllocatedOrder = x.Key.AllocatedQuantity == null ? (int)x.Sum(x => x.QuantityOrdered) : (int)x.Sum(x => x.AllocatedQuantity),
-              //     OrderDate = x.Key.OrderDate.ToString("MM/dd/yyyy"),
                    PreparedDate = x.Key.PreparedDate.ToString()
                });
 
@@ -741,9 +727,7 @@ using System.Collections.Generic;
                     x.FarmName,
                     x.IsActive,
                     x.IsApproved,
-                    x.IsMove,
-                    x.IsBeingPrepared,
-                    x.SetBy
+                    x.IsMove
 
                 }).Where(x => x.Key.IsActive == true)
                 .Where(x => x.Key.IsApproved == true)
@@ -752,51 +736,54 @@ using System.Collections.Generic;
                 {
                     Farm = x.Key.FarmName,
                     IsActive = x.Key.IsActive,
-                    IsApproved = x.Key.IsApproved != null,
-                    IsBeingPrepared = x.Key.IsBeingPrepared != null,
-                    SetBy = x.Key.SetBy
+                    IsApproved = x.Key.IsApproved != null
                 });
 
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
-
-
         }
-        public async Task<IReadOnlyList<OrderDto>> TotalListOfApprovedPreparedDate(string farm)
-        {
-
-            var orders = _context.Orders.GroupBy(x => new
+            public async Task<IReadOnlyList<OrderDto>> TotalListOfApprovedPreparedDate(string farm)
             {
+                var orders = await _context.Orders
+                    .Where(x => x.FarmName == farm && x.IsApproved == true && x.PreparedDate != null && x.IsMove == false)
+                    .Select(x => new 
+                    { 
+                        x.OrderNoPKey, 
+                        x.FarmName, 
+                        x.FarmCode, 
+                        x.PreparedDate, 
+                        x.IsApproved, 
+                        x.IsMove, 
+                        x.IsReject, 
+                        x.Remarks, 
+                        x.AllocatedQuantity, 
+                        x.QuantityOrdered,
+                        Casting = x.AllocatedQuantity == null ? x.QuantityOrdered : (decimal)x.AllocatedQuantity
+                    })
+                    .ToListAsync();
 
-                x.OrderNoPKey,
-                x.FarmName,
-                x.FarmCode,
-                x.PreparedDate,
-                x.IsApproved,
-                x.IsMove,
-                x.IsReject,
-                x.Remarks,
-                x.AllocatedQuantity,
-                x.QuantityOrdered
+                var orderGroups = orders.GroupBy(x => new 
+                { 
+                    x.OrderNoPKey,
+                    x.FarmName,
+                    x.FarmCode, 
+                    x.PreparedDate, 
+                    x.IsApproved, 
+                    x.IsMove, 
+                    x.IsReject, 
+                    x.Remarks
+                }).Select(x => new OrderDto
+                {
+                    Id = x.Key.OrderNoPKey,
+                    Farm = x.Key.FarmName,
+                    FarmCode = x.Key.FarmCode,
+                    QuantityOrder = x.Sum(x => x.Casting),
+                    PreparedDateTime = x.Key.PreparedDate,
+                    IsMove = x.Key.IsMove,
+                    IsReject = x.Key.IsReject != null
+                });
 
-            }).Where(x => x.Key.FarmName == farm)
-              .Where(x => x.Key.IsApproved == true)
-              .Where(x => x.Key.PreparedDate != null)
-              .Where(x => x.Key.IsMove == false)
-              .Select(x => new OrderDto
-            {
-                Id = x.Key.OrderNoPKey,
-                Farm = x.Key.FarmName,
-                FarmCode = x.Key.FarmCode,
-                QuantityOrder = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
-                PreparedDate = x.Key.PreparedDate.ToString(),
-                IsMove = x.Key.IsMove,
-                IsReject = x.Key.IsReject != null,
-                Remarks = x.Key.Remarks
-            });
-
-            return await orders.ToListAsync();
-
-        }
+                return orderGroups.ToList();
+            }
         public async Task<bool> GenerateNumber(GenerateOrderNo generate)
         {
             await _context.GenerateOrderNos.AddAsync(generate);
@@ -858,7 +845,6 @@ using System.Collections.Generic;
                                       In = total.Key.ActualGood,
                                       Out = total.Sum(x => x.Out),
                                       Remaining = total.Key.ActualGood - total.Sum(x => x.Out)
-
                                   });
 
             var totalOrders = _context.Orders.GroupBy(x => new
@@ -872,7 +858,6 @@ using System.Collections.Generic;
                 ItemCode = x.Key.ItemCode,
                 TotalOrders = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
                 IsPrepared = x.Key.IsPrepared
-
             }).Where(x => x.IsPrepared == false);
 
 
@@ -887,7 +872,6 @@ using System.Collections.Generic;
 
                           group warehouse by new
                           {
-
                               ordering.Id,
                               ordering.OrderDate,
                               ordering.DateNeeded,
@@ -903,13 +887,10 @@ using System.Collections.Generic;
                               ordering.PreparedDate,
                               ordering.IsApproved,
                               ordering.AllocatedQuantity
-
-
                           } into total
 
                           select new OrderDto
                           {
-
                               Id = total.Key.Id,
                               OrderDate = total.Key.OrderDate.ToString("MM/dd/yyyy"),
                               DateNeeded = total.Key.DateNeeded.ToString("MM/dd/yyyy"),
@@ -928,12 +909,7 @@ using System.Collections.Generic;
                               IsApproved = total.Key.IsApproved != null
 
                           });
-
-
             return await orders.ToListAsync();
-
-        
-
         }
         public async Task<IReadOnlyList<OrderDto>> ListOfOrdersForMoveOrder(int id)
         {
@@ -963,6 +939,7 @@ using System.Collections.Generic;
                               ordering.Id,
                               ordering.OrderNoPKey,
                               ordering.OrderDate,
+                              ordering.PreparedDate,
                               ordering.DateNeeded,
                               ordering.FarmName,
                               ordering.FarmCode,
@@ -973,7 +950,8 @@ using System.Collections.Generic;
                               ordering.QuantityOrdered,
                               ordering.IsApproved,
                               ordering.AllocatedQuantity,
-                              ordering.SetBy
+                              ordering.SetBy,
+                              ordering.IsBeingPrepared
 
                           } into total
 
@@ -984,6 +962,7 @@ using System.Collections.Generic;
                               OrderNo = total.Key.OrderNoPKey,
                               OrderDate = total.Key.OrderDate.ToString("MM/dd/yyyy"),
                               DateNeeded = total.Key.DateNeeded.ToString("MM/dd/yyyy"),
+                              PreparedDate = total.Key.PreparedDate.ToString(),
                               Farm = total.Key.FarmName,
                               FarmCode = total.Key.FarmCode,
                               Category = total.Key.Category,
@@ -993,7 +972,8 @@ using System.Collections.Generic;
                               QuantityOrder = total.Key.AllocatedQuantity == null ? total.Key.QuantityOrdered : (decimal)total.Key.AllocatedQuantity,
                               IsApproved = total.Key.IsApproved != null,
                               PreparedQuantity = total.Sum(x => x.QuantityPrepared),
-                              SetBy = total.Key.SetBy
+                              SetBy = total.Key.SetBy,
+                              IsBeingPrepared = total.Key.IsBeingPrepared
                           });
 
             return await orders.ToListAsync();
@@ -1014,10 +994,9 @@ using System.Collections.Generic;
                     Uom = x.Uom,
                     QuantityOrder = x.AllocatedQuantity == null ? x.QuantityOrdered : (decimal) x.AllocatedQuantity, 
                     Category = x.Category,
-                    OrderDate = x.OrderDate.ToString("MM/dd/yyyy"),
-                    DateNeeded = x.DateNeeded.ToString("MM/dd/yyyy"),
-                    PreparedDate = x.PreparedDate.ToString()
-
+                    OrderDateTime = x.OrderDate,
+                    DateNeededDateTime = x.DateNeeded,
+                    PreparedDateTime = x.PreparedDate
                 });
 
                 return await orders.Where(x => x.Id == orderid)
@@ -1057,7 +1036,6 @@ using System.Collections.Generic;
 
                                   group totalOut by new
                                   {
-
                                       totalIn.Id,
                                       totalIn.ItemCode,
                                       totalIn.ItemDescription,
@@ -1065,7 +1043,6 @@ using System.Collections.Generic;
                                       totalIn.Expiration,
                                       totalIn.ActualGood,
                                       totalIn.ExpirationDays
-                          
                                   } into total
 
                                   orderby total.Key.ExpirationDays ascending
@@ -1081,7 +1058,6 @@ using System.Collections.Generic;
                                       In = total.Key.ActualGood,
                                       Out = total.Sum(x => x.Out),
                                       Remaining = total.Key.ActualGood - total.Sum(x => x.Out) - totaloutMoveorder - totalIssue
-
                                   };
 
             return await totalRemaining.Where(x => x.Remaining != 0)
@@ -1173,12 +1149,10 @@ using System.Collections.Generic;
 
             foreach(var items in existing)
             {
-
                 items.ApprovedDate = DateTime.Now;
                 items.ApproveDateTempo = DateTime.Now;
                 items.IsApprove = true;
             }
-
             return true;
         }
         public async Task<bool> RejectForMoveOrder(MoveOrder moveorder)
@@ -1239,12 +1213,14 @@ using System.Collections.Generic;
 
             return true;
         }
+
+       
+
         public async Task<bool> ReturnMoveOrderForApproval(MoveOrder moveorder)
         {
             var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
                                                     .ToListAsync();
-
-
+            
             var existingOrders = await _context.Orders.Where(x => x.OrderNoPKey == moveorder.OrderNo)
                                                       .ToListAsync();
 
@@ -1266,46 +1242,40 @@ using System.Collections.Generic;
                 items.IsReject = null;
                 items.RejectBy = null;
                 items.Remarks = moveorder.Remarks;
-
             }
-
             return true;
-
         }
+        
         public async Task<PagedList<MoveOrderDto>> ForApprovalMoveOrderPagination(UserParams userParams)
 
         {
             var orders = _context.MoveOrders.Where(x => x.IsApproveReject == null )
                 .GroupBy(x => new
-            {
+                {
+                    x.OrderNo,
+                    x.FarmName,
+                    x.FarmCode,
+                    x.FarmType,
+                    x.OrderDate,
+                    x.PreparedDate,
+                    x.IsApprove,
+                    x.DeliveryStatus,
+                    x.IsPrepared,
+                }).Where(x => x.Key.IsApprove != true)
+                .Where(x => x.Key.DeliveryStatus != null)
+                .Where(x => x.Key.IsPrepared == true)
+                .Select(x => new MoveOrderDto
+                {
+                    OrderNo = x.Key.OrderNo,
+                    FarmName = x.Key.FarmName,
+                    FarmCode = x.Key.FarmCode,
+                    Category = x.Key.FarmType,
+                    Quantity = x.Sum(x => x.QuantityOrdered),
+                    OrderDate = x.Key.OrderDate.ToString(),
+                    PreparedDate = x.Key.PreparedDate.ToString(),
+                    DeliveryStatus = x.Key.DeliveryStatus,
 
-                x.OrderNo,
-                x.FarmName,
-                x.FarmCode,
-                x.FarmType,
-                x.OrderDate,
-                x.PreparedDate,
-                x.IsApprove,
-                x.DeliveryStatus,
-                x.IsPrepared,
-
-            }).Where(x => x.Key.IsApprove != true)
-              .Where(x => x.Key.DeliveryStatus != null)
-              .Where(x => x.Key.IsPrepared == true)
- 
-
-           .Select(x => new MoveOrderDto
-           {
-               OrderNo = x.Key.OrderNo,
-               FarmName = x.Key.FarmName,
-               FarmCode = x.Key.FarmCode,
-               Category = x.Key.FarmType,
-               Quantity = x.Sum(x => x.QuantityOrdered),
-               OrderDate = x.Key.OrderDate.ToString(),
-               PreparedDate = x.Key.PreparedDate.ToString(),
-               DeliveryStatus = x.Key.DeliveryStatus,
-
-           });
+                });
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
 
@@ -1324,13 +1294,12 @@ using System.Collections.Generic;
                 x.PreparedDate,
                 x.IsApprove,
                 x.DeliveryStatus,
-                x.IsPrepared,
+                x.IsPrepared
 
             }).Where(x => x.Key.IsApprove != true)
               .Where(x => x.Key.DeliveryStatus != null)
               .Where(x => x.Key.IsPrepared == true)
-
-          .Select(x => new MoveOrderDto
+                .Select(x => new MoveOrderDto
           {
               OrderNo = x.Key.OrderNo,
               FarmName = x.Key.FarmName,
@@ -1350,7 +1319,7 @@ using System.Collections.Generic;
         {
             var orders = _context.MoveOrders.Where(x => x.IsActive == true)
                 .Select(x => new MoveOrderDto
-            {
+            {  
 
                 Id = x.Id,
                 OrderNo = x.OrderNo,
@@ -1363,18 +1332,56 @@ using System.Collections.Generic;
                 Quantity = x.QuantityOrdered,
                 Expiration = x.ExpirationDate.ToString(),
                 DeliveryStatus = x.DeliveryStatus,
-
             });
 
             return await orders.Where(x => x.OrderNo == orderid)
                                .ToListAsync();
 
         }
+
         public async Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPagination(UserParams userParams)
+        {
+            var orders = _context.MoveOrders
+                .Where(x => x.IsActive == true)
+                .GroupBy(x => new
+                {
+                    x.OrderNo,
+                    x.FarmName,
+                    x.FarmCode,
+                    x.FarmType,
+                    x.PreparedDate,
+                    x.IsApprove,
+                    x.DeliveryStatus,
+                    x.IsPrepared,
+                    x.IsReject,
+                    x.ApproveDateTempo,
+                    x.IsPrint,
+                    x.IsTransact,
+                }).Where(x => x.Key.IsApprove == true)
+                .Where(x => x.Key.DeliveryStatus != null)
+                .Where(x => x.Key.IsReject != true)
+                .Select(x => new MoveOrderDto
+                {
+                    OrderNo = x.Key.OrderNo,
+                    FarmName = x.Key.FarmName,
+                    FarmCode = x.Key.FarmCode,
+                    Category = x.Key.FarmType,
+                    Quantity = x.Sum(x => x.QuantityOrdered),
+                    PreparedDate = x.Key.PreparedDate.ToString(),
+                    DeliveryStatus = x.Key.DeliveryStatus,
+                    IsApprove = x.Key.IsApprove != null,
+                    IsPrepared = x.Key.IsPrepared,
+                    ApprovedDate = x.Key.ApproveDateTempo.ToString(),
+                    IsPrint = x.Key.IsPrint != null,
+                    IsTransact = x.Key.IsTransact,
+                });
+            return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
+        }
+
+        public async Task<PagedList<MoveOrderDto>> Approvedination(UserParams userParams)
         {
             var orders = _context.MoveOrders.GroupBy(x => new
             {
-
                 x.OrderNo,
                 x.FarmName,
                 x.FarmCode,
@@ -1387,12 +1394,11 @@ using System.Collections.Generic;
                 x.ApproveDateTempo,
                 x.IsPrint,
                 x.IsTransact,
-
+                x.IsActive
             }).Where(x => x.Key.IsApprove == true)
               .Where(x => x.Key.DeliveryStatus != null)
               .Where(x => x.Key.IsReject != true)
-
-
+              .Where(X => X.Key.IsActive == true)
              .Select(x => new MoveOrderDto
              {
                  OrderNo = x.Key.OrderNo,
@@ -1413,9 +1419,10 @@ using System.Collections.Generic;
         }
         public async Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPaginationOrig(UserParams userParams, string search)
         {
-            var orders = _context.MoveOrders.GroupBy(x => new
+            var orders = _context.MoveOrders
+              .Where(X => X.IsActive == true)
+              .GroupBy(x => new
             {
-
                 x.OrderNo,
                 x.FarmName,
                 x.FarmCode,
@@ -1427,14 +1434,12 @@ using System.Collections.Generic;
                 x.IsReject,
                 x.ApproveDateTempo,
                 x.IsPrint,
-                x.IsTransact,
-
+                x.IsTransact
             })
               .Where(x => x.Key.IsApprove == true)
               .Where(x => x.Key.DeliveryStatus != null)
               .Where(x => x.Key.IsReject != true)
-
-             .Select(x => new MoveOrderDto
+              .Select(x => new MoveOrderDto
              {
                  OrderNo = x.Key.OrderNo,
                  FarmName = x.Key.FarmName,
@@ -1459,7 +1464,6 @@ using System.Collections.Generic;
             var orders = _context.MoveOrders.Where(x => x.IsApproveReject == true)
                 .GroupBy(x => new
             {
-
                 x.OrderNo,
                 x.FarmName,
                 x.FarmCode,
@@ -1470,8 +1474,7 @@ using System.Collections.Generic;
                 x.DeliveryStatus,
                 x.IsReject,
                 x.RejectedDateTempo,
-                x.Remarks,
-
+                x.Remarks
             })
               .Where(x => x.Key.DeliveryStatus != null)
          
@@ -1487,8 +1490,7 @@ using System.Collections.Generic;
             DeliveryStatus = x.Key.DeliveryStatus,
             IsReject = x.Key.IsReject != null,
             RejectedDate = x.Key.RejectedDateTempo.ToString(),
-            Remarks = x.Key.Remarks,
-
+            Remarks = x.Key.Remarks
         });
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
@@ -1508,7 +1510,7 @@ using System.Collections.Generic;
                 x.DeliveryStatus,
                 x.IsReject,
                 x.RejectedDateTempo,
-                x.Remarks,
+                x.Remarks
             })
               .Where(x => x.Key.DeliveryStatus != null)
 
@@ -1524,7 +1526,7 @@ using System.Collections.Generic;
            DeliveryStatus = x.Key.DeliveryStatus,
            IsReject = x.Key.IsReject != null,
            RejectedDate = x.Key.RejectedDateTempo.Value.ToString("MM/dd/yyyy"),
-           Remarks = x.Key.Remarks,
+           Remarks = x.Key.Remarks
 
        }).Where(x => Convert.ToString(x.OrderNo).ToLower()
          .Contains(search.Trim().ToLower()));
@@ -1603,8 +1605,7 @@ using System.Collections.Generic;
         }
         public async Task<ItemStocks> GetFirstExpiry(string itemcode)
         {
-            var getWarehouseIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
-                                                           .GroupBy(x => new
+            var getWarehouseIn = _context.WarehouseReceived.Where(x => x.IsActive == true).GroupBy(x => new
           {
               x.Id,
               x.ItemCode,
@@ -1619,8 +1620,7 @@ using System.Collections.Generic;
               
           });
 
-            var getTransformationPreparation = _context.Transformation_Preparation.Where(x => x.IsActive == true)
-                                                                                  .GroupBy(x => new
+            var getTransformationPreparation = _context.Transformation_Preparation.Where(x => x.IsActive == true).GroupBy(x => new
             {
                 x.ItemCode,
                 x.WarehouseId,
@@ -1632,8 +1632,7 @@ using System.Collections.Generic;
                 WarehouseId = x.Key.WarehouseId
             });
 
-            var getMoveorder = _context.MoveOrders.Where(x => x.IsActive == true)
-                                                  .GroupBy(x => new
+            var getMoveorder = _context.MoveOrders.Where(x => x.IsActive == true).GroupBy(x => new
             {
                 x.ItemCode,
                 x.WarehouseId,
@@ -1693,8 +1692,8 @@ using System.Collections.Generic;
         {
             foreach (var moveOrder in moveOrders)
             {
-                var existingOrder = await _context.Orders.Where(x => x.IsBeingPrepared == null)
-                    .Where(x => x.OrderNoPKey == moveOrder.OrderNoPKey)
+                var existingOrder = await _context.Orders.Where(x => x.OrderNoPKey == moveOrder.OrderNoPKey)
+                    .Where(x => x.IsBeingPrepared == null || x.IsBeingPrepared == false)
                     .FirstOrDefaultAsync();
                     
                 if (existingOrder == null)
@@ -1789,15 +1788,12 @@ using System.Collections.Generic;
                 IsApprove = x.IsApprove != null
             });
 
-            return await orders.Where(x => x.OrderNo == orderid)
-                               .ToListAsync();
+            return await orders.Where(x => x.OrderNo == orderid).ToListAsync();
         }
         public async Task<bool> TransanctListOfMoveOrders(TransactMoveOrder transact)
         {
-
-            var existing = await _context.MoveOrders.Where(x => x.OrderNo == transact.OrderNo)
-                                                    .ToListAsync();
-
+            var existing = await _context.MoveOrders.Where(x => x.OrderNo == transact.OrderNo).ToListAsync();
+            
             await _context.TransactMoveOrder.AddAsync(transact);
 
 
@@ -2061,11 +2057,11 @@ using System.Collections.Generic;
        
        
        
-       public async Task<IEnumerable<AllocationResult>> AllocateOrdersPerItems(List<AllocationDTO> itemCodes)
+       public async Task<IReadOnlyList<AllocationResult>> AllocateOrdersPerItems(List<AllocationDTO> itemCodes)
        {
             // Get a list of orders that have an item code in the `itemCodes` list
             var orders = await _context.Orders.Where(x => x.IsActive == true)
-               .Where(x => itemCodes.Select(y => y.ItemCode).Contains(x.ItemCode))
+               .Where(x => itemCodes.Select(y =>y.ItemCode).Contains(x.ItemCode))
                .Where(x => x.IsActive == true)
                .ToListAsync();
 
@@ -2113,77 +2109,54 @@ using System.Collections.Generic;
                results.Add(new AllocationResult
                {
                    AllocatedQuantity = order.AllocatedQuantity,
-                   CustomerName = order.CustomerName,
+                   CustomerName = order.FarmName,
                    OrderNo = order.OrderNo
                });
            }
-
-           // Save the changes to the database
-           await _context.SaveChangesAsync();
-
+           
            return results;
        }
 
        public async Task<bool> ManualAllocationForOrders(List<ManualAllocation> manualAllocations)
        {
-           var orders = manualAllocations.Select(x => x.OrderNoPKey);
-           var orderForAllocation = _context.Orders.Where(x => orders.Contains(x.OrderNoPKey) && x.IsActive);
+           var orders = await _context.Orders.Where(x => x.IsActive == true)
+               .Where(x => manualAllocations.Select(y =>y.Id).Contains(x.OrderNo))
+               .Where(x => x.IsActive == true)
+               .ToListAsync();
 
-           foreach (var order in orderForAllocation)
+           foreach (var order in orders)
            {
-               var manualAllocation = manualAllocations.FirstOrDefault(x => x.OrderNoPKey == order.OrderNoPKey);
+               var manualAllocation = manualAllocations.FirstOrDefault(x => x.Id == order.OrderNo);
                order.AllocatedQuantity = manualAllocation.QuantityOrdered;
                order.ForAllocation = null;
            }
-           await _context.SaveChangesAsync();
            return true;
        }
-       public async Task<PagedList<OrderDto>> GetAllListofOrdersForAllocationPagination(UserParams userParams)
-       {
-           var stocks = await _context.WarehouseReceived
-               .Where(x => x.IsActive)
-               .GroupBy(x => x.ItemCode)
-               .Select(g => new
-               {
-                   ItemCode = g.Key,
-                   ReceivedStocks = g.Sum(x => x.ActualGood)
-               })
-               .ToListAsync();
+      public async Task<PagedList<OrderDto>> GetAllListofOrdersForAllocationPagination(UserParams userParams)
+        {
+            
+            var orders = _context.Orders.OrderBy(x => x.OrderDate)              
+                .GroupBy(x => new
+                {
+                    x.ItemCode,
+                    x.IsActive,
+                    x.PreparedDate,
+                    x.AllocatedQuantity,
+                    x.ForAllocation
 
-           var issues = await _context.MiscellaneousIssueDetails
-               .Where(x => x.IsActive)
-               .GroupBy(x => x.ItemCode)
-               .Select(g => new
-               {
-                   ItemCode = g.Key,
-                   IssuedStocks = g.Sum(x => x.Quantity)
-               })
-               .ToListAsync();
-
-           var totalStocks = stocks.Join(
-               issues,
-               s => s.ItemCode,
-               i => i.ItemCode,
-               (s, i) => new { ItemCode = s.ItemCode, TotalStocks = s.ReceivedStocks - i.IssuedStocks }
-           ).Select(x => new { x.ItemCode, x.TotalStocks }).ToList();
-
-           var orders = _context.Orders
-               .Where(x => x.IsActive && x.PreparedDate == null && x.ForAllocation != null)
-               .GroupBy(x => x.ItemCode)
-               .Select(g => new OrderDto
-               {
-                   ItemCode = g.Key,
-                   IsActive = true,
-                   StockOnHand = totalStocks.FirstOrDefault(x => x.ItemCode == g.Key) != null
-                       ? totalStocks.FirstOrDefault(x => x.ItemCode == g.Key).TotalStocks
-                       : 0
-               })
-               .OrderBy(x => x.ItemCode)
-               .AsQueryable();
-           
-           return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
-       }
-       public async Task<IReadOnlyList<OrderDto>> GetAllListofOrdersAllocation(string itemCode)
+                }).Where(x => x.Key.IsActive == true)
+                .Where(x => x.Key.PreparedDate == null)
+                .Where(x => x.Key.AllocatedQuantity == null)
+                .Where(x => x.Key.ForAllocation != null)
+                .Select(x => new OrderDto
+                {
+                    ItemCode = x.Key.ItemCode,
+                    IsActive = x.Key.IsActive
+                });
+            
+            return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
+        }
+      public async Task<IReadOnlyList<OrderDto>> GetAllListofOrdersAllocation(string itemCode)
         {
             var datenow = DateTime.Now;
         

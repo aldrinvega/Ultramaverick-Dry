@@ -66,21 +66,21 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
             if (itemcode != warehouse.ItemCode)
                 return BadRequest();
 
-            var validateScanbarcode = await _unitOfWork.Warehouse.ScanBarcode(warehouse);
+             var validateScanbarcode = await _unitOfWork.Warehouse.ScanBarcode(warehouse);
 
             if (validateScanbarcode == false)
                 return BadRequest("Already scan all available items in list!");
-
+            
             var actualgood = await _unitOfWork.Warehouse.ReceiveMaterialsFromWarehouse(warehouse);
-
+            
             if (actualgood == false)
                 return BadRequest("Receive failed! please check your input on actual good.");
-
+            
             var validatetotal = await _unitOfWork.Warehouse.ValidateActualAndRejectInput(warehouse);
-
+            
             if (validatetotal == false)
                 return BadRequest("Received failed! actual good and reject are not equal to total goods.");
-
+            
             await _unitOfWork.CompleteAsync();
             //return new JsonResult("Successfully Received Raw Materials!");
 

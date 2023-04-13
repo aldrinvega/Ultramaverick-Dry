@@ -99,7 +99,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         
         
         //==========Allocation=========//
-        Task<IEnumerable<AllocationResult>> AllocateOrdersPerItems(List<AllocationDTO> itemCodes);
+        Task<IReadOnlyList<AllocationResult>> AllocateOrdersPerItems(List<AllocationDTO> itemCodes);
+
         // Task<IReadOnlyList<OrderDto>> GetAllOrdersForAllocation();
         Task<PagedList<OrderDto>> GetAllListofOrdersForAllocationPagination(UserParams userParams);
         Task<IReadOnlyList<OrderDto>> GetAllListofOrdersAllocation(string itemCode);

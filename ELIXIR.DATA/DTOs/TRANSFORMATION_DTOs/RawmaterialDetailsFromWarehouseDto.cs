@@ -14,7 +14,7 @@ namespace ELIXIR.DATA.DTOs.TRANSFORMATION_DTOs
         public string ItemCode { get; set; }
         public string ItemDescription { get; set; }
         public DateTime ManufacturingDate { get; set; }
-        public DateTime ExpirationDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
         public int ExpirationDays { get; set; }
         public decimal Balance { get; set; }
         public decimal QuantityNeeded { get; set; }

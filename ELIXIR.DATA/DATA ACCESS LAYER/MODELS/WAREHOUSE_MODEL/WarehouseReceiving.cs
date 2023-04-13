@@ -10,7 +10,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL
 {
     public class WarehouseReceiving : BaseEntity
     {
-
         public string ItemCode {
             get;
             set;
@@ -45,7 +44,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL
         }
 
         [Column(TypeName = "Date")]
-        public DateTime Expiration { 
+        public DateTime? Expiration { 
             get; 
             set;
         }

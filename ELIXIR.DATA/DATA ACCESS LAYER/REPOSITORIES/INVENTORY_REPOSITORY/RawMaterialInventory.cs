@@ -770,8 +770,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                     total.Sum(x => x.moveorder.QuantityOrdered == null ? 0 : x.moveorder.QuantityOrdered)
 
                           });
-
-
+            
             var getReserve = (from warehouse in getWarehouseStock
                               join request in getTransformationReserve
                               on warehouse.ItemCode equals request.ItemCode
@@ -799,6 +798,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                               {
 
                                   ItemCode = total.Key.ItemCode,
+                                  //Reserve
                                   Reserve = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
                                            (total.Sum(x => x.request.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
                                             total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))
@@ -1092,13 +1092,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  //            select new MoveOrderDto
                                  //            {
                                  //              PreparedDate = a.PreparedDate.ToString()
-                                 //            }).FirstOrDefault()
-
+                                 // }).FirstOrDefault()
                              });
-
             return await PagedList<MRPDto>.CreateAsync(inventory, userParams.PageNumber, userParams.PageSize);
         }
-
+        
         public async Task<PagedList<MRPDto>> GetAllItemForInventoryPaginationOrig(UserParams userParams, string search)
         {
             var EndDate = DateTime.Now;
@@ -1181,7 +1179,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 });
 
             var getTransformation = _context.Transformation_Preparation.Where(x => x.IsActive == true)
-                                                                      
                 .GroupBy(x => new
                 {
                     x.ItemCode,

@@ -76,6 +76,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL
             set;
         }
         public bool IsActive {
+            
             get; 
             set;
         }
