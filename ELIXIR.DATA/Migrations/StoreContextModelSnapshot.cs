@@ -161,7 +161,7 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("CustomerCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ExpirationDate")
+                    b.Property<DateTime?>("ExpirationDate")
                         .HasColumnType("Date");
 
                     b.Property<bool>("IsActive")
@@ -301,6 +301,9 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<string>("AccountTitle")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("ApproveDateTempo")
                         .HasColumnType("Date");
 
@@ -316,10 +319,16 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Company")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateNeeded")
                         .HasColumnType("Date");
 
                     b.Property<string>("DeliveryStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Department")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ExpirationDate")
@@ -365,6 +374,9 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ItemDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("OrderDate")
@@ -440,7 +452,7 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DateNeeded")
-                        .HasColumnType("Date");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("DeliveryStatus")
                         .HasColumnType("nvarchar(max)");
@@ -488,7 +500,7 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("OrderDate")
-                        .HasColumnType("Date");
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("OrderNo")
                         .HasColumnType("int");
@@ -691,7 +703,7 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<bool?>("ExpiryIsApprove")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("Expiry_Date")
+                    b.Property<DateTime?>("Expiry_Date")
                         .HasColumnType("Date");
 
                     b.Property<bool>("IsActive")
@@ -936,6 +948,9 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsExpirable")
                         .HasColumnType("bit");
 
                     b.Property<int>("ItemCategoryId")
@@ -1529,7 +1544,7 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<bool>("ConfirmRejectbyWarehouse")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("Expiration")
+                    b.Property<DateTime?>("Expiration")
                         .HasColumnType("Date");
 
                     b.Property<int>("ExpirationDays")

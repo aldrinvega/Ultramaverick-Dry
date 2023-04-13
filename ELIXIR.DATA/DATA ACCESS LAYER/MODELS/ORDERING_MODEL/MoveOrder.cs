@@ -169,5 +169,25 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
             get;
             set;
         }
+        public string AccountTitle 
+        { 
+            get; 
+            set; 
+        }
+        public string Department
+        { 
+            get;
+            set;
+        }
+        public string Location 
+        { 
+            get;
+            set;
+        }
+        public string Company
+        {
+            get;
+            set;
+        }
     }
 }

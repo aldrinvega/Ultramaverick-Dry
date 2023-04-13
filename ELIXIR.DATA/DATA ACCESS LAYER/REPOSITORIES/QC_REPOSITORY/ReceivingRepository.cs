@@ -184,19 +184,37 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             var cancelpo = (from posummary in _context.POSummary
                             join receive in _context.QC_Receiving on posummary.Id equals receive.PO_Summary_Id into leftJ
                             from receive in leftJ.DefaultIfEmpty()
+                            group new
+                            {
+                                receive,
+                                posummary
+                            } 
+                            by new
+                            {
+                                posummary.Id,
+                                posummary.PO_Number,
+                                posummary.ItemCode,
+                                posummary.ItemDescription,
+                                posummary.VendorName,
+                                posummary.Ordered,
+                                posummary.Date_Cancellation,
+                                posummary.Reason,
+                                posummary.IsActive,
+                            }
+                            into result
                             select new CancelledPoDto
                             {
-                                Id = posummary.Id,
-                                PO_Number = posummary.PO_Number,
-                                ItemCode = posummary.ItemCode,
-                                ItemDescription = posummary.ItemDescription,
-                                Supplier = posummary.VendorName,
-                                QuantityOrdered = posummary.Ordered,
-                                QuantityCancel = receive != null ? receive.Actual_Delivered : 0,
-                                QuantityGood = receive != null ? receive.Actual_Delivered : 0,
-                                DateCancelled = posummary.Date_Cancellation.ToString(),
-                                Remarks = posummary.Reason,
-                                IsActive = posummary.IsActive
+                                Id = result.Key.Id,
+                                PO_Number = result.Key.PO_Number,
+                                ItemCode = result.Key.ItemCode,
+                                ItemDescription = result.Key.ItemDescription,
+                                Supplier = result.Key.VendorName,
+                                QuantityOrdered = result.Key.Ordered,
+                                QuantityCancel = result.Key.Ordered - result.Sum(x => x.receive.Actual_Delivered),
+                                QuantityGood = result.Sum(x => x.receive.Actual_Delivered),
+                                DateCancelled = result.Key.Date_Cancellation.ToString(),
+                                Remarks = result.Key.Reason,
+                                IsActive = result.Key.IsActive
                             }).Where(x => x.IsActive == false)
                               .Where(x => x.DateCancelled != null)
                               .Where(x => x.Remarks != null);
@@ -813,20 +831,37 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             var cancelpo = (from posummary in _context.POSummary
                             join receive in _context.QC_Receiving on posummary.Id equals receive.PO_Summary_Id into leftJ
                             from receive in leftJ.DefaultIfEmpty()
-
+                            group new
+                            {
+                                receive,
+                                posummary
+                            } 
+                            by new
+                            {
+                                posummary.Id,
+                                posummary.PO_Number,
+                                posummary.ItemCode,
+                                posummary.ItemDescription,
+                                posummary.VendorName,
+                                posummary.Ordered,
+                                posummary.Date_Cancellation,
+                                posummary.Reason,
+                                posummary.IsActive
+                            }
+                            into result
                             select new CancelledPoDto
                             {
-                                Id = posummary.Id,
-                                PO_Number = posummary.PO_Number,
-                                ItemCode = posummary.ItemCode,
-                                ItemDescription = posummary.ItemDescription,
-                                Supplier = posummary.VendorName,
-                                QuantityOrdered = posummary.Ordered,
-                                QuantityCancel = receive != null ? receive.Actual_Delivered : 0,
-                                QuantityGood = receive != null ? receive.Actual_Delivered : 0,
-                                DateCancelled = posummary.Date_Cancellation.ToString(),
-                                Remarks = posummary.Reason,
-                                IsActive = posummary.IsActive
+                                Id = result.Key.Id,
+                                PO_Number = result.Key.PO_Number,
+                                ItemCode = result.Key.ItemCode,
+                                ItemDescription = result.Key.ItemDescription,
+                                Supplier = result.Key.VendorName,
+                                QuantityOrdered = result.Key.Ordered,
+                                QuantityCancel = result.Key.Ordered - result.Sum(x => x.receive.Actual_Delivered),
+                                QuantityGood = result.Sum(x => x.receive.Actual_Delivered),
+                                DateCancelled = result.Key.Date_Cancellation.ToString(),
+                                Remarks = result.Key.Reason,
+                                IsActive = result.Key.IsActive
                             }).Where(x => x.IsActive == false)
                               .Where(x => x.DateCancelled != null)
                               .Where(x => x.Remarks != null);
@@ -839,22 +874,37 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             var cancelpo = (from posummary in _context.POSummary
                             join receive in _context.QC_Receiving on posummary.Id equals receive.PO_Summary_Id into leftJ
                             from receive in leftJ.DefaultIfEmpty()
-
-                            join material in _context.POSummary on posummary.ItemCode equals material.ItemCode
-
+                            group new
+                            {
+                                receive,
+                                posummary
+                            } 
+                            by new
+                            {
+                                posummary.Id,
+                                posummary.PO_Number,
+                                posummary.ItemCode,
+                                posummary.ItemDescription,
+                                posummary.VendorName,
+                                posummary.Ordered,
+                                posummary.Date_Cancellation,
+                                posummary.Reason,
+                                posummary.IsActive
+                            }
+                            into result
                             select new CancelledPoDto
                             {
-                                Id = posummary.Id,
-                                PO_Number = posummary.PO_Number,
-                                ItemCode = posummary.ItemCode,
-                                ItemDescription = material.ItemDescription,
-                                Supplier = posummary.VendorName,
-                                QuantityOrdered = posummary.Ordered,
-                                QuantityCancel = receive != null ? receive.Actual_Delivered : 0,
-                                QuantityGood = receive != null ? receive.Actual_Delivered : 0,
-                                DateCancelled = posummary.Date_Cancellation.ToString(),
-                                Remarks = posummary.Reason,
-                                IsActive = posummary.IsActive
+                                Id = result.Key.Id,
+                                PO_Number = result.Key.PO_Number,
+                                ItemCode = result.Key.ItemCode,
+                                ItemDescription = result.Key.ItemDescription,
+                                Supplier = result.Key.VendorName,
+                                QuantityOrdered = result.Key.Ordered,
+                                QuantityCancel = result.Key.Ordered - result.Sum(x => x.receive.Actual_Delivered),
+                                QuantityGood = result.Sum(x => x.receive.Actual_Delivered),
+                                DateCancelled = result.Key.Date_Cancellation.ToString(),
+                                Remarks = result.Key.Reason,
+                                IsActive = result.Key.IsActive
                             }).Where(x => x.IsActive == false)
                               .Where(x => x.DateCancelled != null)
                               .Where(x => x.Remarks != null)

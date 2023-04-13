@@ -12,7 +12,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
 {
-    public class StoreContext : DbContext
+    public class 
+        StoreContext : DbContext
     {
         public StoreContext(DbContextOptions<StoreContext> options) : base(options) { }
 

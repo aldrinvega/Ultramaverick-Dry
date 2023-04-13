@@ -71,7 +71,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
             set; 
         }
         
-
         public bool? ExpiryIsApprove {
             get; 
             set;

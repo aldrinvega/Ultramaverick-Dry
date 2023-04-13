@@ -119,55 +119,55 @@ using System.Collections.Generic;
                               });
 
     
-            //var totalRemaining = (from totalIn in _context.WarehouseReceived
-            //                      where totalIn.IsActive == true
-            //                      join totalOut in totalout
-
-            //                      on totalIn.ItemCode equals totalOut.ItemCode
-            //                      into leftJ
-            //                      from totalOut in leftJ.DefaultIfEmpty()
-
-            //                      join orderout in totalOrders on totalIn.ItemCode equals orderout.ItemCode
-            //                      into leftJ2
-            //                      from orderout in leftJ2.DefaultIfEmpty()
-
-            //                      group new
-            //                      {
-            //                          totalIn,
-            //                          totalOut, 
-            //                          orderout
-
-            //                      }
-            //                      by new 
-            //                      {
-
-            //            //              totalIn.Id,
-            //                          totalIn.ItemCode,
-            //                          totalIn.ItemDescription,
-            //                          totalIn.ManufacturingDate,
-            //                          totalIn.Expiration,
-            //                          totalIn.ActualGood,
-            //                          totalIn.ExpirationDays,
-            //                        //  orderout.TotalOrders
-
-            //                      } into total
-
-            //                      orderby total.Key.ExpirationDays ascending
-
-            //                      select new ItemStocks
-            //                      {
-            //             //             WarehouseId = total.Key.Id,
-            //                          ItemCode = total.Key.ItemCode,
-            //                          ItemDescription = total.Key.ItemDescription,
-            //                          ManufacturingDate = total.Key.ManufacturingDate,
-            //                          ExpirationDate = total.Key.Expiration,
-            //                          ExpirationDays = total.Key.ExpirationDays,
-            //                          In = total.Key.ActualGood,
-            //                    //      Out = total.Sum(x => x.Out),
-            //                          Remaining = total.Key.ActualGood - 
-            //                        //  TotalMoveOrder = total.Key.TotalOrders
-
-            //                      });
+            // var totalRemaining = (from totalIn in _context.WarehouseReceived
+            //                       where totalIn.IsActive == true
+            //                       join totalOut in totalout
+            //
+            //                       on totalIn.ItemCode equals totalOut.ItemCode
+            //                       into leftJ
+            //                       from totalOut in leftJ.DefaultIfEmpty()
+            //
+            //                       join orderout in totalOrders on totalIn.ItemCode equals orderout.ItemCode
+            //                       into leftJ2
+            //                       from orderout in leftJ2.DefaultIfEmpty()
+            //
+            //                       group new
+            //                       {
+            //                           totalIn,
+            //                           totalOut, 
+            //                           orderout
+            //
+            //                       }
+            //                       by new 
+            //                       {
+            //
+            //             //              totalIn.Id,
+            //                           totalIn.ItemCode,
+            //                           totalIn.ItemDescription,
+            //                           totalIn.ManufacturingDate,
+            //                           totalIn.Expiration,
+            //                           totalIn.ActualGood,
+            //                           totalIn.ExpirationDays,
+            //                         //  orderout.TotalOrders
+            //
+            //                       } into total
+            //
+            //                       orderby total.Key.ExpirationDays ascending
+            //
+            //                       select new ItemStocks
+            //                       {
+            //              //             WarehouseId = total.Key.Id,
+            //                           ItemCode = total.Key.ItemCode,
+            //                           ItemDescription = total.Key.ItemDescription,
+            //                           ManufacturingDate = total.Key.ManufacturingDate,
+            //                           ExpirationDate = total.Key.Expiration,
+            //                           ExpirationDays = total.Key.ExpirationDays,
+            //                           In = total.Key.ActualGood,
+            //                     //      Out = total.Sum(x => x.Out),
+            //                           Remaining = total.Key.ActualGood - 
+            //                         //  TotalMoveOrder = total.Key.TotalOrders
+            //
+            //                       });
 
             var orders = (from ordering in _context.Orders
                           where ordering.FarmName == farms && ordering.PreparedDate == null && ordering.IsActive == true && ordering.ForAllocation == null
@@ -196,7 +196,7 @@ using System.Collections.Generic;
                               ordering.AllocatedQuantity,
                               ordering.IsActive,
                               ordering.IsPrepared,
-                              Reserves = warehouse.Reserve
+                              Reserve = warehouse.Reserve != null ? warehouse.Reserve : 0,
 
 
                               } into total
@@ -218,7 +218,7 @@ using System.Collections.Generic;
                               QuantityOrder = total.Key.AllocatedQuantity == null ? total.Key.QuantityOrdered : (decimal)total.Key.AllocatedQuantity,
                               IsActive = total.Key.IsActive,
                               IsPrepared = total.Key.IsPrepared,
-                              StockOnHand = total.Key.Reserves
+                              StockOnHand = total.Key.Reserve
                           });
 
             return await orders.ToListAsync();
@@ -231,8 +231,14 @@ using System.Collections.Generic;
 
             if (existingOrder == null)
                 return false;
+            if (existingOrder.AllocatedQuantity != null)
+            {
+                if(existingOrder.AllocatedQuantity > orders.QuantityOrdered)
+                    existingOrder.AllocatedQuantity = (int)orders.QuantityOrdered;
+            }
             
-            existingOrder.QuantityOrdered = orders.QuantityOrdered;
+            if(existingOrder.QuantityOrdered > orders.QuantityOrdered)
+                existingOrder.QuantityOrdered = orders.QuantityOrdered;
 
             return true;
         }
@@ -413,7 +419,7 @@ using System.Collections.Generic;
                               IsActive = total.Key.IsActive,
                               IsPrepared = total.Key.IsPrepared,
                               StockOnHand = total.Sum(x => x.Remaining),
-                              Difference = total.Sum(x => x.Remaining) - total.Key.QuantityOrdered,
+                              Difference = (total.Sum(x => x.Remaining) - (total.Key.AllocatedQuantity == null ? total.Key.QuantityOrdered : (decimal)total.Key.AllocatedQuantity)) < 0 ? 0 : total.Sum(x => x.Remaining) - (total.Key.AllocatedQuantity == null ? total.Key.QuantityOrdered : (decimal)total.Key.AllocatedQuantity) ,
                               PreparedDate = total.Key.PreparedDate.ToString(),
                               IsApproved = total.Key.IsApproved != null
 
@@ -2063,6 +2069,7 @@ using System.Collections.Generic;
             var orders = await _context.Orders.Where(x => x.IsActive == true)
                .Where(x => itemCodes.Select(y =>y.ItemCode).Contains(x.ItemCode))
                .Where(x => x.IsActive == true)
+               .Where(x => x.ForAllocation == true)
                .ToListAsync();
 
             var results = new List<AllocationResult>();
@@ -2122,6 +2129,7 @@ using System.Collections.Generic;
            var orders = await _context.Orders.Where(x => x.IsActive == true)
                .Where(x => manualAllocations.Select(y =>y.Id).Contains(x.OrderNo))
                .Where(x => x.IsActive == true)
+               .Where(x => x.ForAllocation == true)
                .ToListAsync();
 
            foreach (var order in orders)
@@ -2141,12 +2149,10 @@ using System.Collections.Generic;
                     x.ItemCode,
                     x.IsActive,
                     x.PreparedDate,
-                    x.AllocatedQuantity,
                     x.ForAllocation
 
                 }).Where(x => x.Key.IsActive == true)
                 .Where(x => x.Key.PreparedDate == null)
-                .Where(x => x.Key.AllocatedQuantity == null)
                 .Where(x => x.Key.ForAllocation != null)
                 .Select(x => new OrderDto
                 {

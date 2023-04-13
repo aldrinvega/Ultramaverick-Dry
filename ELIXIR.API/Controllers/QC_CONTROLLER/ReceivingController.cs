@@ -103,7 +103,6 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
 
                 if (validate == false)
                     return BadRequest("Reject failed, Receiving Id doesn't exist!");
-
             }
             await _unitOfWork.CompleteAsync();
 
