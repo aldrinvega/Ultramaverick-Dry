@@ -233,14 +233,20 @@ using System.Collections.Generic;
                 return false;
             if (existingOrder.AllocatedQuantity != null)
             {
-                if(existingOrder.AllocatedQuantity > orders.QuantityOrdered)
+                if (existingOrder.AllocatedQuantity > orders.QuantityOrdered)
+                {
                     existingOrder.AllocatedQuantity = (int)orders.QuantityOrdered;
+                    return true;
+                }
+                return false;
             }
-            
-            if(existingOrder.QuantityOrdered > orders.QuantityOrdered)
-                existingOrder.QuantityOrdered = orders.QuantityOrdered;
 
-            return true;
+            if (existingOrder.QuantityOrdered > orders.QuantityOrdered)
+            {
+                existingOrder.QuantityOrdered = orders.QuantityOrdered;
+                return true;
+            }
+            return false;
         }
         public async Task<bool> SchedulePreparedDate(Ordering orders)
         {

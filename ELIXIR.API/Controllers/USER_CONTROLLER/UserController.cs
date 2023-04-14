@@ -332,8 +332,5 @@ namespace ELIXIR.API.Controllers
 
             return new JsonResult("Successfully Activate Department!");
         }
-
-
-
     }
 }

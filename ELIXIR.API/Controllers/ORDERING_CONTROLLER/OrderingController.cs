@@ -38,9 +38,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         public async Task<IActionResult> EditOrderQuantity([FromBody] Ordering order)
         {
 
-            await _unitOfWork.Order.EditQuantityOrder(order);
+            var result = await _unitOfWork.Order.EditQuantityOrder(order);
+            if (result == false)
+                return BadRequest("Quantity must not transcend the value of reserve!");
             await _unitOfWork.CompleteAsync();
-
             return new JsonResult("Successfully edit order quantity!");
         }
 
