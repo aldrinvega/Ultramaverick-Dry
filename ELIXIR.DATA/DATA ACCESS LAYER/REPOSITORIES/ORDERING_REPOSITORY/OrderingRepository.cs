@@ -118,6 +118,17 @@ using System.Collections.Generic;
                                             total.Sum(x => x.issue.Quantity == null ? 0 : x.issue.Quantity))
                               });
 
+            var customer = _context.Customers.Select(x => new
+            {
+                x.DepartmentName,
+                x.LocationName,
+                x.CustomerCode,
+                x.CustomerName,
+                x.CompanyName,
+                x.DepartmentCode,
+                x.CompanyCode
+            });
+
     
             // var totalRemaining = (from totalIn in _context.WarehouseReceived
             //                       where totalIn.IsActive == true
@@ -170,16 +181,22 @@ using System.Collections.Generic;
             //                       });
 
             var orders = (from ordering in _context.Orders
-                          where ordering.FarmName == farms && ordering.PreparedDate == null && ordering.IsActive == true && ordering.ForAllocation == null
-                          join warehouse in getReserve
-                          on ordering.ItemCode equals warehouse.ItemCode
-                          into leftJ
-                          from warehouse in leftJ.DefaultIfEmpty()
+                where ordering.FarmName == farms && ordering.PreparedDate == null && ordering.IsActive == true &&
+                      ordering.ForAllocation == null
+                join warehouse in getReserve
+                    on ordering.ItemCode equals warehouse.ItemCode
+                    into leftJ
+                from warehouse in leftJ.DefaultIfEmpty()
+
+                join customers in customer on ordering.FarmCode equals customers.CustomerCode
+                    into leftj1
+                from customers in leftj1.DefaultIfEmpty()
 
                           group new
                           {
                               ordering,
-                              warehouse
+                              warehouse,
+                              customers
                           }
                               by new
                           {
@@ -196,6 +213,12 @@ using System.Collections.Generic;
                               ordering.AllocatedQuantity,
                               ordering.IsActive,
                               ordering.IsPrepared,
+                              customers.CustomerCode,
+                              customers.CompanyName,
+                              customers.CompanyCode,
+                              customers.LocationName,
+                              customers.DepartmentName,
+                              customers.DepartmentCode,
                               Reserve = warehouse.Reserve != null ? warehouse.Reserve : 0,
 
 
@@ -218,7 +241,12 @@ using System.Collections.Generic;
                               QuantityOrder = total.Key.AllocatedQuantity == null ? total.Key.QuantityOrdered : (decimal)total.Key.AllocatedQuantity,
                               IsActive = total.Key.IsActive,
                               IsPrepared = total.Key.IsPrepared,
-                              StockOnHand = total.Key.Reserve
+                              StockOnHand = total.Key.Reserve,
+                              CompanyCode = total.Key.CustomerCode,
+                              CompanyName = total.Key.CompanyName,
+                              DepartmentCode = total.Key.DepartmentCode,
+                              DepartmentName = total.Key.DepartmentName,
+                              LocationName = total.Key.LocationName
                           });
 
             return await orders.ToListAsync();

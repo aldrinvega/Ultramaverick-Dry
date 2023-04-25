@@ -55,6 +55,7 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         public string CompanyName { get; set; }
         public string CompanyCode { get; set; }
         public string AddedBy { get; set; }
+        
 
 
     }
