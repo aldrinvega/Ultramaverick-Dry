@@ -19,7 +19,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
         public string Reason { get; set; }
         public string LocationName { get; set; }
         public string DepartmentName { get; set; }
-        public string AccountTitles { get; set; }
         public string CompanyCode { get; set; }
     }
     

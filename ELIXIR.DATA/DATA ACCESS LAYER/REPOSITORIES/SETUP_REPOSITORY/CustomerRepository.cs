@@ -41,7 +41,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                              DateAdded = customer.DateAdded.ToString("MM/dd/yyyy"),
                                              AddedBy = customer.AddedBy,
                                              IsActive = customer.IsActive,
-                                             AccountTitles = customer.AccountTitles,
                                              CompanyCode = customer.CompanyCode,
                                              DepartmentName = customer.DepartmentName,
                                              LocationName = customer.LocationName
@@ -66,7 +65,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                                DateAdded = customer.DateAdded.ToString("MM/dd/yyyy"),
                                                AddedBy = customer.AddedBy,
                                                IsActive = customer.IsActive,
-                                               AccountTitles = customer.AccountTitles,
                                                CompanyCode = customer.CompanyCode,
                                                DepartmentName = customer.DepartmentName,
                                                LocationName = customer.LocationName,
@@ -92,7 +90,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                               DateAdded = customer.DateAdded.ToString("MM/dd/yyyy"),
                                               AddedBy = customer.AddedBy,
                                               IsActive = customer.IsActive,
-                                              AccountTitles = customer.AccountTitles,
                                               CompanyCode = customer.CompanyCode,
                                               DepartmentName = customer.DepartmentName,
                                               LocationName = customer.LocationName,
@@ -119,7 +116,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                                  DateAdded = customer.DateAdded.ToString("MM/dd/yyyy"),
                                                  AddedBy = customer.AddedBy,
                                                  IsActive = customer.IsActive,
-                                                 AccountTitles = customer.AccountTitles,
                                                  CompanyCode = customer.CompanyCode,
                                                  DepartmentName = customer.DepartmentName,
                                                  LocationName = customer.LocationName,
@@ -139,7 +135,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             await _context.Customers.AddAsync(customer);
             return true;
         }
-
+    
 
         public async Task<bool> UpdateCustomerInfo(Customer customer)
         {
@@ -357,7 +353,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                                    DateAdded = customer.DateAdded.ToString("MM/dd/yyyy"),
                                                    AddedBy = customer.AddedBy,
                                                    IsActive = customer.IsActive,
-                                                   AccountTitles = customer.AccountTitles,
                                                    CompanyCode = customer.CompanyCode,
                                                    DepartmentName = customer.DepartmentName,
                                                    LocationName = customer.LocationName,
@@ -386,7 +381,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                                    DateAdded = customer.DateAdded.ToString("MM/dd/yyyy"),
                                                    AddedBy = customer.AddedBy,
                                                    IsActive = customer.IsActive,
-                                                   AccountTitles = customer.AccountTitles,
                                                    CompanyCode = customer.CompanyCode,
                                                    DepartmentName = customer.DepartmentName,
                                                    LocationName = customer.LocationName,
