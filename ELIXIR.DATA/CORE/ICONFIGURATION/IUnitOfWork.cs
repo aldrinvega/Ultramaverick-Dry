@@ -8,7 +8,6 @@ using ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.TRANSFORMATION_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.WAREHOUSE_INTERFACE;
 using System.Threading.Tasks;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY;
 
 namespace ELIXIR.DATA.CORE.ICONFIGURATION
 {
@@ -58,7 +57,9 @@ namespace ELIXIR.DATA.CORE.ICONFIGURATION
         
         //Checklist
         IQCChecklist QcChecklist { get; set; }
-
+        
+        ILabtestMasterlist LabtestMasterlist { get; set; }
+        
         Task CompleteAsync();
 
 

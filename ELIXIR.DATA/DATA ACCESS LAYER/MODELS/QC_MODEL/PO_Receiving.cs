@@ -15,7 +15,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
         }
 
         [Column(TypeName = "Date")]
-        public DateTime Manufacturing_Date {
+        public DateTime? Manufacturing_Date {
             get;
             set;
         }
@@ -114,5 +114,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
             get; 
             set;
         }
+
+        public string MonitoredBy { get; set; }
     }
 }

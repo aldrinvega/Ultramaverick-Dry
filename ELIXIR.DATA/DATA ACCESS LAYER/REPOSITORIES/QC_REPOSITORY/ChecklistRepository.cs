@@ -8,6 +8,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using ELIXIR.DATA.DTOs.RECEIVING_DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -26,111 +27,19 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         #region Add Checklist
         public async Task<bool> AddChecklists(Checklists input)
         {
-            
-            // var checklistForCompliance = new ChecklistForCompliants();
-            // var checklistInput = new CheckListInputs();
-            // var checklistString = new CheckListString();
+            foreach (var compliance in input.ChecklistsString)
+            {
+                CheckListString checklistStrings = new CheckListString
+                {
+                    PO_ReceivingId = input.PO_Receiving.PO_Summary_Id,
+                    Checlist_Type = compliance.Checlist_Type,
+                    Values = compliance.Values
+                };
 
-            foreach (var compliance in input.ChecklistForCompliants)
-            {
-                ChecklistForCompliants checklistForCompliants = new ChecklistForCompliants
-                {
-                    PO_ReceivingId = input.PO_Receiving.PO_Summary_Id,
-                    Checklist_Type = compliance.Checklist_Type,
-                    Value = compliance.Value
-                };
-                switch (compliance.Value)
-                {
-                    case "Certificate of Analysis":
-                    case "Certificate of Product Registration":
-                    case "Food Grade Certificate":
-                    case "Meat Inspection Certificate":
-                    case "Purchase Order":
-                    case "Material Safety Data Sheet":
-                    case "Migration Test":
-                    case "Veterinary Health Certificate":
-                    case "Shipping Permit":
-                    case "No rust, torn/detached parts, etc":
-                    case "Delivered in freezer/refeer van":
-                    case "Properly packed in clean plastic packaging materials/ containers/crates/ sack/boxes etc":
-                    case "Durable / elastic (if plastic/ packaging material":
-                    case "No holes and/or tears":
-                    case "With clear, correct and readable product information and label":
-                    case "No spillages / leaks/wet portions":
-                    case "Stored/ delivered in clean and in good conditioned container (crates and/or pallets)":
-                    case "Each product type is segregated to avoid cross contamination":
-                    case "Absence of unnecessary things/ products inside the delivery truck that may contaminate the products":
-                    case "No dirt, food debris, pest and signs of pest, etc.":
-                    case "No off odor, detached/ disintegrated parts.":
-                    case "No rust, retained dirt, food debris or any sign of pest/pest infestation":
-                    case "Cooling system is in good working condition and without leaks (if ref/ freezer van)":
-                    case "Plastic curtains are available, complete and in good condition":
-                    case "Clean and trimmed fingernails. No nail polish and false nails":
-                    case "Proper  and short haircut":
-                    case "Delivery personnel is apparently healthy":
-                    case "Cleanly shaven face":
-                    case "Absence of loose items":
-                    case "FIT FOR HUMAN CONSUMPTION":
-                    case "NOT FIT FOR HUMAN CONSUMPTION":
-                    case "ACCEPT":
-                        await _context.ChecklistForCompliant.AddAsync(checklistForCompliants);
-                        break;
-                }
-               
-            }
-            
-            foreach (var checklistStrings in input.ChecklistsString)
-            {
-                CheckListString checklistString = new CheckListString
-                {
-                    PO_ReceivingId = input.PO_Receiving.PO_Summary_Id,
-                    Checlist_Type = checklistStrings.Checlist_Type,
-                    Value = checklistStrings.Value
-                };
-    
-                switch (checklistStrings.Checlist_Type)
-                {
-                    case "Color":
-                    case "Odor":
-                    case "Appearance":
-                    case "Texture":
-                    case "Absence Of Contaminants":
-                    case "Product Condition":
-                    case "Product / Commodity Type":
-                        await _context.CheckListStrings.AddAsync(checklistString);
-                        break;
-                }
-            }
+                await _context.CheckListStrings.AddAsync(checklistStrings);
 
-            foreach (var checklistInputs in input.CheckListInput)
-            {
-                CheckListInputs checklistString = new CheckListInputs
-                {
-                    PO_ReceivingId = input.PO_Receiving.PO_Summary_Id,
-                    Checlist_Type = checklistInputs.Checlist_Type,
-                    Parameter = checklistInputs.Parameter,
-                    Value = checklistInputs.Value
-                };
-                
-                switch (checklistInputs.Parameter)
-                {
-                    case "Width":
-                    case "HEIGHT":
-                    case "LENGTH":
-                    case "THICKNESS":
-                    case "DIAMETER":
-                    case "RADIUS":
-                    case "INTERNAL / SURFACE TEMPERATURE (if cold products)":
-                    case "Delivery vehicle temperature (if product is delivered using freezer/reefer van)":
-                    case "Delivery vehicle's plate number":
-                    case "Name of delivery personnel":
-                    case "QUANTITY REJECT":
-                    case "QUANTITY ACCEPT":
-                        await _context.CheckListInput.AddAsync(checklistString);
-                        break;
-                }
             }
-            await _context.QC_Receiving.AddAsync(input.PO_Receiving);
+            await _context.SaveChangesAsync();
             
             return true;
         }

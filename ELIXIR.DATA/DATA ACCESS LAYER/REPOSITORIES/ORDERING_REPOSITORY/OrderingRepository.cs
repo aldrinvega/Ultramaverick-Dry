@@ -565,6 +565,7 @@ using System.Collections.Generic;
                         var issueOut = await _context.MiscellaneousIssueDetails
                             .Where(x => x.IsActive)
                             .Where(x => x.ItemCode == order.ItemCode)
+                            .Where(x => x.IsTransact == true)
                             .SumAsync(x => x.Quantity);
         
                         var receivedStocks = await _context.WarehouseReceived
@@ -927,7 +928,7 @@ using System.Collections.Generic;
         {
             var moveorders = _context.MoveOrders.Where(x => x.IsActive == true || x.IsReject == true)
                 .Where(x => x.IsRejectForPreparation == null)
-               .GroupBy(x => new
+                .GroupBy(x => new
                {
                    x.OrderNo,
                    x.OrderNoPKey
@@ -966,8 +967,6 @@ using System.Collections.Generic;
                               ordering.IsBeingPrepared
 
                           } into total
-
-
                           select new OrderDto
                           {
                               Id = total.Key.Id,
@@ -1130,7 +1129,7 @@ using System.Collections.Generic;
 
             return true;
         }
-        public async Task<bool> AddDeliveryStatus(Ordering order)
+        public async Task<bool> AddDeliveryStatus(OrderDto order)
         {
             var existing = await _context.Orders.Where(x => x.Id == order.Id)
                                                 .FirstOrDefaultAsync();
@@ -1147,24 +1146,35 @@ using System.Collections.Generic;
             foreach (var items in existingMoveorder)
             {
                 items.DeliveryStatus = order.DeliveryStatus;
+                items.AccountTitles = order.AccountTitles;
+                items.LocationName = order.LocationName;
+                items.DepartmentName = order.DepartmentName;
+                items.DepartmentCode = order.DepartmentCode;
+                items.CompanyName = order.DepartmentName;
+                items.CompanyCode = order.CompanyCode;
+                items.AddedBy = order.AddedBy;
             }
 
             return true;
         }
-        public async Task<bool> ApprovalForMoveOrder(MoveOrder moveorder)
+        public async Task<bool> ApprovalForMoveOrder(IEnumerable<MoveOrder> moveorder)
         {
-            var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
-                .ToListAsync();
-
-            if (existing == null)
-                return false;
-
-            foreach(var items in existing)
+            foreach (var order in moveorder)
             {
-                items.ApprovedDate = DateTime.Now;
-                items.ApproveDateTempo = DateTime.Now;
-                items.IsApprove = true;
+                var existing = await _context.MoveOrders.Where(x => x.OrderNo == order.OrderNo)
+                    .ToListAsync();
+
+                if (existing == null)
+                    return false;
+
+                foreach(var items in existing)
+                {
+                    items.ApprovedDate = DateTime.Now;
+                    items.ApproveDateTempo = DateTime.Now;
+                    items.IsApprove = true;
+                }
             }
+            
             return true;
         }
         public async Task<bool> RejectForMoveOrder(MoveOrder moveorder)
@@ -1225,9 +1235,6 @@ using System.Collections.Generic;
 
             return true;
         }
-
-       
-
         public async Task<bool> ReturnMoveOrderForApproval(MoveOrder moveorder)
         {
             var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
@@ -1257,7 +1264,6 @@ using System.Collections.Generic;
             }
             return true;
         }
-        
         public async Task<PagedList<MoveOrderDto>> ForApprovalMoveOrderPagination(UserParams userParams)
 
         {
@@ -2083,9 +2089,10 @@ using System.Collections.Generic;
            foreach (var order in orders)
            {
                var issueOut = await _context.MiscellaneousIssueDetails
-               .Where(x => x.IsActive)
-               .Where(x => x.ItemCode == order.ItemCode)
-               .SumAsync(x => x.Quantity);
+                   .Where(x => x.IsActive)
+                   .Where(x => x.IsTransact == true)
+                   .Where(x => x.ItemCode == order.ItemCode)
+                   .SumAsync(x => x.Quantity);
                
                // Get the sum of received stocks for the current order's item code
                var receivedStocks = await _context.WarehouseReceived
@@ -2100,30 +2107,32 @@ using System.Collections.Generic;
                    .Where(x => x.IsActive == true)
                    .SumAsync(x => x.QuantityOrdered);
 
-                var totalStocks = receivedStocks - issueOut;
+               var totalStocks = receivedStocks - issueOut;
 
-                if (totalStocks <= 0)
-                {
-                    totalStocks = 0;
-                }
+               if (totalStocks <= 0)
+               {
+                   totalStocks = 0;
+               }
 
-                var percentagetoallocate = totalOrdersPerItemAndStore / totalStocks;
+               var percentageToAllocate = totalOrdersPerItemAndStore / totalStocks;
 
                if (totalOrdersPerItemAndStore <= totalStocks)
                {
                    order.AllocatedQuantity = (int)order.QuantityOrdered;
+                   order.ForAllocation = null;
                }
                else
                {
-                   int allocatedStocks = (int)(order.QuantityOrdered/percentagetoallocate);
+                   var allocatedStocks = (int)(order.QuantityOrdered/percentageToAllocate);
                    order.AllocatedQuantity = allocatedStocks;
+                   order.ForAllocation = null;
                }
                
                results.Add(new AllocationResult
                {
                    AllocatedQuantity = order.AllocatedQuantity,
                    CustomerName = order.FarmName,
-                   OrderNo = order.OrderNo
+                   OrderNo = order.OrderNo,
                });
            }
            
@@ -2190,11 +2199,12 @@ using System.Collections.Generic;
          .GroupBy(x => new
          {
              x.ItemCode,
+             x.AllocatedQuantity
         
          }).Select(x => new OrderingInventory
          {
              ItemCode = x.Key.ItemCode,
-             QuantityOrdered = x.Sum(x => x.QuantityOrdered)
+             QuantityOrdered = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity)
          });
             
             var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)
@@ -2220,7 +2230,7 @@ using System.Collections.Generic;
                 Quantity = x.Sum(x => x.Quantity)
             });
         
-            var getReserve = (from warehouse in getWarehouseStock
+                var getReserve = (from warehouse in getWarehouseStock
                               join request in getTransformationReserve
                               on warehouse.ItemCode equals request.ItemCode
                               into leftJ1
@@ -2254,60 +2264,10 @@ using System.Collections.Generic;
         
                                   ItemCode = total.Key.ItemCode,
                                   Reserve = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
-                                           (total.Sum(x => x.request.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
-                                            total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered) +
+                                           (total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered) +
                                             total.Sum(x => x.issue.Quantity == null ? 0 : x.issue.Quantity))
                               });
-            //var totalRemaining = (from totalIn in _context.WarehouseReceived
-            //                      where totalIn.IsActive == true
-            //                      join totalOut in totalout
-        
-            //                      on totalIn.ItemCode equals totalOut.ItemCode
-            //                      into leftJ
-            //                      from totalOut in leftJ.DefaultIfEmpty()
-        
-            //                      join orderout in totalOrders on totalIn.ItemCode equals orderout.ItemCode
-            //                      into leftJ2
-            //                      from orderout in leftJ2.DefaultIfEmpty()
-        
-            //                      group new
-            //                      {
-            //                          totalIn,
-            //                          totalOut, 
-            //                          orderout
-        
-            //                      }
-            //                      by new 
-            //                      {
-        
-            //            //            totalIn.Id,
-            //                          totalIn.ItemCode,
-            //                          totalIn.ItemDescription,
-            //                          totalIn.ManufacturingDate,
-            //                          totalIn.Expiration,
-            //                          totalIn.ActualGood,
-            //                          totalIn.ExpirationDays,
-            //                        //  orderout.TotalOrders
-        
-            //                      } into total
-        
-            //                      orderby total.Key.ExpirationDays ascending
-        
-            //                      select new ItemStocks
-            //                      {
-            //             //             WarehouseId = total.Key.Id,
-            //                          ItemCode = total.Key.ItemCode,
-            //                          ItemDescription = total.Key.ItemDescription,
-            //                          ManufacturingDate = total.Key.ManufacturingDate,
-            //                          ExpirationDate = total.Key.Expiration,
-            //                          ExpirationDays = total.Key.ExpirationDays,
-            //                          In = total.Key.ActualGood,
-            //                    //      Out = total.Sum(x => x.Out),
-            //                          Remaining = total.Key.ActualGood - 
-            //                        //  TotalMoveOrder = total.Key.TotalOrders
-        
-            //                      });
-        
+
             var orders = (from ordering in _context.Orders
                           where ordering.ItemCode == itemCode && ordering.PreparedDate == null && ordering.IsActive == true && ordering.ForAllocation != null
                           join warehouse in getReserve

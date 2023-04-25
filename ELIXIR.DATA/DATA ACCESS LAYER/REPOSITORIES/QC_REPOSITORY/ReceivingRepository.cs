@@ -776,7 +776,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                         IsActive = receive.IsActive,
                         IsWareHouseReceive = receive.IsWareHouseReceive != null,
                         IsExpiryApprove = receive.ExpiryIsApprove != null,
-                        ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy")
+                        ManufacturingDate = receive.Manufacturing_Date.ToString()
 
 
                     }).OrderBy(x => x.PO_Number)
@@ -814,7 +814,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                  IsActive = receive.IsActive,
                                  IsWareHouseReceive = receive.IsWareHouseReceive != null,
                                  IsExpiryApprove = receive.ExpiryIsApprove != null,
-                                 ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy"),
+                                 ManufacturingDate = receive.Manufacturing_Date.ToString(),
                                  IsExpirable = rawmats.IsExpirable
                              }).OrderBy(x => x.PO_Number)
                                .Where(x => x.IsWareHouseReceive == false)

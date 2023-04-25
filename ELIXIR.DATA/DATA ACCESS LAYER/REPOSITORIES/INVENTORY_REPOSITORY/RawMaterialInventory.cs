@@ -268,9 +268,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                               select new ReserveInventory
                               {
                                   ItemCode = total.Key.ItemCode,
-                                  Reserve = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
-                                           (total.Sum(x => x.request.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
-                                            total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))
+                                  Reserve = total.Sum(x => x.warehouse.ActualGood) -
+                                            total.Sum(x => x.ordering.QuantityOrdered)
                               });
 
 
@@ -1113,7 +1112,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                   UnitPrice = x.Sum(x => x.UnitPrice),
                   Ordered = x.Sum(x => x.Ordered),
                   TotalPrice = x.Average(x => x.UnitPrice)
-
               });
 
             var getWarehouseIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
@@ -1590,7 +1588,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  ReserveUsage = total.Key.ReserveUsage,
                                  TransformFrom = total.Key.TransformFrom,
                                  TransformTo = total.Key.TransformTo
-                                 //     LastUsed = total.Key.LastUsed.ToString()
+                                 //LastUsed = total.Key.LastUsed.ToString()
 
                              }).Where(x => x.ItemDescription.ToLower()
                                .Contains(search.Trim().ToLower()));

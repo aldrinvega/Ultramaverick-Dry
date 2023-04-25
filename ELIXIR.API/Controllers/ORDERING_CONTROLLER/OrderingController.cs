@@ -40,7 +40,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             var result = await _unitOfWork.Order.EditQuantityOrder(order);
             if (result == false)
-                return BadRequest("Quantity must not transcend the value of reserve!");
+                return BadRequest("Quantity must not transcend the value of allocated quantity!");
             await _unitOfWork.CompleteAsync();
             return new JsonResult("Successfully edit order quantity!");
         }
@@ -456,10 +456,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpPut]
         [Route("AddDeliveryStatus")]
-        public async Task<IActionResult> AddDeliveryStatus([FromBody] Ordering[] order)
+        public async Task<IActionResult> AddDeliveryStatus([FromBody]OrderDto[] order )
         {
 
-            foreach (Ordering items in order)
+            foreach (OrderDto items in order)
             {
 
                 await _unitOfWork.Order.AddDeliveryStatus(items);
@@ -473,7 +473,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpPut]
         [Route("ApproveListOfMoveOrder")]
-        public async Task<IActionResult> ApproveListOfMoveOrder([FromBody] MoveOrder moveorder)
+        public async Task<IActionResult> ApproveListOfMoveOrder([FromBody] MoveOrder[] moveorder)
         {
 
             await _unitOfWork.Order.ApprovalForMoveOrder(moveorder);
@@ -887,8 +887,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             await _unitOfWork.CompleteAsync();
             if(isSuccess)
                 return Ok("Manual Allocation Complete");
+            
             return new JsonResult("Something Wrong");
         }
+        
 
     }
 }

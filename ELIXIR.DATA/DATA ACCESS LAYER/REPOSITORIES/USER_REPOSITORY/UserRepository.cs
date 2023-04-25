@@ -357,9 +357,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES
   
             if (user.Reason == null)
                 existingUser.Reason = "Resigned";
-
-           
-
+            
             return true;
         }
 

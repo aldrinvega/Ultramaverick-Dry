@@ -48,8 +48,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<IReadOnlyList<MoveOrderDto>> ListOfPreparedItemsForMoveOrder(int id);
         Task<bool> CancelMoveOrder(MoveOrder moveorder);
         Task<bool> AddPlateNumberInMoveOrder(Ordering order);
-        Task<bool> AddDeliveryStatus(Ordering order);
-        Task<bool> ApprovalForMoveOrder(MoveOrder moveorder);
+        Task<bool> AddDeliveryStatus(OrderDto order);
+        Task<bool> ApprovalForMoveOrder(IEnumerable<MoveOrder> moveorder);
         Task<bool> RejectForMoveOrder(MoveOrder moveorder);
         Task<bool> RejectApproveMoveOrder(MoveOrder moveorder);
         Task<PagedList<MoveOrderDto>> ForApprovalMoveOrderPagination(UserParams userParams);

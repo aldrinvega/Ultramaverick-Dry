@@ -38,7 +38,6 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 
             await _unitOfWork.Miscellaneous.AddMiscellaneousReceipt(receipt);
             await _unitOfWork.CompleteAsync();
-
             return Ok(receipt);
         }
 

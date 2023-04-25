@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Security;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -39,7 +40,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                              Address = customer.Address,
                                              DateAdded = customer.DateAdded.ToString("MM/dd/yyyy"),
                                              AddedBy = customer.AddedBy,
-                                             IsActive = customer.IsActive
+                                             IsActive = customer.IsActive,
+                                             AccountTitles = customer.AccountTitles,
+                                             CompanyCode = customer.CompanyCode,
+                                             DepartmentName = customer.DepartmentName,
+                                             LocationName = customer.LocationName
                                          }).ToListAsync();
         }
         public override async Task<CustomerDto> GetById(int id)
@@ -60,7 +65,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                                Address = customer.Address,
                                                DateAdded = customer.DateAdded.ToString("MM/dd/yyyy"),
                                                AddedBy = customer.AddedBy,
-                                               IsActive = customer.IsActive
+                                               IsActive = customer.IsActive,
+                                               AccountTitles = customer.AccountTitles,
+                                               CompanyCode = customer.CompanyCode,
+                                               DepartmentName = customer.DepartmentName,
+                                               LocationName = customer.LocationName,
                                            }).FirstOrDefaultAsync(x => x.Id == id);
         }
 
@@ -82,7 +91,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                               Address = customer.Address,
                                               DateAdded = customer.DateAdded.ToString("MM/dd/yyyy"),
                                               AddedBy = customer.AddedBy,
-                                              IsActive = customer.IsActive
+                                              IsActive = customer.IsActive,
+                                              AccountTitles = customer.AccountTitles,
+                                              CompanyCode = customer.CompanyCode,
+                                              DepartmentName = customer.DepartmentName,
+                                              LocationName = customer.LocationName,
                                           }).Where(x => x.IsActive == true)
                                             .ToListAsync();
         }
@@ -105,7 +118,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                                  Address = customer.Address,
                                                  DateAdded = customer.DateAdded.ToString("MM/dd/yyyy"),
                                                  AddedBy = customer.AddedBy,
-                                                 IsActive = customer.IsActive
+                                                 IsActive = customer.IsActive,
+                                                 AccountTitles = customer.AccountTitles,
+                                                 CompanyCode = customer.CompanyCode,
+                                                 DepartmentName = customer.DepartmentName,
+                                                 LocationName = customer.LocationName,
                                              }).Where(x => x.IsActive == false)
                                                .ToListAsync();
         }
@@ -135,6 +152,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             exisitngCustomer.MobileNumber = customer.MobileNumber;
             exisitngCustomer.LeadMan = customer.LeadMan;
             exisitngCustomer.Address = customer.Address;
+            exisitngCustomer.CustomerCode = customer.CustomerCode;
+            exisitngCustomer.LocationName = customer.LocationName;
+            exisitngCustomer.DepartmentName = customer.DepartmentName;
+            exisitngCustomer.CompanyName = customer.CompanyName;
             exisitngCustomer.CustomerCode = customer.CustomerCode;
 
             return true;
@@ -335,7 +356,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                                    Address = customer.Address,
                                                    DateAdded = customer.DateAdded.ToString("MM/dd/yyyy"),
                                                    AddedBy = customer.AddedBy,
-                                                   IsActive = customer.IsActive
+                                                   IsActive = customer.IsActive,
+                                                   AccountTitles = customer.AccountTitles,
+                                                   CompanyCode = customer.CompanyCode,
+                                                   DepartmentName = customer.DepartmentName,
+                                                   LocationName = customer.LocationName,
                                                }).Where(x => x.IsActive == status);
 
             return await PagedList<CustomerDto>.CreateAsync(customer, userParams.PageNumber, userParams.PageSize);
@@ -360,7 +385,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                                    Address = customer.Address,
                                                    DateAdded = customer.DateAdded.ToString("MM/dd/yyyy"),
                                                    AddedBy = customer.AddedBy,
-                                                   IsActive = customer.IsActive
+                                                   IsActive = customer.IsActive,
+                                                   AccountTitles = customer.AccountTitles,
+                                                   CompanyCode = customer.CompanyCode,
+                                                   DepartmentName = customer.DepartmentName,
+                                                   LocationName = customer.LocationName,
                                                }).Where(x => x.IsActive == status)
                                                  .Where(x => x.CustomerName.ToLower()
                                                  .Contains(search.Trim().ToLower()));

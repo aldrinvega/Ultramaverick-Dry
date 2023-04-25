@@ -48,7 +48,13 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         public DateTime OrderDateTime { get; set; }
         public DateTime? PreparedDateTime { get; set; }
         public DateTime DateNeededDateTime { get; set; }
-        
+        public string AccountTitles { get; set; }
+        public string LocationName { get; set; }
+        public string DepartmentName { get; set; }
+        public string DepartmentCode { get; set; }
+        public string CompanyName { get; set; }
+        public string CompanyCode { get; set; }
+        public string AddedBy { get; set; }
 
 
     }

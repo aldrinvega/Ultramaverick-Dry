@@ -21,7 +21,6 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 using ELIXIR.DATA.SERVICES;
 using Microsoft.AspNetCore.SignalR;
 
@@ -75,6 +74,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
         
         //Checklist
         public IQCChecklist QcChecklist { get; set; }
+        
+        //LabTest MasterList
+        public ILabtestMasterlist LabtestMasterlist { get; set; }
+        
+        
+        
 
         //public IOrderHub Hub { get; set; }
 
@@ -128,6 +133,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
             
             //Checklist 
             QcChecklist = new ChecklistRepository(_context);
+
+            LabtestMasterlist = new LabTestMasterList(_context);
 
 
         }

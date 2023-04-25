@@ -77,7 +77,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                  //ExpirationDays = total.Key.Expiry_Date == null ? 0 : total.Key.Expiry_Date.Value.Subtract(dateNow).Days,
                                  TotalStock = total.Key.computeStock,
                                  IsWarehouseReceived = total.Key.IsWareHouseReceive != null,
-                                 ManufacturingDate = total.Key.Manufacturing_Date.ToString("MM/dd/yyyy"),
+                                 ManufacturingDate = total.Key.Manufacturing_Date.ToString(),
                                  ExpectedDelivery = total.Key.Expected_Delivery,
                                  IsActive = total.Key.IsActive
 
@@ -270,7 +270,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                    PO_Number = posummary.PO_Number,
                                    Supplier = posummary.VendorName,
                                    Uom = posummary.UOM,
-                                   ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy"),
+                                   ManufacturingDate = receive.Manufacturing_Date.ToString(),
                                    ActualDelivered = receive.Actual_Delivered,
                                    Expiration = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
                                    // ExpirationDays = receive.Expiry_Date.HasValue ? receive.Expiry_Date.Value.Subtract(dateNow).Days : 0,
@@ -350,7 +350,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                    PO_Number = posummary.PO_Number,
                                    Supplier = posummary.VendorName,
                                    Uom = posummary.UOM,
-                                   ManufacturingDate = receive.Manufacturing_Date.ToString("MM/dd/yyyy"),
+                                   ManufacturingDate = receive.Manufacturing_Date.ToString(),
                                    ActualDelivered = receive.Actual_Delivered,
                                    Expiration = receive.Expiry_Date != null ? receive.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
                                    ExpirationDays = receive.Expiry_Date.HasValue
