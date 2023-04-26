@@ -125,7 +125,6 @@ using System.Collections.Generic;
                 x.CustomerCode,
                 x.CustomerName,
                 x.CompanyName,
-                x.DepartmentCode,
                 x.CompanyCode
             });
 
@@ -218,7 +217,6 @@ using System.Collections.Generic;
                               customers.CompanyCode,
                               customers.LocationName,
                               customers.DepartmentName,
-                              customers.DepartmentCode,
                               Reserve = warehouse.Reserve != null ? warehouse.Reserve : 0,
 
 
@@ -244,7 +242,6 @@ using System.Collections.Generic;
                               StockOnHand = total.Key.Reserve,
                               CompanyCode = total.Key.CustomerCode,
                               CompanyName = total.Key.CompanyName,
-                              DepartmentCode = total.Key.DepartmentCode,
                               DepartmentName = total.Key.DepartmentName,
                               LocationName = total.Key.LocationName
                           });
@@ -782,32 +779,32 @@ using System.Collections.Generic;
 
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
-        public async Task<TotalListOfPreparedDateDTO> TotalListOfApprovedPreparedDate(string farm)
+        public async Task<IReadOnlyList<TotalListOfPreparedDateDTO>> TotalListOfApprovedPreparedDate(string farm)
             {
-                var orders = await _context.Orders.FirstOrDefaultAsync(x => x.FarmName == farm && x.IsApproved == true && x.PreparedDate != null && x.IsMove == false);
-
-                if (orders == null)
-                    return null;
+                var order = await _context.Orders.FirstOrDefaultAsync(x => x.FarmName == farm && x.IsApproved == true && x.PreparedDate != null && x.IsMove == false);
+                var result = new List<TotalListOfPreparedDateDTO>();
                 
-                var customer = await _context.Customers.FirstOrDefaultAsync(x => x.CustomerCode == orders.FarmCode);
-                if (customer == null)
-                    return null;
+                    var customer = await _context.Customers.FirstOrDefaultAsync(x => x.CustomerCode == order.FarmCode);
 
-                var result = new TotalListOfPreparedDateDTO
-                {
-                    Id = orders.OrderNoPKey,
-                    FarmName = orders.FarmName,
-                    FarmCode = orders.FarmCode,
-                    PreparedDate = orders.PreparedDate.ToString(),
-                    IsMove = orders.IsMove,
-                    IsReject = orders.IsReject,
-                    QuantityOrder = orders.AllocatedQuantity ?? (int)orders.QuantityOrdered,
-                    LocationName = customer.LocationName,
-                    CompanyName = customer.CompanyName,
-                    CompanyCode = customer.CompanyCode,
-                    DepartmentName = customer.DepartmentName
-                };
-                return result;
+                    if (customer == null || order == null)
+                        return null;
+
+                    var dto = new TotalListOfPreparedDateDTO
+                    {
+                        Id = order.OrderNoPKey,
+                        FarmName = order.FarmName,
+                        FarmCode = order.FarmCode,
+                        PreparedDate = order.PreparedDate.ToString(),
+                        IsMove = order.IsMove,
+                        IsReject = order.IsReject,
+                        QuantityOrder = order.AllocatedQuantity ?? (int)order.QuantityOrdered,
+                        LocationName = customer.LocationName,
+                        CompanyName = customer.CompanyName,
+                        CompanyCode = customer.CompanyCode,
+                        DepartmentName = customer.DepartmentName
+                    };
+                    result.Add(dto);
+                    return result;
             }
         public async Task<bool> GenerateNumber(GenerateOrderNo generate)
         {

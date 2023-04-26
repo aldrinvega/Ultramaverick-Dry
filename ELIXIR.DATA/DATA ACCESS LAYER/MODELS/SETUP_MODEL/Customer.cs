@@ -10,6 +10,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
         public FarmType FarmType { get; set; }
         public int FarmTypeId { get; set; }
         public string CompanyName { get; set; }
+        public string CompanyCode { get; set; }
         public string MobileNumber { get; set; }
         public string LeadMan { get; set; }
         public string Address { get; set; }
@@ -19,8 +20,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
         public string Reason { get; set; }
         public string LocationName { get; set; }
         public string DepartmentName { get; set; }
-        public string DepartmentCode { get; set; }
-        public string CompanyCode { get; set; }
+        
     }
     
 }

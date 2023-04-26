@@ -92,7 +92,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                               IsActive = customer.IsActive,
                                               CompanyCode = customer.CompanyCode,
                                               DepartmentName = customer.DepartmentName,
-                                              LocationName = customer.LocationName,
+                                              LocationName = customer.LocationName
                                           }).Where(x => x.IsActive == true)
                                             .ToListAsync();
         }
@@ -152,6 +152,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             exisitngCustomer.LocationName = customer.LocationName;
             exisitngCustomer.DepartmentName = customer.DepartmentName;
             exisitngCustomer.CompanyName = customer.CompanyName;
+            exisitngCustomer.CompanyCode = customer.CompanyCode;
             exisitngCustomer.CustomerCode = customer.CustomerCode;
 
             return true;

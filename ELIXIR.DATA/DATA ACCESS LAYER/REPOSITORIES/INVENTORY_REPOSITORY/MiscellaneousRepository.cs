@@ -207,7 +207,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     PreparedDate = x.PreparedDate.ToString("MM/dd/yyyy"),
                     Remarks = x.Remarks,
                     PreparedBy = x.PreparedBy,
-                    IsActive = x.IsActive
+                    IsActive = x.IsActive,
+                    TransactionDate = x.TransactionDate.ToString("MM/dd/yyyy")
                 });
 
             return await PagedList<MIssueDto>.CreateAsync(issue, userParams.PageNumber, userParams.PageSize);
@@ -226,8 +227,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                  PreparedDate = x.PreparedDate.ToString("MM/dd/yyyy"),
                  Remarks = x.Remarks,
                  PreparedBy = x.PreparedBy,
-                 IsActive = x.IsActive
-
+                 IsActive = x.IsActive,
+                 TransactionDate = x.TransactionDate.ToString("MM/dd/yyyy")
              }).Where(x => (Convert.ToString(x.IssuePKey)).ToLower()
                .Contains(search.Trim().ToLower()));
 

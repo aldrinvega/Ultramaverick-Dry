@@ -34,7 +34,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL
         public string CompanyName { get; set; }
         public string CompanyCode { get; set; }
         public string AddedBy { get; set; }
-
-
+        public DateTime TransactionDate { get; set; }
     }
 }
