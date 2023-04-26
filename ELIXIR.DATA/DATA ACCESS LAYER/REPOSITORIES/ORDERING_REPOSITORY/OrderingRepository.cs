@@ -782,48 +782,33 @@ using System.Collections.Generic;
 
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
-            public async Task<IReadOnlyList<OrderDto>> TotalListOfApprovedPreparedDate(string farm)
+        public async Task<TotalListOfPreparedDateDTO> TotalListOfApprovedPreparedDate(string farm)
             {
-                var orders = await _context.Orders
-                    .Where(x => x.FarmName == farm && x.IsApproved == true && x.PreparedDate != null && x.IsMove == false)
-                    .Select(x => new 
-                    { 
-                        x.OrderNoPKey, 
-                        x.FarmName, 
-                        x.FarmCode, 
-                        x.PreparedDate, 
-                        x.IsApproved, 
-                        x.IsMove, 
-                        x.IsReject, 
-                        x.Remarks, 
-                        x.AllocatedQuantity, 
-                        x.QuantityOrdered,
-                        Casting = x.AllocatedQuantity == null ? x.QuantityOrdered : (decimal)x.AllocatedQuantity
-                    })
-                    .ToListAsync();
+                var orders = await _context.Orders.FirstOrDefaultAsync(x => x.FarmName == farm && x.IsApproved == true && x.PreparedDate != null && x.IsMove == false);
 
-                var orderGroups = orders.GroupBy(x => new 
-                { 
-                    x.OrderNoPKey,
-                    x.FarmName,
-                    x.FarmCode, 
-                    x.PreparedDate, 
-                    x.IsApproved, 
-                    x.IsMove, 
-                    x.IsReject, 
-                    x.Remarks
-                }).Select(x => new OrderDto
+                if (orders == null)
+                    return null;
+                
+                var customer = await _context.Customers.FirstOrDefaultAsync(x => x.CustomerCode == orders.FarmCode);
+                if (customer == null)
+                    return null;
+
+                var result = new TotalListOfPreparedDateDTO
                 {
-                    Id = x.Key.OrderNoPKey,
-                    Farm = x.Key.FarmName,
-                    FarmCode = x.Key.FarmCode,
-                    QuantityOrder = x.Sum(x => x.Casting),
-                    PreparedDateTime = x.Key.PreparedDate,
-                    IsMove = x.Key.IsMove,
-                    IsReject = x.Key.IsReject != null
-                });
-
-                return orderGroups.ToList();
+                    Id = orders.OrderNoPKey,
+                    FarmName = orders.FarmName,
+                    FarmCode = orders.FarmCode,
+                    PreparedDate = orders.PreparedDate.ToString(),
+                    IsMove = orders.IsMove,
+                    IsReject = orders.IsReject,
+                    QuantityOrder = orders.AllocatedQuantity ?? (int)orders.QuantityOrdered,
+                    LocationName = customer.LocationName,
+                    CompanyName = customer.CompanyName,
+                    CompanyCode = customer.CompanyCode,
+                    DepartmentName = customer.DepartmentName,
+                    DepartmentCode = customer.DepartmentCode
+                };
+                return result;
             }
         public async Task<bool> GenerateNumber(GenerateOrderNo generate)
         {

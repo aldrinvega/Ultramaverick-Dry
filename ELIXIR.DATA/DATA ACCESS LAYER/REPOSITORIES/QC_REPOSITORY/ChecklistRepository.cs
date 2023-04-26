@@ -27,17 +27,15 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         #region Add Checklist
         public async Task<bool> AddChecklists(Checklists input)
         {
-            foreach (var compliance in input.ChecklistsString)
+            foreach (var checklistStrings in input.ChecklistsString.Select(compliance => new CheckListString
+                     {
+                         PO_ReceivingId = input.PO_Receiving.PO_Summary_Id,
+                         Checlist_Type = compliance.Checlist_Type,
+                         Values = compliance.Values,
+                         Remarks = compliance.Remarks
+                     }))
             {
-                CheckListString checklistStrings = new CheckListString
-                {
-                    PO_ReceivingId = input.PO_Receiving.PO_Summary_Id,
-                    Checlist_Type = compliance.Checlist_Type,
-                    Values = compliance.Values
-                };
-
                 await _context.CheckListStrings.AddAsync(checklistStrings);
-
             }
             await _context.SaveChangesAsync();
             

@@ -308,6 +308,9 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             var orders = await _unitOfWork.Order.TotalListOfApprovedPreparedDate(farm);
 
+            if (orders == null)
+                return BadRequest("No Orders Currently Available");
+
             return Ok(orders);
 
         }

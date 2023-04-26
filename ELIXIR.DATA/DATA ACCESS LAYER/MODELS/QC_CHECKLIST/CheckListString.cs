@@ -20,5 +20,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
             set => Value = JsonSerializer.Serialize(value);
         }
         public string Value { get; set; }
+
+        public string Remarks { get; set; }
     }
 }
