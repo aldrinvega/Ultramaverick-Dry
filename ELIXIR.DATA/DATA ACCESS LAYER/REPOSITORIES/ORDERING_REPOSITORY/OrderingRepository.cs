@@ -805,8 +805,7 @@ using System.Collections.Generic;
                     LocationName = customer.LocationName,
                     CompanyName = customer.CompanyName,
                     CompanyCode = customer.CompanyCode,
-                    DepartmentName = customer.DepartmentName,
-                    DepartmentCode = customer.DepartmentCode
+                    DepartmentName = customer.DepartmentName
                 };
                 return result;
             }
