@@ -889,7 +889,6 @@ using System.Collections.Generic;
                           join warehouse in totalRemaining
                           on ordering.ItemCode equals warehouse.ItemCode
                           into leftJ
-
                           from warehouse in leftJ.DefaultIfEmpty()
 
                           group warehouse by new
@@ -929,7 +928,6 @@ using System.Collections.Generic;
                               Difference = total.Sum(x => x.Remaining) - total.Key.QuantityOrdered,
                               PreparedDate = total.Key.PreparedDate.ToString(),
                               IsApproved = total.Key.IsApproved != null
-
                           });
             return await orders.ToListAsync();
         }
@@ -1122,7 +1120,7 @@ using System.Collections.Generic;
             var existing = await _context.Orders.Where(x => x.Id == order.Id)
                                                 .FirstOrDefaultAsync();
 
-            var existingMoveorder = await _context.MoveOrders.Where(x => x.OrderNoPKey == order.Id)
+            var existingMoveOrder = await _context.MoveOrders.Where(x => x.OrderNoPKey == order.Id)
                                                              .ToListAsync();
 
             if (existing == null)
@@ -1131,7 +1129,7 @@ using System.Collections.Generic;
             existing.PlateNumber = order.PlateNumber;
             existing.IsMove = true;
 
-            foreach(var items in existingMoveorder)
+            foreach(var items in existingMoveOrder)
             {
                 items.PlateNumber = order.PlateNumber;
             }
@@ -1298,7 +1296,7 @@ using System.Collections.Generic;
                     FarmCode = x.Key.FarmCode,
                     Category = x.Key.FarmType,
                     Quantity = x.Sum(x => x.QuantityOrdered),
-                    OrderDate = x.Key.OrderDate.ToString(),
+                    OrderDate = x.Key.OrderDate.ToString("MM/dd/yyyy"),
                     PreparedDate = x.Key.PreparedDate.ToString(),
                     DeliveryStatus = x.Key.DeliveryStatus,
 
@@ -1432,7 +1430,7 @@ using System.Collections.Generic;
                  FarmName = x.Key.FarmName,
                  FarmCode = x.Key.FarmCode,
                  Category = x.Key.FarmType,
-                 Quantity = x.Sum(x => x.QuantityOrdered),
+                 Quantity = x.Sum(y => y.QuantityOrdered),
                  PreparedDate = x.Key.PreparedDate.ToString(),
                  DeliveryStatus = x.Key.DeliveryStatus,
                  IsApprove = x.Key.IsApprove != null,
@@ -1472,7 +1470,7 @@ using System.Collections.Generic;
                  FarmName = x.Key.FarmName,
                  FarmCode = x.Key.FarmCode,
                  Category = x.Key.FarmType,
-                 Quantity = x.Sum(x => x.QuantityOrdered),
+                 Quantity = x.Sum(y => y.QuantityOrdered),
                  PreparedDate = x.Key.PreparedDate.ToString(),
                  DeliveryStatus = x.Key.DeliveryStatus,
                  IsApprove = x.Key.IsApprove != null,
@@ -1511,8 +1509,8 @@ using System.Collections.Generic;
             FarmName = x.Key.FarmName,
             FarmCode = x.Key.FarmCode,
             Category = x.Key.FarmType,
-            Quantity = x.Sum(x => x.QuantityOrdered),
-            OrderDate = x.Key.OrderDate.ToString(),
+            Quantity = x.Sum(y => y.QuantityOrdered),
+            OrderDate = x.Key.OrderDate.ToString("MM/dd/yyyy"),
             PreparedDate = x.Key.PreparedDate.ToString(),
             DeliveryStatus = x.Key.DeliveryStatus,
             IsReject = x.Key.IsReject != null,
@@ -1548,7 +1546,7 @@ using System.Collections.Generic;
            FarmCode = x.Key.FarmCode,
            Category = x.Key.FarmType,
            Quantity = x.Sum(x => x.QuantityOrdered),
-           OrderDate = x.Key.OrderDate.ToString(),
+           OrderDate = x.Key.OrderDate.ToString("MM/dd/yyyy"),
            PreparedDate = x.Key.PreparedDate.ToString(),
            DeliveryStatus = x.Key.DeliveryStatus,
            IsReject = x.Key.IsReject != null,

@@ -1,38 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 
-namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
+namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
 {
-    public class PO_Receiving : BaseEntity
+    public class ForViewingofChecklistResult
     {
-
         public int PO_Summary_Id {
             get; 
             set; 
         }
-
-        [Column(TypeName = "Date")]
+        
         public DateTime? Manufacturing_Date {
             get;
             set;
         }
-
-        [Column(TypeName = "decimal(18,2)")]
+        
         public int Expected_Delivery {
             get; 
             set;
         }
-
-        [Column(TypeName = "Date")]
+        
         public DateTime? Expiry_Date {
             get; 
             set; 
         }
-
-        [Column(TypeName = "decimal(18,2)")]
+        
         public decimal Actual_Delivered {
             get; 
             set;
@@ -47,7 +40,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
             set;
         }
 
-        [Column(TypeName = "decimal(18,2)")]
         public decimal TotalReject {
             get;
             set;
@@ -56,8 +48,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
             get; 
             set; 
         }
-
-        [Column(TypeName = "Date")]
         public DateTime? CancelDate {
             get;
             set; 
@@ -85,14 +75,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
             get;
             set;
         }
-
-        [Column(TypeName = "Date")]
         public DateTime? ExpiryDateOfApprove { 
             get; 
             set;
         }
-
-        [Column(TypeName = "Date")]
+        
         public DateTime QC_ReceiveDate {
             get; 
             set; 
@@ -114,8 +101,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
             get; 
             set;
         }
-
         public string MonitoredBy { get; set; }
-        public virtual ICollection<CheckListString> Checklist { get; set; }
+        public string ChecklistType { get; set; }
+        public List<string> Values { get; set; }
     }
 }

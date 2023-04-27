@@ -9,7 +9,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.QC_INTERFACE
     public interface IQCChecklist
     {
         Task<bool> AddChecklists(Checklists input);
-        //Task<List<ChecklistParent>> GetAllChecklist();
-        //Task<List<ChecklistParent>> GetAllChecklistbyPOSummaryId(int po_SummaryId);
+        Task<IReadOnlyList<ChecklistStringDTO>> GetAllChecklist();
+        Task<IReadOnlyList<ChecklistStringDTO>> GetChecklistByPoSummaryId(int poSummaryId);
+        Task<IReadOnlyList<ForViewingofChecklistResult>> GetPoReceivingInformation(int poSummaryId);
     }
 }
