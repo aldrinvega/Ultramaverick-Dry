@@ -3,8 +3,10 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.INTERFACES.QC_INTERFACE;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.EXCEPTIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
+using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 using ELIXIR.DATA.DTOs.RECEIVING_DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -68,37 +70,41 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             return checklistStrings;
         }
 
-        public async Task<IReadOnlyList<ForViewingofChecklistResult>> GetPoReceivingInformation(int poSummaryId)
+        public async Task<IEnumerable<ForViewingofChecklistResult>> GetPoReceivingInformation(int poSummaryId)
         {
-            var poReceivingInformation = await _context.QC_Receiving.Where(x => x.PO_Summary_Id == poSummaryId).SelectMany(
-                x => x.Checklist, (r, c) =>
-                    new ForViewingofChecklistResult
-                    {
-                        PO_Summary_Id = r.PO_Summary_Id,
-                        Manufacturing_Date = r.Manufacturing_Date,
-                        Expected_Delivery = r.Expected_Delivery,
-                        Expiry_Date = r.Expiry_Date,
-                        Actual_Delivered = r.Actual_Delivered,
-                        ItemCode = r.ItemCode,
-                        Batch_No = r.Batch_No,
-                        TotalReject = r.TotalReject,
-                        IsActive = r.IsActive,
-                        CancelDate = r.CancelDate,
-                        CancelBy = r.CancelBy,
-                        Reason = r.Reason,
-                        ExpiryIsApprove = r.ExpiryIsApprove,
-                        IsNearlyExpire = r.IsNearlyExpire,
-                        ExpiryApproveBy = r.ExpiryApproveBy,
-                        ExpiryDateOfApprove = r.ExpiryDateOfApprove,
-                        QC_ReceiveDate = r.QC_ReceiveDate,
-                        ConfirmRejectByQc = r.ConfirmRejectByQc,
-                        IsWareHouseReceive = r.IsWareHouseReceive,
-                        CancelRemarks = r.CancelRemarks,
-                        QcBy = r.QcBy,
-                        MonitoredBy = r.MonitoredBy,
-                        ChecklistType = c.Checlist_Type,
-                        Values = JsonConvert.DeserializeObject<List<string>>(c.Value)
-                    }).ToListAsync();
+            var poReceivingInformation = await _context.QC_Receiving.Where(x => x.PO_Summary_Id == poSummaryId)
+                .SelectMany(
+                    x => x.Checklist, (r, c) =>
+                        new ForViewingofChecklistResult
+                        {
+                            PO_Summary_Id = r.PO_Summary_Id,
+                            Manufacturing_Date = r.Manufacturing_Date,
+                            Expected_Delivery = r.Expected_Delivery,
+                            Expiry_Date = r.Expiry_Date,
+                            Actual_Delivered = r.Actual_Delivered,
+                            ItemCode = r.ItemCode,
+                            Batch_No = r.Batch_No,
+                            TotalReject = r.TotalReject,
+                            IsActive = r.IsActive,
+                            CancelDate = r.CancelDate,
+                            CancelBy = r.CancelBy,
+                            Reason = r.Reason,
+                            ExpiryIsApprove = r.ExpiryIsApprove,
+                            IsNearlyExpire = r.IsNearlyExpire,
+                            ExpiryApproveBy = r.ExpiryApproveBy,
+                            ExpiryDateOfApprove = r.ExpiryDateOfApprove,
+                            QC_ReceiveDate = r.QC_ReceiveDate,
+                            ConfirmRejectByQc = r.ConfirmRejectByQc,
+                            IsWareHouseReceive = r.IsWareHouseReceive,
+                            CancelRemarks = r.CancelRemarks,
+                            QcBy = r.QcBy,
+                            // MonitoredBy = r.MonitoredBy,
+                            ChecklistType = c.Checlist_Type,
+                            Values = JsonConvert.DeserializeObject<List<string>>(c.Value)
+                        }).ToListAsync();
+
+            if (poReceivingInformation.Count == 0)
+                throw new NoResultFound();
             return poReceivingInformation;
         }
     

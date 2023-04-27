@@ -1,4 +1,5 @@
-﻿using ELIXIR.DATA.CORE.ICONFIGURATION;
+﻿using System;
+using ELIXIR.DATA.CORE.ICONFIGURATION;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL;
@@ -10,6 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.COMMON;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.EXCEPTIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 
 namespace ELIXIR.API.Controllers.QC_CONTROLLER
@@ -630,6 +633,28 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
 
             return Ok(checklist);
         }
-        
+
+        [HttpGet("GetPoSummaryInformation")]
+        public async Task<ActionResult<ForViewingofChecklistResult>> GetP0SummaryInformation([FromQuery]int poSummaryId)
+        {
+            var result = new QueryResult<IEnumerable<ForViewingofChecklistResult>>();
+           
+            try
+            {
+                var poSummaryInformationResult = await _unitOfWork.QcChecklist.GetPoReceivingInformation(poSummaryId);
+
+                result.Success = true;
+                result.Data = poSummaryInformationResult;
+                return Ok(result);
+            }
+            catch (NoResultFound e)
+            {
+                result.Success = false;
+                result.Messages.Add(e.Message);
+                return Conflict(result);
+            }
+
+        }
+
     }
 }
