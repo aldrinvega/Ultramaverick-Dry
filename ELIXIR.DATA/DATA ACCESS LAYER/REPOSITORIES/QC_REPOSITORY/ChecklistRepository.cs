@@ -52,7 +52,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             {
                 Po_Summary_Id = x.PO_ReceivingId,
                 Checklist_Type = x.Checlist_Type,
-                Values = JsonConvert.DeserializeObject<List<string>>(x.Value)
+                Values = JsonConvert.DeserializeObject<List<string>>(x.Value),
+                Remarks = x.Remarks
             }).ToListAsync();
 
             return checklistStrings;
@@ -65,7 +66,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 {
                 Po_Summary_Id = x.PO_ReceivingId,
                 Checklist_Type = x.Checlist_Type,
-                Values = JsonConvert.DeserializeObject<List<string>>(x.Value)
+                Values = JsonConvert.DeserializeObject<List<string>>(x.Value),
+                Remarks = x.Remarks
                 }).ToListAsync();
 
             return checklistStrings;
