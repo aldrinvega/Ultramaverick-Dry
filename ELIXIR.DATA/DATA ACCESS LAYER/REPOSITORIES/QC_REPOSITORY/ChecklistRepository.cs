@@ -29,16 +29,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         #region Add Checklist
         public async Task<bool> AddChecklists(Checklists input)
         {
-            foreach (var checklistStrings in input.ChecklistsString.Select(compliance => new CheckListString
-                     {
-                         PO_ReceivingId = input.PO_Receiving.PO_Summary_Id,
-                         Checlist_Type = compliance.Checlist_Type,
-                         Values = compliance.Values,
-                         Remarks = compliance.Remarks
-                     }))
-            {
+            foreach (var checklistStrings in input.ChecklistsString
+                         .Select(compliance => new CheckListString
+                         {
+                             PO_ReceivingId = input.PO_Receiving.PO_Summary_Id,
+                             Checlist_Type = compliance.Checlist_Type,
+                             Values = compliance.Values,
+                             Remarks = compliance.Remarks
+                         }))
+                
                 await _context.CheckListStrings.AddAsync(checklistStrings);
-            }
+            
             await _context.SaveChangesAsync();
             
             return true;
@@ -98,8 +99,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                             IsWareHouseReceive = r.IsWareHouseReceive,
                             CancelRemarks = r.CancelRemarks,
                             QcBy = r.QcBy,
-                            // MonitoredBy = r.MonitoredBy,
+                            MonitoredBy = r.MonitoredBy,
                             ChecklistType = c.Checlist_Type,
+                            Remarks = c.Remarks,
                             Values = JsonConvert.DeserializeObject<List<string>>(c.Value)
                         }).ToListAsync();
 
