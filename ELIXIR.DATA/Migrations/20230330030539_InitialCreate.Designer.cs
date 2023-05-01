@@ -4,14 +4,16 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20230330030539_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,25 +118,10 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("AccountTitles")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AddedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CompanyCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CompanyName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Customer")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CustomerCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DepartmentName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Details")
@@ -145,9 +132,6 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<bool?>("IsTransact")
                         .HasColumnType("bit");
-
-                    b.Property<string>("LocationName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PreparedBy")
                         .HasColumnType("nvarchar(max)");
@@ -160,9 +144,6 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<decimal>("TotalQuantity")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -230,29 +211,11 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("AccountTitles")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AddedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CompanyCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CompanyName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DepartmentName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Details")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
-
-                    b.Property<string>("LocationName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PreparedBy")
                         .HasColumnType("nvarchar(max)");
@@ -271,9 +234,6 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<decimal>("TotalQuantity")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -343,10 +303,7 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("AccountTitles")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AddedBy")
+                    b.Property<string>("AccountTitle")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ApproveDateTempo")
@@ -364,10 +321,7 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CompanyCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CompanyName")
+                    b.Property<string>("Company")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DateNeeded")
@@ -376,10 +330,7 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("DeliveryStatus")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DepartmentCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DepartmentName")
+                    b.Property<string>("Department")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ExpirationDate")
@@ -427,7 +378,7 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("ItemDescription")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LocationName")
+                    b.Property<string>("Location")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("OrderDate")
@@ -685,15 +636,10 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<int>("PO_ReceivingId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Remarks")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ChecklistStringId");
-
-                    b.HasIndex("PO_ReceivingId");
 
                     b.ToTable("CheckListStrings");
                 });
@@ -774,11 +720,8 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("ItemCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("Manufacturing_Date")
+                    b.Property<DateTime>("Manufacturing_Date")
                         .HasColumnType("Date");
-
-                    b.Property<string>("MonitoredBy")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PO_Summary_Id")
                         .HasColumnType("int");
@@ -821,33 +764,6 @@ namespace ELIXIR.DATA.Migrations
                     b.ToTable("QC_Reject");
                 });
 
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Analysis", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("AnalysisName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DateAdded")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Analyses");
-                });
-
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", b =>
                 {
                     b.Property<int>("Id")
@@ -859,9 +775,6 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CompanyCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CompanyName")
@@ -876,9 +789,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DepartmentName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("FarmTypeId")
                         .HasColumnType("int");
 
@@ -886,9 +796,6 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LeadMan")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LocationName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MobileNumber")
@@ -902,33 +809,6 @@ namespace ELIXIR.DATA.Migrations
                     b.HasIndex("FarmTypeId");
 
                     b.ToTable("Customers");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Disposition", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<DateTime>("DateAdded")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DispositionName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Dispositions");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.FarmType", b =>
@@ -1053,60 +933,6 @@ namespace ELIXIR.DATA.Migrations
                     b.ToTable("LotNames");
                 });
 
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Parameters", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<DateTime>("DateAdded")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ParameterName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Parameters");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.ProductCondition", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<DateTime>("DateAdded")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductConditionName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProductConditions");
-                });
-
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.RawMaterial", b =>
                 {
                     b.Property<int>("Id")
@@ -1178,33 +1004,6 @@ namespace ELIXIR.DATA.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Reasons");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.SampleType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<DateTime>("DateAdded")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SampleTypeName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SampleTypes");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Supplier", b =>
@@ -1335,33 +1134,6 @@ namespace ELIXIR.DATA.Migrations
                     b.HasIndex("TransformationFormulaId");
 
                     b.ToTable("FormulaRequirements");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.TypeOfSwab", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<DateTime>("DateAdded")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TypeofSwabName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TypeOfSwabs");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.UOM", b =>
@@ -1880,17 +1652,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Navigation("MainMenu");
                 });
 
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.CheckListString", b =>
-                {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL.PO_Receiving", "PoReceiving")
-                        .WithMany("Checklist")
-                        .HasForeignKey("PO_ReceivingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PoReceiving");
-                });
-
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", b =>
                 {
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.FarmType", "FarmType")
@@ -1968,11 +1729,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Navigation("Department");
 
                     b.Navigation("UserRole");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL.PO_Receiving", b =>
-                {
-                    b.Navigation("Checklist");
                 });
 #pragma warning restore 612, 618
         }

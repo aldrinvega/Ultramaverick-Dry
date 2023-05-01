@@ -57,7 +57,7 @@ namespace ELIXIR.API
                };
 
            });
-            services.AddTransient(typeof(IUserService), typeof(UserService));
+            services.AddScoped(typeof(IUserService), typeof(UserService));
       
             services.AddDbContext<StoreContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DevConnection")));

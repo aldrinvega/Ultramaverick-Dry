@@ -4,14 +4,16 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20230418024246_AddLabMasterlist")]
+    partial class AddLabMasterlist
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -134,6 +136,9 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("CustomerCode")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DepartmentCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DepartmentName")
                         .HasColumnType("nvarchar(max)");
 
@@ -160,9 +165,6 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<decimal>("TotalQuantity")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -242,6 +244,9 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("CompanyName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DepartmentCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DepartmentName")
                         .HasColumnType("nvarchar(max)");
 
@@ -271,9 +276,6 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<decimal>("TotalQuantity")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -685,15 +687,10 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<int>("PO_ReceivingId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Remarks")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ChecklistStringId");
-
-                    b.HasIndex("PO_ReceivingId");
 
                     b.ToTable("CheckListStrings");
                 });
@@ -774,11 +771,8 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("ItemCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("Manufacturing_Date")
+                    b.Property<DateTime>("Manufacturing_Date")
                         .HasColumnType("Date");
-
-                    b.Property<string>("MonitoredBy")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PO_Summary_Id")
                         .HasColumnType("int");
@@ -861,9 +855,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CompanyCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CompanyName")
                         .HasColumnType("nvarchar(max)");
 
@@ -876,9 +867,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DepartmentName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("FarmTypeId")
                         .HasColumnType("int");
 
@@ -886,9 +874,6 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LeadMan")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LocationName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MobileNumber")
@@ -1880,17 +1865,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Navigation("MainMenu");
                 });
 
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.CheckListString", b =>
-                {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL.PO_Receiving", "PoReceiving")
-                        .WithMany("Checklist")
-                        .HasForeignKey("PO_ReceivingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PoReceiving");
-                });
-
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", b =>
                 {
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.FarmType", "FarmType")
@@ -1968,11 +1942,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Navigation("Department");
 
                     b.Navigation("UserRole");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL.PO_Receiving", b =>
-                {
-                    b.Navigation("Checklist");
                 });
 #pragma warning restore 612, 618
         }
