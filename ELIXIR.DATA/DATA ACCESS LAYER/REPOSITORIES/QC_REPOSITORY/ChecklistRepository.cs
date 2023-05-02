@@ -1,18 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.INTERFACES.QC_INTERFACE;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.EXCEPTIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
-using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 using ELIXIR.DATA.DTOs.RECEIVING_DTOs;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 {
@@ -116,10 +111,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                              ChecklistType = ck.Checklist_Type,
                                              Remarks = ck.Remarks,
                                              Values = ck.Values,
-
                                          };
 
-            return poReceivingInformation == null ? throw new NoResultFound() : poReceivingInformation;
+            return poReceivingInformation ?? throw new NoResultFound();
         }
 
     }

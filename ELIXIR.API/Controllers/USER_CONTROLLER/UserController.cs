@@ -133,7 +133,7 @@ namespace ELIXIR.API.Controllers
         }
 
         [HttpPost]
-        [Route("AddeNwUser")]
+        [Route("AddNewUser")]
         public async Task<IActionResult> CreateUser(User user)
         {
             if (ModelState.IsValid)
@@ -143,7 +143,6 @@ namespace ELIXIR.API.Controllers
 
                 if (await _unitOfWork.Users.UserAlreadyExists(user.UserName))
                     return BadRequest("UserName Already Exist!, Please try something else!");
-
 
                 if (getRoleId == false)
                     return BadRequest("Role doesn't exist, Please input data first!");

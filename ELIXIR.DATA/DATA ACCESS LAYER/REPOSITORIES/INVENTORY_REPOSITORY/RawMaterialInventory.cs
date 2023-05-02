@@ -294,7 +294,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                   {
                                       ItemCode = total.Key.ItemCode,
                                       Ordered = total.Sum(x => x.posummary.Ordered == null ? 0 : x.posummary.Ordered) -
-                                              total.Sum(x => x.receive.QuantityOrdered == null ? 0 : x.receive.QuantityOrdered)
+                                      total.Sum(x => x.receive.QuantityOrdered == null ? 0 : x.receive.QuantityOrdered)
                                   });
 
             var getTransformOutPerMonth = _context.Transformation_Preparation.Where(x => x.PreparedDate >= StartDate && x.PreparedDate <= EndDate)
