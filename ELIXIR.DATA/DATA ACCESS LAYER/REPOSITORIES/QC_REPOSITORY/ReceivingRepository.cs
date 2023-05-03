@@ -1017,7 +1017,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                     QuantityOrdered = result.Key.QuantityOrdered,
                     IsActive = result.Key.IsActive,
                     ActualGood = result.Key.ActutalGood,
-                    ActualRemaining = result.Key.QuantityOrdered - result.Key.ActualGood - result.Key.TotalReject,             
+                    ActualRemaining = result.Key.QuantityOrdered - result.Sum(x => x.received != null && x.received.IsActive ? x.received.Actual_Delivered - x.received.TotalReject : 0),
+                    TotalReject = result.Key.TotalReject,
                     ExpiryDate = result.Key.Expiry_Date != null ? result.Key.Expiry_Date.ToString() : null,
                     Days = result.Key.Expiry_Date.HasValue
                         ? (int)Math.Round(result.Key.Expiry_Date.Value.Subtract(dateNow).TotalDays)
@@ -1080,7 +1081,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                               Uom = result.Key.UOM,
                               QuantityOrdered = result.Key.QuantityOrdered,
                               ActualGood = result.Key.Actual_Delivered - result.Key.TotalReject,
-                              ActualRemaining = result.Key.QuantityOrdered - result.Key.Actual_Delivered - result.Key.TotalReject,
+                              ActualRemaining = result.Key.QuantityOrdered - result.Sum(x => x.receiving != null && x.receiving.IsActive ? x.receiving.Actual_Delivered - x.receiving.TotalReject : 0),
                               ExpiryDate = result.Key.Expiry_Date != null ? result.Key.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
                               Days =  result.Key.Expiry_Date.HasValue ? (int)Math.Round(result.Key.Expiry_Date.Value.Subtract(dateNow).TotalDays) : 0,
                               IsActive = result.Key.IsActive,
