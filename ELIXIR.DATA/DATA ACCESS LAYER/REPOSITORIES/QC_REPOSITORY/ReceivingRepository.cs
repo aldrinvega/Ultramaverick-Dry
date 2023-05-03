@@ -16,6 +16,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.JSInterop.Implementation;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 {
@@ -753,6 +754,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         {
             var warehouse = (from posummary in _context.POSummary
                     join receive in _context.QC_Receiving on posummary.Id equals receive.PO_Summary_Id
+
                     select new WarehouseReceivingDto
                     {
                         Id = receive.Id,
@@ -928,6 +930,15 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 x.Key.PO_Summary_Id,
                 ACtual_Delivered = x.Sum(x => x.Actual_Delivered - x.TotalReject)
             });
+
+            var receiving = _context.QC_Receiving.Select(x => new QC_ReceivingDTO
+            {
+                PO_Summary_Id = x.PO_Summary_Id,
+                Manufacturing_Date = x.Manufacturing_Date,
+                Expected_Delivery = x.Expected_Delivery,
+                MonitoredBy = x.MonitoredBy,
+                QcBy = x.QcBy
+            });
             
             var posummary1 = _context.POSummary
                 .Select(x => new 
@@ -987,7 +998,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                         received.ExpiryIsApprove,
                         ReceivingId = received.Id,
                         received.IsNearlyExpire,
-                        received.Expiry_Date
+                        received.Expiry_Date,
+                        received.Manufacturing_Date,
+                        received.Expected_Delivery,
+                        received.MonitoredBy,
+                        received.QcBy
+                     
                     }
                 into result
                 select new NearlyExpireDto
@@ -1009,7 +1025,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                         : 0,
                     IsNearlyExpire = result.Key.IsNearlyExpire,
                     ExpiryIsApprove = result.Key.ExpiryIsApprove,
-                    ReceivingId = result.Key.ReceivingId
+                    ReceivingId = result.Key.ReceivingId,
+                    ManufacturingDate = result.Key.Manufacturing_Date.ToString(),
+                    ExpectedDelivery = result.Key.Expected_Delivery,
+                    MonitoredBy = result.Key.MonitoredBy,
+                    QcBy = result.Key.QcBy
                 });
          return await PagedList<NearlyExpireDto>.CreateAsync(nearlyExpiryItems, userParams.PageNumber, userParams.PageSize);
 
@@ -1039,10 +1059,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                               IsActive = receiving.IsActive,
                               IsNearlyExpire = receiving.IsNearlyExpire != null,
                               ExpiryIsApprove = receiving.ExpiryIsApprove != null,
-                              ReceivingId = receiving.Id
+                              ReceivingId = receiving.Id,
+                              ManufacturingDate = receiving.Manufacturing_Date.ToString(),
+                              ExpectedDelivery = receiving.Expected_Delivery,
+                              MonitoredBy = receiving.MonitoredBy,
+                              QcBy = receiving.QcBy
 
                           }).Where(x => x.IsNearlyExpire == true)
-                            .Where(x => x.ExpiryIsApprove == false)
+                            .Where(x => x.ExpiryIsApprove == null)
                             .Where(x => Convert.ToString(x.PO_Number).ToLower()
                             .Contains(search.Trim().ToLower()));
 

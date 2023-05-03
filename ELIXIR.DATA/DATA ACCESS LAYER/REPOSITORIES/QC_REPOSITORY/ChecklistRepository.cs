@@ -129,7 +129,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 CancelRemarks = poSummary.CancelRemarks,
                 QcBy = poSummary.QcBy,
                 MonitoredBy = poSummary.MonitoredBy,
-                ChecklistsString = ckk
+                Checklists = ckk
             };
 
             return result;
