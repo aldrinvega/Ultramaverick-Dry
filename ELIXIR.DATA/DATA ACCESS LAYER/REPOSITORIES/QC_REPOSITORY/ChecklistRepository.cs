@@ -53,7 +53,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         {
             var checklistStrings = await _context.CheckListStrings.Select(x => new ChecklistStringDTO
             {
-                PoReceivingId = x.ReceivingId,
+                ReceivingId = x.ReceivingId,
                 Checklist_Type = x.Checlist_Type,
                 Values = JsonConvert.DeserializeObject<List<string>>(x.Value),
                 Remarks = x.Remarks
@@ -67,7 +67,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 .Where(x => x.ReceivingId == receivingId) 
                 .Select(x => new ChecklistStringDTO
                 {
-                PoReceivingId = x.ReceivingId,
+                ReceivingId = x.ReceivingId,
                 Checklist_Type = x.Checlist_Type,
                 Values = JsonConvert.DeserializeObject<List<string>>(x.Value),
                 Remarks = x.Remarks

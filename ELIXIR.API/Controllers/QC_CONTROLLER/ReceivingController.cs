@@ -660,7 +660,6 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
         public async Task<IActionResult> UpdateReceivingId(int id)
         {
             await _unitOfWork.QcChecklist.UpdateReceivingId(id);
-            await _unitOfWork.CompleteAsync();
             return Ok();
         }
 

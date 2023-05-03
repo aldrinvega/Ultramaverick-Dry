@@ -23,6 +23,5 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
         public string Value { get; set; }
 
         public string Remarks { get; set; }
-        public PO_Receiving PoReceiving { get; set; }
     }
 }
