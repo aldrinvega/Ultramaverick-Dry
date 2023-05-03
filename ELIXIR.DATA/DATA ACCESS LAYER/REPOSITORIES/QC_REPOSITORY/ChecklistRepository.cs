@@ -41,9 +41,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         #endregion
         public async Task<bool> UpdateReceivingId(int receivingId)
         {
-            var checklistString = await _context.CheckListStrings.FirstOrDefaultAsync(x => x.ReceivingId == null);
+            var checklistString = await _context.CheckListStrings.Where(x => x.ReceivingId == null).ToListAsync();
 
-            checklistString.ReceivingId = receivingId;
+           foreach(var ck in checklistString)
+            {
+                ck.ReceivingId = receivingId;
+            }
+
             await _context.SaveChangesAsync();
             return true;
 
