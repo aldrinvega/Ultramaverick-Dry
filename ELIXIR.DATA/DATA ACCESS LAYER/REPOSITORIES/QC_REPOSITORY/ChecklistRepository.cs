@@ -111,6 +111,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                              ChecklistType = ck.Checklist_Type,
                                              Remarks = ck.Remarks,
                                              Values = ck.Values,
+                                             ProductType = PO.ProductType
                                          };
 
             return poReceivingInformation ?? throw new NoResultFound();
