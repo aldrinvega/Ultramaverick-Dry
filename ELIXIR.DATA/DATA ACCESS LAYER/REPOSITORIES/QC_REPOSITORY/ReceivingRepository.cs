@@ -1207,28 +1207,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                                ExpiryIsApprove = receiving.ExpiryIsApprove != null ,
                                ExpiryDate = receiving.Expiry_Date.ToString(),
                                Uom = posummary.UOM,
-                               // TruckApproval1 = receiving.Truck_Approval1,
-                               // TruckApprovalRemarks1 = receiving.Truck_Approval1_Remarks,
-                               // TruckApproval2 = receiving.Truck_Approval2,
-                               // TruckApprovalRemarks2 = receiving.Truck_Approval2_Remarks,
-                               // TruckApproval3 = receiving.Truck_Approval3,
-                               // TruckApprovalRemarks3 = receiving.Truck_Approval3_Remarks,
-                               // TruckApproval4 = receiving.Truck_Approval4,
-                               // TruckApprovalRemarks4 = receiving.Truck_Approval4_Remarks,
-                               // UnloadingApproval1 = receiving.Unloading_Approval1,
-                               // UnloadingApprovalRemarks1 = receiving.Unloading_Approval1_Remarks,
-                               // UnloadingApproval2 = receiving.Unloading_Approval2,
-                               // UnloadingApprovalRemarks2 = receiving.Unloading_Approval2_Remarks,
-                               // UnloadingApproval3 = receiving.Unloading_Approval3,
-                               // UnloadingApprovalRemarks3 = receiving.Unloading_Approval3_Remarks,
-                               // UnloadingApproval4 = receiving.Unloading_Approval4,
-                               // UnloadingApprovalRemarks4 = receiving.Unloading_Approval4_Remarks,
-                               // CheckingApproval1 = receiving.Checking_Approval1,
-                               // CheckingApprovalRemarks1 = receiving.Checking_Approval1_Remarks,
-                               // CheckingApproval2 = receiving.Checking_Approval2,
-                               // CheckingApprovalRemarks2 = receiving.Checking_Approval2_Remarks,
-                               // QAApproval = receiving.QA_Approval,
-                               // QAApprovalRemarks = receiving.QA_Approval_Remarks
                            });
 
             return await summary.Where(x => x.Id == id)

@@ -27,7 +27,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             foreach (var checklistStrings in input.ChecklistsString
                          .Select(compliance => new CheckListString
                          {
-                             PO_ReceivingId = input.PO_Receiving.PO_Summary_Id,
                              Checlist_Type = compliance.Checlist_Type,
                              Values = compliance.Values,
                              Remarks = compliance.Remarks
@@ -40,12 +39,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             return true;
         }
         #endregion
+        public async Task<bool> UpdateReceivingId(int receivingId)
+        {
+            var checklistString = await _context.CheckListStrings.FirstOrDefaultAsync(x => x.ReceivingId == null);
+
+            checklistString.ReceivingId = receivingId;
+            await _context.SaveChangesAsync();
+            return true;
+
+        }
 
         public async Task<IReadOnlyList<ChecklistStringDTO>> GetAllChecklist()
         {
             var checklistStrings = await _context.CheckListStrings.Select(x => new ChecklistStringDTO
             {
-                Po_Summary_Id = x.PO_ReceivingId,
+                PoReceivingId = x.ReceivingId,
                 Checklist_Type = x.Checlist_Type,
                 Values = JsonConvert.DeserializeObject<List<string>>(x.Value),
                 Remarks = x.Remarks
@@ -53,13 +61,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 
             return checklistStrings;
         }
-        public async Task<IReadOnlyList<ChecklistStringDTO>> GetChecklistByPoSummaryId(int poSummaryId)
+        public async Task<IReadOnlyList<ChecklistStringDTO>> GetChecklistByPoSummaryId(int receivingId)
         {
             var checklistStrings = await _context.CheckListStrings
-                .Where(x => x.PO_ReceivingId == poSummaryId) 
+                .Where(x => x.ReceivingId == receivingId) 
                 .Select(x => new ChecklistStringDTO
                 {
-                Po_Summary_Id = x.PO_ReceivingId,
+                PoReceivingId = x.ReceivingId,
                 Checklist_Type = x.Checlist_Type,
                 Values = JsonConvert.DeserializeObject<List<string>>(x.Value),
                 Remarks = x.Remarks
@@ -68,10 +76,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             return checklistStrings;
         }
 
-        public async Task<ForViewingofChecklistResult> GetPoReceivingInformation(int poSummaryId)
+        public async Task<ForViewingofChecklistResult> GetPoReceivingInformation(int receivingId)
         {
             var poSummary = await _context.QC_Receiving
-                .Where(x => x.PO_Summary_Id == poSummaryId)
+                .Where(x => x.PO_Summary_Id == receivingId)
                 .FirstOrDefaultAsync();
 
             if (poSummary == null)
@@ -80,11 +88,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             }
 
             var checklists = _context.CheckListStrings
-                .Where(x => x.PO_ReceivingId == poSummaryId)
+                .Where(x => x.ReceivingId == receivingId)
                 .ToList();
 
             var checklistGroups = checklists
-                .GroupBy(x => x.PO_ReceivingId)
+                .GroupBy(x => x.ReceivingId)
                 .Select(g => new ChecklistGroups
                 {
                     Checklists = g.Select(c => new ChecklistStringDTO
@@ -96,7 +104,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 });
 
             var ckk = _context.CheckListStrings
-            .Where(c => c.PO_ReceivingId == poSummaryId)
+            .Where(c => c.ReceivingId == receivingId)
             .Select(c => new ChecklistStringDTO
             {
                 Checklist_Type = c.Checlist_Type,
