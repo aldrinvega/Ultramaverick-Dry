@@ -79,7 +79,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         public async Task<ForViewingofChecklistResult> GetPoReceivingInformation(int receivingId)
         {
             var poSummary = await _context.QC_Receiving
-                .Where(x => x.PO_Summary_Id == receivingId)
+                .Where(x => x.Id == receivingId)
                 .FirstOrDefaultAsync();
 
             if (poSummary == null)
