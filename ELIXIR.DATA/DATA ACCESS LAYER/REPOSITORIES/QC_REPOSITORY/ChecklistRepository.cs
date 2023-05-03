@@ -95,6 +95,16 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                     }).ToList()
                 });
 
+            var ckk = _context.CheckListStrings
+            .Where(c => c.PO_ReceivingId == poSummaryId)
+            .Select(c => new ChecklistStringDTO
+            {
+                Checklist_Type = c.Checlist_Type,
+                Values = JsonConvert.DeserializeObject<List<string>>(c.Value),
+                Remarks = c.Remarks
+            })
+            .ToList();
+
             var result = new ForViewingofChecklistResult
             {
                 PO_Summary_Id = poSummary.PO_Summary_Id,
@@ -119,7 +129,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 CancelRemarks = poSummary.CancelRemarks,
                 QcBy = poSummary.QcBy,
                 MonitoredBy = poSummary.MonitoredBy,
-                ChecklistsString = checklistGroups.ToList(),
+                ChecklistsString = ckk
             };
 
             return result;
