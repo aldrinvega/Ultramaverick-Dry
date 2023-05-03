@@ -105,6 +105,6 @@ namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
 
         public string Remarks { get; set; }
         public string MonitoredBy { get; set; }
-        public List<ChecklistStringDTO> ChecklistsString { get; set; }
+        public List<ChecklistStringDTO> Checklists { get; set; }
     }
 }
