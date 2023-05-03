@@ -11,6 +11,6 @@ namespace ELIXIR.DATA.CORE.INTERFACES.QC_INTERFACE
         Task<bool> AddChecklists(Checklists input);
         Task<IReadOnlyList<ChecklistStringDTO>> GetAllChecklist();
         Task<IReadOnlyList<ChecklistStringDTO>> GetChecklistByPoSummaryId(int poSummaryId);
-        Task<IEnumerable<ForViewingofChecklistResult>> GetPoReceivingInformation(int poSummaryId);
+        Task<ForViewingofChecklistResult> GetPoReceivingInformation(int poSummaryId);
     }
 }

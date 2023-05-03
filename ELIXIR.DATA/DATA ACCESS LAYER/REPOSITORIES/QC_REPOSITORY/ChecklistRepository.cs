@@ -68,54 +68,63 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             return checklistStrings;
         }
 
-        public async Task<IEnumerable<ForViewingofChecklistResult>> GetPoReceivingInformation(int poSummaryId)
+        public async Task<ForViewingofChecklistResult> GetPoReceivingInformation(int poSummaryId)
         {
-            var poSummary = await _context.QC_Receiving.Where(x => x.PO_Summary_Id == poSummaryId).ToListAsync();
-            var checklist = _context.CheckListStrings.Where(x => x.PO_ReceivingId == poSummaryId).Select(x => new ChecklistStringDTO
+            var poSummary = await _context.QC_Receiving
+                .Where(x => x.PO_Summary_Id == poSummaryId)
+                .FirstOrDefaultAsync();
+
+            if (poSummary == null)
             {
-                Po_Summary_Id = x.PO_ReceivingId,
-                Checklist_Type = x.Checlist_Type,
-                Values = JsonConvert.DeserializeObject<List<string>>(x.Value)
-            });
+                throw new NoResultFound();
+            }
 
-            var poReceivingInformation = from PO in poSummary
-                                         join ck in checklist
-                                         on PO.PO_Summary_Id equals ck.Po_Summary_Id
-                                         into result
-                                         from ck in result.DefaultIfEmpty()
+            var checklists = _context.CheckListStrings
+                .Where(x => x.PO_ReceivingId == poSummaryId)
+                .ToList();
 
-                                         select new ForViewingofChecklistResult
-                                         {
-                                             PO_Summary_Id = PO.PO_Summary_Id,
-                                             Manufacturing_Date = PO.Manufacturing_Date,
-                                             Expected_Delivery = PO.Expected_Delivery,
-                                             Expiry_Date = PO.Expiry_Date,
-                                             Actual_Delivered = PO.Actual_Delivered,
-                                             ItemCode = PO.ItemCode,
-                                             Batch_No = PO.Batch_No,
-                                             TotalReject = PO.TotalReject,
-                                             IsActive = PO.IsActive,
-                                             CancelDate = PO.CancelDate,
-                                             CancelBy = PO.CancelBy,
-                                             Reason = PO.Reason,
-                                             ExpiryIsApprove = PO.ExpiryIsApprove,
-                                             IsNearlyExpire = PO.IsNearlyExpire,
-                                             ExpiryApproveBy = PO.ExpiryApproveBy,
-                                             ExpiryDateOfApprove = PO.ExpiryDateOfApprove,
-                                             QC_ReceiveDate = PO.QC_ReceiveDate,
-                                             ConfirmRejectByQc = PO.ConfirmRejectByQc,
-                                             IsWareHouseReceive = PO.IsWareHouseReceive,
-                                             CancelRemarks = PO.CancelRemarks,
-                                             QcBy = PO.QcBy,
-                                             MonitoredBy = PO.MonitoredBy,
-                                             ChecklistType = ck.Checklist_Type,
-                                             Remarks = ck.Remarks,
-                                             Values = ck.Values,
-                                             ProductType = PO.ProductType
-                                         };
+            var checklistGroups = checklists
+                .GroupBy(x => x.PO_ReceivingId)
+                .Select(g => new ChecklistGroups
+                {
+                    Checklists = g.Select(c => new ChecklistStringDTO
+                    {
+                        Checklist_Type = c.Checlist_Type,
+                        Values = JsonConvert.DeserializeObject<List<string>>(c.Value),
+                        Remarks = c.Remarks
+                    }).ToList()
+                });
 
-            return poReceivingInformation ?? throw new NoResultFound();
+            var result = new ForViewingofChecklistResult
+            {
+                PO_Summary_Id = poSummary.PO_Summary_Id,
+                Manufacturing_Date = poSummary.Manufacturing_Date,
+                Expected_Delivery = poSummary.Expected_Delivery,
+                Expiry_Date = poSummary.Expiry_Date,
+                Actual_Delivered = poSummary.Actual_Delivered,
+                ItemCode = poSummary.ItemCode,
+                Batch_No = poSummary.Batch_No,
+                TotalReject = poSummary.TotalReject,
+                IsActive = poSummary.IsActive,
+                CancelDate = poSummary.CancelDate,
+                CancelBy = poSummary.CancelBy,
+                Reason = poSummary.Reason,
+                ExpiryIsApprove = poSummary.ExpiryIsApprove,
+                IsNearlyExpire = poSummary.IsNearlyExpire,
+                ExpiryApproveBy = poSummary.ExpiryApproveBy,
+                ExpiryDateOfApprove = poSummary.ExpiryDateOfApprove,
+                QC_ReceiveDate = poSummary.QC_ReceiveDate,
+                ConfirmRejectByQc = poSummary.ConfirmRejectByQc,
+                IsWareHouseReceive = poSummary.IsWareHouseReceive,
+                CancelRemarks = poSummary.CancelRemarks,
+                QcBy = poSummary.QcBy,
+                MonitoredBy = poSummary.MonitoredBy,
+                ChecklistsString = checklistGroups.ToList(),
+            };
+
+            return result;
         }
+
 
     }
 }

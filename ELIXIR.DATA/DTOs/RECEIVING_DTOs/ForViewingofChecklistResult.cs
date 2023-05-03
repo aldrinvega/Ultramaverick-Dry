@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -104,8 +105,6 @@ namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
 
         public string Remarks { get; set; }
         public string MonitoredBy { get; set; }
-        public string ProductType { get; set; }
-        public string ChecklistType { get; set; }
-        public List<string> Values { get; set; }
+        public List<ChecklistGroups> ChecklistsString { get; set; }
     }
 }

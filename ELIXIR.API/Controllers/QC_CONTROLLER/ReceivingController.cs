@@ -637,7 +637,7 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
         [HttpGet("GetPoSummaryInformation")]
         public async Task<ActionResult<ForViewingofChecklistResult>> GetP0SummaryInformation([FromQuery]int poSummaryId)
         {
-            var result = new QueryResult<IEnumerable<ForViewingofChecklistResult>>();
+            var result = new QueryResult<ForViewingofChecklistResult>();
            
             try
             {
