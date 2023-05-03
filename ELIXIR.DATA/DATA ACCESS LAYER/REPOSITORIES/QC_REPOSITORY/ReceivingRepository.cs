@@ -928,7 +928,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             }).Select(x => new
             {
                 x.Key.PO_Summary_Id,
-                ACtual_Delivered = x.Sum(x => x.Actual_Delivered - x.TotalReject)
+                Actual_Delivered = x.Sum(x => x.Actual_Delivered - x.TotalReject)
             });
 
             var receiving = _context.QC_Receiving.Select(x => new QC_ReceivingDTO
@@ -967,8 +967,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                         x.Summary.UOM,
                         x.Summary.Ordered,
                         x.Summary.IsActive,
-                        ActualGood = y.ACtual_Delivered,
-                        ActualRemaining = x.Summary.Ordered - (y.ACtual_Delivered)
+                        ActualGood = y.Actual_Delivered,
+                        ActualRemaining = x.Summary.Ordered - (y.Actual_Delivered)
                     });
 
             var nearlyExpiryItems = (from posummary in posummary1
@@ -1017,8 +1017,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                     QuantityOrdered = result.Key.QuantityOrdered,
                     IsActive = result.Key.IsActive,
                     ActualGood = result.Key.ActutalGood,
-                    ActualRemaining = result.Key.QuantityOrdered - result.Key.ActualGood,
-                    TotalReject = result.Key.TotalReject,
+                    ActualRemaining = result.Key.QuantityOrdered - result.Key.ActualGood - result.Key.TotalReject,             
                     ExpiryDate = result.Key.Expiry_Date != null ? result.Key.Expiry_Date.ToString() : null,
                     Days = result.Key.Expiry_Date.HasValue
                         ? (int)Math.Round(result.Key.Expiry_Date.Value.Subtract(dateNow).TotalDays)
@@ -1043,27 +1042,55 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             var expiry = (from summary in _context.POSummary
                           join receiving in _context.QC_Receiving on summary.Id equals receiving.PO_Summary_Id
                           where receiving.Expiry_Date <= dateadd
+                          group new
+                          {
+                              summary,
+                              receiving
+                          }
+                    by new
+                    {
+                        summary.Id,
+                        summary.PO_Number,
+                        summary.ItemCode,
+                        summary.ItemDescription,
+                        summary.VendorName,
+                        summary.UOM,
+                        QuantityOrdered = summary.Ordered,
+                        summary.IsActive,
+                        ActutalGood = receiving.Actual_Delivered,
+                        receiving.TotalReject,
+                        receiving.Actual_Delivered,
+                        receiving.ExpiryIsApprove,
+                        ReceivingId = receiving.Id,
+                        receiving.IsNearlyExpire,
+                        receiving.Expiry_Date,
+                        receiving.Manufacturing_Date,
+                        receiving.Expected_Delivery,
+                        receiving.MonitoredBy,
+                        receiving.QcBy
+                    }
+                into result
                           select new NearlyExpireDto
                           {
-                              Id = summary.Id,
-                              PO_Number = summary.PO_Number,
-                              ItemCode = summary.ItemCode,
-                              ItemDescription = summary.ItemDescription,
-                              Supplier = summary.VendorName,
-                              Uom = summary.UOM,
-                              QuantityOrdered = summary.Ordered,
-                              ActualGood = receiving.Actual_Delivered,
-                              ActualRemaining = summary.Ordered - receiving.Actual_Delivered,
-                              ExpiryDate = receiving.Expiry_Date != null ? receiving.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
-                              Days =  receiving.Expiry_Date.HasValue ? (int)Math.Round(receiving.Expiry_Date.Value.Subtract(dateNow).TotalDays) : 0,
-                              IsActive = receiving.IsActive,
-                              IsNearlyExpire = receiving.IsNearlyExpire != null,
-                              ExpiryIsApprove = receiving.ExpiryIsApprove != null,
-                              ReceivingId = receiving.Id,
-                              ManufacturingDate = receiving.Manufacturing_Date.ToString(),
-                              ExpectedDelivery = receiving.Expected_Delivery,
-                              MonitoredBy = receiving.MonitoredBy,
-                              QcBy = receiving.QcBy
+                              Id = result.Key.Id,
+                              PO_Number = result.Key.PO_Number,
+                              ItemCode = result.Key.ItemCode,
+                              ItemDescription = result.Key.ItemDescription,
+                              Supplier = result.Key.VendorName,
+                              Uom = result.Key.UOM,
+                              QuantityOrdered = result.Key.QuantityOrdered,
+                              ActualGood = result.Key.Actual_Delivered - result.Key.TotalReject,
+                              ActualRemaining = result.Key.QuantityOrdered - result.Key.Actual_Delivered - result.Key.TotalReject,
+                              ExpiryDate = result.Key.Expiry_Date != null ? result.Key.Expiry_Date.Value.ToString("MM/dd/yyyy") : null,
+                              Days =  result.Key.Expiry_Date.HasValue ? (int)Math.Round(result.Key.Expiry_Date.Value.Subtract(dateNow).TotalDays) : 0,
+                              IsActive = result.Key.IsActive,
+                              IsNearlyExpire = result.Key.IsNearlyExpire != null,
+                              ExpiryIsApprove = result.Key.ExpiryIsApprove != null,
+                              ReceivingId = result.Key.Id,
+                              ManufacturingDate = result.Key.Manufacturing_Date.ToString(),
+                              ExpectedDelivery = result.Key.Expected_Delivery,
+                              MonitoredBy = result.Key.MonitoredBy,
+                              QcBy = result.Key.QcBy
 
                           }).Where(x => x.IsNearlyExpire == true)
                             .Where(x => x.ExpiryIsApprove == null)
