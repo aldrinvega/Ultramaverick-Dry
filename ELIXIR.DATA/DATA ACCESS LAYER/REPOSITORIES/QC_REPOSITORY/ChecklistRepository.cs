@@ -114,8 +114,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 Checklist_Type = c.Checlist_Type,
                 Values = JsonConvert.DeserializeObject<List<string>>(c.Value),
                 Remarks = c.Remarks
-            })
-            .ToList();
+            }).ToList();
 
             var result = new ForViewingofChecklistResult
             {
