@@ -1016,7 +1016,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                     Uom = result.Key.UOM,
                     QuantityOrdered = result.Key.QuantityOrdered,
                     IsActive = result.Key.IsActive,
-                    ActualGood = result.Key.ActutalGood,
+                    ActualGood = result.Key.ActutalGood - result.Key.TotalReject,
                     ActualRemaining = result.Key.QuantityOrdered - result.Sum(x => x.received != null && x.received.IsActive ? x.received.Actual_Delivered - x.received.TotalReject : 0),
                     TotalReject = result.Key.TotalReject,
                     ExpiryDate = result.Key.Expiry_Date != null ? result.Key.Expiry_Date.ToString() : null,
