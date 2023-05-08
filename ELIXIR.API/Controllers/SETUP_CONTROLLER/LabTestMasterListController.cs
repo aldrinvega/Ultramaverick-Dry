@@ -55,7 +55,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
         [HttpPut]
         [Route("UpdateSampleType/{id}")]
-        public async Task<IActionResult> UpdateSampleType(int id, [FromBody] SampleType sampleType)
+        public async Task<IActionResult> UpdateSampleType([FromBody] SampleType sampleType)
         {
             var validateSampleType = await _unitOfWork.LabtestMasterlist.GetSampleTypeById(sampleType.Id);
             if (validateSampleType == null)
@@ -67,9 +67,9 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
         [HttpGet]
         [Route("GetAllSampleTypePagination")]
-        public async Task<ActionResult<IEnumerable<SampleTypeDto>>> GetAllSampleTypePagination([FromQuery]UserParams userParams)
+        public async Task<ActionResult<IEnumerable<SampleTypeDto>>> GetAllSampleTypePagination([FromRoute] bool status, [FromQuery] UserParams userParams)
         {
-            var sampleTypes = await _unitOfWork.LabtestMasterlist.GetAllSampleTypePagination(userParams);
+            var sampleTypes = await _unitOfWork.LabtestMasterlist.GetAllSampleTypePagination(status, userParams);
             
             Response.AddPaginationHeader(sampleTypes.CurrentPage, sampleTypes.PageSize, sampleTypes.TotalCount, sampleTypes.TotalPages, sampleTypes.HasNextPage, sampleTypes.HasPreviousPage);
 
@@ -82,6 +82,34 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 sampleTypes.TotalPages,
                 sampleTypes.HasNextPage,
                 sampleTypes.HasPreviousPage
+            };
+
+            return Ok(sampleTypeResult);
+        }
+
+        [HttpGet]
+        [Route("GetAllSampleTypePaginationOrig/{status}")]
+        public async Task<ActionResult<IEnumerable<SampleTypeDto>>> GetAllSampleTypePaginationOrig([FromRoute] bool status, [FromQuery] UserParams userParams, [FromQuery] string search)
+        {
+
+            if (search == null)
+
+                return await GetAllSampleTypePagination(status, userParams);
+
+            var sampleType = await _unitOfWork.LabtestMasterlist.GetAllSampleTypeByStatusPaginationOrig(search, status, userParams);
+
+
+            Response.AddPaginationHeader(sampleType.CurrentPage, sampleType.PageSize, sampleType.TotalCount, sampleType.TotalPages, sampleType.HasNextPage, sampleType.HasPreviousPage);
+
+            var sampleTypeResult = new
+            {
+                sampleType,
+                sampleType.CurrentPage,
+                sampleType.PageSize,
+                sampleType.TotalCount,
+                sampleType.TotalPages,
+                sampleType.HasNextPage,
+                sampleType.HasPreviousPage
             };
 
             return Ok(sampleTypeResult);
@@ -147,9 +175,9 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
         [HttpGet]
         [Route("GetAllTypeOfSwabPagination")]
-        public async Task<ActionResult<IEnumerable<TypeOfSwabDto>>> GetAllTypeOfSwabPagination(UserParams userParams)
+        public async Task<ActionResult<IEnumerable<TypeOfSwabDto>>> GetAllTypeOfSwabPagination([FromRoute] bool status, [FromQuery] UserParams userParams)
         {
-            var typeOfSwab = await _unitOfWork.LabtestMasterlist.GetAllTypeOfSwabPagination(userParams);
+            var typeOfSwab = await _unitOfWork.LabtestMasterlist.GetAllTypeOfSwabPagination(status, userParams);
             
             Response.AddPaginationHeader(typeOfSwab.CurrentPage, typeOfSwab.PageSize, typeOfSwab.TotalCount, typeOfSwab.TotalPages, typeOfSwab.HasNextPage, typeOfSwab.HasPreviousPage);
 
@@ -164,7 +192,35 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 typeOfSwab.HasPreviousPage
             };
 
-            return Ok(typeOfSwab);
+            return Ok(typeOfSwabResult);
+        }
+
+        [HttpGet]
+        [Route("GetAllSampleTypePaginationOrig/{status}")]
+        public async Task<ActionResult<IEnumerable<SampleTypeDto>>> GetAllTypeOfSwabPagination([FromRoute] bool status, [FromQuery] UserParams userParams, [FromQuery] string search)
+        {
+
+            if (search == null)
+
+                return await GetAllSampleTypePagination(status, userParams);
+
+            var typeOfSwab = await _unitOfWork.RawMaterials.GetRawMaterialByStatusWithPaginationOrig(userParams, status, search);
+
+
+            Response.AddPaginationHeader(typeOfSwab.CurrentPage, typeOfSwab.PageSize, typeOfSwab.TotalCount, typeOfSwab.TotalPages, typeOfSwab.HasNextPage, typeOfSwab.HasPreviousPage);
+
+            var typeOfSwabResult = new
+            {
+                typeOfSwab,
+                typeOfSwab.CurrentPage,
+                typeOfSwab.PageSize,
+                typeOfSwab.TotalCount,
+                typeOfSwab.TotalPages,
+                typeOfSwab.HasNextPage,
+                typeOfSwab.HasPreviousPage
+            };
+
+            return Ok(typeOfSwabResult);
         }
 
         [HttpPut]
@@ -227,9 +283,9 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
         [HttpGet]
         [Route("GetAllAnalysesSwabPagination")]
-        public async Task<ActionResult<IEnumerable<AnalysesDto>>> GetAllAnalysesPagination(UserParams userParams)
+        public async Task<ActionResult<IEnumerable<AnalysesDto>>> GetAllAnalysesPagination([FromRoute] bool status, [FromQuery] UserParams userParams)
         {
-            var analyses = await _unitOfWork.LabtestMasterlist.GetAllTypeOfSwabPagination(userParams);
+            var analyses = await _unitOfWork.LabtestMasterlist.GetAllTypeOfSwabPagination(status,userParams);
             
             Response.AddPaginationHeader(analyses.CurrentPage, analyses.PageSize, analyses.TotalCount, analyses.TotalPages, analyses.HasNextPage, analyses.HasPreviousPage);
 
@@ -245,6 +301,34 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             };
 
             return Ok(analysesResult);
+        }
+
+        [HttpGet]
+        [Route("GetAllAnalysesPaginationOrig/{status}")]
+        public async Task<ActionResult<IEnumerable<AnalysesDto>>> GetAllAnalysesPaginationOrig([FromRoute] bool status, [FromQuery] UserParams userParams, [FromQuery] string search)
+        {
+
+            if (search == null)
+
+                return await GetAllAnalysesPagination(status, userParams);
+
+            var typeOfSwab = await _unitOfWork.RawMaterials.GetRawMaterialByStatusWithPaginationOrig(userParams, status, search);
+
+
+            Response.AddPaginationHeader(typeOfSwab.CurrentPage, typeOfSwab.PageSize, typeOfSwab.TotalCount, typeOfSwab.TotalPages, typeOfSwab.HasNextPage, typeOfSwab.HasPreviousPage);
+
+            var typeOfSwabResult = new
+            {
+                typeOfSwab,
+                typeOfSwab.CurrentPage,
+                typeOfSwab.PageSize,
+                typeOfSwab.TotalCount,
+                typeOfSwab.TotalPages,
+                typeOfSwab.HasNextPage,
+                typeOfSwab.HasPreviousPage
+            };
+
+            return Ok(typeOfSwabResult);
         }
 
         [HttpPut]

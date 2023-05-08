@@ -14,7 +14,9 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<IReadOnlyList<SampleType>> GetAllSampleType();
         Task<SampleType> GetSampleTypeById(int id);
         Task<SampleType> GetSampleTypeByName(string sampleTypeName);
-        Task<PagedList<SampleTypeDto>> GetAllSampleTypePagination(UserParams userParams);
+        Task<PagedList<SampleTypeDto>> GetAllSampleTypePagination(bool status, UserParams userParams);
+        Task<PagedList<SampleTypeDto>> GetAllSampleTypePaginationOrig(string search, bool status, UserParams userParams);
+        Task<PagedList<SampleTypeDto>> GetAllSampleTypeByStatusPaginationOrig(string search, bool status, UserParams userParams);
         Task<bool> UpdateSampleTypeStatus(SampleType sampleTypes);
 
         #endregion
@@ -25,7 +27,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<bool> UpdateTypeOfSwab(TypeOfSwab typeOfSwab);
         Task<IReadOnlyList<TypeOfSwab>> GetAllTypeOfSwab();
         Task<TypeOfSwab> GetTypeOfSwabById(int id);
-        Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPagination(UserParams userParams);
+        Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPagination(bool status, UserParams userParams);
+        Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPaginationOrig(string search, bool status, UserParams userParams);
         Task<bool> UpdateTypeOfSwabStatus(TypeOfSwab typeOfSwab);
 
         #endregion
@@ -35,7 +38,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<bool> AddNewAnalysis(Analysis analysis);
         Task<bool> UpdateAnalysis(Analysis analysis);
         Task<IReadOnlyList<Analysis>> GetAllAnalysis();
-        Task<PagedList<AnalysesDto>> GetAllAnalysesPagination(UserParams userParams);
+        Task<PagedList<AnalysesDto>> GetAllAnalysesPagination(bool status, UserParams userParams);
+        Task<PagedList<AnalysesDto>> GetAllAnalysesPaginationOrig(string search, bool status, UserParams userParams);
         Task<bool> UpdateAnalysisStatus(Analysis analysis);
         Task<Analysis> GetAnalysisById(int id);
 
@@ -46,7 +50,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<bool> AddNewParameter(Parameters parameters);
         Task<bool> UpdateParameters(Parameters parameters);
         Task<Parameters> GetParametersById(int id);
-        Task<PagedList<ParametersDto>> GetAllParametersPagination(UserParams userParams);
+        Task<PagedList<ParametersDto>> GetAllParametersPagination(bool status, UserParams userParams);
+        Task<PagedList<ParametersDto>> GetAllParametersPaginationOrig(string search, bool status, UserParams userParams);
         Task<bool> UpdateParameterStatus(Parameters parameters);
 
         #endregion
@@ -57,7 +62,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<bool> UpdateProductCondition(ProductCondition productCondition);
         Task<IReadOnlyList<ProductCondition>> GetAllProductCondition();
         Task<ProductCondition> GetProductConditionById(int id);
-        Task<PagedList<ProductConditionDto>> GetAllProductConditionPagination(UserParams userParams);
+        Task<PagedList<ProductConditionDto>> GetAllProductConditionPagination(bool status, UserParams userParams);
+        Task<PagedList<ProductConditionDto>> GetAllProductConditionPaginationOrig(string search, bool status, UserParams userParams);
         Task<bool> UpdateProductConditionStatus(ProductCondition productCondition);
         Task<ProductCondition> GetProductConditionByName(string productConditionName);
 
@@ -68,7 +74,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<bool> UpdateProductDisposition(Disposition disposition);
         Task<IReadOnlyList<Disposition>> GetAllDisposition();
         Task<Disposition> GetDispositionById(int id);
-        Task<PagedList<DispositionDto>> GetAllDispositionPagination(UserParams userParams);
+        Task<PagedList<DispositionDto>> GetAllDispositionPagination(bool status, UserParams userParams);
+        Task<PagedList<DispositionDto>> GetAllDispositionPaginationOrig(string search, bool status, UserParams userParams);
         Task<bool> UpdateDispositionStatus(Disposition disposition);
         #endregion
     }
