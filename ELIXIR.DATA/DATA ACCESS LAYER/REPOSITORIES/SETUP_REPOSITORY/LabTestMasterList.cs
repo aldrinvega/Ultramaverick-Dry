@@ -160,6 +160,37 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             return await _context.TypeOfSwabs.FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        public async Task<PagedList<TypeOfSwabDto>> GetTypeOfSwabByStatusPagination(bool status, UserParams userParams)
+        {
+            var typeofSwabs = _context.TypeOfSwabs.Where(x => x.IsActive == status).Select(x => new TypeOfSwabDto
+            {
+                TypeofSwabName = x.TypeofSwabName,
+                IsActive = x.IsActive,
+                DateAdded = x.DateAdded,
+                ModifiedBy = x.ModifiedBy,
+                Reason = x.Reason
+            });
+
+            return await PagedList<TypeOfSwabDto>.CreateAsync(typeofSwabs, userParams.PageNumber, userParams.PageSize);
+        }
+
+        public async Task<PagedList<TypeOfSwabDto>> GetTypeOfSwabByStatusPaginationOrig(string search, bool status, UserParams userParams)
+        {
+            var typeofSwabs = _context.TypeOfSwabs.Where(x => x.IsActive == status).Select(x => new TypeOfSwabDto
+            {
+                TypeofSwabName = x.TypeofSwabName,
+                IsActive = x.IsActive,
+                DateAdded = x.DateAdded,
+                ModifiedBy = x.ModifiedBy,
+                Reason = x.Reason
+            }).OrderBy(x => x.TypeofSwabName)
+              .Where(x => x.IsActive == status)
+              .Where(x => x.TypeofSwabName.ToLower()
+              .Contains(search.Trim().ToLower()));
+
+            return await PagedList<TypeOfSwabDto>.CreateAsync(typeofSwabs, userParams.PageNumber, userParams.PageSize);
+        }
+
         public async Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPagination(bool status,UserParams userParams)
         {
             var typeofSwabs = _context.TypeOfSwabs.Where(x => x.IsActive == status).Select(x => new TypeOfSwabDto
@@ -258,7 +289,22 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             return await PagedList<AnalysesDto>.CreateAsync(analysesResult, userParams.PageNumber, userParams.PageSize);
         }
 
+        public async Task<PagedList<AnalysesDto>> GetAnalysisByStatusPaginationOrig(string search, bool status, UserParams userParams)
+        {
+            var analysesResult = _context.Analyses.Where(x => x.IsActive == true).Select(x => new AnalysesDto
+            {
+                AnalysisName = x.AnalysisName,
+                IsActive = x.IsActive,
+                Reason = x.Reason,
+                DateAdded = x.DateAdded.ToString(),
+                ModifiedBy = x.ModifiedBy
+            }).OrderBy(x => x.AnalysisName)
+              .Where(x => x.IsActive == status)
+              .Where(x => x.AnalysisName.ToLower()
+              .Contains(search.Trim().ToLower()));
 
+            return await PagedList<AnalysesDto>.CreateAsync(analysesResult, userParams.PageNumber, userParams.PageSize);
+        }
         public async Task<bool> UpdateAnalysisStatus(Analysis analysis)
         {
             var analysisResult = await _context.Analyses.FirstOrDefaultAsync(x => x.Id == analysis.Id);
@@ -268,6 +314,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             analysisResult.ModifiedBy = analysis.ModifiedBy;
             return true;
         }
+
         #endregion
 
         #region Parameters

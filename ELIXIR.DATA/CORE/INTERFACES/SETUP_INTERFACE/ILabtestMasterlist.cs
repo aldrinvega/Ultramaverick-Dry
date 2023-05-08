@@ -16,6 +16,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<SampleType> GetSampleTypeByName(string sampleTypeName);
         Task<PagedList<SampleTypeDto>> GetAllSampleTypePagination(bool status, UserParams userParams);
         Task<PagedList<SampleTypeDto>> GetAllSampleTypePaginationOrig(string search, bool status, UserParams userParams);
+        Task<PagedList<SampleTypeDto>> GetAllSampleTypeByStatusPagination(bool status, UserParams userParams);
         Task<PagedList<SampleTypeDto>> GetAllSampleTypeByStatusPaginationOrig(string search, bool status, UserParams userParams);
         Task<bool> UpdateSampleTypeStatus(SampleType sampleTypes);
 
@@ -29,6 +30,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<TypeOfSwab> GetTypeOfSwabById(int id);
         Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPagination(bool status, UserParams userParams);
         Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPaginationOrig(string search, bool status, UserParams userParams);
+        Task<PagedList<TypeOfSwabDto>> GetTypeOfSwabByStatusPaginationOrig(string search, bool status, UserParams userParams);
         Task<bool> UpdateTypeOfSwabStatus(TypeOfSwab typeOfSwab);
 
         #endregion
@@ -40,6 +42,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<IReadOnlyList<Analysis>> GetAllAnalysis();
         Task<PagedList<AnalysesDto>> GetAllAnalysesPagination(bool status, UserParams userParams);
         Task<PagedList<AnalysesDto>> GetAllAnalysesPaginationOrig(string search, bool status, UserParams userParams);
+        Task<PagedList<AnalysesDto>> GetAnalysisByStatusPaginationOrig(string search, bool status, UserParams userParams);
         Task<bool> UpdateAnalysisStatus(Analysis analysis);
         Task<Analysis> GetAnalysisById(int id);
 
