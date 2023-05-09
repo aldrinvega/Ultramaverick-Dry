@@ -747,6 +747,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                   by new
                                   {
                                       warehouse.Id,
+                                      warehouse.QcReceivingId,
                                       warehouse.PO_Number,
                                       warehouse.ItemCode,
                                       warehouse.ItemDescription,
@@ -770,6 +771,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                       select new WarehouseReceivingDto
                                       {
                                           Id = total.Key.Id,
+                                          QCReceivingId = total.Key.QcReceivingId,
                                           ItemCode = total.Key.ItemCode,
                                           ItemDescription = total.Key.ItemDescription,
                                           ManufacturingDate = total.Key.ManufacturingDate.ToString("MM/dd/yyyy"),
@@ -853,6 +855,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                   by new
                                   {
                                       warehouse.Id,
+                                      warehouse.QcReceivingId,
                                       warehouse.PO_Number,
                                       warehouse.ItemCode,
                                       warehouse.ItemDescription,
@@ -878,6 +881,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                       select new WarehouseReceivingDto
                                       {
                                           Id = total.Key.Id,
+                                          QCReceivingId = total.Key.QcReceivingId,
                                           ItemCode = total.Key.ItemCode,
                                           ItemDescription = total.Key.ItemDescription,
                                           ManufacturingDate = total.Key.ManufacturingDate.ToString("MM/dd/yyyy"),

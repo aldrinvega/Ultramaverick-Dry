@@ -24,6 +24,7 @@ namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
         public string ExpirationDate { get; set; }
         public int ExpirationDay { get; set; }
         public string QC_ReceivedDate { get; set; }
+        public int QCReceivingId { get; set; }
         public bool IsActive { get; set; }
         public bool IsWareHouseReceive { get; set; }
         public bool IsExpiryApprove { get; set; }
