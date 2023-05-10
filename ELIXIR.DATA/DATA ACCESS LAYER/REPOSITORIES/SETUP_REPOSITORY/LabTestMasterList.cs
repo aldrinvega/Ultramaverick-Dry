@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
@@ -47,6 +48,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         public async Task<SampleType> GetSampleTypeById(int id)
         {
             return await _context.SampleTypes.FirstOrDefaultAsync(x => x.Id == id);
+        }
+        public async Task<IEnumerable<SampleType>> GetAllSampleTypeByStatus(bool status)
+        {
+            return await _context.SampleTypes.Where(x => x.IsActive == status).ToListAsync();
         }
 
         public async Task<SampleType> GetSampleTypeByName(string sampleTypeName)
@@ -159,6 +164,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             return await _context.TypeOfSwabs.FirstOrDefaultAsync(x => x.Id == id);
         }
+        public async Task<IEnumerable<TypeOfSwab>> GetAllTypeOfSwabByStatus(bool status)
+        {
+            return await _context.TypeOfSwabs.Where(x => x.IsActive == status).ToListAsync();
+        }
 
         public async Task<PagedList<TypeOfSwabDto>> GetTypeOfSwabByStatusPagination(bool status, UserParams userParams)
         {
@@ -191,9 +200,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             return await PagedList<TypeOfSwabDto>.CreateAsync(typeofSwabs, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPagination(bool status,UserParams userParams)
+        public async Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPagination(UserParams userParams)
         {
-            var typeofSwabs = _context.TypeOfSwabs.Where(x => x.IsActive == status).Select(x => new TypeOfSwabDto
+            var typeofSwabs = _context.TypeOfSwabs.Where(x => x.IsActive == true).Select(x => new TypeOfSwabDto
             {
                 TypeofSwabName = x.TypeofSwabName,
                 IsActive = x.IsActive,
@@ -260,9 +269,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             return await _context.Analyses.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<PagedList<AnalysesDto>> GetAllAnalysesPagination(bool status, UserParams userParams)
+        public async Task<IEnumerable<Analysis>> GetAllAnalysisByStatus(bool status)
         {
-            var analysesResult = _context.Analyses.Where(x => x.IsActive == status).Select(x => new AnalysesDto
+            return await _context.Analyses.Where(x => x.IsActive == status).ToListAsync();
+        }
+        public async Task<PagedList<AnalysesDto>> GetAllAnalysesPagination(UserParams userParams)
+        {
+            var analysesResult = _context.Analyses.Where(x => x.IsActive == true).Select(x => new AnalysesDto
             {
                 AnalysisName = x.AnalysisName,
                 IsActive = x.IsActive,
@@ -323,6 +336,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             await _context.Parameters.AddAsync(parameters);
             return true;
+
         }
 
         public async Task<bool> UpdateParameters(Parameters parameters)
@@ -348,9 +362,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             return await _context.Parameters.FirstOrDefaultAsync(x => x.Id == id);
         }
         
-        public async Task<PagedList<ParametersDto>> GetAllParametersPagination(bool status, UserParams userParams)
+        public async Task<PagedList<ParametersDto>> GetAllParametersPagination(UserParams userParams)
         {
-            var parammeters = _context.Parameters.Where(x => x.IsActive == status).Select(x => new ParametersDto
+            var parammeters = _context.Parameters.Where(x => x.IsActive == true).Select(x => new ParametersDto
             {
                 Id = x.Id,
                 ParameterName = x.ParameterName,
@@ -362,7 +376,16 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
             return await PagedList<ParametersDto>.CreateAsync(parammeters, userParams.PageNumber, userParams.PageSize);
         }
+        
+        public async Task<IEnumerable<Parameters>> GetAllParametersByStatus(bool status)
+        {
+            return await _context.Parameters.Where(x => x.IsActive == status).ToListAsync();
+        }
 
+        public async Task<Parameters> GetParametersByName(string name)
+        {
+           return await _context.Parameters.FirstOrDefaultAsync(x => x.ParameterName == name);
+        }
         public async Task<PagedList<ParametersDto>> GetAllParametersPaginationOrig(string search, bool status, UserParams userParams)
         {
             var parammeters = _context.Parameters.Where(x => x.IsActive == true).Select(x => new ParametersDto
@@ -380,6 +403,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
             return await PagedList<ParametersDto>.CreateAsync(parammeters, userParams.PageNumber, userParams.PageSize);
         }
+
 
         public async Task<bool> UpdateParameterStatus(Parameters parameters)
         {
@@ -430,9 +454,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             return await _context.ProductConditions.FirstOrDefaultAsync(x =>
                 x.ProductConditionName == productConditionName);
         }
-        public async Task<PagedList<ProductConditionDto>> GetAllProductConditionPagination(bool status, UserParams userParams)
+
+        public async Task<IEnumerable<ProductCondition>> GetAllProductConditionByStatus(bool status)
         {
-            var productConditions = _context.ProductConditions.Where(x => x.IsActive == status).Select(x =>
+            return await _context.ProductConditions.Where(x => x.IsActive == status).ToListAsync();
+        }
+        public async Task<PagedList<ProductConditionDto>> GetAllProductConditionPagination(UserParams userParams)
+        {
+            var productConditions = _context.ProductConditions.Where(x => x.IsActive == true).Select(x =>
                 new ProductConditionDto
                 {
                     ProductConditionName = x.ProductConditionName,
@@ -509,7 +538,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             return await _context.Dispositions.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<PagedList<DispositionDto>> GetAllDispositionPagination(bool status, UserParams userParams)
+        public async Task<IEnumerable<Disposition>> GetAllDispositionByStatus(bool status)
+        {
+            return await _context.Dispositions.Where(x => x.IsActive == status).ToListAsync();
+        }
+
+        public async Task<PagedList<DispositionDto>> GetAllDispositionPagination(UserParams userParams)
         {
             var dispositions = _context.Dispositions.Where(x => x.IsActive == true).Select(x => new DispositionDto
             {
