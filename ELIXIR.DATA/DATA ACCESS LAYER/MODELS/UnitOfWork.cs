@@ -23,6 +23,7 @@ using System;
 using System.Threading.Tasks;
 using ELIXIR.DATA.SERVICES;
 using Microsoft.AspNetCore.SignalR;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
 {
@@ -77,10 +78,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
         
         //LabTest MasterList
         public ILabtestMasterlist LabtestMasterlist { get; set; }
+        public IProductTypeRepository ProductType { get; set; }
         
-        
-        
-
         //public IOrderHub Hub { get; set; }
 
         public UnitOfWork(
@@ -135,6 +134,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
             QcChecklist = new ChecklistRepository(_context);
 
             LabtestMasterlist = new LabTestMasterList(_context);
+            ProductType = new ProductTypeRepository(_context);
 
 
         }

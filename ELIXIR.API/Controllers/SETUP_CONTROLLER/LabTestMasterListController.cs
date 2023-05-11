@@ -8,6 +8,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DTOs.SETUP_DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 {
@@ -128,11 +129,20 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         [Route("UpdateSampleTypeStatus/{id}")]
         public async Task<IActionResult> UpdateSampleTypeStatus(int id, [FromBody] SampleType sampleType)
         {
+            string status;
             var validateSampleType = await _unitOfWork.LabtestMasterlist.GetSampleTypeById(id);
             if (validateSampleType == null)
                 return BadRequest($"Sample Type with id {sampleType.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateSampleTypeStatus(sampleType);
-            return Ok("Sample Type updated successfully.");
+            if (sampleType.IsActive == true)
+            {
+                status = "Activated";
+            }
+            else
+            {
+                status = "Inactivated";
+            }
+            return Ok($" {sampleType.SampleTypeName} is sucessfully {status}");
         }
         #endregion
         
@@ -237,11 +247,20 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         [Route("UpdateTypeOfSwabStatus/{id}")]
         public async Task<IActionResult> UpdateTypeofSwabStatus(int id, [FromBody] TypeOfSwab typeOfSwab)
         {
+            string status;
             var validateTypeofSwab = await _unitOfWork.LabtestMasterlist.GetTypeOfSwabById(id);
             if (validateTypeofSwab == null)
                 return BadRequest($"Sample Type with id {typeOfSwab.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateTypeOfSwab(typeOfSwab);
-            return Ok("Type of Swab updated successfully.");
+            if (typeOfSwab.IsActive == true)
+            {
+                status = "Activated";
+            }
+            else
+            {
+                status = "Inactivated";
+            }
+            return Ok($" {validateTypeofSwab.TypeofSwabName} is sucessfully {status}");
         }
         #endregion
         
@@ -278,6 +297,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 return BadRequest("No records found");
             return Ok(analysisResult);
         }
+
         [HttpGet("GetAllAnalysisByStauts/{status}")]
         public async Task<IActionResult> GetAllAnalysisById([FromRoute]bool status)
         {
@@ -353,11 +373,20 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         [Route("UpdateAnalysisStatus/{id}")]
         public async Task<IActionResult> UpdateAnalysisStatus(int id, [FromBody] Analysis analysis)
         {
+            string status;
             var validateAnalysis = await _unitOfWork.LabtestMasterlist.GetAnalysisById(id);
             if (validateAnalysis == null)
                 return BadRequest($"Analysis with id {analysis.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateAnalysis(analysis);
-            return Ok("Analysis updated successfully.");
+            if (analysis.IsActive == true)
+            {
+                status = "Activated";
+            }
+            else
+            {
+                status = "Inactivated";
+            }
+            return Ok($" {validateAnalysis.AnalysisName} is sucessfully {status}");
         }
         #endregion
         
@@ -496,12 +525,23 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpPut("UpdateDispositionStatus")]
-        public async Task<IActionResult> UpdateDispositionStatus(Disposition status)
+        public async Task<IActionResult> UpdateDispositionStatus([FromBody] Disposition disposition)
         {
-            var dispositionResult = await _unitOfWork.LabtestMasterlist.UpdateDispositionStatus(status);
-            if (!dispositionResult)
-                return BadRequest("Something went wrong");
-            return Ok("Update success!");
+            string status;
+            var validateDisposition = await _unitOfWork.LabtestMasterlist.GetDispositionById(disposition.Id);
+            if (validateDisposition == null)
+                return BadRequest("No paramaeters found.");
+            await _unitOfWork.LabtestMasterlist.UpdateDispositionStatus(disposition);
+            await _unitOfWork.CompleteAsync();
+            if (disposition.IsActive == true)
+            {
+                status = "Activated";
+            }
+            else
+            {
+                status = "Inactivated";
+            }
+            return Ok($" {validateDisposition.DispositionName} is sucessfully {status}");
         }
 
         [HttpGet("GetAllDispositionPagination")]
@@ -526,7 +566,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
         #endregion
 
-        #region
+        #region Parameters
 
         [HttpPost]
         [Route("AddNewParameters")]
@@ -580,7 +620,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok(parametersResult);
         }
 
-        [HttpGet("GetAllParametersPagination/{status}")]
+        [HttpGet("GetAllParametersPaginationOrig/{status}")]
         public async Task<ActionResult<IEnumerable<Parameters>>> GetAllParametersPaginationOrig([FromQuery] string search, [FromQuery] bool status,[FromQuery] UserParams userParams)
         {
             var parameters = await _unitOfWork.LabtestMasterlist.GetAllParametersPaginationOrig(search, status, userParams);
@@ -614,8 +654,8 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         public async Task<IActionResult> UpdateParameterStatus([FromBody] Parameters parameters)
         {
             string status;
-            var validatePrameters = await _unitOfWork.LabtestMasterlist.GetParametersById(parameters.Id);
-            if (validatePrameters == null)
+            var validateParameters = await _unitOfWork.LabtestMasterlist.GetParametersById(parameters.Id);
+            if (validateParameters == null)
                 return BadRequest("No paramaeters found.");
             await _unitOfWork.LabtestMasterlist.UpdateParameterStatus(parameters);
             await _unitOfWork.CompleteAsync();
@@ -626,7 +666,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             else {
                 status = "Inactivated";
             }
-            return Ok($" {validatePrameters.ParameterName} is sucessfully {status}");
+            return Ok($" {validateParameters.ParameterName} is sucessfully {status}");
         }
         #endregion
 

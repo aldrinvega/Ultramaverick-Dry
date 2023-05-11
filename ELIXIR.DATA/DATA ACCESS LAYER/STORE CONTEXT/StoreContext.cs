@@ -90,6 +90,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public DbSet<TypeOfSwab> TypeOfSwabs { get; set; }
         public DbSet<ProductCondition> ProductConditions { get; set; }
         public DbSet<Disposition> Dispositions { get; set; }
+        public DbSet<ProductType> ProductTypes { get; set; }
 
     }
 } 
