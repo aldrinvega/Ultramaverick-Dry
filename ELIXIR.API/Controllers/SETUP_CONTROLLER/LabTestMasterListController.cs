@@ -201,7 +201,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
         [HttpGet]
         [Route("GetAllTypeOfSwabPagination")]
-        public async Task<ActionResult<IEnumerable<TypeOfSwabDto>>> GetAllTypeOfSwabPagination([FromRoute] bool status, [FromQuery] UserParams userParams)
+        public async Task<ActionResult<IEnumerable<TypeOfSwabDto>>> GetAllTypeOfSwabPagination([FromQuery] UserParams userParams)
         {
             var typeOfSwab = await _unitOfWork.LabtestMasterlist.GetAllTypeOfSwabPagination(userParams);
 
@@ -303,7 +303,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok(analysisResult);
         }
 
-        [HttpGet("GetAllAnalysisByStauts/{status}")]
+        [HttpGet("GetAllAnalysisByStatus/{status}")]
         public async Task<IActionResult> GetAllAnalysisById([FromRoute] bool status)
         {
             var analysisResult = await _unitOfWork.LabtestMasterlist.GetAllAnalysisByStatus(status);
@@ -325,10 +325,10 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpGet]
-        [Route("GetAllAnalysesSwabPagination")]
+        [Route("GetAllAnalysesPagination")]
         public async Task<ActionResult<IEnumerable<AnalysesDto>>> GetAllAnalysesPagination([FromQuery] UserParams userParams)
         {
-            var analyses = await _unitOfWork.LabtestMasterlist.GetAllTypeOfSwabPagination(userParams);
+            var analyses = await _unitOfWork.LabtestMasterlist.GetAllAnalysesPagination(userParams);
 
             Response.AddPaginationHeader(analyses.CurrentPage, analyses.PageSize, analyses.TotalCount, analyses.TotalPages, analyses.HasNextPage, analyses.HasPreviousPage);
 
