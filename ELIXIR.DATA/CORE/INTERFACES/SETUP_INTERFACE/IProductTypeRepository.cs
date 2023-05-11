@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
 {
-    internal class IProductTypeRepository
+    public class IProductTypeRepository
     {
     }
 }

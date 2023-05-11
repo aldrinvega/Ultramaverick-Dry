@@ -650,6 +650,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             await _unitOfWork.LabtestMasterlist.UpdateParameters(parameters);
             return Ok("Analysis updated successfully.");
         }
+
         [HttpPut("UpdateParameterStatus")] 
         public async Task<IActionResult> UpdateParameterStatus([FromBody] Parameters parameters)
         {
