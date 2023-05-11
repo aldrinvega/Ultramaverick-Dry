@@ -81,16 +81,16 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public virtual DbSet<MiscellaneousIssue> MiscellaneousIssues { get; set; }
         public virtual DbSet<MiscellaneousIssueDetails> MiscellaneousIssueDetails { get; set; }
         public virtual DbSet<Transaction> Transactions { get; set; }
-        public DbSet<ChecklistForCompliants> ChecklistForCompliant { get; set; }
-        public DbSet<CheckListInputs> CheckListInput { get; set; }
-        public DbSet<CheckListString> CheckListStrings { get; set; }
-        public DbSet<Analysis> Analyses { get; set; }
-        public DbSet<Parameters> Parameters { get; set; }
-        public DbSet<SampleType> SampleTypes { get; set; }
-        public DbSet<TypeOfSwab> TypeOfSwabs { get; set; }
-        public DbSet<ProductCondition> ProductConditions { get; set; }
-        public DbSet<Disposition> Dispositions { get; set; }
-        public DbSet<ProductType> ProductTypes { get; set; }
+        public virtual DbSet<ChecklistForCompliants> ChecklistForCompliant { get; set; }
+        public virtual DbSet<CheckListInputs> CheckListInput { get; set; }
+        public virtual DbSet<CheckListString> CheckListStrings { get; set; }
+        public virtual DbSet<Analysis> Analyses { get; set; }
+        public virtual DbSet<Parameters> Parameters { get; set; }
+        public virtual DbSet<SampleType> SampleTypes { get; set; }
+        public virtual DbSet<TypeOfSwab> TypeOfSwabs { get; set; }
+        public virtual DbSet<ProductCondition> ProductConditions { get; set; }
+        public virtual DbSet<Disposition> Dispositions { get; set; }
+        public virtual DbSet<ProductType> ProductTypes { get; set; }
 
     }
 } 

@@ -162,9 +162,9 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         [Route("AddNewTypeOfSwab")]
         public async Task<IActionResult> AddNewTypeOfSwab(TypeOfSwab typeOfSwab)
         {
-            var validateSampleType = _unitOfWork.LabtestMasterlist.GetTypeofSwabByName(typeOfSwab.TypeofSwabName);
-            if (validateSampleType != null)
-                return BadRequest($"Sample type {typeOfSwab.TypeofSwabName} is already exist");
+            var validateTypeofSwab = await _unitOfWork.LabtestMasterlist.GetTypeofSwabByName(typeOfSwab.TypeofSwabName);
+            if (validateTypeofSwab != null)
+                return BadRequest($"Type of swab {typeOfSwab.TypeofSwabName} is already exist");
             await _unitOfWork.LabtestMasterlist.AddNewTypeOfSwab(typeOfSwab);
             await _unitOfWork.CompleteAsync();
             return Ok("Type of Swab successfully added");
@@ -284,7 +284,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         [Route("AddNewAnalysis")]
         public async Task<IActionResult> AddNewAnalysis(Analysis analysis)
         {
-            var validateSampleType = _unitOfWork.LabtestMasterlist.GetAnalaysisByName(analysis.AnalysisName);
+            var validateSampleType = await _unitOfWork.LabtestMasterlist.GetAnalaysisByName(analysis.AnalysisName);
             if (validateSampleType != null)
                 return BadRequest($"Sample type {analysis.AnalysisName} is already exist");
             await _unitOfWork.LabtestMasterlist.AddNewAnalysis(analysis);
@@ -411,7 +411,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         public async Task<IActionResult> AddNewAnalysis(ProductCondition productCondition)
         {
             var validateProductCondition =
-                _unitOfWork.LabtestMasterlist.GetProductConditionByName(productCondition.ProductConditionName);
+               await _unitOfWork.LabtestMasterlist.GetProductConditionByName(productCondition.ProductConditionName);
             if (validateProductCondition != null)
                 return BadRequest($"Sample type {productCondition.ProductConditionName} is already exist");
             await _unitOfWork.LabtestMasterlist.AddNewProductCondition(productCondition);
@@ -508,7 +508,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         [Route("AddNewDisposition")]
         public async Task<IActionResult> AddNewDisposition(Disposition disposition)
         {
-            var validateSampleType = _unitOfWork.LabtestMasterlist.GetDispositonByName(disposition.DispositionName);
+            var validateSampleType = await _unitOfWork.LabtestMasterlist.GetDispositonByName(disposition.DispositionName);
             if (validateSampleType != null)
                 return BadRequest($"Disposition {disposition.DispositionName} is already exist");
             await _unitOfWork.LabtestMasterlist.AddNewDisposition(disposition);
@@ -616,7 +616,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         [Route("AddNewParameters")]
         public async Task<IActionResult> AddNewParameters(Parameters parameters)
         {
-            var validateSampleType = _unitOfWork.LabtestMasterlist.GetParametersByName(parameters.ParameterName);
+            var validateSampleType = await _unitOfWork.LabtestMasterlist.GetParametersByName(parameters.ParameterName);
             if (validateSampleType != null)
                 return BadRequest($"Paramters {parameters.ParameterName} is already exist");
             await _unitOfWork.LabtestMasterlist.AddNewParameter(parameters);
