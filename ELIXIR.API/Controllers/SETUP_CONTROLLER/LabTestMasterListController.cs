@@ -47,6 +47,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             var validateSampleType = await _unitOfWork.LabtestMasterlist.GetSampleTypeByName(sampleType.SampleTypeName);
             if (validateSampleType != null)
                 return BadRequest($"Sample type {sampleType.SampleTypeName} is already exist");
+            sampleType.IsActive = true;
             await _unitOfWork.LabtestMasterlist.AddNewSampleType(sampleType);
             await _unitOfWork.CompleteAsync();
             return Ok("Sample Type successfully added");

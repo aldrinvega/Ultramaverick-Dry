@@ -7,7 +7,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
     {
         public string SampleTypeName { get; set; }
         public bool IsActive { get; set; }
-        public DateTime DateAdded { get; set; }
+        public DateTime DateAdded { get; set; } = DateTime.Now;
         public string Reason { get; set; }
         public string ModifiedBy { get; set; }
     }

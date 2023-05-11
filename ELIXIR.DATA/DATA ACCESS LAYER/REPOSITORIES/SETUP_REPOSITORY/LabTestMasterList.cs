@@ -62,6 +62,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             var sampleType = _context.SampleTypes.Where(x => x.IsActive == status).Select(x => new SampleTypeDto
             {
+                Id = x.Id,
                 SampleTypeName = x.SampleTypeName,
                 IsActive = x.IsActive,
                 Reason = x.Reason,
@@ -76,6 +77,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             var sampleType = _context.SampleTypes.Where(x => x.IsActive == true).Select(x => new SampleTypeDto
             {
+                Id = x.Id,
                 SampleTypeName = x.SampleTypeName,
                 IsActive = x.IsActive,
                 Reason = x.Reason,
@@ -92,7 +94,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         public async Task<PagedList<SampleTypeDto>> GetAllSampleTypeByStatusPagination(bool status, UserParams userParams)
         {
             var sampleType = _context.SampleTypes.Where(x => x.IsActive == status).Select(x => new SampleTypeDto
-            {
+            { 
+                Id = x.Id,
                 SampleTypeName = x.SampleTypeName,
                 IsActive = x.IsActive,
                 Reason = x.Reason,
@@ -107,7 +110,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         public async Task<PagedList<SampleTypeDto>> GetAllSampleTypeByStatusPaginationOrig(string search, bool status, UserParams userParams)
         {
             var sampleType = _context.SampleTypes.Where(x => x.IsActive == status).Select(x => new SampleTypeDto
-            {
+            {   
+                Id = x.Id,
                 SampleTypeName = x.SampleTypeName,
                 IsActive = x.IsActive,
                 Reason = x.Reason,
@@ -277,6 +281,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             var analysesResult = _context.Analyses.Where(x => x.IsActive == true).Select(x => new AnalysesDto
             {
+                Id = x.Id,
                 AnalysisName = x.AnalysisName,
                 IsActive = x.IsActive,
                 Reason = x.Reason,
@@ -289,6 +294,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             var analysesResult = _context.Analyses.Where(x => x.IsActive == true).Select(x => new AnalysesDto
             {
+                Id = x.Id,
                 AnalysisName = x.AnalysisName,
                 IsActive = x.IsActive,
                 Reason = x.Reason,
@@ -306,6 +312,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             var analysesResult = _context.Analyses.Where(x => x.IsActive == true).Select(x => new AnalysesDto
             {
+                Id = x.Id,
                 AnalysisName = x.AnalysisName,
                 IsActive = x.IsActive,
                 Reason = x.Reason,
@@ -464,6 +471,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             var productConditions = _context.ProductConditions.Where(x => x.IsActive == true).Select(x =>
                 new ProductConditionDto
                 {
+                    Id = x.Id,
                     ProductConditionName = x.ProductConditionName,
                     IsActive = x.IsActive,
                     Reason = x.Reason,
@@ -479,6 +487,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             var productConditions = _context.ProductConditions.Where(x => x.IsActive == true).Select(x =>
                 new ProductConditionDto
                 {
+                    Id = x.Id,
                     ProductConditionName = x.ProductConditionName,
                     IsActive = x.IsActive,
                     Reason = x.Reason,
