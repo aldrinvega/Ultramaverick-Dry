@@ -168,6 +168,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             return await _context.TypeOfSwabs.FirstOrDefaultAsync(x => x.Id == id);
         }
+        public async Task<TypeOfSwab> GetTypeofSwabByName(string typeOfSwabNAme)
+        {
+            return await _context.TypeOfSwabs.FirstOrDefaultAsync(x => x.TypeofSwabName == typeOfSwabNAme);
+        }
+
         public async Task<IEnumerable<TypeOfSwab>> GetAllTypeOfSwabByStatus(bool status)
         {
             return await _context.TypeOfSwabs.Where(x => x.IsActive == status).ToListAsync();
@@ -271,6 +276,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         public async Task<Analysis> GetAnalysisById(int id)
         {
             return await _context.Analyses.FirstOrDefaultAsync(x => x.Id == id);
+        }
+        public async Task<Analysis> GetAnalaysisByName(string analysisName)
+        {
+            return await _context.Analyses.FirstOrDefaultAsync(x => x.AnalysisName == analysisName);
         }
 
         public async Task<IEnumerable<Analysis>> GetAllAnalysisByStatus(bool status)
@@ -545,6 +554,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         public async Task<Disposition> GetDispositionById(int id)
         {
             return await _context.Dispositions.FirstOrDefaultAsync(x => x.Id == id);
+        }
+        public async Task<Disposition> GetDispositonByName(string dispositionName)
+        {
+            return await _context.Dispositions.FirstOrDefaultAsync(x => x.DispositionName == dispositionName);
         }
 
         public async Task<IEnumerable<Disposition>> GetAllDispositionByStatus(bool status)

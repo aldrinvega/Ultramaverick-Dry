@@ -57,17 +57,36 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             return await _context.ProductTypes.ToListAsync();
         }
-        //public async Task<PagedList<IEnumerable<ProductType>>> GetAllProductTypePagination(UserParams userParams)
-        //{
-        //    var productType = _context.ProductTypes.Where(x => x.IsAcctive == true).Select(x => new ProductTypeDto
-        //    {
-        //        Id = x.Id,
-        //        ProductTypeName = x.ProductTypeName,
-        //        IsActive = x.IsAcctive,
-        //        DateAdded = x.Date.ToString()
+        public async Task<PagedList<ProductTypeDto>> GetAllProductTypePagination(UserParams userParams)
+        {
+            var productType = _context.ProductTypes.Where(x => x.IsAcctive == true).Select(x => new ProductTypeDto
+            {
+                Id = x.Id,
+                ProductTypeName = x.ProductTypeName,
+                IsActive = x.IsAcctive,
+                DateAdded = x.Date.ToString()
 
-        //    });
-        //}
+            });
+
+            return await PagedList<ProductTypeDto>.CreateAsync(productType, userParams.PageNumber, userParams.PageSize);
+        }
+
+        public async Task<PagedList<ProductTypeDto>> GetAllProductTypePaginationOrig(string search, bool status, UserParams userParams)
+        {
+            var productType = _context.ProductTypes.Where(x => x.IsAcctive == true).Select(x => new ProductTypeDto
+            {
+                Id = x.Id,
+                ProductTypeName = x.ProductTypeName,
+                IsActive = x.IsAcctive,
+                DateAdded = x.Date.ToString()
+
+            }).OrderBy(x => x.ProductTypeName)
+              .Where(x => x.IsActive == status)
+              .Where(x => x.ProductTypeName.ToLower()
+              .Contains(search.Trim().ToLower()));
+
+            return await PagedList<ProductTypeDto>.CreateAsync(productType, userParams.PageNumber, userParams.PageSize);
+        }
 
     }
 }

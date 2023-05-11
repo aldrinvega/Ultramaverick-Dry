@@ -29,6 +29,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<bool> UpdateTypeOfSwab(TypeOfSwab typeOfSwab);
         Task<IReadOnlyList<TypeOfSwab>> GetAllTypeOfSwab();
         Task<TypeOfSwab> GetTypeOfSwabById(int id);
+        Task<TypeOfSwab> GetTypeofSwdabByName(string typeOfSwabNAme);
         Task<IEnumerable<TypeOfSwab>> GetAllTypeOfSwabByStatus(bool status);
         Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPagination(UserParams userParams);
         Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPaginationOrig(string search, bool status, UserParams userParams);
@@ -43,6 +44,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<bool> UpdateAnalysis(Analysis analysis);
         Task<IReadOnlyList<Analysis>> GetAllAnalysis();
         Task<IEnumerable<Analysis>> GetAllAnalysisByStatus(bool status);
+        Task<Analysis> GetAnalaysisByName(string analysisName);
         Task<PagedList<AnalysesDto>> GetAllAnalysesPagination(UserParams userParams);
         Task<PagedList<AnalysesDto>> GetAllAnalysesPaginationOrig(string search, bool status, UserParams userParams);
         Task<PagedList<AnalysesDto>> GetAnalysisByStatusPaginationOrig(string search, bool status, UserParams userParams);
@@ -84,6 +86,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<bool> UpdateProductDisposition(Disposition disposition);
         Task<IReadOnlyList<Disposition>> GetAllDisposition();
         Task<Disposition> GetDispositionById(int id);
+        Task<Disposition> GetDispositonByName(string dispositionName);
         Task<IEnumerable<Disposition>> GetAllDispositionByStatus(bool status);
         Task<PagedList<DispositionDto>> GetAllDispositionPagination(UserParams userParams);
         Task<PagedList<DispositionDto>> GetAllDispositionPaginationOrig(string search, bool status, UserParams userParams);

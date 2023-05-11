@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.SymbolStore;
-using System.Security.Cryptography.Pkcs;
 using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.ICONFIGURATION;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
@@ -8,8 +6,6 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DTOs.SETUP_DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 {
@@ -166,7 +162,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         [Route("AddNewTypeOfSwab")]
         public async Task<IActionResult> AddNewTypeOfSwab(TypeOfSwab typeOfSwab)
         {
-            var validateSampleType = _unitOfWork.LabtestMasterlist.GetSampleTypeByName(typeOfSwab.TypeofSwabName);
+            var validateSampleType = _unitOfWork.LabtestMasterlist.GetTypeofSwabByName(typeOfSwab.TypeofSwabName);
             if (validateSampleType != null)
                 return BadRequest($"Sample type {typeOfSwab.TypeofSwabName} is already exist");
             await _unitOfWork.LabtestMasterlist.AddNewTypeOfSwab(typeOfSwab);
@@ -288,7 +284,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         [Route("AddNewAnalysis")]
         public async Task<IActionResult> AddNewAnalysis(Analysis analysis)
         {
-            var validateSampleType = _unitOfWork.LabtestMasterlist.GetSampleTypeByName(analysis.AnalysisName);
+            var validateSampleType = _unitOfWork.LabtestMasterlist.GetAnalaysisByName(analysis.AnalysisName);
             if (validateSampleType != null)
                 return BadRequest($"Sample type {analysis.AnalysisName} is already exist");
             await _unitOfWork.LabtestMasterlist.AddNewAnalysis(analysis);
@@ -508,6 +504,18 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
         #region Disposition
 
+        [HttpPost]
+        [Route("AddNewDisposition")]
+        public async Task<IActionResult> AddNewDisposition(Disposition disposition)
+        {
+            var validateSampleType = _unitOfWork.LabtestMasterlist.GetDispositonByName(disposition.DispositionName);
+            if (validateSampleType != null)
+                return BadRequest($"Disposition {disposition.DispositionName} is already exist");
+            await _unitOfWork.LabtestMasterlist.AddNewDisposition(disposition);
+            await _unitOfWork.CompleteAsync();
+            return Ok("Disposition successfully added");
+        }
+
         [HttpGet("GetAllDisposition")]
         public async Task<IActionResult> GetAllDisposition()
         {
@@ -600,7 +608,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
             return Ok(dispositionResult);
         }
-#endregion
+        #endregion
 
         #region Parameters
 
