@@ -32,7 +32,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 return BadRequest("No Sample Types found.");
             return Ok(sampleTypes);
         }
-        
+
         [HttpGet("GetAllSampleTypeByStatus/{status}")]
         public async Task<ActionResult<IEnumerable<SampleTypeDto>>> GetAllSampleTypeByStatus(bool status)
         {
@@ -55,7 +55,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpGet]
-        [Route("GetSampleTypeById{id:int}")]
+        [Route("GetSampleTypeById{id}")]
         public async Task<IActionResult> GetAllSampleTypeById(int id)
         {
             var sampleTypeResult = await _unitOfWork.LabtestMasterlist.GetSampleTypeById(id);
@@ -82,7 +82,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         public async Task<ActionResult<IEnumerable<SampleTypeDto>>> GetAllSampleTypePagination([FromRoute] bool status, [FromQuery] UserParams userParams)
         {
             var sampleTypes = await _unitOfWork.LabtestMasterlist.GetAllSampleTypePagination(status, userParams);
-            
+
             Response.AddPaginationHeader(sampleTypes.CurrentPage, sampleTypes.PageSize, sampleTypes.TotalCount, sampleTypes.TotalPages, sampleTypes.HasNextPage, sampleTypes.HasPreviousPage);
 
             var sampleTypeResult = new
@@ -136,7 +136,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             if (validateSampleType == null)
                 return BadRequest($"Sample Type with id {sampleType.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateSampleTypeStatus(sampleType);
-            
+
             if (sampleType.IsActive == true)
             {
                 status = "Activated";
@@ -150,7 +150,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok($" {validateSampleType.SampleTypeName} is sucessfully {status}");
         }
         #endregion
-        
+
         #region Type of Swab
         [HttpGet]
         [Route("GetAllTypeOfSwab")]
@@ -175,7 +175,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpGet]
-        [Route("GetTypeOfSwabById{id:int}")]
+        [Route("GetTypeOfSwabById{id}")]
         public async Task<IActionResult> GetSampleTypeById(int id)
         {
             var typeOfSwabResult = await _unitOfWork.LabtestMasterlist.GetTypeOfSwabById(id);
@@ -192,8 +192,8 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpPut]
-        [Route("UpdateTypeOfSwab/{id}")]
-        public async Task<IActionResult> UpdateSampleType(int id, [FromBody] TypeOfSwab typeOfSwab)
+        [Route("UpdateTypeOfSwab/")]
+        public async Task<IActionResult> UpdateSampleType([FromBody] TypeOfSwab typeOfSwab)
         {
             var validateSampleType = await _unitOfWork.LabtestMasterlist.GetSampleTypeById(typeOfSwab.Id);
             if (validateSampleType == null)
@@ -208,7 +208,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         public async Task<ActionResult<IEnumerable<TypeOfSwabDto>>> GetAllTypeOfSwabPagination([FromRoute] bool status, [FromQuery] UserParams userParams)
         {
             var typeOfSwab = await _unitOfWork.LabtestMasterlist.GetAllTypeOfSwabPagination(userParams);
-            
+
             Response.AddPaginationHeader(typeOfSwab.CurrentPage, typeOfSwab.PageSize, typeOfSwab.TotalCount, typeOfSwab.TotalPages, typeOfSwab.HasNextPage, typeOfSwab.HasPreviousPage);
 
             var typeOfSwabResult = new
@@ -272,7 +272,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok($" {validateTypeofSwab.TypeofSwabName} is sucessfully {status}");
         }
         #endregion
-        
+
         #region Analysis
         [HttpGet]
         [Route("GetAllAnalyses")]
@@ -308,7 +308,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpGet("GetAllAnalysisByStauts/{status}")]
-        public async Task<IActionResult> GetAllAnalysisById([FromRoute]bool status)
+        public async Task<IActionResult> GetAllAnalysisById([FromRoute] bool status)
         {
             var analysisResult = await _unitOfWork.LabtestMasterlist.GetAllAnalysisByStatus(status);
             if (analysisResult == null)
@@ -333,7 +333,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         public async Task<ActionResult<IEnumerable<AnalysesDto>>> GetAllAnalysesPagination([FromQuery] UserParams userParams)
         {
             var analyses = await _unitOfWork.LabtestMasterlist.GetAllTypeOfSwabPagination(userParams);
-            
+
             Response.AddPaginationHeader(analyses.CurrentPage, analyses.PageSize, analyses.TotalCount, analyses.TotalPages, analyses.HasNextPage, analyses.HasPreviousPage);
 
             var analysesResult = new
@@ -398,7 +398,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok($" {validateAnalysis.AnalysisName} is sucessfully {status}");
         }
         #endregion
-        
+
         #region Product Condition
         [HttpGet]
         [Route("GetAllProductCondition")]
@@ -452,7 +452,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         public async Task<ActionResult<IEnumerable<ProductConditionDto>>> GetAllProductConditionPagination([FromQuery] UserParams userParams)
         {
             var productCondition = await _unitOfWork.LabtestMasterlist.GetAllProductConditionPagination(userParams);
-            
+
             Response.AddPaginationHeader(productCondition.CurrentPage, productCondition.PageSize, productCondition.TotalCount, productCondition.TotalPages, productCondition.HasNextPage, productCondition.HasPreviousPage);
 
             var productConditionResult = new
@@ -577,7 +577,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok(dispositionResult);
         }
 
-        [HttpGet("GetAllDispositionPagination")]
+        [HttpGet("GetAllDispositionPaginationOrig")]
         public async Task<ActionResult<IEnumerable<DispositionDto>>> GetAllDispositionPaginationOrig([FromQuery] string search, [FromQuery] bool status, [FromQuery] UserParams userParams)
         {
             if (search == null)
@@ -600,7 +600,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
             return Ok(dispositionResult);
         }
-        #endregion
+#endregion
 
         #region Parameters
 
@@ -624,20 +624,20 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok(parametersResult);
         }
         [HttpGet("GetParametersById/{id}")]
-        public async Task<ActionResult> GetParametersById([FromRoute]int id)
+        public async Task<ActionResult> GetParametersById([FromRoute] int id)
         {
             var parametersResult = await _unitOfWork.LabtestMasterlist.GetParametersById(id);
             return Ok(parametersResult);
         }
         [HttpGet("GetParametersByStatus/{status}")]
-        public async Task<ActionResult<IEnumerable<Parameters>>> GetAllParametersByStatus([FromRoute]bool status)
+        public async Task<ActionResult<IEnumerable<Parameters>>> GetAllParametersByStatus([FromRoute] bool status)
         {
             var parametersResults = await _unitOfWork.LabtestMasterlist.GetAllParametersByStatus(status);
             return Ok(parametersResults);
         }
 
         [HttpGet("GetAllParametersPagination")]
-        public async Task<ActionResult<IEnumerable<ParametersDto>>> GetAllParametersPagination([FromQuery]UserParams userParams)
+        public async Task<ActionResult<IEnumerable<ParametersDto>>> GetAllParametersPagination([FromQuery] UserParams userParams)
         {
             var parameters = await _unitOfWork.LabtestMasterlist.GetAllParametersPagination(userParams);
             Response.AddPaginationHeader(parameters.CurrentPage, parameters.PageSize, parameters.TotalCount, parameters.TotalPages, parameters.HasNextPage, parameters.HasPreviousPage);
@@ -657,7 +657,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpGet("GetAllParametersPaginationOrig/{status}")]
-        public async Task<ActionResult<IEnumerable<ParametersDto>>> GetAllParametersPaginationOrig([FromQuery] string search, [FromQuery] bool status,[FromQuery] UserParams userParams)
+        public async Task<ActionResult<IEnumerable<ParametersDto>>> GetAllParametersPaginationOrig([FromQuery] string search, [FromQuery] bool status, [FromQuery] UserParams userParams)
         {
             if (search == null)
                 return await _unitOfWork.LabtestMasterlist.GetAllParametersPagination(userParams);
@@ -681,7 +681,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
         [HttpPut]
         [Route("UpdateParameters/{id}")]
-        public async Task<IActionResult> UpdateParameter([FromRoute]int id, [FromBody] Parameters parameters)
+        public async Task<IActionResult> UpdateParameter([FromRoute] int id, [FromBody] Parameters parameters)
         {
             var validateParameters = await _unitOfWork.LabtestMasterlist.GetParametersById(id);
             if (validateParameters == null)
@@ -690,7 +690,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok("Analysis updated successfully.");
         }
 
-        [HttpPut("UpdateParameterStatus")] 
+        [HttpPut("UpdateParameterStatus")]
         public async Task<IActionResult> UpdateParameterStatus([FromBody] Parameters parameters)
         {
             string status;
@@ -699,11 +699,12 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 return BadRequest("No paramaeters found.");
             await _unitOfWork.LabtestMasterlist.UpdateParameterStatus(parameters);
             await _unitOfWork.CompleteAsync();
-            if(parameters.IsActive == true)
+            if (parameters.IsActive == true)
             {
                 status = "Activated";
             }
-            else {
+            else
+            {
                 status = "Inactivated";
             }
             return Ok($" {validateParameters.ParameterName} is sucessfully {status}");
