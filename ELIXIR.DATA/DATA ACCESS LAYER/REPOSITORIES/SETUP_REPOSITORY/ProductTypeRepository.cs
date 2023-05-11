@@ -1,6 +1,8 @@
 ﻿using ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
+using ELIXIR.DATA.DTOs.SETUP_DTOs;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -55,6 +57,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             return await _context.ProductTypes.ToListAsync();
         }
+        //public async Task<PagedList<IEnumerable<ProductType>>> GetAllProductTypePagination(UserParams userParams)
+        //{
+        //    var productType = _context.ProductTypes.Where(x => x.IsAcctive == true).Select(x => new ProductTypeDto
+        //    {
+        //        Id = x.Id,
+        //        ProductTypeName = x.ProductTypeName,
+        //        IsActive = x.IsAcctive,
+        //        DateAdded = x.Date.ToString()
+
+        //    });
+        //}
 
     }
 }
