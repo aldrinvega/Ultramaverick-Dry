@@ -127,14 +127,15 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpPut]
-        [Route("UpdateSampleTypeStatus/{id}")]
-        public async Task<IActionResult> UpdateSampleTypeStatus(int id, [FromBody] SampleType sampleType)
+        [Route("UpdateSampleTypeStatus")]
+        public async Task<IActionResult> UpdateSampleTypeStatus([FromBody] SampleType sampleType)
         {
             string status;
-            var validateSampleType = await _unitOfWork.LabtestMasterlist.GetSampleTypeById(id);
+            var validateSampleType = await _unitOfWork.LabtestMasterlist.GetSampleTypeById(sampleType.Id);
             if (validateSampleType == null)
                 return BadRequest($"Sample Type with id {sampleType.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateSampleTypeStatus(sampleType);
+            
             if (sampleType.IsActive == true)
             {
                 status = "Activated";
@@ -143,7 +144,9 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             {
                 status = "Inactivated";
             }
-            return Ok($" {sampleType.SampleTypeName} is sucessfully {status}");
+            await _unitOfWork.CompleteAsync();
+
+            return Ok($" {validateSampleType.SampleTypeName} is sucessfully {status}");
         }
         #endregion
         
@@ -245,11 +248,11 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
 
         [HttpPut]
-        [Route("UpdateTypeOfSwabStatus/{id}")]
-        public async Task<IActionResult> UpdateTypeofSwabStatus(int id, [FromBody] TypeOfSwab typeOfSwab)
+        [Route("UpdateTypeOfSwabStatus")]
+        public async Task<IActionResult> UpdateTypeofSwabStatus([FromBody] TypeOfSwab typeOfSwab)
         {
             string status;
-            var validateTypeofSwab = await _unitOfWork.LabtestMasterlist.GetTypeOfSwabById(id);
+            var validateTypeofSwab = await _unitOfWork.LabtestMasterlist.GetTypeOfSwabById(typeOfSwab.Id);
             if (validateTypeofSwab == null)
                 return BadRequest($"Sample Type with id {typeOfSwab.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateTypeOfSwab(typeOfSwab);
@@ -309,8 +312,8 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpPut]
-        [Route("UpdateAnalysis/{id}")]
-        public async Task<IActionResult> UpdateAnalysis(int id, [FromBody] Analysis analysis)
+        [Route("UpdateAnalysis")]
+        public async Task<IActionResult> UpdateAnalysis([FromBody] Analysis analysis)
         {
             var validateAnalysis = await _unitOfWork.LabtestMasterlist.GetSampleTypeById(analysis.Id);
             if (validateAnalysis == null)
@@ -371,11 +374,11 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpPut]
-        [Route("UpdateAnalysisStatus/{id}")]
-        public async Task<IActionResult> UpdateAnalysisStatus(int id, [FromBody] Analysis analysis)
+        [Route("UpdateAnalysisStatus")]
+        public async Task<IActionResult> UpdateAnalysisStatus([FromBody] Analysis analysis)
         {
             string status;
-            var validateAnalysis = await _unitOfWork.LabtestMasterlist.GetAnalysisById(id);
+            var validateAnalysis = await _unitOfWork.LabtestMasterlist.GetAnalysisById(analysis.Id);
             if (validateAnalysis == null)
                 return BadRequest($"Analysis with id {analysis.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateAnalysis(analysis);
@@ -484,8 +487,8 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpPut]
-        [Route("UpdateProductConditionStatus/{id}")]
-        public async Task<IActionResult> UpdateProductConditionStatus(int id, [FromBody] ProductCondition productCondition)
+        [Route("UpdateProductConditionStatus")]
+        public async Task<IActionResult> UpdateProductConditionStatus([FromBody] ProductCondition productCondition)
         {
             var validateProductCondition = await _unitOfWork.LabtestMasterlist.GetProductConditionById(id);
             if (validateProductCondition == null)
