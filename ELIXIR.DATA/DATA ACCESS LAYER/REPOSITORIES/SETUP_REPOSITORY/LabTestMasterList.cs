@@ -182,6 +182,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             var typeofSwabs = _context.TypeOfSwabs.Where(x => x.IsActive == status).Select(x => new TypeOfSwabDto
             {
+                Id = x.Id,
                 TypeofSwabName = x.TypeofSwabName,
                 IsActive = x.IsActive,
                 DateAdded = x.DateAdded,
@@ -196,6 +197,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             var typeofSwabs = _context.TypeOfSwabs.Where(x => x.IsActive == status).Select(x => new TypeOfSwabDto
             {
+                Id = x.Id,
                 TypeofSwabName = x.TypeofSwabName,
                 IsActive = x.IsActive,
                 DateAdded = x.DateAdded,
@@ -213,6 +215,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             var typeofSwabs = _context.TypeOfSwabs.Where(x => x.IsActive == true).Select(x => new TypeOfSwabDto
             {
+                Id = x.Id,
                 TypeofSwabName = x.TypeofSwabName,
                 IsActive = x.IsActive,
                 DateAdded = x.DateAdded,
@@ -225,7 +228,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         public async Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPaginationOrig(string search, bool status, UserParams userParams)
         {
             var typeofSwabs = _context.TypeOfSwabs.Where(x => x.IsActive == true).Select(x => new TypeOfSwabDto
-            {
+            {   
+                Id = x.Id,
                 TypeofSwabName = x.TypeofSwabName,
                 IsActive = x.IsActive,
                 DateAdded = x.DateAdded,
