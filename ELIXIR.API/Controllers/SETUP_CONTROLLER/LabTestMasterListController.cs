@@ -490,7 +490,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         [Route("UpdateProductConditionStatus")]
         public async Task<IActionResult> UpdateProductConditionStatus([FromBody] ProductCondition productCondition)
         {
-            var validateProductCondition = await _unitOfWork.LabtestMasterlist.GetProductConditionById(id);
+            var validateProductCondition = await _unitOfWork.LabtestMasterlist.GetProductConditionById(productCondition.Id);
             if (validateProductCondition == null)
                 return BadRequest($"Analysis with id {productCondition.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateProductCondition(productCondition);
