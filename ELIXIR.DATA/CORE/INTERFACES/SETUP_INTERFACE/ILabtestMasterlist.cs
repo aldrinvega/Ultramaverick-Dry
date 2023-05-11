@@ -29,7 +29,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<bool> UpdateTypeOfSwab(TypeOfSwab typeOfSwab);
         Task<IReadOnlyList<TypeOfSwab>> GetAllTypeOfSwab();
         Task<TypeOfSwab> GetTypeOfSwabById(int id);
-        Task<TypeOfSwab> GetTypeofSwdabByName(string typeOfSwabNAme);
+        Task<TypeOfSwab> GetTypeofSwabByName(string typeOfSwabNAme);
         Task<IEnumerable<TypeOfSwab>> GetAllTypeOfSwabByStatus(bool status);
         Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPagination(UserParams userParams);
         Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPaginationOrig(string search, bool status, UserParams userParams);
