@@ -188,7 +188,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpPut]
-        [Route("UpdateTypeOfSwab/")]
+        [Route("UpdateTypeOfSwab")]
         public async Task<IActionResult> UpdateTypeOfSwab([FromBody] TypeOfSwab typeOfSwab)
         {
             var validateTypeofSwab = await _unitOfWork.LabtestMasterlist.GetTypeOfSwabById(typeOfSwab.Id);
