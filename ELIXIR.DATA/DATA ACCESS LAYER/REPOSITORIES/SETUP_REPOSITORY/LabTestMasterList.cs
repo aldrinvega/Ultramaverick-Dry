@@ -211,9 +211,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             return await PagedList<TypeOfSwabDto>.CreateAsync(typeofSwabs, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPagination(UserParams userParams)
+        public async Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPagination(bool status, UserParams userParams)
         {
-            var typeofSwabs = _context.TypeOfSwabs.Where(x => x.IsActive == true).Select(x => new TypeOfSwabDto
+            var typeofSwabs = _context.TypeOfSwabs.Where(x => x.IsActive == status).Select(x => new TypeOfSwabDto
             {
                 Id = x.Id,
                 TypeofSwabName = x.TypeofSwabName,
@@ -290,9 +290,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             return await _context.Analyses.Where(x => x.IsActive == status).ToListAsync();
         }
-        public async Task<PagedList<AnalysesDto>> GetAllAnalysesPagination(UserParams userParams)
+        public async Task<PagedList<AnalysesDto>> GetAllAnalysesPagination(bool status, UserParams userParams)
         {
-            var analysesResult = _context.Analyses.Where(x => x.IsActive == true).Select(x => new AnalysesDto
+            var analysesResult = _context.Analyses.Where(x => x.IsActive == status).Select(x => new AnalysesDto
             {
                 Id = x.Id,
                 AnalysisName = x.AnalysisName,
@@ -382,9 +382,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             return await _context.Parameters.FirstOrDefaultAsync(x => x.Id == id);
         }
         
-        public async Task<PagedList<ParametersDto>> GetAllParametersPagination(UserParams userParams)
+        public async Task<PagedList<ParametersDto>> GetAllParametersPagination(bool status, UserParams userParams)
         {
-            var parammeters = _context.Parameters.Where(x => x.IsActive == true).Select(x => new ParametersDto
+            var parammeters = _context.Parameters.Where(x => x.IsActive == status).Select(x => new ParametersDto
             {
                 Id = x.Id,
                 ParameterName = x.ParameterName,
@@ -479,9 +479,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             return await _context.ProductConditions.Where(x => x.IsActive == status).ToListAsync();
         }
-        public async Task<PagedList<ProductConditionDto>> GetAllProductConditionPagination(UserParams userParams)
+        public async Task<PagedList<ProductConditionDto>> GetAllProductConditionPagination(bool status, UserParams userParams)
         {
-            var productConditions = _context.ProductConditions.Where(x => x.IsActive == true).Select(x =>
+            var productConditions = _context.ProductConditions.Where(x => x.IsActive == status).Select(x =>
                 new ProductConditionDto
                 {
                     Id = x.Id,
@@ -538,7 +538,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             return true;
         }
 
-        public async Task<bool> UpdateProductDisposition(Disposition disposition)
+        public async Task<bool> UpdateDisposition(Disposition disposition)
         {
             var dispositionResult = await _context.Dispositions.FirstOrDefaultAsync(x => x.Id == disposition.Id);
 
@@ -569,9 +569,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             return await _context.Dispositions.Where(x => x.IsActive == status).ToListAsync();
         }
 
-        public async Task<PagedList<DispositionDto>> GetAllDispositionPagination(UserParams userParams)
+        public async Task<PagedList<DispositionDto>> GetAllDispositionPagination(bool status, UserParams userParams)
         {
-            var dispositions = _context.Dispositions.Where(x => x.IsActive == true).Select(x => new DispositionDto
+            var dispositions = _context.Dispositions.Where(x => x.IsActive == status).Select(x => new DispositionDto
             {
                 Id = x.Id,
                 DispositionName = x.DispositionName,

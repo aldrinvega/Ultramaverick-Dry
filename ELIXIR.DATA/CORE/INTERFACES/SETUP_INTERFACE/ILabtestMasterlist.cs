@@ -31,7 +31,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<TypeOfSwab> GetTypeOfSwabById(int id);
         Task<TypeOfSwab> GetTypeofSwabByName(string typeOfSwabNAme);
         Task<IEnumerable<TypeOfSwab>> GetAllTypeOfSwabByStatus(bool status);
-        Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPagination(UserParams userParams);
+        Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPagination(bool status, UserParams userParams);
         Task<PagedList<TypeOfSwabDto>> GetAllTypeOfSwabPaginationOrig(string search, bool status, UserParams userParams);
         Task<PagedList<TypeOfSwabDto>> GetTypeOfSwabByStatusPaginationOrig(string search, bool status, UserParams userParams);
         Task<bool> UpdateTypeOfSwabStatus(TypeOfSwab typeOfSwab);
@@ -45,7 +45,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<IReadOnlyList<Analysis>> GetAllAnalysis();
         Task<IEnumerable<Analysis>> GetAllAnalysisByStatus(bool status);
         Task<Analysis> GetAnalaysisByName(string analysisName);
-        Task<PagedList<AnalysesDto>> GetAllAnalysesPagination(UserParams userParams);
+        Task<PagedList<AnalysesDto>> GetAllAnalysesPagination(bool status, UserParams userParams);
         Task<PagedList<AnalysesDto>> GetAllAnalysesPaginationOrig(string search, bool status, UserParams userParams);
         Task<PagedList<AnalysesDto>> GetAnalysisByStatusPaginationOrig(string search, bool status, UserParams userParams);
         Task<bool> UpdateAnalysisStatus(Analysis analysis);
@@ -61,7 +61,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<IEnumerable<Parameters>> GetAllParametersByStatus(bool status);
         Task<IReadOnlyList<Parameters>> GetAllParameters();
         Task<Parameters> GetParametersByName(string name);
-        Task<PagedList<ParametersDto>> GetAllParametersPagination(UserParams userParams);
+        Task<PagedList<ParametersDto>> GetAllParametersPagination(bool status, UserParams userParams);
         Task<PagedList<ParametersDto>> GetAllParametersPaginationOrig(string search, bool status, UserParams userParams);
         Task<bool> UpdateParameterStatus(Parameters parameters);
 
@@ -74,7 +74,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
         Task<IReadOnlyList<ProductCondition>> GetAllProductCondition();
         Task<ProductCondition> GetProductConditionById(int id);
         Task<IEnumerable<ProductCondition>> GetAllProductConditionByStatus(bool status);
-        Task<PagedList<ProductConditionDto>> GetAllProductConditionPagination(UserParams userParams);
+        Task<PagedList<ProductConditionDto>> GetAllProductConditionPagination(bool status, UserParams userParams);
         Task<PagedList<ProductConditionDto>> GetAllProductConditionPaginationOrig(string search, bool status, UserParams userParams);
         Task<bool> UpdateProductConditionStatus(ProductCondition productCondition);
         Task<ProductCondition> GetProductConditionByName(string productConditionName);
@@ -83,12 +83,12 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
 
         #region Disposition
         Task<bool> AddNewDisposition(Disposition disposition);
-        Task<bool> UpdateProductDisposition(Disposition disposition);
+        Task<bool> UpdateDisposition(Disposition disposition);
         Task<IReadOnlyList<Disposition>> GetAllDisposition();
         Task<Disposition> GetDispositionById(int id);
         Task<Disposition> GetDispositonByName(string dispositionName);
         Task<IEnumerable<Disposition>> GetAllDispositionByStatus(bool status);
-        Task<PagedList<DispositionDto>> GetAllDispositionPagination(UserParams userParams);
+        Task<PagedList<DispositionDto>> GetAllDispositionPagination(bool status, UserParams userParams);
         Task<PagedList<DispositionDto>> GetAllDispositionPaginationOrig(string search, bool status, UserParams userParams);
         Task<bool> UpdateDispositionStatus(Disposition disposition);
         #endregion
