@@ -172,7 +172,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
         [HttpGet]
         [Route("GetTypeOfSwabById{id}")]
-        public async Task<IActionResult> GetSampleTypeById(int id)
+        public async Task<IActionResult> GetztypeOfSwabById(int id)
         {
             var typeOfSwabResult = await _unitOfWork.LabtestMasterlist.GetTypeOfSwabById(id);
 
@@ -189,10 +189,10 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
         [HttpPut]
         [Route("UpdateTypeOfSwab/")]
-        public async Task<IActionResult> UpdateSampleType([FromBody] TypeOfSwab typeOfSwab)
+        public async Task<IActionResult> UpdateTypeOfSwab([FromBody] TypeOfSwab typeOfSwab)
         {
-            var validateSampleType = await _unitOfWork.LabtestMasterlist.GetSampleTypeById(typeOfSwab.Id);
-            if (validateSampleType == null)
+            var validateTypeofSwab = await _unitOfWork.LabtestMasterlist.GetTypeOfSwabById(typeOfSwab.Id);
+            if (validateTypeofSwab == null)
                 return BadRequest($"Id {typeOfSwab.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateTypeOfSwab(typeOfSwab);
             await _unitOfWork.CompleteAsync();
@@ -284,8 +284,8 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         [Route("AddNewAnalysis")]
         public async Task<IActionResult> AddNewAnalysis(Analysis analysis)
         {
-            var validateSampleType = await _unitOfWork.LabtestMasterlist.GetAnalaysisByName(analysis.AnalysisName);
-            if (validateSampleType != null)
+            var validatenalysis = await _unitOfWork.LabtestMasterlist.GetAnalaysisByName(analysis.AnalysisName);
+            if (validatenalysis != null)
                 return BadRequest($"Sample type {analysis.AnalysisName} is already exist");
             await _unitOfWork.LabtestMasterlist.AddNewAnalysis(analysis);
             await _unitOfWork.CompleteAsync();
@@ -316,7 +316,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         [Route("UpdateAnalysis")]
         public async Task<IActionResult> UpdateAnalysis([FromBody] Analysis analysis)
         {
-            var validateAnalysis = await _unitOfWork.LabtestMasterlist.GetSampleTypeById(analysis.Id);
+            var validateAnalysis = await _unitOfWork.LabtestMasterlist.GetAnalysisById(analysis.Id);
             if (validateAnalysis == null)
                 return BadRequest($"Id {analysis.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateAnalysis(analysis);
@@ -355,23 +355,23 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
                 return await GetAllAnalysesPagination(userParams);
 
-            var typeOfSwab = await _unitOfWork.LabtestMasterlist.GetAllAnalysesPaginationOrig(search, status, userParams);
+            var analyses = await _unitOfWork.LabtestMasterlist.GetAllAnalysesPaginationOrig(search, status, userParams);
 
 
-            Response.AddPaginationHeader(typeOfSwab.CurrentPage, typeOfSwab.PageSize, typeOfSwab.TotalCount, typeOfSwab.TotalPages, typeOfSwab.HasNextPage, typeOfSwab.HasPreviousPage);
+            Response.AddPaginationHeader(analyses.CurrentPage, analyses.PageSize, analyses.TotalCount, analyses.TotalPages, analyses.HasNextPage, analyses.HasPreviousPage);
 
-            var typeOfSwabResult = new
+            var analysesResult = new
             {
-                typeOfSwab,
-                typeOfSwab.CurrentPage,
-                typeOfSwab.PageSize,
-                typeOfSwab.TotalCount,
-                typeOfSwab.TotalPages,
-                typeOfSwab.HasNextPage,
-                typeOfSwab.HasPreviousPage
+                analyses,
+                analyses.CurrentPage,
+                analyses.PageSize,
+                analyses.TotalCount,
+                analyses.TotalPages,
+                analyses.HasNextPage,
+                analyses.HasPreviousPage
             };
 
-            return Ok(typeOfSwabResult);
+            return Ok(analysesResult);
         }
 
         [HttpPut]
@@ -408,7 +408,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
         [HttpPost]
         [Route("AddNewProductCondition")]
-        public async Task<IActionResult> AddNewAnalysis(ProductCondition productCondition)
+        public async Task<IActionResult> AddNewProduction(ProductCondition productCondition)
         {
             var validateProductCondition =
                await _unitOfWork.LabtestMasterlist.GetProductConditionByName(productCondition.ProductConditionName);
@@ -591,7 +591,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             if (search == null)
                 return await _unitOfWork.LabtestMasterlist.GetAllDispositionPagination(userParams);
 
-            var disposition = await _unitOfWork.LabtestMasterlist.GetAllProductConditionPaginationOrig(search, status, userParams);
+            var disposition = await _unitOfWork.LabtestMasterlist.GetAllDispositionPaginationOrig(search, status, userParams);
 
             Response.AddPaginationHeader(disposition.CurrentPage, disposition.PageSize, disposition.TotalCount, disposition.TotalPages, disposition.HasNextPage, disposition.HasPreviousPage);
 
