@@ -699,10 +699,10 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpPut]
-        [Route("UpdateParameters/{id}")]
-        public async Task<IActionResult> UpdateParameter([FromRoute] int id, [FromBody] Parameters parameters)
+        [Route("UpdateParameters")]
+        public async Task<IActionResult> UpdateParameter([FromBody] Parameters parameters)
         {
-            var validateParameters = await _unitOfWork.LabtestMasterlist.GetParametersById(id);
+            var validateParameters = await _unitOfWork.LabtestMasterlist.GetParametersById(parameters.Id);
             if (validateParameters == null)
                 return BadRequest($"Analysis with id {parameters.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateParameters(parameters);

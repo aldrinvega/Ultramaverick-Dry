@@ -577,6 +577,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                 DispositionName = x.DispositionName,
                 DateAdded = x.DateAdded,
                 Reason = x.Reason,
+                IsActive = x.IsActive,
                 ModifiedBy = x.ModifiedBy
             });
 
@@ -590,6 +591,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                 Id = x.Id,
                 DispositionName = x.DispositionName,
                 DateAdded = x.DateAdded,
+                IsActive = x.IsActive,
                 Reason = x.Reason,
                 ModifiedBy = x.ModifiedBy
             }).OrderBy(x => x.DispositionName)
