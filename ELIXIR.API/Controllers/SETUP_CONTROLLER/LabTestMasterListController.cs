@@ -475,7 +475,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             if (search == null)
                 return await GetAllProductConditionPagination(status, userParams);
 
-            var productCondition = await GetAllProductConditionPaginationOrig(search, status, userParams);
+            var productCondition = await _unitOfWork.LabtestMasterlist.GetAllProductConditionPaginationOrig(search, status, userParams);
 
             Response.AddPaginationHeader(productCondition.CurrentPage, productCondition.PageSize, productCondition.TotalCount, productCondition.TotalPages, productCondition.HasNextPage, productCondition.HasPreviousPage);
 
