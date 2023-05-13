@@ -94,7 +94,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         public async Task<ActionResult<IEnumerable<ProductTypeDto>>> GetAllProductTypeByStatusPaginationOrig([FromRoute] bool status, [FromQuery] string search, [FromQuery] UserParams userParams)
         {
             if (search == null)
-                return await _unitOfWork.ProductType.GetAllProductTypePagination(status, userParams);
+                return await GetAllProductTypePagination(status, userParams);
 
             var productType = await _unitOfWork.ProductType.GetAllProductTypePaginationOrig(search, status, userParams);
             Response.AddPaginationHeader(productType.CurrentPage, productType.PageSize, productType.TotalCount, productType.TotalPages, productType.HasNextPage, productType.HasPreviousPage);
