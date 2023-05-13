@@ -44,27 +44,37 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             return await _context.ProductTypes.FirstOrDefaultAsync(x => x.Id == id);
         }
+        public async Task<bool> UpdateProductTypeStatus(ProductType productType)
+        {
+            var productTypes = await _context.ProductTypes.FirstOrDefaultAsync(x => x.Id == productType.Id);
+            if (productTypes == null)
+                return false;
+            productTypes.IsActive = productType.IsActive;
+            productType.ModifiedBy = productType.ModifiedBy;
 
+            await _context.SaveChangesAsync();
+            return true;
+        }
         public async Task<ProductType> GetProductTypeByName(string productTypeName)
         {
             return await _context.ProductTypes.FirstOrDefaultAsync(x => x.ProductTypeName == productTypeName);
         }
         public async Task<IEnumerable<ProductType>> GetProductTypeByStatus(bool status)
         {
-            return await _context.ProductTypes.Where(x => x.IsAcctive == status).ToListAsync();
+            return await _context.ProductTypes.Where(x => x.IsActive == status).ToListAsync();
         }
         public async Task<IEnumerable<ProductType>> GetProductTypesAsync()
         {
             return await _context.ProductTypes.ToListAsync();
         }
-        public async Task<PagedList<ProductTypeDto>> GetAllProductTypePagination(UserParams userParams)
+        public async Task<PagedList<ProductTypeDto>> GetAllProductTypePagination(bool status, UserParams userParams)
         {
-            var productType = _context.ProductTypes.Where(x => x.IsAcctive == true).Select(x => new ProductTypeDto
+            var productType = _context.ProductTypes.Where(x => x.IsActive == status).Select(x => new ProductTypeDto
             {
                 Id = x.Id,
                 ProductTypeName = x.ProductTypeName,
-                IsActive = x.IsAcctive,
-                DateAdded = x.Date.ToString()
+                IsActive = x.IsActive,
+                DateAdded = x.DateAdded.ToString()
 
             });
 
@@ -73,12 +83,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<PagedList<ProductTypeDto>> GetAllProductTypePaginationOrig(string search, bool status, UserParams userParams)
         {
-            var productType = _context.ProductTypes.Where(x => x.IsAcctive == true).Select(x => new ProductTypeDto
+            var productType = _context.ProductTypes.Where(x => x.IsActive == true).Select(x => new ProductTypeDto
             {
                 Id = x.Id,
                 ProductTypeName = x.ProductTypeName,
-                IsActive = x.IsAcctive,
-                DateAdded = x.Date.ToString()
+                IsActive = x.IsActive,
+                DateAdded = x.DateAdded.ToString()
 
             }).OrderBy(x => x.ProductTypeName)
               .Where(x => x.IsActive == status)

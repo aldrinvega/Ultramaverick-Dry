@@ -59,6 +59,8 @@ namespace ELIXIR.DATA.CORE.ICONFIGURATION
         IQCChecklist QcChecklist { get; set; }
         
         ILabtestMasterlist LabtestMasterlist { get; set; }
+
+        IProductTypeRepository ProductType { get; set; }
         
         Task CompleteAsync();
 
