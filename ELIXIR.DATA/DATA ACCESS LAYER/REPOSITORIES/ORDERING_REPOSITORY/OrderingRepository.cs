@@ -217,7 +217,7 @@ using System.Collections.Generic;
                               customers.CompanyCode,
                               customers.LocationName,
                               customers.DepartmentName,
-                              Reserve = warehouse.Reserve != null ? warehouse.Reserve : 0,
+                              Reserve = warehouse.Reserve == null ? 0 : warehouse.Reserve,
 
 
                               } into total

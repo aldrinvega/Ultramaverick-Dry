@@ -58,7 +58,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
             status = productType.IsActive == true ? "Activated" : "Inactivated";
             await _unitOfWork.CompleteAsync();
-            return Ok($"{productType.ProductTypeName} is successfully {status}");
+            return Ok($"{exisitingProducType.ProductTypeName} is successfully {status}");
         }
 
         [HttpGet("GetProductTypeById/{id}")]
