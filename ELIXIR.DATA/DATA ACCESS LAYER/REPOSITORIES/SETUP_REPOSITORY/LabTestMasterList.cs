@@ -37,7 +37,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                 return false;
             sampleType.SampleTypeName = sampleTypes.SampleTypeName;
             sampleType.Reason = sampleTypes.Reason;
-            sampleType.ModifiedBy = sampleTypes.SampleTypeName;
+            sampleType.ModifiedBy = sampleTypes.ModifiedBy;
             return true;
         }
 

@@ -67,6 +67,8 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         public async Task<IActionResult> UpdateSampleType([FromBody] SampleType sampleType)
         {
             var validateSampleType = await _unitOfWork.LabtestMasterlist.GetSampleTypeById(sampleType.Id);
+            var exisitingSampleType = await _unitOfWork.LabtestMasterlist.GetSampleTypeByName(sampleType.SampleTypeName);
+            if (exisitingSampleType != null) return BadRequest($"{sampleType.SampleTypeName} is already exist");
             if (validateSampleType == null)
                 return BadRequest($"Id {sampleType.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateSampleType(sampleType);
@@ -193,6 +195,8 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         public async Task<IActionResult> UpdateTypeOfSwab([FromBody] TypeOfSwab typeOfSwab)
         {
             var validateTypeofSwab = await _unitOfWork.LabtestMasterlist.GetTypeOfSwabById(typeOfSwab.Id);
+            var existingTypeofSwab = await _unitOfWork.LabtestMasterlist.GetTypeofSwabByName(typeOfSwab.TypeofSwabName);
+            if (existingTypeofSwab != null) return BadRequest($"{typeOfSwab.TypeofSwabName} is already exist");
             if (validateTypeofSwab == null)
                 return BadRequest($"Id {typeOfSwab.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateTypeOfSwab(typeOfSwab);
@@ -319,6 +323,8 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         public async Task<IActionResult> UpdateAnalysis([FromBody] Analysis analysis)
         {
             var validateAnalysis = await _unitOfWork.LabtestMasterlist.GetAnalysisById(analysis.Id);
+            var existingAnalysis = await _unitOfWork.LabtestMasterlist.GetAnalaysisByName(analysis.AnalysisName);
+            if (existingAnalysis != null) return BadRequest($"{analysis.AnalysisName} is already exist");
             if (validateAnalysis == null)
                 return BadRequest($"Id {analysis.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateAnalysis(analysis);
@@ -440,6 +446,8 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         public async Task<IActionResult> UpdateProductCondition([FromBody] ProductCondition productCondition)
         {
             var validateProductCondition = await _unitOfWork.LabtestMasterlist.GetProductConditionById(productCondition.Id);
+            var existingProductCnodition = await _unitOfWork.LabtestMasterlist.GetProductConditionByName(productCondition.ProductConditionName);
+            if (existingProductCnodition != null) return BadRequest($"{productCondition.ProductConditionName} is already exist");
             if (validateProductCondition == null)
                 return BadRequest($"Id {productCondition.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateProductCondition(productCondition);
