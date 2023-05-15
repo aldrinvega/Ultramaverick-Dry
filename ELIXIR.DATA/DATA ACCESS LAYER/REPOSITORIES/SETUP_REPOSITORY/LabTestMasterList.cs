@@ -576,7 +576,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             {
                 Id = x.Id,
                 DispositionName = x.DispositionName,
-                DateAdded = x.DateAdded,
+                DateAdded = x.DateAdded.ToString("MM-dd-yyyy"),
                 Reason = x.Reason,
                 IsActive = x.IsActive,
                 ModifiedBy = x.ModifiedBy
@@ -591,7 +591,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             {
                 Id = x.Id,
                 DispositionName = x.DispositionName,
-                DateAdded = x.DateAdded,
+                DateAdded = x.DateAdded.ToString("MM-dd-yyyy"),
                 IsActive = x.IsActive,
                 Reason = x.Reason,
                 ModifiedBy = x.ModifiedBy

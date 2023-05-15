@@ -5,6 +5,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DTOs.SETUP_DTOs;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
@@ -497,11 +498,14 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         [Route("UpdateProductConditionStatus")]
         public async Task<IActionResult> UpdateProductConditionStatus([FromBody] ProductCondition productCondition)
         {
+            string status;
             var validateProductCondition = await _unitOfWork.LabtestMasterlist.GetProductConditionById(productCondition.Id);
             if (validateProductCondition == null)
                 return BadRequest($"Analysis with id {productCondition.Id} is not exists");
             await _unitOfWork.LabtestMasterlist.UpdateProductConditionStatus(productCondition);
-            return Ok("Product Condition updated successfully.");
+            await _unitOfWork.CompleteAsync();
+            status = productCondition.IsActive == true ? "Activated" : "Inactivated";
+            return Ok($"{validateProductCondition.ProductConditionName} is successfully {status}");
         }
         #endregion
 
@@ -551,6 +555,9 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         public async Task<IActionResult> UpdateDisposition([FromBody] Disposition disposition)
         {
             var validateDisposition = await _unitOfWork.LabtestMasterlist.GetDispositionById(disposition.Id);
+            var exisitingDeispositionName = await _unitOfWork.LabtestMasterlist.GetDispositonByName(disposition.DispositionName);
+            if (exisitingDeispositionName != null)
+                return BadRequest($"{disposition.DispositionName} is already exist");
             if (validateDisposition == null)
                 return BadRequest("No paramaeters found.");
             await _unitOfWork.LabtestMasterlist.UpdateDisposition(disposition);
@@ -703,7 +710,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpPut]
-        [Route("UpdateParameters")]
+        [Route("UpdateParameter")]
         public async Task<IActionResult> UpdateParameter([FromBody] Parameters parameters)
         {
             var validateParameters = await _unitOfWork.LabtestMasterlist.GetParametersById(parameters.Id);
