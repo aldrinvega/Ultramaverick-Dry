@@ -455,7 +455,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                 return false;
             productConditionResult.ProductConditionName = productCondition.ProductConditionName;
             productConditionResult.DateAdded = productCondition.DateAdded;
-            productConditionResult.IsActive = productCondition.IsActive;
             productConditionResult.Reason = productCondition.Reason;
             return true;
         }

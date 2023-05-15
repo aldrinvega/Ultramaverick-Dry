@@ -14,7 +14,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 {
     public class ProductTypeRepository : IProductTypeRepository
     {
-        private new readonly StoreContext _context;
+        private readonly StoreContext _context;
 
         public ProductTypeRepository(StoreContext context)
         {

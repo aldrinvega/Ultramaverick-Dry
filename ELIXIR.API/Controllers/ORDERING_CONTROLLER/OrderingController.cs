@@ -50,9 +50,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         public async Task<IActionResult> SchedulePreparedOrderedDate([FromBody] Ordering[] order)
         {
 
-            var generate = new GenerateOrderNo();
-
-            generate.IsActive = true;
+            var generate = new GenerateOrderNo
+            {
+                IsActive = true
+            };
 
             await _unitOfWork.Order.GenerateNumber(generate);
             await _unitOfWork.CompleteAsync();
