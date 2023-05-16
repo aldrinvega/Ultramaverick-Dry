@@ -28,6 +28,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             var uom = await _unitOfWork.Uoms.GetAll();
 
             return Ok(uom);
+
         }
 
         [HttpGet]
