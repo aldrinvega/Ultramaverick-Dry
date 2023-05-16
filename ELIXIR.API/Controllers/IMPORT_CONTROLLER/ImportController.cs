@@ -466,11 +466,10 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                     if (await _unitOfWork.Customers.CustomerCodeExist(customer.CustomerCode))
                         return BadRequest("Customer already Exist!, Please try something else!");
 
-                    await _unitOfWork.Customers.AddNewCustomer(customer);
-                    await _unitOfWork.CompleteAsync();
-
-                    return CreatedAtAction("GetAllCustomer", new { customer.Id }, customer);
+                    await _unitOfWork.Imports.AddNewCustomers(customer);
                 }
+                await _unitOfWork.CompleteAsync();
+                return Ok("Successfully import customers!");
             }
             return new JsonResult("Something went Wrong!") { StatusCode = 500 };
         }
