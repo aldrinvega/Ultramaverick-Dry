@@ -462,7 +462,7 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                     if (farmId == false)
                         //farmtype in database
                         return BadRequest("Customer Type doesn't exist, Please add data first!");
-
+                     
                     if (await _unitOfWork.Customers.CustomerCodeExist(customer.CustomerCode))
                         return BadRequest("Customer already Exist!, Please try something else!");
 
@@ -471,7 +471,6 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
 
                     return CreatedAtAction("GetAllCustomer", new { customer.Id }, customer);
                 }
-                await _unitOfWork.CompleteAsync();
             }
             return new JsonResult("Something went Wrong!") { StatusCode = 500 };
         }
