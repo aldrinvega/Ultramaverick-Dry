@@ -449,6 +449,34 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
             return Ok("Successfully import raw materials!");
         }
 
+        [HttpPost("AddNewCustomerManual")]
+        public async Task<IActionResult> AddNewCustomerManual([FromBody] Customer[] customers)
+        {
+            if (ModelState.IsValid)
+            {
+                foreach (Customer customer in customers)
+                {
+
+                    var farmId = await _unitOfWork.Customers.ValidateFarmId(customer.FarmTypeId);
+
+                    if (farmId == false)
+                        //farmtype in database
+                        return BadRequest("Customer Type doesn't exist, Please add data first!");
+
+                    if (await _unitOfWork.Customers.CustomerCodeExist(customer.CustomerCode))
+                        return BadRequest("Customer already Exist!, Please try something else!");
+
+                    await _unitOfWork.Customers.AddNewCustomer(customer);
+                    await _unitOfWork.CompleteAsync();
+
+                    return CreatedAtAction("GetAllCustomer", new { customer.Id }, customer);
+                }
+                await _unitOfWork.CompleteAsync();
+            }
+            return new JsonResult("Something went Wrong!") { StatusCode = 500 };
+        }
+
+
         [HttpPost]
         [Route("AddNewFormulaManual")]
         public async Task<IActionResult> AddNewFormulaManual([FromBody] TransformationRequirement[] requirement)

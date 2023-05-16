@@ -599,5 +599,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.IMPORT_REPOSITORY
             return true;
 
         }
+
+        //Import Customers
+
+        public async Task<bool> AddNewCustomers(Customer customer)
+        {
+
+            customer.IsActive = true;
+            customer.DateAdded = DateTime.Now;
+
+            await _context.Customers.AddAsync(customer);
+            return true;
+        }
     }
 }

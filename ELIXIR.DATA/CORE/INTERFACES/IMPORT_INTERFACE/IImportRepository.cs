@@ -72,5 +72,10 @@ namespace ELIXIR.DATA.CORE.INTERFACES.IMPORT_INTERFACE
 
         Task<bool> AddNewSupplierSummary(Supplier  supply);
 
+
+        //Customer
+
+        Task<bool> AddNewCustomers(Customer customer);
+
     }
 }
