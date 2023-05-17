@@ -105,7 +105,8 @@ using System.Collections.Generic;
                               {
                                   warehouse.ItemCode,
                                   ordering.QuantityOrdered,
-                                  warehouse.ActualGood
+                                  warehouse.ActualGood,
+                                  issue.Quantity
 
                               } into total
 
@@ -113,7 +114,7 @@ using System.Collections.Generic;
                               {
 
                                   ItemCode = total.Key.ItemCode,
-                                  Reserve = total.Key.ActualGood - (total.Key.QuantityOrdered != null ? total.Key.QuantityOrdered : 0)
+                                  Reserve = total.Key.ActualGood - ((total.Key.QuantityOrdered != null ? total.Key.QuantityOrdered : 0) + (total.Key.Quantity != null ? total.Key.Quantity : 0))
                               });
 
             var customer = _context.Customers.Select(x => new
@@ -2092,14 +2093,18 @@ using System.Collections.Generic;
             
            foreach (var order in orders)
            {
-               var issueOut = await _context.MiscellaneousIssueDetails
-                   .Where(x => x.IsActive)
-                   .Where(x => x.IsTransact == true)
-                   .Where(x => x.ItemCode == order.ItemCode)
-                   .SumAsync(x => x.Quantity);
-               
-               // Get the sum of received stocks for the current order's item code
-               var receivedStocks = await _context.WarehouseReceived
+                var orderingReserve = await _context.Orders.Where(x => x.IsActive == true)
+                                                     .Where(x => x.PreparedDate != null)
+                                                     .Where(x => x.ItemCode == order.ItemCode)
+                                                     .SumAsync(order => order.AllocatedQuantity ?? (int)order.QuantityOrdered);
+
+                var getIssueOut = await _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
+                                                             .Where(x => x.IsTransact == true)
+                                                             .Where(x => x.ItemCode == order.ItemCode)
+                                                             .SumAsync(x => x.Quantity);
+           
+                // Get the sum of received stocks for the current order's item code
+                var receivedStocks = await _context.WarehouseReceived
                    .Where(x => x.ItemCode == order.ItemCode)
                    .Where(x => x.IsActive == true)
                    .SumAsync(x => x.ActualGood);
@@ -2111,7 +2116,7 @@ using System.Collections.Generic;
                    .Where(x => x.IsActive == true)
                    .SumAsync(x => x.QuantityOrdered);
 
-               var totalStocks = receivedStocks - issueOut;
+               var totalStocks = receivedStocks - (orderingReserve + getIssueOut);
 
                if (totalStocks <= 0)
                {
@@ -2202,13 +2207,12 @@ using System.Collections.Generic;
                                                   .Where(x => x.PreparedDate != null)
          .GroupBy(x => new
          {
-             x.ItemCode,
-             x.AllocatedQuantity
+             x.ItemCode
         
          }).Select(x => new OrderingInventory
          {
              ItemCode = x.Key.ItemCode,
-             QuantityOrdered = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity)
+             QuantityOrdered = x.Sum(order => order.AllocatedQuantity ?? (int)order.QuantityOrdered)
          });
             
             var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)
@@ -2260,6 +2264,9 @@ using System.Collections.Generic;
                               by new
                               {
                                   warehouse.ItemCode,
+                                  ordering.QuantityOrdered,
+                                  warehouse.ActualGood,
+                                  issue.Quantity
         
                               } into total
         
@@ -2267,9 +2274,7 @@ using System.Collections.Generic;
                               {
         
                                   ItemCode = total.Key.ItemCode,
-                                  Reserve = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
-                                           (total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered) +
-                                            total.Sum(x => x.issue.Quantity == null ? 0 : x.issue.Quantity))
+                                  Reserve = total.Key.ActualGood - ((total.Key.QuantityOrdered != null ? total.Key.QuantityOrdered : 0) + (total.Key.Quantity == null ? 0 : total.Key.Quantity))
                               });
 
             var orders = (from ordering in _context.Orders
