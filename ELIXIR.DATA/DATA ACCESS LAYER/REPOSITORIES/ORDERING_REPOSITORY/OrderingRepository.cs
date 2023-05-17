@@ -779,30 +779,77 @@ using System.Collections.Generic;
         }
         public async Task<IReadOnlyList<TotalListOfPreparedDateDTO>> TotalListOfApprovedPreparedDate(string farm)
             {
-                var order = await _context.Orders.FirstOrDefaultAsync(x => x.FarmName == farm && x.IsApproved == true && x.PreparedDate != null && x.IsMove == false);
-                var result = new List<TotalListOfPreparedDateDTO>();
+
+            var orders = _context.Orders.GroupBy(x => new
+            {
+
+                x.OrderNoPKey,
+                x.FarmName,
+                x.FarmCode,
+                x.FarmType,
+                x.PreparedDate,
+                x.IsApproved,
+                x.IsMove,
+                x.IsReject,
+                x.Remarks
+
+            }).Where(x => x.Key.FarmName == farm)
+            .Where(x => x.Key.IsApproved == true)
+            .Where(x => x.Key.PreparedDate != null)
+            .Where(x => x.Key.IsMove == false)
+
+
+          .Select(x => new OrderDto
+          {
+              Id = x.Key.OrderNoPKey,
+              Farm = x.Key.FarmName,
+              FarmCode = x.Key.FarmCode,
+              Category = x.Key.FarmType,
+              TotalOrders = x.Sum(order => order.AllocatedQuantity ?? (int)order.QuantityOrdered),
+              PreparedDate = x.Key.PreparedDate.ToString(),
+              IsMove = x.Key.IsMove,
+              IsReject = x.Key.IsReject != null,
+              Remarks = x.Key.Remarks
+
+          });
+
+            var customer = _context.Customers.GroupBy(x => new
+            {
+                x.CustomerCode,
+                x.LocationName,
+                x.CompanyName,
+                x.CompanyCode,
+                x.DepartmentName
+            }) 
+                .Select(x => new
+            {
+                CustomerCode = x.Key.CustomerCode,
+                LocationName = x.Key.LocationName,
+                CompanyName = x.Key.CompanyName,
+                CompanyCode = x.Key.CompanyCode,
+                DepartmentName = x.Key.DepartmentName
                 
-                    var customer = await _context.Customers.FirstOrDefaultAsync(x => x.CustomerCode == order.FarmCode);
+            });
 
-                    if (customer == null || order == null)
-                        return null;
+            var oderResult = await (from order in orders
+                                join cust in customer on order.FarmCode equals cust.CustomerCode
+                                select new TotalListOfPreparedDateDTO
+                                {
+                                Id = order.Id,
+                                FarmName = order.Farm,
+                                FarmCode = order.FarmCode,
+                                PreparedDate = order.PreparedDate,
+                                IsMove = order.IsMove,
+                                IsReject = order.IsReject,
+                                QuantityOrder = (int)order.TotalOrders,
+                                LocationName = cust.LocationName,
+                                CompanyName = cust.CompanyName,
+                                CompanyCode = cust.CompanyCode,
+                                DepartmentName = cust.DepartmentName,
+                                Remarks = order.Remarks
+                                }).ToListAsync();
 
-                    var dto = new TotalListOfPreparedDateDTO
-                    {
-                        Id = order.OrderNoPKey,
-                        FarmName = order.FarmName,
-                        FarmCode = order.FarmCode,
-                        PreparedDate = order.PreparedDate.ToString(),
-                        IsMove = order.IsMove,
-                        IsReject = order.IsReject,
-                        QuantityOrder = order.AllocatedQuantity ?? (int)order.QuantityOrdered,
-                        LocationName = customer.LocationName,
-                        CompanyName = customer.CompanyName,
-                        CompanyCode = customer.CompanyCode,
-                        DepartmentName = customer.DepartmentName
-                    };
-                    result.Add(dto);
-                    return result;
+            return oderResult;
             }
         public async Task<bool> GenerateNumber(GenerateOrderNo generate)
         {
