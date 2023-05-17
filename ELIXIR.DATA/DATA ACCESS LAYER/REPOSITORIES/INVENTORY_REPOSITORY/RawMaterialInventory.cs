@@ -175,9 +175,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                     .Where(x => x.PreparedDate != null)
            .GroupBy(x => new
            {
-               x.ItemCode,
-               x.AllocatedQuantity,
-               x.QuantityOrdered
+               x.ItemCode
 
            }).Select(x => new OrderingInventory
            {
@@ -188,7 +186,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
             var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)
            .GroupBy(x => new
            {
-               x.ItemCode,
+               x.ItemCode
 
            }).Select(x => new OrderingInventory
            {
@@ -706,7 +704,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                     .Where(x => x.PreparedDate != null)
            .GroupBy(x => new
            {
-               x.ItemCode,
+               x.ItemCode
 
            }).Select(x => new OrderingInventory
            {
@@ -1193,8 +1191,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                     .Where(x => x.PreparedDate != null)
            .GroupBy(x => new
            {
-               x.ItemCode,
-               x.AllocatedQuantity
+               x.ItemCode
 
            }).Select(x => new OrderingInventory
            {
@@ -1261,35 +1258,26 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
 
             var getReserve = (from warehouse in getWarehouseStock
-                              join request in getTransformationReserve
-                              on warehouse.ItemCode equals request.ItemCode
-                              into leftJ1
-                              from request in leftJ1.DefaultIfEmpty()
-
                               join ordering in getOrderingReserve
                               on warehouse.ItemCode equals ordering.ItemCode
-                              into leftJ2
-                              from ordering in leftJ2.DefaultIfEmpty()
-
+                              into leftJ1
+                              from ordering in leftJ1.DefaultIfEmpty()
                               group new
                               {
                                   warehouse,
-                                  request,
                                   ordering
                               }
                               by new
                               {
                                   warehouse.ItemCode,
-
+                                  warehouse.ActualGood,
+                                  ordering.QuantityOrdered
+                                 
                               } into total
-
                               select new ReserveInventory
                               {
-
                                   ItemCode = total.Key.ItemCode,
-                                  Reserve = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
-                                           (total.Sum(x => x.request.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
-                                            total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.ordering.QuantityOrdered))
+                                  Reserve =  total.Key.ActualGood - (total.Key.QuantityOrdered != null ? total.Key.QuantityOrdered : 0)
                               });
 
 
