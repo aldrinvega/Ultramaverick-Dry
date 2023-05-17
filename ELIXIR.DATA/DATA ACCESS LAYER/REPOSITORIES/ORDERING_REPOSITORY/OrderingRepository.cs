@@ -46,13 +46,12 @@ using System.Collections.Generic;
                                                   .Where(x => x.PreparedDate != null)
          .GroupBy(x => new
          {
-             x.ItemCode,
-             x.AllocatedQuantity
+             x.ItemCode
 
          }).Select(x => new OrderingInventory
          {
              ItemCode = x.Key.ItemCode,
-             QuantityOrdered = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
+             QuantityOrdered = x.Sum(order => order.AllocatedQuantity ?? (int)order.QuantityOrdered)
          });
 
             
