@@ -104,6 +104,8 @@ using System.Collections.Generic;
                               by new
                               {
                                   warehouse.ItemCode,
+                                  ordering.QuantityOrdered,
+                                  warehouse.ActualGood
 
                               } into total
 
@@ -111,10 +113,7 @@ using System.Collections.Generic;
                               {
 
                                   ItemCode = total.Key.ItemCode,
-                                  Reserve = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
-                                           (total.Sum(x => x.request.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
-                                            total.Sum(x => x.ordering.QuantityOrdered == null ? 0 : x.request.QuantityOrdered) +
-                                            total.Sum(x => x.issue.Quantity == null ? 0 : x.issue.Quantity))
+                                  Reserve = total.Key.ActualGood - (total.Key.QuantityOrdered != null ? total.Key.QuantityOrdered : 0)
                               });
 
             var customer = _context.Customers.Select(x => new
