@@ -585,18 +585,17 @@ using System.Collections.Generic;
                     
                     foreach (var order in orders)
                     {
-                        var issueOut = await _context.MiscellaneousIssueDetails
-                            .Where(x => x.IsActive)
-                            .Where(x => x.ItemCode == order.ItemCode)
-                            .Where(x => x.IsTransact == true)
-                            .SumAsync(x => x.Quantity);
-        
+                        var orderingReserve = await _context.Orders.Where(x => x.IsActive == true)
+                                            .Where(x => x.PreparedDate != null)
+                                            .Where(x => x.ItemCode == order.ItemCode)
+                                            .SumAsync(order => order.AllocatedQuantity ?? (int)order.QuantityOrdered);
+
                         var receivedStocks = await _context.WarehouseReceived
                             .Where(x => x.ItemCode == order.ItemCode)
                             .Where(x => x.IsActive == true)
                             .SumAsync(x => x.ActualGood);
         
-                        var reserve =  receivedStocks - issueOut;
+                        var reserve =  receivedStocks - orderingReserve;
                         
                         var totalOrderedForThisItem = totalOrderedPerItem
                             .Single(x => x.ItemCode == order.ItemCode)
