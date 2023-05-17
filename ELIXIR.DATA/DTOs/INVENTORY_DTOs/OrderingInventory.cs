@@ -10,5 +10,6 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs
     {
         public string ItemCode { get; set; }
         public decimal QuantityOrdered { get; set; }
+
     }
 }
