@@ -1224,6 +1224,8 @@ using System.Collections.Generic;
                     items.ApprovedDate = DateTime.Now;
                     items.ApproveDateTempo = DateTime.Now;
                     items.IsApprove = true;
+                    items.IsReject = null;
+                    items.Remarks = null;
                 }
             }
             
@@ -1247,9 +1249,10 @@ using System.Collections.Generic;
                 items.RejectedDateTempo = DateTime.Now;
                 items.Remarks = moveorder.Remarks;
                 items.IsReject = true;
-                items.IsActive = false;
-                items.IsPrepared = false;
+                items.IsActive = true;
+                items.IsPrepared = true;
                 items.IsApproveReject = null;
+                items.DeliveryStatus = null;
                // items.IsRejectForPreparation = true;
 
             }
@@ -1333,7 +1336,6 @@ using System.Collections.Generic;
                     x.IsPrepared,
                 }).Where(x => x.Key.IsApprove != true)
                 .Where(x => x.Key.DeliveryStatus != null)
-                .Where(x => x.Key.IsPrepared == true)
                 .Select(x => new MoveOrderDto
                 {
                     OrderNo = x.Key.OrderNo,
@@ -1368,7 +1370,6 @@ using System.Collections.Generic;
 
             }).Where(x => x.Key.IsApprove != true)
               .Where(x => x.Key.DeliveryStatus != null)
-              .Where(x => x.Key.IsPrepared == true)
                 .Select(x => new MoveOrderDto
           {
               OrderNo = x.Key.OrderNo,
