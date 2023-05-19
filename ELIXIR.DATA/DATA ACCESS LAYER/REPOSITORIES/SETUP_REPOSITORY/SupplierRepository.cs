@@ -54,7 +54,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             supplier.IsActive = true;
 
             if(supplier.AddedBy == null)
-            supplier.AddedBy = "Admin";
+                supplier.AddedBy = supplier.AddedBy;
 
             await _context.Suppliers.AddAsync(supplier);
             return true;

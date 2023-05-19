@@ -286,7 +286,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             category.IsActive = true;
 
             if (category.AddedBy == null)
-                category.AddedBy = "Admin";
+                category.AddedBy = category.AddedBy;
 
             await _context.ItemCategories.AddAsync(category);
             return true;

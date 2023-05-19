@@ -130,7 +130,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             customer.IsActive = true;
 
             if (customer.AddedBy == null)
-                customer.AddedBy = "Admin";
+                customer.AddedBy = customer.AddedBy;
 
             await _context.Customers.AddAsync(customer);
             return true;
@@ -242,7 +242,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             farm.IsActive = true;
 
             if (farm.AddedBy == null)
-                farm.AddedBy = "Admin";
+                farm.AddedBy = farm.AddedBy;
 
             await _context.Farms.AddAsync(farm);
             return true;

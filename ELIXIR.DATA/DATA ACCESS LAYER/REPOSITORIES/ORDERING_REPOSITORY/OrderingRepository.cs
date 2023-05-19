@@ -257,7 +257,7 @@ using System.Collections.Generic;
                 return false;
             if (existingOrder.AllocatedQuantity != null)
             {
-                if (existingOrder.AllocatedQuantity > orders.QuantityOrdered)
+                if (existingOrder.AllocatedQuantity >= orders.QuantityOrdered)
                 {
                     existingOrder.AllocatedQuantity = (int)orders.QuantityOrdered;
                     return true;
@@ -265,7 +265,7 @@ using System.Collections.Generic;
                 return false;
             }
 
-            if (existingOrder.QuantityOrdered > orders.QuantityOrdered)
+            if (existingOrder.QuantityOrdered >= orders.QuantityOrdered)
             {
                 existingOrder.QuantityOrdered = orders.QuantityOrdered;
                 return true;
@@ -324,7 +324,6 @@ using System.Collections.Generic;
             
             return true;
         }
-
         public async Task<bool> RejectPreparedDate(List<Ordering> orders)
         {
             var orderNos = orders.Select(o => o.OrderNoPKey);
@@ -1409,7 +1408,6 @@ using System.Collections.Generic;
                                .ToListAsync();
 
         }
-
         public async Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPagination(UserParams userParams)
         {
             var orders = _context.MoveOrders
@@ -1448,7 +1446,6 @@ using System.Collections.Generic;
                 });
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
-
         public async Task<PagedList<MoveOrderDto>> Approvedination(UserParams userParams)
         {
             var orders = _context.MoveOrders.GroupBy(x => new
@@ -1777,7 +1774,6 @@ using System.Collections.Generic;
             await _context.SaveChangesAsync();
             return true;
         }
-
         public async Task<bool>UnsetBeingPrepared(List<Ordering> orderNos)
         {
             foreach (var orderNo in orderNos)
@@ -1876,7 +1872,6 @@ using System.Collections.Generic;
             return true;
 
         }
-
         public async Task<IReadOnlyList<OrderDto>> GetMoveOrdersForNotification()
         {
             var orders = _context.Orders
@@ -1900,7 +1895,6 @@ using System.Collections.Generic;
             return await orders.ToListAsync();
 
         }
-
         public async Task<IReadOnlyList<OrderDto>> GetAllForTransactMoveOrderNotification()
         {
             var orders = _context.MoveOrders.Where(x => x.IsActive == true)
@@ -1937,8 +1931,7 @@ using System.Collections.Generic;
          });
 
             return await orders.ToListAsync();
-        }
-        
+        }       
         public async Task<IReadOnlyList<MoveOrderDto>> GetForApprovalMoveOrderNotification()
         {
             var orders = _context.MoveOrders.Where(x => x.IsApproveReject == null)
@@ -1975,7 +1968,6 @@ using System.Collections.Generic;
             return await orders.ToListAsync();
 
         }
-
         public async Task<IReadOnlyList<MoveOrderDto>> GetRejectMoveOrderNotification()
         {
             var orders = _context.MoveOrders.Where(x => x.IsApproveReject == true)
@@ -2016,7 +2008,6 @@ using System.Collections.Generic;
             return await orders.ToListAsync();
 
         }
-
         public async Task<bool> CancelControlInMoveOrder(Ordering order)
         {
 
@@ -2030,6 +2021,7 @@ using System.Collections.Generic;
             {
                 items.IsApproved = null;
                 items.ApprovedDate = null;
+                items.DeliveryStatus = null;
             }
 
             if(existMoveorders != null)
@@ -2043,7 +2035,6 @@ using System.Collections.Generic;
             return true;
 
         }
-
         public async Task<IReadOnlyList<OrderDto>> GetAllApprovedOrdersForCalendar()
         {
 
@@ -2126,8 +2117,6 @@ using System.Collections.Generic;
        //         .SumAsync(x => x.Quantity);
        // }
        
-       
-       
        public async Task<IReadOnlyList<AllocationResult>> AllocateOrdersPerItems(List<AllocationDTO> itemCodes)
        {
             // Get a list of orders that have an item code in the `itemCodes` list
@@ -2195,7 +2184,6 @@ using System.Collections.Generic;
            
            return results;
        }
-
        public async Task<bool> ManualAllocationForOrders(List<ManualAllocation> manualAllocations)
        {
            var orders = await _context.Orders.Where(x => x.IsActive == true)
@@ -2212,7 +2200,7 @@ using System.Collections.Generic;
            }
            return true;
        }
-      public async Task<PagedList<OrderDto>> GetAllListofOrdersForAllocationPagination(UserParams userParams)
+        public async Task<PagedList<OrderDto>> GetAllListofOrdersForAllocationPagination(UserParams userParams)
         {
             
             var orders = _context.Orders.OrderBy(x => x.OrderDate)              
@@ -2234,7 +2222,7 @@ using System.Collections.Generic;
             
             return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
-      public async Task<IReadOnlyList<OrderDto>> GetAllListofOrdersAllocation(string itemCode)
+        public async Task<IReadOnlyList<OrderDto>> GetAllListofOrdersAllocation(string itemCode)
         {
             var datenow = DateTime.Now;
         
