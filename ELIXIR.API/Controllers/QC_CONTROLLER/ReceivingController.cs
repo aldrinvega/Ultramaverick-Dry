@@ -454,6 +454,7 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
             var forapprovallist = await _unitOfWork.Order.GetForApprovalMoveOrderNotification();
             var rejectlist = await _unitOfWork.Order.GetRejectMoveOrderNotification();
             var forallocation = await _unitOfWork.Order.GetForAllocationOrdersForNotification();
+            var approvedMoveOrder = await _unitOfWork.Order.GetAllapprovedMoveorderNotification();
 
             //QC ReceivingCount
             var posummarycount = posummary.Count();
@@ -477,6 +478,7 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
             var forapprovallistcount = forapprovallist.Count();
             var rejectlistcount = rejectlist.Count();
             var forallocationcount = forallocation.Count();
+            var approvedMoveOrdercount = approvedMoveOrder.Count();
 
 
             var countList = new
@@ -548,6 +550,10 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
                 Allocation = new
                 {
                     forallocationcount
+                },
+                ApprovedMoveOrder = new
+                {
+                    approvedMoveOrdercount
                 }
             };
 

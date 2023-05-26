@@ -29,5 +29,11 @@
         public bool IsPrint { get; set; }
         public bool IsTransact { get; set; }
         public string DeliveryStatus { get; set; }
+        public string PreparedBy{ get; set; }
+        public string CheckedBy
+        {
+            get;
+            set;
+        }
     }
 }

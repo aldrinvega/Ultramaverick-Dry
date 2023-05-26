@@ -94,6 +94,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<IReadOnlyList<OrderDto>> GetAllForTransactMoveOrderNotification();
         Task<IReadOnlyList<MoveOrderDto>> GetForApprovalMoveOrderNotification();
         Task<IReadOnlyList<MoveOrderDto>> GetRejectMoveOrderNotification();
+        Task<IReadOnlyList<MoveOrderDto>> GetAllapprovedMoveorderNotification();
         Task<bool> SetBeingPrepared(List<Ordering> moveOrders);
         Task<bool> UnsetBeingPrepared(List<Ordering> orderNos);
         

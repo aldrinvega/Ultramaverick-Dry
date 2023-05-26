@@ -1225,6 +1225,8 @@ using System.Collections.Generic;
                     items.IsApprove = true;
                     items.IsReject = null;
                     items.Remarks = null;
+                    items.AddedBy = items.AddedBy;
+                    items.CheckedBy = order.CheckedBy;
                 }
             }
             
@@ -1333,8 +1335,10 @@ using System.Collections.Generic;
                     x.IsApprove,
                     x.DeliveryStatus,
                     x.IsPrepared,
+                    x.IsActive
                 }).Where(x => x.Key.IsApprove != true)
                 .Where(x => x.Key.DeliveryStatus != null)
+                .Where(x => x.Key.IsActive == true)
                 .Select(x => new MoveOrderDto
                 {
                     OrderNo = x.Key.OrderNo,
@@ -1365,10 +1369,11 @@ using System.Collections.Generic;
                 x.PreparedDate,
                 x.IsApprove,
                 x.DeliveryStatus,
-                x.IsPrepared
-
+                x.IsPrepared,
+                x.IsActive
             }).Where(x => x.Key.IsApprove != true)
               .Where(x => x.Key.DeliveryStatus != null)
+              .Where(x => x.Key.IsActive == true)
                 .Select(x => new MoveOrderDto
           {
               OrderNo = x.Key.OrderNo,
@@ -1402,6 +1407,8 @@ using System.Collections.Generic;
                 Quantity = x.QuantityOrdered,
                 Expiration = x.ExpirationDate.ToString(),
                 DeliveryStatus = x.DeliveryStatus,
+                PreparedBy = x.PreparedBy,
+                CheckedBy = x.CheckedBy
             });
 
             return await orders.Where(x => x.OrderNo == orderid)
@@ -1946,11 +1953,12 @@ using System.Collections.Generic;
                  x.PreparedDate,
                  x.IsApprove,
                  x.DeliveryStatus,
-                 x.IsPrepared
-
+                 x.IsPrepared,
+                 x.IsActive
              }).Where(x => x.Key.IsApprove != true)
            .Where(x => x.Key.DeliveryStatus != null)
            .Where(x => x.Key.IsPrepared == true)
+           .Where(x => x.Key.IsActive == true)
 
         .Select(x => new MoveOrderDto
         {
@@ -1968,6 +1976,47 @@ using System.Collections.Generic;
             return await orders.ToListAsync();
 
         }
+
+        public async Task<IReadOnlyList<MoveOrderDto>> GetAllapprovedMoveorderNotification()
+        {
+            var orders = _context.MoveOrders
+                .Where(x => x.IsActive == true)
+                .GroupBy(x => new
+                {
+                    x.OrderNo,
+                    x.FarmName,
+                    x.FarmCode,
+                    x.FarmType,
+                    x.PreparedDate,
+                    x.IsApprove,
+                    x.DeliveryStatus,
+                    x.IsPrepared,
+                    x.IsReject,
+                    x.ApproveDateTempo,
+                    x.IsPrint,
+                    x.IsTransact,
+                }).Where(x => x.Key.IsApprove == true)
+                .Where(x => x.Key.DeliveryStatus != null)
+                .Where(x => x.Key.IsReject != true)
+                .Select(x => new MoveOrderDto
+                {
+                    OrderNo = x.Key.OrderNo,
+                    FarmName = x.Key.FarmName,
+                    FarmCode = x.Key.FarmCode,
+                    Category = x.Key.FarmType,
+                    Quantity = x.Sum(x => x.QuantityOrdered),
+                    PreparedDate = x.Key.PreparedDate.ToString(),
+                    DeliveryStatus = x.Key.DeliveryStatus,
+                    IsApprove = x.Key.IsApprove != null,
+                    IsPrepared = x.Key.IsPrepared,
+                    ApprovedDate = x.Key.ApproveDateTempo.ToString(),
+                    IsPrint = x.Key.IsPrint != null,
+                    IsTransact = x.Key.IsTransact,
+                });
+
+            return await orders.ToListAsync();
+        }
+
         public async Task<IReadOnlyList<MoveOrderDto>> GetRejectMoveOrderNotification()
         {
             var orders = _context.MoveOrders.Where(x => x.IsApproveReject == true)

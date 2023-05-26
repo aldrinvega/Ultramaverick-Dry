@@ -49,5 +49,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
         public string CompanyName { get; set; }
         public string CompanyCode { get; set; }
         public string AddedBy { get; set; }
+        public string CheckedBy { get; set; }
     }
 }
