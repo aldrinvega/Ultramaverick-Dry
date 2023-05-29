@@ -33,7 +33,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<bool> CancelOrders(Ordering orders);
         Task<IReadOnlyList<OrderDto>> GetAllListOfCancelledOrders();
         Task<bool> ReturnCancellOrdersInList(Ordering orders);
-        Task<PagedList<OrderDto>> GetAllListForMoveOrderPagination(UserParams userParams);
+        Task<PagedList<CustomersForMoveOrderDTO>> GetAllListForMoveOrderPagination(UserParams userParams);
         Task<IReadOnlyList<TotalListOfPreparedDateDTO>> TotalListOfApprovedPreparedDate(string farm);
         Task<IReadOnlyList<OrderDto>> DetailedListOfOrders(string farm);
         Task<IReadOnlyList<OrderDto>> GetAllListForApprovalOfSchedule();

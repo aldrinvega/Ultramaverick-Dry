@@ -753,30 +753,27 @@ using System.Collections.Generic;
             return getCount;
 
         }
-        public async Task<PagedList<OrderDto>> GetAllListForMoveOrderPagination(UserParams userParams)
+        public async Task<PagedList<CustomersForMoveOrderDTO>> GetAllListForMoveOrderPagination(UserParams userParams)
         {
 
             var orders = _context.Orders
-                .GroupBy(x => new
+            .Join(
+                     _context.Customers,
+                     order => order.FarmName,
+                     customer => customer.CustomerName,
+                     (order, customer) => new { Order = order, Customer = customer })
+                    .Where(x => x.Order.IsActive == true)
+                    .Where(x => x.Order.IsApproved == true)
+                    .Where(x => x.Order.IsMove == false)
+                    .Select(x => new CustomersForMoveOrderDTO
                 {
-                    x.Id,
-                    x.FarmName,
-                    x.IsActive,
-                    x.IsApproved,
-                    x.IsMove
+                    Farm = x.Order.FarmName,
+                    IsActive = x.Order.IsActive,
+                    IsApproved = x.Order.IsApproved != null,
+                    CustomerId = x.Customer.Id  
+                 });
 
-                }).Where(x => x.Key.IsActive == true)
-                .Where(x => x.Key.IsApproved == true)
-                .Where(x => x.Key.IsMove == false)
-                .Select(x => new OrderDto
-                {
-                    Id = x.Key.Id,
-                    Farm = x.Key.FarmName,
-                    IsActive = x.Key.IsActive,
-                    IsApproved = x.Key.IsApproved != null
-                });
-
-            return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
+            return await PagedList<CustomersForMoveOrderDTO>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
         public async Task<IReadOnlyList<TotalListOfPreparedDateDTO>> TotalListOfApprovedPreparedDate(string farm)
             {
