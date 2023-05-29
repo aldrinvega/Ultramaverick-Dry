@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
 {
@@ -20,6 +22,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
         public string Reason { get; set; }
         public string LocationName { get; set; }
         public string DepartmentName { get; set; }
+        public string AccountTitle { get; set; }
+        public virtual ICollection<CancelledOrders> CancelledOrders { get; set; }
         
     }
     

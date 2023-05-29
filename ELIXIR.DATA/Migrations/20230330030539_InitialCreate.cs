@@ -45,7 +45,7 @@ namespace ELIXIR.DATA.Migrations
                 {
                     ChecklistStringId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PO_ReceivingId = table.Column<int>(type: "int", nullable: false),
+                    PO_Summary_Id = table.Column<int>(type: "int", nullable: false),
                     Checlist_Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },

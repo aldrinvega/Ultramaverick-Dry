@@ -759,6 +759,7 @@ using System.Collections.Generic;
             var orders = _context.Orders
                 .GroupBy(x => new
                 {
+                    x.Id,
                     x.FarmName,
                     x.IsActive,
                     x.IsApproved,
@@ -769,6 +770,7 @@ using System.Collections.Generic;
                 .Where(x => x.Key.IsMove == false)
                 .Select(x => new OrderDto
                 {
+                    Id = x.Key.Id,
                     Farm = x.Key.FarmName,
                     IsActive = x.Key.IsActive,
                     IsApproved = x.Key.IsApproved != null
@@ -822,12 +824,11 @@ using System.Collections.Generic;
             }) 
                 .Select(x => new
             {
-                CustomerCode = x.Key.CustomerCode,
-                LocationName = x.Key.LocationName,
-                CompanyName = x.Key.CompanyName,
-                CompanyCode = x.Key.CompanyCode,
-                DepartmentName = x.Key.DepartmentName
-                
+                    x.Key.CustomerCode,
+                    x.Key.LocationName,
+                    x.Key.CompanyName,
+                    x.Key.CompanyCode,
+                    x.Key.DepartmentName
             });
 
             var oderResult = await (from order in orders
@@ -2455,5 +2456,7 @@ using System.Collections.Generic;
         
             return true;
         }
+
+        
     }
 }

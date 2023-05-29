@@ -27,7 +27,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             foreach (var checklistStrings in input.ChecklistsString
                          .Select(compliance => new CheckListString
                          {
-                             PO_ReceivingId = compliance.PO_ReceivingId,
+                             PO_Summary_Id = compliance.PO_Summary_Id,
                              Checlist_Type = compliance.Checlist_Type,
                              Values = compliance.Values,
                              Remarks = compliance.Remarks

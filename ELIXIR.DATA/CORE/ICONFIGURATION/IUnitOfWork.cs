@@ -1,4 +1,5 @@
 ﻿using ELIXIR.DATA.CORE.INTERFACES;
+using ELIXIR.DATA.CORE.INTERFACES.CANCELLED_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.IMPORT_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE;
@@ -62,6 +63,9 @@ namespace ELIXIR.DATA.CORE.ICONFIGURATION
 
         IProductTypeRepository ProductType { get; set; }
         
+        //Cancelled Orders
+        ICancelledOrders CancelledOrders { get; set; }
+
         Task CompleteAsync();
 
 

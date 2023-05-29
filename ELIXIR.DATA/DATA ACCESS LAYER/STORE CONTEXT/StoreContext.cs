@@ -91,5 +91,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public virtual DbSet<ProductCondition> ProductConditions { get; set; }
         public virtual DbSet<Disposition> Dispositions { get; set; }
         public virtual DbSet<ProductType> ProductTypes { get; set; }
+        public virtual DbSet<CancelledOrders> CancelledOrders { get; set; }
     }
 }
