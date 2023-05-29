@@ -20,7 +20,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.CANCELLED_ORDERS
         }
         public async Task<bool> VoidOrder(CancelledOrders cancelledOrder)
         {
-            var existing = await _context.Orders.Where(x => x.Id == cancelledOrder.OrderNo)
+            var existing = await _context.Orders.Where(x => x.Id == cancelledOrder.Order.Id)
                 .Where(x => x.IsActive == true)
                 .FirstOrDefaultAsync();
 
@@ -34,7 +34,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.CANCELLED_ORDERS
         public async Task<IEnumerable<CancelledOrders>> GetCancelledOrdersAsync()
         {
         
-            return await _context.CancelledOrders.Include(x => x.Customers).ToListAsync();
+            return await _context.CancelledOrders.Include(x => x.Customer).ToListAsync();
         }
     }
 }

@@ -12,51 +12,19 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
 {
     public class CancelledOrders : BaseEntity
     {
-        public int OrderNo
+        public Ordering Order
         {
-            get;
-            set;
+        get; set; }
+        public int OrderId
+        {
+            get; set;
         }
-        
-        public Customer Customers { get; set; }
-        
-        [Column(TypeName = "Date")]
-        public DateTime OrderDate
+        public Customer Customer
         {
-            get;
-            set;
-        }
-        [Column(TypeName = "Date")]
-        public DateTime DateNeeded
-        {
-            get;
-            set;
-        }
-        public string ItemCode
-        {
-            get;
-            set;
-        }
-        public string ItemDescription
-        {
-            get;
-            set;
-        }
-        public string Uom
-        {
-            get;
-            set;
-        }
-        public int QuantityOrdered
-        {
-        
-         get;
-         set;
-        }
-        public string Category
-        {
-            get;
-            set;
+        get; set; }
+        public int CustomerId
+        {     
+         get; set;
         }
     }
 }

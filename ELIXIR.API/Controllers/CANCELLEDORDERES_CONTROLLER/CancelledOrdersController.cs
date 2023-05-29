@@ -22,7 +22,7 @@ namespace ELIXIR.API.Controllers.CANCELLEDORDERES_CONTROLLER
 
             var result = await _unitOfWork.CancelledOrders.VoidOrder(cancelledOrder);
             if (result)
-                return Ok($"{cancelledOrder.ItemDescription} is cancelled");
+                return Ok($"{cancelledOrder.Order.ItemDescription} is cancelled");
             return BadRequest();
         }
         [HttpGet("GetCancelledOrders")]
