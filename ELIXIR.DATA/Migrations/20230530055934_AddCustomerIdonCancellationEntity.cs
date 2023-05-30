@@ -2,20 +2,16 @@
 
 namespace ELIXIR.DATA.Migrations
 {
-    public partial class AdjustCancelledOrdersEntity : Migration
+    public partial class AddCustomerIdonCancellationEntity : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_CancelledOrders_Orders_OrdersId",
-                table: "CancelledOrders");
-
-            migrationBuilder.DropColumn(
-                name: "OrderId",
+                name: "FK_CancelledOrders_Customers_CustomerId",
                 table: "CancelledOrders");
 
             migrationBuilder.AlterColumn<int>(
-                name: "OrdersId",
+                name: "CustomerId",
                 table: "CancelledOrders",
                 type: "int",
                 nullable: false,
@@ -25,10 +21,10 @@ namespace ELIXIR.DATA.Migrations
                 oldNullable: true);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_CancelledOrders_Orders_OrdersId",
+                name: "FK_CancelledOrders_Customers_CustomerId",
                 table: "CancelledOrders",
-                column: "OrdersId",
-                principalTable: "Orders",
+                column: "CustomerId",
+                principalTable: "Customers",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }
@@ -36,29 +32,22 @@ namespace ELIXIR.DATA.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_CancelledOrders_Orders_OrdersId",
+                name: "FK_CancelledOrders_Customers_CustomerId",
                 table: "CancelledOrders");
 
             migrationBuilder.AlterColumn<int>(
-                name: "OrdersId",
+                name: "CustomerId",
                 table: "CancelledOrders",
                 type: "int",
                 nullable: true,
                 oldClrType: typeof(int),
                 oldType: "int");
 
-            migrationBuilder.AddColumn<int>(
-                name: "OrderId",
-                table: "CancelledOrders",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
-
             migrationBuilder.AddForeignKey(
-                name: "FK_CancelledOrders_Orders_OrdersId",
+                name: "FK_CancelledOrders_Customers_CustomerId",
                 table: "CancelledOrders",
-                column: "OrdersId",
-                principalTable: "Orders",
+                column: "CustomerId",
+                principalTable: "Customers",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
         }

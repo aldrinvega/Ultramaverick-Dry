@@ -3,23 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
 {
-    public class CancelledOrderDTO
+    public class CustomerCancelledOrdersDTO
     {
         public int Id
         {
-            get; set;
+        get; set; 
         }
         public string CustomerCode
         {
             get; set;
         }
         public string CustomerName
+        {
+            get; set;
+        }
+        public FarmType FarmType
         {
             get; set;
         }
@@ -47,7 +52,7 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         {
             get; set;
         }
-
+        
         public string LocationName
         {
             get; set;
@@ -64,9 +69,5 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         {
             get; set;
         }
-        //public List<Ordering> Orders
-        //{
-        //    get; set;
-        //} = new List<Ordering>();
     }
 }

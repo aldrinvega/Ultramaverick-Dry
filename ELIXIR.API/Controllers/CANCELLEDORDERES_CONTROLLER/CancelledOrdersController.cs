@@ -22,28 +22,32 @@ namespace ELIXIR.API.Controllers.CANCELLEDORDERES_CONTROLLER
 
             var result = await _unitOfWork.CancelledOrders.VoidOrder(cancelledOrder);
             if (result)
-                return Ok($"{cancelledOrder.Orders.ItemDescription} is cancelled");
+            {
+                await _unitOfWork.CompleteAsync();
+                return Ok($"Order has been is cancelled");
+            }
+
             return BadRequest();
         }
-        [HttpGet("GetCancelledOrders")]
-        public async Task<IActionResult> GetCancelledOrders()
-        {
-            var result = await _unitOfWork.CancelledOrders.GetCancelledOrdersAsync();
-            return Ok(result);
-        }
-        [HttpGet("GetAllOrderandcancelledOrders")]
-        public async Task<IActionResult> GetAllOrderandcancelledOrders()
-        {
-            var result = await _unitOfWork.CancelledOrders.GetAllOrderandcancelledOrders();
-            return Ok(result);
-        }
+        //[HttpGet("GetCancelledOrders/{customerId}")]
+        //public async Task<IActionResult> GetCancelledOrdersByCustomer(int customerId)
+        //{
+        //    var result = await _unitOfWork.CancelledOrders.GetAllCancelledOrdersByCustomer(customerId);
+        //    return Ok(result);
+        //}
+        //[HttpGet("GetAllOrderandcancelledOrders")]
+        //public async Task<IActionResult> GetAllOrderandcancelledOrders()
+        //{
+        //    var result = await _unitOfWork.CancelledOrders.GetAllOrderandcancelledOrders();
+        //    return Ok(result);
+        //}
 
         [HttpGet("GetAllOrderandcancelledOrdersById/{customerId}")]
         public async Task<IActionResult> GetAllOrderandcancelledOrdersById(int customerId)
         {
-        
-          var result = await _unitOfWork.CancelledOrders.GetAllOrderandcancelledOrdersById(customerId);
-          return Ok(result);
+
+            var result = await _unitOfWork.CancelledOrders.GetAllOrderandcancelledOrdersById(customerId);
+            return Ok(result);
         }
     }
 }

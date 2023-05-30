@@ -18,6 +18,7 @@ using System.Net;
 using ELIXIR.DATA.SERVICES;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Cors;
+using System.Text.Json.Serialization;
 
 namespace ELIXIR.API
 {
@@ -35,7 +36,19 @@ namespace ELIXIR.API
         public void ConfigureServices(IServiceCollection services)
         {
 
-          services.AddAuthentication(authOptions =>
+            //     services.AddControllers()
+            //.AddJsonOptions(options =>
+            //{
+            //    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            //    options.JsonSerializerOptions.MaxDepth = 32;
+            //});
+
+            services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+            services.AddControllers().AddJsonOptions(x =>
+             x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+
+            services.AddAuthentication(authOptions =>
             {
                 authOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 authOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;

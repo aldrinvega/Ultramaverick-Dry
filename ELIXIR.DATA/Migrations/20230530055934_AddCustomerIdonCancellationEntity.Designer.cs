@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20230529083620_AddjustCancelledOrders")]
-    partial class AddjustCancelledOrders
+    [Migration("20230530055934_AddCustomerIdonCancellationEntity")]
+    partial class AddCustomerIdonCancellationEntity
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -333,10 +333,10 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<DateTime>("CancellationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("OrderId")
+                    b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("OrdersId")
+                    b.Property<int>("OrderId")
                         .HasColumnType("int");
 
                     b.Property<string>("Reason")
@@ -344,7 +344,9 @@ namespace ELIXIR.DATA.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrdersId");
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("OrderId");
 
                     b.ToTable("CancelledOrders");
                 });
@@ -527,7 +529,7 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("CustomerId")
+                    b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
                     b.Property<string>("CustomerName")
@@ -1960,18 +1962,30 @@ namespace ELIXIR.DATA.Migrations
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.CancelledOrders", b =>
                 {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.Ordering", "Orders")
+                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", null)
                         .WithMany("CancelledOrders")
-                        .HasForeignKey("OrdersId");
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Orders");
+                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.Ordering", "Order")
+                        .WithMany("CancelledOrders")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.Ordering", b =>
                 {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", null)
+                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", "Customer")
                         .WithMany("Orders")
-                        .HasForeignKey("CustomerId");
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.CheckListString", b =>
@@ -2072,6 +2086,8 @@ namespace ELIXIR.DATA.Migrations
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", b =>
                 {
+                    b.Navigation("CancelledOrders");
+
                     b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
