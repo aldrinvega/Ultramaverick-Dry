@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.INTERFACES.CANCELLED_INTERFACE;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +21,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.CANCELLED_ORDERS
         }
         public async Task<bool> VoidOrder(CancelledOrders cancelledOrder)
         {
-            var existing = await _context.Orders.Where(x => x.Id == cancelledOrder.Order.Id)
+            var existing = await _context.Orders.Where(x => x.Id == cancelledOrder.OrdersId)
                 .Where(x => x.IsActive == true)
                 .FirstOrDefaultAsync();
 
@@ -33,8 +34,28 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.CANCELLED_ORDERS
         }
         public async Task<IEnumerable<CancelledOrders>> GetCancelledOrdersAsync()
         {
-        
-            return await _context.CancelledOrders.Include(x => x.Customer).ToListAsync();
+            var cancelledOrders = await _context.CancelledOrders
+                .Include(x => x.Orders)
+                .ToListAsync();
+            return cancelledOrders;
+        }
+
+        public async Task<IEnumerable<Customer>> GetAllOrderandcancelledOrders()
+        {
+            var customers = await _context.Customers
+                .Include(x => x.Orders)
+                .Include(x => x.CancelledOrders)
+                .ToListAsync();
+            return customers;
+        }
+        public async Task<IEnumerable<Customer>> GetAllOrderandcancelledOrdersById(int customerId)
+        {
+            var customers = await _context.Customers
+                .Include(x => x.Orders)
+                .Include(x => x.CancelledOrders)
+                .Where(x => x.Id == customerId)
+                .ToListAsync();
+            return customers;
         }
     }
 }

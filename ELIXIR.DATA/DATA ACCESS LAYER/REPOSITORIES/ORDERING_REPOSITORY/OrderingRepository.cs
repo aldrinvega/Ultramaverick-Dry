@@ -467,7 +467,7 @@ using System.Collections.Generic;
         }
         public async Task<bool> ValidateCustomerName(Ordering orders)
         {
-            var customername = await _context.Customers.Where(x => x.CustomerName == orders.FarmName)
+            var customername = await _context.Customers.Where(x => x.Id == orders.CustomerId)
                                                        .Where(x => x.IsActive == true)
                                                        .FirstOrDefaultAsync();
 

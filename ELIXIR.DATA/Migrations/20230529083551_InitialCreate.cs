@@ -8,6 +8,23 @@ namespace ELIXIR.DATA.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Analyses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AnalysisName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    DateAdded = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Analyses", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ChecklistForCompliant",
                 columns: table => new
                 {
@@ -40,21 +57,6 @@ namespace ELIXIR.DATA.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CheckListStrings",
-                columns: table => new
-                {
-                    ChecklistStringId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PO_Summary_Id = table.Column<int>(type: "int", nullable: false),
-                    Checlist_Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CheckListStrings", x => x.ChecklistStringId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Departments",
                 columns: table => new
                 {
@@ -69,6 +71,23 @@ namespace ELIXIR.DATA.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Departments", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Dispositions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DispositionName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    DateAdded = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Dispositions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -217,7 +236,14 @@ namespace ELIXIR.DATA.Migrations
                     Details = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    IsTransact = table.Column<bool>(type: "bit", nullable: true)
+                    IsTransact = table.Column<bool>(type: "bit", nullable: true),
+                    AccountTitles = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LocationName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DepartmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AddedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -237,7 +263,14 @@ namespace ELIXIR.DATA.Migrations
                     PreparedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Details = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    AccountTitles = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LocationName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DepartmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AddedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -285,10 +318,14 @@ namespace ELIXIR.DATA.Migrations
                     IsPrint = table.Column<bool>(type: "bit", nullable: true),
                     IsApproveReject = table.Column<bool>(type: "bit", nullable: true),
                     IsRejectForPreparation = table.Column<bool>(type: "bit", nullable: true),
-                    AccountTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Department = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Company = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    AccountTitles = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LocationName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DepartmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DepartmentCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AddedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CheckedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -296,54 +333,20 @@ namespace ELIXIR.DATA.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Orders",
+                name: "Parameters",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TransactId = table.Column<int>(type: "int", nullable: false),
-                    CustomerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CustomerPosition = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FarmType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FarmCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FarmName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OrderNo = table.Column<int>(type: "int", nullable: false),
-                    BatchNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DateNeeded = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TimeNeeded = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TransactionType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ItemCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ItemDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Uom = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    QuantityOrdered = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ParameterName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    PreparedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    PreparedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsApproved = table.Column<bool>(type: "bit", nullable: true),
-                    ApprovedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsReject = table.Column<bool>(type: "bit", nullable: true),
-                    RejectBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RejectedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsPrepared = table.Column<bool>(type: "bit", nullable: false),
-                    IsCancel = table.Column<bool>(type: "bit", nullable: true),
-                    IsCancelBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CancelDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OrderNoPKey = table.Column<int>(type: "int", nullable: false),
-                    IsMove = table.Column<bool>(type: "bit", nullable: false),
-                    PlateNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DeliveryStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReceivedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsBeingPrepared = table.Column<bool>(type: "bit", nullable: true),
-                    SetBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AllocatedQuantity = table.Column<int>(type: "int", nullable: true),
-                    ForAllocation = table.Column<bool>(type: "bit", nullable: true)
+                    DateAdded = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.PrimaryKey("PK_Parameters", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -376,13 +379,47 @@ namespace ELIXIR.DATA.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProductConditions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductConditionName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    DateAdded = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductConditions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductTypeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    DateAdded = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AddedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "QC_Receiving",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PO_Summary_Id = table.Column<int>(type: "int", nullable: false),
-                    Manufacturing_Date = table.Column<DateTime>(type: "Date", nullable: false),
+                    Manufacturing_Date = table.Column<DateTime>(type: "Date", nullable: true),
                     Expected_Delivery = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Expiry_Date = table.Column<DateTime>(type: "Date", nullable: true),
                     Actual_Delivered = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -401,7 +438,9 @@ namespace ELIXIR.DATA.Migrations
                     ConfirmRejectByQc = table.Column<bool>(type: "bit", nullable: false),
                     IsWareHouseReceive = table.Column<bool>(type: "bit", nullable: true),
                     CancelRemarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    QcBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    QcBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MonitoredBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProductType = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -472,6 +511,23 @@ namespace ELIXIR.DATA.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SampleTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SampleTypeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    DateAdded = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SampleTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -639,6 +695,23 @@ namespace ELIXIR.DATA.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TypeOfSwabs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TypeofSwabName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    DateAdded = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TypeOfSwabs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UOMS",
                 columns: table => new
                 {
@@ -721,13 +794,17 @@ namespace ELIXIR.DATA.Migrations
                     CustomerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FarmTypeId = table.Column<int>(type: "int", nullable: false),
                     CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MobileNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LeadMan = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateAdded = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AddedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LocationName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DepartmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AccountTitle = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -790,6 +867,30 @@ namespace ELIXIR.DATA.Migrations
                         principalTable: "MainMenus",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CheckListStrings",
+                columns: table => new
+                {
+                    ChecklistStringId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PO_Summary_Id = table.Column<int>(type: "int", nullable: true),
+                    ReceivingId = table.Column<int>(type: "int", nullable: true),
+                    Checlist_Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PO_ReceivingId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CheckListStrings", x => x.ChecklistStringId);
+                    table.ForeignKey(
+                        name: "FK_CheckListStrings_QC_Receiving_PO_ReceivingId",
+                        column: x => x.PO_ReceivingId,
+                        principalTable: "QC_Receiving",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -861,6 +962,65 @@ namespace ELIXIR.DATA.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TransactId = table.Column<int>(type: "int", nullable: false),
+                    CustomerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CustomerPosition = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FarmType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FarmCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FarmName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OrderNo = table.Column<int>(type: "int", nullable: false),
+                    BatchNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateNeeded = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TimeNeeded = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransactionType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ItemCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ItemDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Uom = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    QuantityOrdered = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    PreparedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    PreparedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: true),
+                    ApprovedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsReject = table.Column<bool>(type: "bit", nullable: true),
+                    RejectBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RejectedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsPrepared = table.Column<bool>(type: "bit", nullable: false),
+                    IsCancel = table.Column<bool>(type: "bit", nullable: true),
+                    IsCancelBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CancelDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OrderNoPKey = table.Column<int>(type: "int", nullable: false),
+                    IsMove = table.Column<bool>(type: "bit", nullable: false),
+                    PlateNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeliveryStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReceivedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsBeingPrepared = table.Column<bool>(type: "bit", nullable: true),
+                    SetBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AllocatedQuantity = table.Column<int>(type: "int", nullable: true),
+                    ForAllocation = table.Column<bool>(type: "bit", nullable: true),
+                    IsCancelledOrder = table.Column<bool>(type: "bit", nullable: true),
+                    CustomerId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Orders_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "FormulaRequirements",
                 columns: table => new
                 {
@@ -890,6 +1050,37 @@ namespace ELIXIR.DATA.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "CancelledOrders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CancellationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OrdersId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CancelledOrders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CancelledOrders_Orders_OrdersId",
+                        column: x => x.OrdersId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CancelledOrders_OrdersId",
+                table: "CancelledOrders",
+                column: "OrdersId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CheckListStrings_PO_ReceivingId",
+                table: "CheckListStrings",
+                column: "PO_ReceivingId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_FarmTypeId",
                 table: "Customers",
@@ -916,6 +1107,11 @@ namespace ELIXIR.DATA.Migrations
                 column: "MainMenuId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_CustomerId",
+                table: "Orders",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RawMaterials_ItemCategoryId",
                 table: "RawMaterials",
                 column: "ItemCategoryId");
@@ -939,6 +1135,12 @@ namespace ELIXIR.DATA.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Analyses");
+
+            migrationBuilder.DropTable(
+                name: "CancelledOrders");
+
+            migrationBuilder.DropTable(
                 name: "ChecklistForCompliant");
 
             migrationBuilder.DropTable(
@@ -948,7 +1150,7 @@ namespace ELIXIR.DATA.Migrations
                 name: "CheckListStrings");
 
             migrationBuilder.DropTable(
-                name: "Customers");
+                name: "Dispositions");
 
             migrationBuilder.DropTable(
                 name: "FormulaRequirements");
@@ -975,13 +1177,16 @@ namespace ELIXIR.DATA.Migrations
                 name: "MoveOrders");
 
             migrationBuilder.DropTable(
-                name: "Orders");
+                name: "Parameters");
 
             migrationBuilder.DropTable(
                 name: "POSummary");
 
             migrationBuilder.DropTable(
-                name: "QC_Receiving");
+                name: "ProductConditions");
+
+            migrationBuilder.DropTable(
+                name: "ProductTypes");
 
             migrationBuilder.DropTable(
                 name: "QC_Reject");
@@ -991,6 +1196,9 @@ namespace ELIXIR.DATA.Migrations
 
             migrationBuilder.DropTable(
                 name: "RoleModules");
+
+            migrationBuilder.DropTable(
+                name: "SampleTypes");
 
             migrationBuilder.DropTable(
                 name: "Suppliers");
@@ -1014,6 +1222,9 @@ namespace ELIXIR.DATA.Migrations
                 name: "Transformation_Request");
 
             migrationBuilder.DropTable(
+                name: "TypeOfSwabs");
+
+            migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
@@ -1023,7 +1234,10 @@ namespace ELIXIR.DATA.Migrations
                 name: "WarehouseReceived");
 
             migrationBuilder.DropTable(
-                name: "Farms");
+                name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "QC_Receiving");
 
             migrationBuilder.DropTable(
                 name: "Formulas");
@@ -1044,10 +1258,16 @@ namespace ELIXIR.DATA.Migrations
                 name: "Roles");
 
             migrationBuilder.DropTable(
+                name: "Customers");
+
+            migrationBuilder.DropTable(
                 name: "ItemCategories");
 
             migrationBuilder.DropTable(
                 name: "UOMS");
+
+            migrationBuilder.DropTable(
+                name: "Farms");
         }
     }
 }

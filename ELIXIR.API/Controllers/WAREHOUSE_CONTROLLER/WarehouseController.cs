@@ -80,6 +80,8 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
             
             if (validatetotal == false)
                 return BadRequest("Received failed! actual good and reject are not equal to total goods.");
+
+            await _unitOfWork.Warehouse.CheckOrderInAllocationModule(warehouse);
             
             await _unitOfWork.CompleteAsync();
             //return new JsonResult("Successfully Received Raw Materials!");

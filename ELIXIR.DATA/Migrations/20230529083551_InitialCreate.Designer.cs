@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20230508082234_LabTest")]
-    partial class LabTest
+    [Migration("20230529083551_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -323,6 +323,29 @@ namespace ELIXIR.DATA.Migrations
                     b.ToTable("Modules");
                 });
 
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.CancelledOrders", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<DateTime>("CancellationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("OrdersId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrdersId");
+
+                    b.ToTable("CancelledOrders");
+                });
+
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.GenerateOrderNo", b =>
                 {
                     b.Property<int>("Id")
@@ -364,6 +387,9 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CheckedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CompanyCode")
@@ -498,6 +524,9 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CustomerName")
                         .HasColumnType("nvarchar(max)");
 
@@ -536,6 +565,9 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<string>("IsCancelBy")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsCancelledOrder")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsMove")
                         .HasColumnType("bit");
@@ -601,6 +633,8 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
 
                     b.ToTable("Orders");
                 });
@@ -685,6 +719,9 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("PO_ReceivingId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PO_Summary_Id")
                         .HasColumnType("int");
 
                     b.Property<int?>("ReceivingId")
@@ -862,6 +899,9 @@ namespace ELIXIR.DATA.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
+
+                    b.Property<string>("AccountTitle")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1113,6 +1153,33 @@ namespace ELIXIR.DATA.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ProductConditions");
+                });
+
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.ProductType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("AddedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateAdded")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductTypeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductTypes");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.RawMaterial", b =>
@@ -1888,6 +1955,22 @@ namespace ELIXIR.DATA.Migrations
                     b.Navigation("MainMenu");
                 });
 
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.CancelledOrders", b =>
+                {
+                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.Ordering", "Orders")
+                        .WithMany("CancelledOrders")
+                        .HasForeignKey("OrdersId");
+
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.Ordering", b =>
+                {
+                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", null)
+                        .WithMany("Orders")
+                        .HasForeignKey("CustomerId");
+                });
+
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.CheckListString", b =>
                 {
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL.PO_Receiving", null)
@@ -1974,9 +2057,19 @@ namespace ELIXIR.DATA.Migrations
                     b.Navigation("UserRole");
                 });
 
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.Ordering", b =>
+                {
+                    b.Navigation("CancelledOrders");
+                });
+
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL.PO_Receiving", b =>
                 {
                     b.Navigation("Checklist");
+                });
+
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", b =>
+                {
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

@@ -23,8 +23,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
         public string LocationName { get; set; }
         public string DepartmentName { get; set; }
         public string AccountTitle { get; set; }
-        public virtual ICollection<CancelledOrders> CancelledOrders { get; set; }
-        
+        public List<Ordering> Orders {get; set; }
+        public List<CancelledOrders> CancelledOrders
+        {
+            get;
+            set;
+        }
     }
     
 }

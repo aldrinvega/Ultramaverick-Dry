@@ -15,7 +15,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
     public class StoreContext : DbContext
     {
         public StoreContext(DbContextOptions<StoreContext> options) : base(options) { }
-
+      
         public virtual DbSet<User> Users { get; set; }
 
         public virtual DbSet<UserRole> Roles { get; set; }
@@ -92,5 +92,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public virtual DbSet<Disposition> Dispositions { get; set; }
         public virtual DbSet<ProductType> ProductTypes { get; set; }
         public virtual DbSet<CancelledOrders> CancelledOrders { get; set; }
+        
     }
 }

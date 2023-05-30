@@ -22,7 +22,7 @@ namespace ELIXIR.API.Controllers.CANCELLEDORDERES_CONTROLLER
 
             var result = await _unitOfWork.CancelledOrders.VoidOrder(cancelledOrder);
             if (result)
-                return Ok($"{cancelledOrder.Order.ItemDescription} is cancelled");
+                return Ok($"{cancelledOrder.Orders.ItemDescription} is cancelled");
             return BadRequest();
         }
         [HttpGet("GetCancelledOrders")]
@@ -30,6 +30,20 @@ namespace ELIXIR.API.Controllers.CANCELLEDORDERES_CONTROLLER
         {
             var result = await _unitOfWork.CancelledOrders.GetCancelledOrdersAsync();
             return Ok(result);
+        }
+        [HttpGet("GetAllOrderandcancelledOrders")]
+        public async Task<IActionResult> GetAllOrderandcancelledOrders()
+        {
+            var result = await _unitOfWork.CancelledOrders.GetAllOrderandcancelledOrders();
+            return Ok(result);
+        }
+
+        [HttpGet("GetAllOrderandcancelledOrdersById/{customerId}")]
+        public async Task<IActionResult> GetAllOrderandcancelledOrdersById(int customerId)
+        {
+        
+          var result = await _unitOfWork.CancelledOrders.GetAllOrderandcancelledOrdersById(customerId);
+          return Ok(result);
         }
     }
 }
