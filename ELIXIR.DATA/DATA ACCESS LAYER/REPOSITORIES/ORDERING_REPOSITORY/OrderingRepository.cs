@@ -541,6 +541,8 @@ using System.Collections.Generic;
                                         .Select(x => new OrderDto
                                           {
                                               Farm = x.Key.FarmName,
+                                              FarmType = x.Key.FarmName,
+                                              FarmCode = x.Key.FarmName,
                                               IsActive = x.Key.IsActive
                                           });
 
