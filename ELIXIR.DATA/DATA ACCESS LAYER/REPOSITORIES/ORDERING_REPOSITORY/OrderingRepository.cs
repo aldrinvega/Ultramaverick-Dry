@@ -533,7 +533,9 @@ using System.Collections.Generic;
                                             x.FarmName,
                                             x.IsActive,
                                             x.PreparedDate,
-                                            x.ForAllocation
+                                            x.ForAllocation,
+                                            x.FarmCode,
+                                            x.FarmType
 
                                         }).Where(x => x.Key.IsActive == true)
                                           .Where(x => x.Key.PreparedDate == null)
@@ -541,8 +543,8 @@ using System.Collections.Generic;
                                         .Select(x => new OrderDto
                                           {
                                               Farm = x.Key.FarmName,
-                                              FarmType = x.Key.FarmName,
-                                              FarmCode = x.Key.FarmName,
+                                              FarmType = x.Key.FarmType,
+                                              FarmCode = x.Key.FarmCode,
                                               IsActive = x.Key.IsActive
                                           });
 
