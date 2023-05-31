@@ -11,7 +11,7 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
 {
     public class CancelledOrderDTO
     {
-        public int Id
+        public int CustomerId
         {
             get; set;
         }
@@ -60,7 +60,7 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         {
             get; set;
         }
-        public List<CancelledOrders> CancelledOrders
+        public List<OrdersforCancelledPaginationDTO> CancelledOrders
         {
             get; set;
         }

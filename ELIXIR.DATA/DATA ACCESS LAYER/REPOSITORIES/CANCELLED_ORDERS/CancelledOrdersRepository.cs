@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.INTERFACES.CANCELLED_INTERFACE;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml.Style;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.CANCELLED_ORDERS
 {
@@ -36,12 +38,42 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.CANCELLED_ORDERS
         }
 
 
-        public async Task<IEnumerable<CancelledOrders>> GetCancelledOrdersAsync()
+        public async Task<PagedList<CancelledOrderDTO>> GetAllcancelledOrdersPagination(UserParams userParams)
         {
-            var cancelledOrders = await _context.CancelledOrders
-                .Include(x => x.Order)
-                .ToListAsync();
-            return cancelledOrders;
+            var customers = _context.Customers
+                .Where(x => x.CancelledOrders.Any())
+                .Include(x => x.CancelledOrders)
+                .ThenInclude(x => x.Order)
+                .Select(x => new CancelledOrderDTO
+                {
+                    CustomerId = x.Id,
+                    CustomerName = x.CustomerName,
+                    CustomerCode = x.CustomerCode,
+                    LocationName = x.LocationName,
+                    DepartmentName = x.DepartmentName,
+                    FarmTypeId = x.FarmTypeId,
+                    CompanyName = x.CompanyName,
+                    CompanyCode = x.CompanyCode,
+                    MobileNumber = x.MobileNumber,
+                    LeadMan = x.LeadMan,
+                    Address = x.Address,
+                    CancelledOrders = x.CancelledOrders.Select(x => new OrdersforCancelledPaginationDTO
+                    {
+                        Id = x.Id,
+                        OrderId = x.OrderId,
+                        Reason = x.Reason,
+                        CancellationDate = x.CancellationDate,
+                        ItemCode = x.Order.ItemCode,
+                        ItemDescription = x.Order.ItemDescription,
+                        Category = x.Order.Category,
+                        UOM = x.Order.Uom,
+                        QuantityOrdered = x.Order.QuantityOrdered,
+                        OrderDate = x.Order.OrderDate.ToString("dd/MM/yyyy"),
+                        DateNeeded = x.Order.DateNeeded.ToString("dd/MM/yyyy")
+                    }).ToList()
+                });
+
+            return await PagedList<CancelledOrderDTO>.CreateAsync(customers, userParams.PageNumber, userParams.PageSize);
         }
 
         //public async Task<Customer> GetAllCancelledOrdersByCustomer(int customerId)
@@ -76,7 +108,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.CANCELLED_ORDERS
                 .ThenInclude(x => x.Order)
                 .Select(x => new CancelledOrderDTO
                 {
-                    Id = x.Id,
+                    CustomerId = x.Id,
                     CustomerName = x.CustomerName,
                     CustomerCode = x.CustomerCode,
                     LocationName = x.LocationName,
@@ -87,9 +119,22 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.CANCELLED_ORDERS
                     MobileNumber = x.MobileNumber,
                     LeadMan = x.LeadMan,
                     Address = x.Address,
-                    CancelledOrders = x.CancelledOrders
+                    CancelledOrders = x.CancelledOrders.Select(x => new OrdersforCancelledPaginationDTO
+                    {
+                        Id = x.Id,
+                        OrderId = x.OrderId,
+                        Reason = x.Reason,
+                        CancellationDate = x.CancellationDate,
+                        ItemCode = x.Order.ItemCode,
+                        ItemDescription = x.Order.ItemDescription,
+                        Category = x.Order.Category,
+                        UOM = x.Order.Uom,
+                        QuantityOrdered = x.Order.QuantityOrdered,
+                        OrderDate = x.Order.OrderDate.ToString("dd/MM/yyyy"),
+                        DateNeeded = x.Order.DateNeeded.ToString("dd/MM/yyyy")
+                    }).ToList()
                 })
-                .FirstOrDefaultAsync(x => x.Id == customerId);
+                .FirstOrDefaultAsync(x => x.CustomerId == customerId);
 
             //if (customers != null)
             //{
