@@ -13,8 +13,10 @@ using System.Collections.Generic;
  using ELIXIR.DATA.DTOs;
  using ELIXIR.DATA.SERVICES;
  using Microsoft.AspNetCore.SignalR;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
+using OfficeOpenXml.Style;
 
- namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
+namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 {
     public class OrderingRepository : IOrdering
     {
@@ -128,56 +130,7 @@ using System.Collections.Generic;
             });
 
     
-            // var totalRemaining = (from totalIn in _context.WarehouseReceived
-            //                       where totalIn.IsActive == true
-            //                       join totalOut in totalout
-            //
-            //                       on totalIn.ItemCode equals totalOut.ItemCode
-            //                       into leftJ
-            //                       from totalOut in leftJ.DefaultIfEmpty()
-            //
-            //                       join orderout in totalOrders on totalIn.ItemCode equals orderout.ItemCode
-            //                       into leftJ2
-            //                       from orderout in leftJ2.DefaultIfEmpty()
-            //
-            //                       group new
-            //                       {
-            //                           totalIn,
-            //                           totalOut, 
-            //                           orderout
-            //
-            //                       }
-            //                       by new 
-            //                       {
-            //
-            //             //              totalIn.Id,
-            //                           totalIn.ItemCode,
-            //                           totalIn.ItemDescription,
-            //                           totalIn.ManufacturingDate,
-            //                           totalIn.Expiration,
-            //                           totalIn.ActualGood,
-            //                           totalIn.ExpirationDays,
-            //                         //  orderout.TotalOrders
-            //
-            //                       } into total
-            //
-            //                       orderby total.Key.ExpirationDays ascending
-            //
-            //                       select new ItemStocks
-            //                       {
-            //              //             WarehouseId = total.Key.Id,
-            //                           ItemCode = total.Key.ItemCode,
-            //                           ItemDescription = total.Key.ItemDescription,
-            //                           ManufacturingDate = total.Key.ManufacturingDate,
-            //                           ExpirationDate = total.Key.Expiration,
-            //                           ExpirationDays = total.Key.ExpirationDays,
-            //                           In = total.Key.ActualGood,
-            //                     //      Out = total.Sum(x => x.Out),
-            //                           Remaining = total.Key.ActualGood - 
-            //                         //  TotalMoveOrder = total.Key.TotalOrders
-            //
-            //                       });
-
+           
             var orders = (from ordering in _context.Orders
                 where ordering.FarmName == farms && ordering.PreparedDate == null && ordering.IsActive == true &&
                       ordering.ForAllocation == null
@@ -248,6 +201,7 @@ using System.Collections.Generic;
             return await orders.ToListAsync();
 
         }
+
         public async Task<bool> EditQuantityOrder(Ordering orders)
         {
             var existingOrder = await _context.Orders.Where(x => x.Id == orders.Id)
@@ -524,31 +478,50 @@ using System.Collections.Generic;
             return false;
 
         }
-        public async Task<PagedList<OrderDto>> GetAllListofOrdersPagination(UserParams userParams)
+        public async Task<PagedList<CustomerListForPreparationSchedule>> GetAllListofOrdersPagination(UserParams userParams)
         {
 
-            var orders = _context.Orders.OrderBy(x => x.OrderDate)
-                                        .GroupBy(x => new
-                                        {
-                                            x.FarmName,
-                                            x.IsActive,
-                                            x.PreparedDate,
-                                            x.ForAllocation,
-                                            x.FarmCode,
-                                            x.FarmType
+            //var orders = _context.Orders.OrderBy(x => x.OrderDate)
+            //                            .GroupBy(x => new
+            //                            {
+            //                                x.FarmName,
+            //                                x.IsActive,
+            //                                x.PreparedDate,
+            //                                x.ForAllocation,
+            //                                x.FarmCode,
+            //                                x.FarmType,
 
-                                        }).Where(x => x.Key.IsActive == true)
-                                          .Where(x => x.Key.PreparedDate == null)
-                                          .Where(x => x.Key.ForAllocation == null)
-                                        .Select(x => new OrderDto
-                                          {
-                                              Farm = x.Key.FarmName,
-                                              FarmType = x.Key.FarmType,
-                                              FarmCode = x.Key.FarmCode,
-                                              IsActive = x.Key.IsActive
-                                          });
+            //                            }).Where(x => x.Key.IsActive == true)
+            //                              .Where(x => x.Key.PreparedDate == null)
+            //                              .Where(x => x.Key.ForAllocation == null)
+            //                            .Select(x => new OrderDto
+            //                              {
+            //                                  Farm = x.Key.FarmName,
+            //                                  FarmType = x.Key.FarmType,
+            //                                  FarmCode = x.Key.FarmCode,
+            //                                  IsActive = x.Key.IsActive,
+            //                                  NumberofOrders = x.Count(x => x.ItemCode)
 
-            return await PagedList<OrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
+            //                              });
+
+            var customers = _context.Customers
+                            .Include(x => x.Orders)
+                            .Where(x => x.IsActive == true)
+                            .Where(x => x.Orders.Any(x => x.IsActive == true))
+                            .Where(x => x.Orders.Any(x => x.PreparedDate == null))
+                            .Where(x => x.Orders.Any(x => x.ForAllocation == null))
+                            .Select(x => new CustomerListForPreparationSchedule
+                            {
+                             Id = x.Id,
+                             CustomerCode = x.CustomerCode,
+                             CustomerName = x.CustomerName,
+                             DepartmentName = x.DepartmentName,
+                             CompanyName = x.CompanyName,
+                             LocationName = x.LocationName,
+                             FarmName = x.FarmType.FarmName,
+                             });
+
+            return await PagedList<CustomerListForPreparationSchedule>.CreateAsync(customers, userParams.PageNumber, userParams.PageSize);
 
 
         }

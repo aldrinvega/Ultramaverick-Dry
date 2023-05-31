@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ELIXIR.DATA.DTOs;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 
 namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 {
@@ -27,8 +28,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<bool> ValidateRawMaterial(Ordering orders);
         Task<bool> ValidateUom(Ordering orders);
         Task<bool> ValidateExistingOrders(Ordering orders);
-        Task<PagedList<OrderDto>> GetAllListofOrdersPagination(UserParams userParams);
-      
+        Task<PagedList<CustomerListForPreparationSchedule>> GetAllListofOrdersPagination(UserParams userParams);
         Task<bool> ValidateOrderAndDateNeeded(Ordering orders);
         Task<bool> CancelOrders(Ordering orders);
         Task<IReadOnlyList<OrderDto>> GetAllListOfCancelledOrders();

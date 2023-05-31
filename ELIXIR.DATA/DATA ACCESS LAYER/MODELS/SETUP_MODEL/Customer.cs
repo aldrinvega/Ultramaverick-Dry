@@ -75,11 +75,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
         {
             get; set;
         }
-        //public List<Ordering> Orders
-        //{
-        //    get; set;
-        //} = new List<Ordering>();
-        
+        public List<Ordering> Orders
+        {
+            get; set;
+        } = new List<Ordering>();
+
     }
-    
+
 }

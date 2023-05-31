@@ -15,9 +15,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.CANCELLED_INTERFACE
         Task<bool> VoidOrder(CancelledOrders cancelledOrder);
         Task<IEnumerable<CancelledOrders>> GetCancelledOrdersAsync();
         //Task<Customer> GetAllCancelledOrdersByCustomer(int customerId);
-        Task<CancelledOrderDTO> GetAllOrderandcancelledOrdersById(int customerId);
+        Task<CancelledOrderDTO> GetCancelledOrdersById(int customerId);
         //Task<IEnumerable<Customer>> GetAllOrderandcancelledOrders();
-
-
     }
 }

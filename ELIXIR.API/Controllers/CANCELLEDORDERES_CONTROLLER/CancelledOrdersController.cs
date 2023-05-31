@@ -35,6 +35,7 @@ namespace ELIXIR.API.Controllers.CANCELLEDORDERES_CONTROLLER
         //    var result = await _unitOfWork.CancelledOrders.GetAllCancelledOrdersByCustomer(customerId);
         //    return Ok(result);
         //}
+
         //[HttpGet("GetAllOrderandcancelledOrders")]
         //public async Task<IActionResult> GetAllOrderandcancelledOrders()
         //{
@@ -42,11 +43,11 @@ namespace ELIXIR.API.Controllers.CANCELLEDORDERES_CONTROLLER
         //    return Ok(result);
         //}
 
-        [HttpGet("GetAllOrderandcancelledOrdersById/{customerId}")]
-        public async Task<IActionResult> GetAllOrderandcancelledOrdersById(int customerId)
+        [HttpGet("GetCancelledOrdersById/{customerId}")]
+        public async Task<IActionResult> GetCancelledOrdersById(int customerId)
         {
 
-            var result = await _unitOfWork.CancelledOrders.GetAllOrderandcancelledOrdersById(customerId);
+            var result = await _unitOfWork.CancelledOrders.GetCancelledOrdersById(customerId);
             return Ok(result);
         }
     }

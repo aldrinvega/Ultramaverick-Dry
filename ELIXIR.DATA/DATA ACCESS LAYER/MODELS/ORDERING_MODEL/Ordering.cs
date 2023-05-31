@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
+using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
 {
@@ -50,7 +53,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
             get;
             set;
         }
-        
+
         public DateTime OrderDate
         {
             get;
@@ -228,9 +231,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
 
         public Customer Customer
         {
-        get; set; }
+            get; set;
+        }
         public int CustomerId
         {
-        get; set; }       
+            get; set;
+        }
+
     }
 }
+

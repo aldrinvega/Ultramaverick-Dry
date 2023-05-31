@@ -69,7 +69,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.CANCELLED_ORDERS
         //    }
         //    return customers;
         //}
-        public async Task<CancelledOrderDTO> GetAllOrderandcancelledOrdersById(int customerId)
+        public async Task<CancelledOrderDTO> GetCancelledOrdersById(int customerId)
         {
             return await _context.Customers
                 .Include(x => x.CancelledOrders)
