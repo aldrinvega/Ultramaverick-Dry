@@ -819,9 +819,9 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         //========Allocation========//
 
         [HttpPut("Allocate")]
-        public async Task<IActionResult> AllocateOrderPerItem([FromBody] List<AllocationDTO> itemCode)
+        public async Task<IActionResult> AllocateOrderPerItem([FromBody] AllocationFinalResult allocation)
         {
-            var orders = await _unitOfWork.Order.AllocateOrdersPerItems(itemCode);
+            var orders = await _unitOfWork.Order.AllocateOrdersPerItems(allocation);
             await _unitOfWork.CompleteAsync();
             return Ok(orders);
         }

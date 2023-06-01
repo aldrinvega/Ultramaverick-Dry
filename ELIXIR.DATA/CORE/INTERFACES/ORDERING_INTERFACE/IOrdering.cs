@@ -97,10 +97,10 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<IReadOnlyList<MoveOrderDto>> GetAllapprovedMoveorderNotification();
         Task<bool> SetBeingPrepared(List<Ordering> moveOrders);
         Task<bool> UnsetBeingPrepared(List<Ordering> orderNos);
-        
-        
+
+
         //==========Allocation=========//
-        Task<IReadOnlyList<AllocationResult>> AllocateOrdersPerItems(List<AllocationDTO> itemCodes);
+        Task<IReadOnlyList<AllocationResult>> AllocateOrdersPerItems(AllocationFinalResult allocation);
 
         // Task<IReadOnlyList<OrderDto>> GetAllOrdersForAllocation();
         Task<PagedList<OrderDto>> GetAllListofOrdersForAllocationPagination(UserParams userParams);

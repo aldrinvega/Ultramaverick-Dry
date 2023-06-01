@@ -2141,14 +2141,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
        //         .SumAsync(x => x.Quantity);
        // }
        
-       public async Task<IReadOnlyList<AllocationResult>> AllocateOrdersPerItems(List<AllocationDTO> itemCodes)
+       public async Task<IReadOnlyList<AllocationResult>> AllocateOrdersPerItems(AllocationFinalResult allocation)
        {
             // Get a list of orders that have an item code in the `itemCodes` list
             var orders = await _context.Orders.Where(x => x.IsActive == true)
-               .Where(x => itemCodes.Select(y =>y.ItemCode).Contains(x.ItemCode))
-               .Where(x => x.IsActive == true)
-               .Where(x => x.ForAllocation == true)
-               .ToListAsync();
+                .Where(x => allocation.Allocations.Select(x=>x.ItemCode).Contains(x.ItemCode))
+                .Where(x => x.IsActive == true)
+                .Where(x => x.ForAllocation == true)
+                .ToListAsync();
 
             var results = new List<AllocationResult>();
             
@@ -2163,30 +2163,32 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                                              .Where(x => x.IsTransact == true)
                                                              .Where(x => x.ItemCode == order.ItemCode)
                                                              .SumAsync(x => x.Quantity);
-           
+
+
                 // Get the sum of received stocks for the current order's item code
-                var receivedStocks = await _context.WarehouseReceived
-                   .Where(x => x.ItemCode == order.ItemCode)
-                   .Where(x => x.IsActive == true)
-                   .SumAsync(x => x.ActualGood);
 
-               // Get the sum of quantity ordered for the current order's item code and farm name where the allocated quantity is null
-               var totalOrdersPerItemAndStore = await _context.Orders
-                   .Where(x => x.ItemCode == order.ItemCode)
-                   .Where(x => x.AllocatedQuantity == null)
-                   .Where(x => x.IsActive == true)
-                   .SumAsync(x => x.QuantityOrdered);
+                //var receivedStocks = await _context.WarehouseReceived
+                //   .Where(x => x.ItemCode == order.ItemCode)
+                //   .Where(x => x.IsActive == true)
+                //   .SumAsync(x => x.ActualGood);
 
-               var totalStocks = receivedStocks - (orderingReserve + getIssueOut);
+                // Get the sum of quantity ordered for the current order's item code and farm name where the allocated quantity is null
+                var totalOrdersPerItemAndStore = await _context.Orders
+                    .Where(x => x.ItemCode == order.ItemCode)
+                    .Where(x => x.AllocatedQuantity == null)
+                    .Where(x => x.IsActive == true)
+                    .SumAsync(x => x.QuantityOrdered);
 
-               if (totalStocks <= 0)
+                // var totalStocks = receivedStocks - (orderingReserve + getIssueOut);
+
+                if (allocation.SOH <= 0)
                {
-                   totalStocks = 0;
+                   allocation.SOH = 0;
                }
 
-               var percentageToAllocate = totalOrdersPerItemAndStore / totalStocks;
+               var percentageToAllocate = totalOrdersPerItemAndStore / allocation.SOH;
 
-               if (totalOrdersPerItemAndStore <= totalStocks)
+               if (totalOrdersPerItemAndStore <= allocation.SOH)
                {
                    order.AllocatedQuantity = (int)order.QuantityOrdered;
                    order.ForAllocation = null;
