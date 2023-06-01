@@ -904,6 +904,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             var orders = (from ordering in _context.Orders
                           where ordering.ItemCode == itemcode
+                          where ordering.IsCancelledOrder != true
                           && ordering.OrderDate == DateTime.Parse(orderdate)
                           join warehouse in totalRemaining
                           on ordering.ItemCode equals warehouse.ItemCode

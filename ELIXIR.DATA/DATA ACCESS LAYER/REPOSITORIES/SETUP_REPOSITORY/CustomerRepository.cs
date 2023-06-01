@@ -24,7 +24,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         //-----CUSTOMER-------
         public override async Task<IReadOnlyList<CustomerDto>> GetAll()
         {
-            return await _context.Customers.OrderByDescending(x => x.DateAdded)
+            return await _context.Customers.OrderByDescending(x => x.Id)
                                          .Join(_context.Farms,
                                           customer => customer.FarmTypeId,
                                           farm => farm.Id,
@@ -73,7 +73,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<IReadOnlyList<CustomerDto>> GetAllActiveCustomer()
         {
-            return await _context.Customers
+            return await _context.Customers.OrderByDescending(x => x.Id)
                                           .Join(_context.Farms,
                                            customer => customer.FarmTypeId,
                                            farm => farm.Id,
@@ -99,7 +99,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<IReadOnlyList<CustomerDto>> GetAllInActiveCustomer()
         {
-            return await _context.Customers
+            return await _context.Customers.OrderByDescending(x => x.Id)
                                              .Join(_context.Farms,
                                               customer => customer.FarmTypeId,
                                               farm => farm.Id,
@@ -209,7 +209,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<IReadOnlyList<FarmDto>> GetAllFarm()
         {
-                 return await _context.Farms
+                 return await _context.Farms.OrderByDescending(x => x.Id)
                                             .Select(farm => new FarmDto
                                             {
                                                 Id = farm.Id,
@@ -223,7 +223,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<FarmDto> GetFarmById(int id)
         {
-            return await _context.Farms
+            return await _context.Farms.OrderByDescending(x => x.Id)
                                           .Select(farm => new FarmDto
                                           {
                                               Id = farm.Id,
@@ -291,7 +291,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<IReadOnlyList<FarmDto>> GetAllActiveFarm()
         {
-                 return await _context.Farms
+                 return await _context.Farms.OrderByDescending(x => x.Id)
                                             .Select(farm => new FarmDto
                                             {
                                                 Id = farm.Id,
@@ -306,7 +306,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<IReadOnlyList<FarmDto>> GetAllInActiveFarm()
         {
-            return await _context.Farms
+            return await _context.Farms.OrderByDescending(x => x.Id)
                                          .Select(farm => new FarmDto
                                          {
                                              Id = farm.Id,
@@ -336,7 +336,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<PagedList<CustomerDto>> GetAllCustomerWithPagination(bool status, UserParams userParams)
         {
-            var customer =  _context.Customers.OrderByDescending(x => x.DateAdded)
+            var customer =  _context.Customers.OrderByDescending(x => x.Id)
                                                .Join(_context.Farms,
                                                 customer => customer.FarmTypeId,
                                                 farm => farm.Id,
@@ -364,7 +364,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<PagedList<CustomerDto>> GetCustomerByStatusWithPaginationOrig(UserParams userParams, bool status, string search)
         {
-            var customer = _context.Customers.OrderByDescending(x => x.DateAdded)
+            var customer = _context.Customers.OrderByDescending(x => x.Id)
                                                .Join(_context.Farms,
                                                 customer => customer.FarmTypeId,
                                                 farm => farm.Id,
@@ -394,7 +394,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<PagedList<FarmDto>> GetAllFarmWithPagination(bool status, UserParams userParams)
         {
-            var farm = _context.Farms.OrderByDescending(x => x.DateAdded)
+            var farm = _context.Farms.OrderByDescending(x => x.Id)
                              .Select(farm => new FarmDto
                              {
                                  Id = farm.Id,
@@ -412,7 +412,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         public async Task<PagedList<FarmDto>> GetAllFarmWithPaginationOrig(UserParams userParams, bool status, string search)
         {
 
-            var farm = _context.Farms.OrderByDescending(x => x.DateAdded)
+            var farm = _context.Farms.OrderByDescending(x => x.Id)
                              .Select(farm => new FarmDto
                              {
                                  Id = farm.Id,
