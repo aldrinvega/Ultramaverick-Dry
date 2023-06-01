@@ -42,7 +42,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.CANCELLED_ORDERS
         {
             var customers = _context.Customers
                 .Where(x => x.CancelledOrders.Any())
-                .AsSplitQuery()
                 .Include(x => x.CancelledOrders)
                 .ThenInclude(x => x.Order)
                 .Select(x => new CancelledOrderDTO
