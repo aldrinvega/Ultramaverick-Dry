@@ -45,7 +45,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                         IsActive = rawmaterial.IsActive,
                                         Reason = rawmaterial.Reason,
                                         IsExpirable = rawmaterial.IsExpirable
-                                    });
+                                    }).OrderByDescending(X => X.Id);
                 return await rawmaterials.ToListAsync();
         }
 
@@ -93,7 +93,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                     IsExpirable = rawmaterial.IsExpirable
                                 });
 
-            return await rawmaterials.OrderBy(x => x.ItemCode)
+            return await rawmaterials.OrderBy(x => x.Id)
                                      .Where(x => x.IsActive == true)
                                      .ToListAsync();
         }
@@ -120,6 +120,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
             return await rawmaterials
                                      .Where(x => x.IsActive == false)
+                                     .OrderByDescending(X => X.Id)
                                      .ToListAsync();
         }
         public async Task<bool> AddNewRawMaterial(RawMaterial rawmaterial)
@@ -222,7 +223,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<IReadOnlyList<ItemCategoryDto>> GetAllItemCategory()
         {
-            return await _context.ItemCategories
+            return await _context.ItemCategories.OrderByDescending(x => x.Id)
                                                 .Select(item => new ItemCategoryDto
                                                 {
                                                     Id = item.Id,
@@ -250,7 +251,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<IReadOnlyList<ItemCategoryDto>> GetAllActiveItemCategory()
         {
-            return await _context.ItemCategories
+            return await _context.ItemCategories.OrderByDescending(x => x.Id)
                                             .Select(item => new ItemCategoryDto
                                             {
                                                 Id = item.Id,
@@ -266,7 +267,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<IReadOnlyList<ItemCategoryDto>> GetAllInActiveItemCategory()
         {
-            return await _context.ItemCategories
+            return await _context.ItemCategories.OrderByDescending (x => x.Id)
                                           .Select(item => new ItemCategoryDto
                                           {
                                               Id = item.Id,
@@ -360,7 +361,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                     IsActive = rawmaterial.IsActive,
                                     Reason = rawmaterial.Reason,
                                     IsExpirable = rawmaterial.IsExpirable
-                                }).OrderBy(x => x.ItemCode)
+                                }).OrderBy(x => x.Id)
                                   .Where(x => x.IsActive == status);
 
 
@@ -389,7 +390,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                     IsActive = rawmaterial.IsActive,
                                     Reason = rawmaterial.Reason,
                                     IsExpirable = rawmats.IsExpirable
-                                }).OrderBy(x => x.ItemCode)
+                                }).OrderBy(x => x.Id)
                                   .Where(x => x.IsActive == status)
                                   .Where(x => x.ItemCode.ToLower()
                                   .Contains(search.Trim().ToLower()));
@@ -410,7 +411,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                                     IsActive = item.IsActive,
                                                     Reason = item.Reason
 
-                                                })
+                                                }).OrderByDescending(x => x.Id)
                                                   .Where(x => x.IsActive == status);
 
             return await PagedList<ItemCategoryDto>.CreateAsync(category, userParams.PageNumber, userParams.PageSize);
@@ -428,7 +429,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                                    IsActive = item.IsActive,
                                                    Reason = item.Reason
 
-                                               })
+                                               }).OrderByDescending(x => x.Id)
                                                  .Where(x => x.IsActive == status)
                                                  .Where(x => x.ItemCategoryName.ToLower()
                                                  .Contains(search.Trim().ToLower()));

@@ -20,7 +20,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         }
         public override async Task<IReadOnlyList<SupplierDto>> GetAll()
         {
-            return await  _context.Suppliers
+            return await  _context.Suppliers.OrderByDescending(x => x.Id)
                                             .Select(supplier => new SupplierDto
                                             {
                                                 Id = supplier.Id,
@@ -35,7 +35,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         }
         public override async Task<SupplierDto> GetById(int id)
         {
-              return await _context.Suppliers
+              return await _context.Suppliers.OrderByDescending(x => x.Id)
                                              .Select(supplier => new SupplierDto
                                              {
                                                  Id = supplier.Id,
@@ -77,7 +77,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<IReadOnlyList<SupplierDto>> GetAllActiveSupplier()
         {
-            return await _context.Suppliers
+            return await _context.Suppliers.OrderByDescending(x => x.Id)
                             .Select(supplier => new SupplierDto
                             {
                                 Id = supplier.Id,
@@ -94,7 +94,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<IReadOnlyList<SupplierDto>> GetAllInActiveSupplier()
         {
-            return await _context.Suppliers
+            return await _context.Suppliers.OrderByDescending(x => x.Id)
                            .Select(supplier => new SupplierDto
                            {
                                Id = supplier.Id,
@@ -147,7 +147,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<PagedList<SupplierDto>> GetAllSupplierWithPagination(bool status, UserParams userParams)
         {
-            var suppliers = _context.Suppliers.OrderByDescending(x => x.DateAdded)
+            var suppliers = _context.Suppliers.OrderByDescending(x => x.Id)
                                          .Select(supplier => new SupplierDto
                                          {
                                              Id = supplier.Id,
@@ -168,7 +168,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<PagedList<SupplierDto>> GetSupplierByStatusWithPaginationOrig(UserParams userParams, bool status, string search)
         {
-            var suppliers = _context.Suppliers.OrderByDescending(x => x.DateAdded)
+            var suppliers = _context.Suppliers.OrderByDescending(x => x.Id)
                                        .Select(supplier => new SupplierDto
                                        {
                                            Id = supplier.Id,
