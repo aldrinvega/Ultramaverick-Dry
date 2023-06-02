@@ -155,6 +155,9 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<DateTime>("PreparedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
@@ -259,6 +262,9 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<DateTime>("PreparedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
@@ -493,6 +499,9 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Uom")
                         .HasColumnType("nvarchar(max)");
