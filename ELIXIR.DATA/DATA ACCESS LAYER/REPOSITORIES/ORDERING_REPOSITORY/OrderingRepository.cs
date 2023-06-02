@@ -45,6 +45,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
 
             var getOrderingReserve = _context.Orders.Where(x => x.IsActive == true)
+                                                    .Where(x => x.IsCancelledOrder == null)
                                                   .Where(x => x.PreparedDate != null)
          .GroupBy(x => new
          {
@@ -133,7 +134,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
            
             var orders = (from ordering in _context.Orders
                 where ordering.FarmName == farms && ordering.PreparedDate == null && ordering.IsActive == true &&
-                      ordering.ForAllocation == null
+                      ordering.ForAllocation == null && ordering.IsCancelledOrder == null
                 join warehouse in getReserve
                     on ordering.ItemCode equals warehouse.ItemCode
                     into leftJ
@@ -264,7 +265,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         {
             var orderNos = orders.Select(o => o.OrderNoPKey);
             var activeOrders = await _context.Orders
-                .Where(o => orderNos.Contains(o.OrderNoPKey) && o.IsActive)
+                .Where(o => orderNos.Contains(o.OrderNoPKey) && o.IsActive && o.IsCancelledOrder == null)
                 .ToListAsync();
 
             foreach (var order in activeOrders)
@@ -282,7 +283,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         {
             var orderNos = orders.Select(o => o.OrderNoPKey);
             var activeOrders = await _context.Orders
-                .Where(o => orderNos.Contains(o.OrderNoPKey) && o.IsActive)
+                .Where(o => orderNos.Contains(o.OrderNoPKey) && o.IsActive && o.IsCancelledOrder == null)
                 .ToListAsync();
 
             foreach (var item in activeOrders)
@@ -362,6 +363,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             var orders = (from ordering in _context.Orders                  
                           where ordering.OrderDate >= DateTime.Parse(DateFrom) && ordering.OrderDate <= DateTime.Parse(DateTo)
+                          where ordering.IsCancelledOrder == null
                           join warehouse in totalRemaining
                           on ordering.ItemCode equals warehouse.ItemCode
                           into leftJ
@@ -470,6 +472,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         {
             var validate = await _context.Orders.Where(x => x.TransactId == orders.TransactId)
                                                 .Where(x => x.IsActive == true)
+                                                .Where(x => x.IsCancelledOrder == null)
                                                 .FirstOrDefaultAsync();
 
             if (validate == null)
@@ -532,6 +535,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 .Where(x => x.IsActive == true)
                 .Where(x => x.PreparedDate == null)
                 .Where(x => x.ForAllocation == null)
+                .Where(x => x.IsCancelledOrder == null)
                 // .Where(x => x.AllocatedQuantity != null || x.QuantityOrdered != null)
                 .GroupBy(x => new
                 {
@@ -563,6 +567,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     foreach (var order in orders)
                     {
                         var orderingReserve = await _context.Orders.Where(x => x.IsActive == true)
+                                            .Where(x => x.IsCancelledOrder == null)
                                             .Where(x => x.PreparedDate != null)
                                             .Where(x => x.ItemCode == order.ItemCode)
                                             .SumAsync(order => order.AllocatedQuantity ?? (int)order.QuantityOrdered);
@@ -589,6 +594,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         {
             var existing = await _context.Orders.Where(x => x.Id == orders.Id)
                                                 .Where(x => x.IsActive == true)
+                                                .Where(x => x.IsCancelledOrder == true)
+                                                .Where(x => x.IsCancelledOrder == null)
                                                 .FirstOrDefaultAsync();
 
             if (existing == null)
@@ -672,10 +679,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.PreparedDate,
                 x.IsApproved,
                 x.IsActive,
-                x.AllocatedQuantity
+                x.AllocatedQuantity,
+                x.IsCancelledOrder
             }).Where(x => x.Key.IsApproved == null)
               .Where(x => x.Key.PreparedDate != null)
               .Where(x => x.Key.IsActive == true)
+              .Where(x => x.Key.IsCancelledOrder == null)
                .Select(x => new OrderDto
                {
                    OrderNo = x.Key.OrderNoPKey,
@@ -691,7 +700,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         public async Task<IReadOnlyList<OrderDto>> GetAllOrdersForScheduleApproval(int id)
         {
             var orders = _context.Orders.OrderBy(x => x.PreparedDate)
-
+            .Where(x => x.IsCancelledOrder == null)
             .Select(x => new OrderDto
             {
                 OrderNo = x.OrderNoPKey,
@@ -742,6 +751,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     .Where(x => x.Order.IsActive == true)
                     .Where(x => x.Order.IsApproved == true)
                     .Where(x => x.Order.IsMove == false)
+                    .Where(x => x.Order.IsCancelledOrder == null)
                     .Select(x => new CustomersForMoveOrderDTO
                 {
                     Farm = x.Order.FarmName,
@@ -766,13 +776,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.IsApproved,
                 x.IsMove,
                 x.IsReject,
-                x.Remarks
+                x.Remarks,
+                x.IsCancelledOrder
 
             }).Where(x => x.Key.FarmName == farm)
             .Where(x => x.Key.IsApproved == true)
             .Where(x => x.Key.PreparedDate != null)
             .Where(x => x.Key.IsMove == false)
-
+            .Where(x => x.Key.IsCancelledOrder == null)
 
           .Select(x => new OrderDto
           {
@@ -888,18 +899,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                       Remaining = total.Key.ActualGood - total.Sum(x => x.Out)
                                   });
 
-            var totalOrders = _context.Orders.GroupBy(x => new
-            {
-                x.ItemCode,
-                x.IsPrepared,
-                x.IsActive,
-                x.AllocatedQuantity
-            }).Select(x => new OrderDto
-            {
-                ItemCode = x.Key.ItemCode,
-                TotalOrders = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
-                IsPrepared = x.Key.IsPrepared
-            }).Where(x => x.IsPrepared == false);
+            var totalOrders = _context.Orders
+                .Where(x => x.IsCancelledOrder == null)
+                .GroupBy(x => new
+                {
+                    x.ItemCode,
+                    x.IsPrepared,
+                    x.IsActive,
+                    x.IsCancelledOrder,
+                    x.AllocatedQuantity
+                }).Select(x => new OrderDto
+                {
+                    ItemCode = x.Key.ItemCode,
+                    TotalOrders = x.Key.AllocatedQuantity == null ? x.Sum(x => x.QuantityOrdered) : (decimal)x.Sum(x => x.AllocatedQuantity),
+                    IsPrepared = x.Key.IsPrepared
+                }).Where(x => x.IsPrepared == false);
 
 
             var orders = (from ordering in _context.Orders
@@ -969,6 +983,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             var orders = (from ordering in _context.Orders
                           where ordering.OrderNoPKey == id
+                          where ordering.IsCancelledOrder == null
                           join moveorder in moveorders
                           on ordering.Id equals moveorder.OrderPKey into leftJ
 
@@ -1445,7 +1460,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.ApproveDateTempo,
                 x.IsPrint,
                 x.IsTransact,
-                x.IsActive
+                x.IsActive,
             }).Where(x => x.Key.IsApprove == true)
               .Where(x => x.Key.DeliveryStatus != null)
               .Where(x => x.Key.IsReject != true)
@@ -2075,14 +2090,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.IsMove,
                 x.IsReject,
                 x.Remarks,
-                x.AllocatedQuantity
-
+                x.AllocatedQuantity,
+                x.IsCancelledOrder
             })
          .Where(x => x.Key.IsApproved == true)
          .Where(x => x.Key.PreparedDate != null)
          .Where(x => x.Key.IsMove == false)
-
-
+         .Where(x => x.Key.IsCancelledOrder == null)
        .Select(x => new OrderDto
        {
            Id = x.Key.OrderNoPKey,
@@ -2148,6 +2162,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             var orders = await _context.Orders.Where(x => x.IsActive == true)
                 .Where(x => allocation.Allocations.Select(x=>x.ItemCode).Contains(x.ItemCode))
                 .Where(x => x.IsActive == true)
+                .Where(x => x.IsCancelledOrder == null)
                 .Where(x => x.ForAllocation == true)
                 .ToListAsync();
 
@@ -2156,6 +2171,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
            foreach (var order in orders)
            {
                 var orderingReserve = await _context.Orders.Where(x => x.IsActive == true)
+                                                     .Where(x => x.IsCancelledOrder == null)
                                                      .Where(x => x.PreparedDate != null)
                                                      .Where(x => x.ItemCode == order.ItemCode)
                                                      .SumAsync(order => order.AllocatedQuantity ?? (int)order.QuantityOrdered);
@@ -2178,6 +2194,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     .Where(x => x.ItemCode == order.ItemCode)
                     .Where(x => x.AllocatedQuantity == null)
                     .Where(x => x.IsActive == true)
+                    .Where(x => x.IsCancelledOrder == null)
                     .SumAsync(x => x.QuantityOrdered);
 
                 // var totalStocks = receivedStocks - (orderingReserve + getIssueOut);
@@ -2216,6 +2233,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
            var orders = await _context.Orders.Where(x => x.IsActive == true)
                .Where(x => manualAllocations.Select(y =>y.Id).Contains(x.OrderNo))
                .Where(x => x.IsActive == true)
+               .Where(x => x.IsCancelledOrder == null)
                .Where(x => x.ForAllocation == true)
                .ToListAsync();
 
@@ -2236,9 +2254,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     x.ItemCode,
                     x.IsActive,
                     x.PreparedDate,
-                    x.ForAllocation
+                    x.ForAllocation,
+                    x.IsCancelledOrder
 
                 }).Where(x => x.Key.IsActive == true)
+                .Where(x => x.Key.IsCancelledOrder == null)
                 .Where(x => x.Key.PreparedDate == null)
                 .Where(x => x.Key.ForAllocation != null)
                 .Select(x => new OrderDto
@@ -2267,6 +2287,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         
         
             var getOrderingReserve = _context.Orders.Where(x => x.IsActive == true)
+                                                    .Where(x => x.IsCancelledOrder == null)
                                                   .Where(x => x.PreparedDate != null)
          .GroupBy(x => new
          {
@@ -2341,7 +2362,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                               });
 
             var orders = (from ordering in _context.Orders
-                          where ordering.ItemCode == itemCode && ordering.PreparedDate == null && ordering.IsActive == true && ordering.ForAllocation != null
+                          where ordering.ItemCode == itemCode && ordering.PreparedDate == null && ordering.IsActive == true && ordering.ForAllocation != null && ordering.IsCancelledOrder == null
                           join warehouse in getReserve
                           on ordering.ItemCode equals warehouse.ItemCode
                           into leftJ
@@ -2406,12 +2427,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     x.IsMove,
                     x.AllocatedQuantity,
                     x.ForAllocation,
-                    x.PreparedDate
+                    x.PreparedDate,
+                    x.IsCancelledOrder
         
                 })
                 .Where(x => x.Key.IsActive == true)
                 .Where(x => x.Key.PreparedDate == null)
                 .Where(x => x.Key.ForAllocation != null)
+                .Where(x => x.Key.IsCancelledOrder == null)
                 .Select(x => new OrderDto
                 {
                     ItemCode = x.Key.ItemCode,
@@ -2426,14 +2449,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         {
             var existing = await _context.Orders.Where(x => x.CustomerName == customer)
                 .Where(x => x.IsActive == true)
+                .Where(x => x.IsCancelledOrder == null)
                 .FirstOrDefaultAsync();
-        
-            if (existing == null)
-                return false;
-        
-            return true;
+
+            return existing != null;
         }
 
-        
+
     }
 }

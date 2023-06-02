@@ -19,7 +19,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             _context = context;
         }
 
-        public override async Task<IReadOnlyList<UomDto>> GetAll()
+        public async override Task<IReadOnlyList<UomDto>> GetAll()
         {
             return await _context.UOMS
                                 .Select(uom => new UomDto
@@ -34,7 +34,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                                 }).ToListAsync();             
         }
 
-        public override async Task<UomDto> GetById(int id)
+        public async override Task<UomDto> GetById(int id)
         {
             return await _context.UOMS
                                        .Select(uom => new UomDto
@@ -89,7 +89,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<IReadOnlyList<UomDto>> GetAllActiveUOM()
         {
-            return await _context.UOMS
+            return await _context.UOMS.OrderByDescending(x => x.Id)
                             .Select(uom => new UomDto
                             {
                                 Id = uom.Id,
@@ -105,7 +105,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<IReadOnlyList<UomDto>> GetAllInActiveUOM()
         {
-            return await _context.UOMS
+            return await _context.UOMS.OrderByDescending(x => x.Id)
                            .Select(uom => new UomDto
                            {
                                Id = uom.Id,
@@ -154,7 +154,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<PagedList<UomDto>> GetAllUomWithPagination(bool status, UserParams userParams)
         {
-            var uom = _context.UOMS.OrderByDescending(x => x.DateAdded)
+            var uom = _context.UOMS.OrderByDescending(x => x.Id)
                                   .Select(uom => new UomDto
                                   {
                                       Id = uom.Id,
@@ -172,7 +172,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<PagedList<UomDto>> GetUomByStatusWithPaginationOrig(UserParams userParams, bool status, string search)
         {
-            var uom = _context.UOMS.OrderByDescending(x => x.DateAdded)
+            var uom = _context.UOMS.OrderByDescending(x => x.Id)
                                   .Select(uom => new UomDto
                                   {
                                       Id = uom.Id,
