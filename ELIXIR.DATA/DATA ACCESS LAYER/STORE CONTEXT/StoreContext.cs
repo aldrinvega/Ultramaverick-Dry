@@ -1,4 +1,7 @@
-﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
@@ -9,6 +12,10 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
 {
@@ -94,6 +101,20 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public virtual DbSet<CancelledOrders> CancelledOrders
         {
             get; set;
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CheckListString>()
+                .Property(e => e.Value)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, null),
+                    new ValueComparer<List<string>>(
+                        (c1, c2) => c1.SequenceEqual(c2),
+                        c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                        c => c.ToList()
+                        ));
         }
     }
 }

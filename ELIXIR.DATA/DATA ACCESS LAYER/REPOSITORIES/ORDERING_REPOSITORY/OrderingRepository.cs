@@ -1383,10 +1383,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         }
         public async Task<IReadOnlyList<MoveOrderDto>> ViewMoveOrderForApproval(int orderid)
         {
+            
+                
             var orders = _context.MoveOrders.Where(x => x.IsActive == true)
                 .Select(x => new MoveOrderDto
-            {  
-
+            {
                 Id = x.Id,
                 OrderNo = x.OrderNo,
                 BarcodeNo = x.WarehouseId,
@@ -1401,8 +1402,54 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 PreparedBy = x.PreparedBy,
                 CheckedBy = x.CheckedBy
             });
+            
+            var unitCosts =
+                from posummary in _context.POSummary
+                join wr in _context.WarehouseReceived
+                    on posummary.PO_Number equals wr.PO_Number into LeftJ
+                from wr in LeftJ.DefaultIfEmpty()
+                
+                join order in orders
+                    on wr.Id equals order.BarcodeNo
+                group wr by new
+                {
+                    wr.Id,
+                    posummary.UnitPrice,
+                    order.OrderNo,
+                    order.BarcodeNo,
+                    order.ItemCode,
+                    order.ItemDescription,
+                    order.Uom,
+                    order.FarmName,
+                    order.ApprovedDate,
+                    order.Quantity,
+                    order.Expiration,
+                    order.DeliveryStatus,
+                    order.PreparedBy,
+                    order.CheckedBy,
+                }
+                into total
+                select new MoveOrderDto
+                {
+                    Id = total.Key.Id,
+                    UnitPrice = total.Key.UnitPrice,
+                    OrderNo = total.Key.OrderNo,
+                    BarcodeNo = total.Key.BarcodeNo,
+                    ItemCode = total.Key.ItemCode,
+                    ItemDescription = total.Key.ItemDescription,
+                    Uom = total.Key.Uom,
+                    FarmName = total.Key.FarmName, 
+                    ApprovedDate = total.Key.ApprovedDate,
+                    Quantity = total.Key.Quantity,
+                    Expiration = total.Key.Expiration,
+                    DeliveryStatus = total.Key.DeliveryStatus,
+                    PreparedBy = total.Key.PreparedBy,
+                    CheckedBy = total.Key.CheckedBy
+                };
 
-            return await orders.Where(x => x.OrderNo == orderid)
+
+
+            return await unitCosts.Where(x => x.OrderNo == orderid)
                                .ToListAsync();
 
         }
@@ -2200,30 +2247,30 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 // var totalStocks = receivedStocks - (orderingReserve + getIssueOut);
 
                 if (allocation.SOH <= 0)
-               {
-                   allocation.SOH = 0;
-               }
+                {
+                    allocation.SOH = 0;
+                }
 
-               var percentageToAllocate = totalOrdersPerItemAndStore / allocation.SOH;
+                var percentageToAllocate = totalOrdersPerItemAndStore / allocation.SOH;
 
-               if (totalOrdersPerItemAndStore <= allocation.SOH)
-               {
-                   order.AllocatedQuantity = (int)order.QuantityOrdered;
-                   order.ForAllocation = null;
-               }
-               else
-               {
-                   var allocatedStocks = (int)(order.QuantityOrdered/percentageToAllocate);
-                   order.AllocatedQuantity = allocatedStocks;
-                   order.ForAllocation = null;
-               }
+                if (totalOrdersPerItemAndStore <= allocation.SOH)
+                {
+                    order.AllocatedQuantity = (int)order.QuantityOrdered;
+                    order.ForAllocation = null;
+                }
+                else
+                {
+                    var allocatedStocks = (int)(order.QuantityOrdered/percentageToAllocate);
+                    order.AllocatedQuantity = allocatedStocks;
+                    order.ForAllocation = null;
+                }
                
-               results.Add(new AllocationResult
-               {
-                   AllocatedQuantity = order.AllocatedQuantity,
-                   CustomerName = order.FarmName,
-                   OrderNo = order.OrderNo,
-               });
+                results.Add(new AllocationResult
+                {
+                    AllocatedQuantity = order.AllocatedQuantity,
+                    CustomerName = order.FarmName,
+                    OrderNo = order.OrderNo,
+                });
            }
            
            return results;

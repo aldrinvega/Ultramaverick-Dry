@@ -633,13 +633,13 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
         public async Task<IActionResult> GetChecklistByPoSummaryId([FromQuery] int id)
         {
             var checklist = await _unitOfWork.QcChecklist.GetChecklistByPoSummaryId(id);
-
+        
             if (checklist.Count == 0)
                 return BadRequest("No Records Found");
-
+        
             return Ok(checklist);
         }
-
+        
         [HttpGet("GetPoSummaryInformation")]
         public async Task<ActionResult<ForViewingofChecklistResult>> GetP0SummaryInformation(int receivingId)
         {
@@ -648,7 +648,7 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
             try
             {
                 var poSummaryInformationResult = await _unitOfWork.QcChecklist.GetPoReceivingInformation(receivingId);
-
+        
                 result.Success = true;
                 result.Data = poSummaryInformationResult;
                 return Ok(result);
@@ -659,7 +659,7 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
                 result.Messages.Add(e.Message);
                 return Conflict(result);
             }
-
+        
         }
         [HttpPut]
         [Route("UpdateReceivingId/{id}")]
