@@ -70,7 +70,7 @@ namespace ELIXIR.API
             services.AddScoped(typeof(IUserService), typeof(UserService));
       
             services.AddDbContext<StoreContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("ProdConnection")));
+            options.UseSqlServer(Configuration.GetConnectionString("DevConnection")));
 
             services.Configure<ApiBehaviorOptions>(options =>
             {

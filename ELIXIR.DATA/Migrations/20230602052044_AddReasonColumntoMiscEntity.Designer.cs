@@ -4,14 +4,16 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20230602052044_AddReasonColumntoMiscEntity")]
+    partial class AddReasonColumntoMiscEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -730,6 +732,9 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("Checlist_Type")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("PO_ReceivingId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("PO_Summary_Id")
                         .HasColumnType("int");
 
@@ -743,6 +748,8 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ChecklistStringId");
+
+                    b.HasIndex("PO_ReceivingId");
 
                     b.ToTable("CheckListStrings");
                 });
@@ -1990,6 +1997,13 @@ namespace ELIXIR.DATA.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.CheckListString", b =>
+                {
+                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL.PO_Receiving", null)
+                        .WithMany("Checklist")
+                        .HasForeignKey("PO_ReceivingId");
+                });
+
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", b =>
                 {
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.FarmType", "FarmType")
@@ -2067,6 +2081,11 @@ namespace ELIXIR.DATA.Migrations
                     b.Navigation("Department");
 
                     b.Navigation("UserRole");
+                });
+
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL.PO_Receiving", b =>
+                {
+                    b.Navigation("Checklist");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", b =>

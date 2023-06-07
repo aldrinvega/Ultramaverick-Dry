@@ -35,5 +35,11 @@
             get;
             set;
         }
+
+        public decimal UnitPrice
+        {
+            get;
+            set;
+        }
     }
 }

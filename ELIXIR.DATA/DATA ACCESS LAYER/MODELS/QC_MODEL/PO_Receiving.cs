@@ -116,7 +116,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
         }
         
         public string MonitoredBy { get; set; }
-        public string ProductType { get; set; }
-        public virtual ICollection<CheckListString> Checklist { get; set; }
+
+        public string ProductType
+        {
+            get;
+            set;
+        }
     }
 }

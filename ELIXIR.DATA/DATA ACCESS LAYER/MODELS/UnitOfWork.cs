@@ -86,6 +86,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
         public ICancelledOrders CancelledOrders { get; set; }
         
         //public IOrderHub Hub { get; set; }
+        
 
         public UnitOfWork(
             StoreContext context,
@@ -94,8 +95,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
         {
             _context = context;
             _logger = loggerFactory.CreateLogger("logs");
-
-
+            
         //User
             Users = new UserRepository(_context, _logger);
             Modules = new ModuleRepository(_context);
@@ -126,8 +126,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
 
             //Ordering
             Order = new OrderingRepository(_context, _clients);
-
-
+            
             //Inventory
             Inventory = new RawMaterialInventory(_context);
             Miscellaneous = new MiscellaneousRepository(_context);
@@ -143,8 +142,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
 
             //Cancelled Orders
             CancelledOrders = new CancelledOrdersRepository(_context);
-
-
         }
         public async Task CompleteAsync()
         {

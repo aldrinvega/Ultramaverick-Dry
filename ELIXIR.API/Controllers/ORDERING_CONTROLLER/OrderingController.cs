@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.INTERFACES.ORDER_HUB;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 using ELIXIR.DATA.DTOs;
 using ELIXIR.DATA.SERVICES;
 using Microsoft.AspNetCore.SignalR;
@@ -893,6 +894,13 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 return Ok("Manual Allocation Complete");
             
             return new JsonResult("Something Wrong");
+        }
+
+        [HttpPost("AddChecklist")]
+        public async Task<IActionResult> AddChecklist(Checklists input)
+        {
+            await _unitOfWork.QcChecklist.AddChecklists(input);
+            return Ok("Goods");
         }
         
 

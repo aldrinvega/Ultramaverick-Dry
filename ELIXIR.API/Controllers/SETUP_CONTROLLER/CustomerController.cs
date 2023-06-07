@@ -19,8 +19,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             _unitOfWork = unitofwork;
         }
 
-        //----CUSTOMER---------
-
+        //----CUSTOMER--------//
         [HttpGet]
         [Route("GetAllCustomers")]
         public async Task<IActionResult> GetAllCustomer()
@@ -29,8 +28,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
             return Ok(customer);
         }
-
-
+        
         [HttpGet]
         [Route("GetAllCustomerWithPagination/{status}")]
         public async Task<ActionResult<IEnumerable<CustomerDto>>> GetAllCustomerWithPagination([FromRoute] bool status, [FromQuery] UserParams userParams)

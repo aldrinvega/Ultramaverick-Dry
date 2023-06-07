@@ -14,15 +14,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
         public int? PO_Summary_Id { get; set; }
         public int? ReceivingId { get; set; }
         public string Checlist_Type { get; set; }
-
-        [NotMapped]
-        public List<string> Values
-        {
-            get => JsonSerializer.Deserialize<List<string>>(Value);
-            set => Value = JsonSerializer.Serialize(value);
-        }
-        public string Value { get; set; }
-
+        public List<string> Value { get; set; }
         public string Remarks { get; set; }
     }
 }
