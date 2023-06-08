@@ -1381,10 +1381,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
-        public async Task<IReadOnlyList<MoveOrderDto>> ViewMoveOrderForApproval(int orderid)
+       public async Task<IReadOnlyList<MoveOrderDto>> ViewMoveOrderForApproval(int orderid)
         {
             
-                
             var orders = _context.MoveOrders.Where(x => x.IsActive == true)
                 .Select(x => new MoveOrderDto
             {
@@ -1403,14 +1402,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 CheckedBy = x.CheckedBy
             });
             
-            var unitCosts =
-                from posummary in _context.POSummary
-                join wr in _context.WarehouseReceived
-                    on posummary.PO_Number equals wr.PO_Number into LeftJ
+            var unitCosts = from posummary in _context.POSummary
+                join wr in _context.WarehouseReceived on posummary.PO_Number equals wr.PO_Number into LeftJ
                 from wr in LeftJ.DefaultIfEmpty()
-                
-                join order in orders
-                    on wr.Id equals order.BarcodeNo
+                join order in orders on wr != null ? wr.Id : (int?)null equals order.BarcodeNo  
                 group wr by new
                 {
                     wr.Id,
@@ -1426,7 +1421,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     order.Expiration,
                     order.DeliveryStatus,
                     order.PreparedBy,
-                    order.CheckedBy,
+                    order.CheckedBy
                 }
                 into total
                 select new MoveOrderDto
@@ -1438,7 +1433,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     ItemCode = total.Key.ItemCode,
                     ItemDescription = total.Key.ItemDescription,
                     Uom = total.Key.Uom,
-                    FarmName = total.Key.FarmName, 
+                    FarmName = total.Key.FarmName,
                     ApprovedDate = total.Key.ApprovedDate,
                     Quantity = total.Key.Quantity,
                     Expiration = total.Key.Expiration,
@@ -1447,10 +1442,31 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     CheckedBy = total.Key.CheckedBy
                 };
 
+            return await unitCosts.Where(x => x.OrderNo == orderid).ToListAsync();
 
+        }
+       public async Task<IReadOnlyList<MoveOrderDto>> ViewMoveOrderForApprovalOriginal(int orderid)
+        {
+            
+            var orders = _context.MoveOrders.Where(x => x.IsActive == true)
+                .Select(x => new MoveOrderDto
+            {
+                Id = x.Id,
+                OrderNo = x.OrderNo,
+                BarcodeNo = x.WarehouseId,
+                ItemCode = x.ItemCode,
+                ItemDescription = x.ItemDescription,
+                Uom = x.Uom,
+                FarmName = x.FarmName, 
+                ApprovedDate = x.ApprovedDate.ToString(),
+                Quantity = x.QuantityOrdered,
+                Expiration = x.ExpirationDate.ToString(),
+                DeliveryStatus = x.DeliveryStatus,
+                PreparedBy = x.PreparedBy,
+                CheckedBy = x.CheckedBy
+            });
 
-            return await unitCosts.Where(x => x.OrderNo == orderid)
-                               .ToListAsync();
+            return await orders.Where(x => x.OrderNo == orderid).ToListAsync();
 
         }
         public async Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPagination(UserParams userParams)

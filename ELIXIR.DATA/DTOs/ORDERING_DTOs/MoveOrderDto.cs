@@ -1,4 +1,6 @@
-﻿namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
 {
     public class MoveOrderDto
     {

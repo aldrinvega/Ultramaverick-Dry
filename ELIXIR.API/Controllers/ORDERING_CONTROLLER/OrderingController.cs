@@ -6,6 +6,7 @@ using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.INTERFACES.ORDER_HUB;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
@@ -592,7 +593,15 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         public async Task<IActionResult> ViewMoveOrderForApproval([FromQuery] int id)
         {
             var orders = await _unitOfWork.Order.ViewMoveOrderForApproval(id);
-            return Ok(orders);
+
+            if (orders.Count != 0)
+            {
+                return Ok(orders);
+            }
+
+            var order = await _unitOfWork.Order.ViewMoveOrderForApprovalOriginal(id);
+            return Ok(order);
+
         }
 
         [HttpGet]
