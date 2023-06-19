@@ -308,14 +308,9 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("GetAllListOfApprovedPreparedForMoveOrder")]
         public async Task<IActionResult> GetAllListOfApprovedPreparedForMoveOrder([FromQuery] string farm)
         {
-
             var orders = await _unitOfWork.Order.TotalListOfApprovedPreparedDate(farm);
 
-            if (orders == null)
-                return BadRequest("No Orders Currently Available");
-
-            return Ok(orders);
-
+            return orders == null ? BadRequest("No Orders Currently Available") : Ok(orders);
         }
 
         [HttpGet]

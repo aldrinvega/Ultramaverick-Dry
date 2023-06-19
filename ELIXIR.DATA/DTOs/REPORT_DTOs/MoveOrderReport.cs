@@ -30,6 +30,13 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public string BatchNo { get; set; }
         public string DeliveryDate { get; set; }
 
+        public decimal WeightedAverageUnitCost
+        {
+            get;
+            set;
+        }
+        
+
 
     }
 }

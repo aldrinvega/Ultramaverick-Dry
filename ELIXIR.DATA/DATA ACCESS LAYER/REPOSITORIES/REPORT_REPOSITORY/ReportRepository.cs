@@ -65,35 +65,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                               SupplierName = posummary != null ? posummary.VendorName : null,
                               Price = posummary != null ? posummary.UnitPrice : 0,
                               QcBy = receiving.QcBy,
-                              // TruckApproval1 = receiving.Truck_Approval1,
-                              // TruckApprovalRemarks1 = receiving.Truck_Approval1_Remarks,
-                              // TruckApproval2 = receiving.Truck_Approval2,
-                              // TruckApprovalRemarks2 = receiving.Truck_Approval2_Remarks,
-                              // TruckApproval3 = receiving.Truck_Approval3,
-                              // TruckApprovalRemarks3 = receiving.Truck_Approval3_Remarks,
-                              // TruckApproval4 = receiving.Truck_Approval4,
-                              // TruckApprovalRemarks4 = receiving.Truck_Approval4_Remarks,
-                              // UnloadingApproval1 = receiving.Unloading_Approval1,
-                              // UnloadingApprovalRemarks1 = receiving.Unloading_Approval1_Remarks,
-                              // UnloadingApproval2 = receiving.Unloading_Approval2,
-                              // UnloadingApprovalRemarks2 = receiving.Unloading_Approval2_Remarks,
-                              // UnloadingApproval3 = receiving.Unloading_Approval3,
-                              // UnloadingApprovalRemarks3 = receiving.Unloading_Approval3_Remarks,
-                              // UnloadingApproval4 = receiving.Unloading_Approval4,
-                              // UnloadingApprovalRemarks4 = receiving.Unloading_Approval4_Remarks,
-                              // CheckingApproval1 = receiving.Checking_Approval1,
-                              // CheckingApprovalRemarks1 = receiving.Checking_Approval1_Remarks,
-                              // CheckingApproval2 = receiving.Checking_Approval2, 
-                              // CheckingApprovalRemarks2 = receiving.Checking_Approval2_Remarks,
-                              // QAApproval = receiving.QA_Approval, 
-                              // QAApprovalRemarks = receiving.QA_Approval_Remarks
-
                           });
 
             return await report.ToListAsync();
 
         }
-        public async Task<IReadOnlyList<WarehouseReport>> WarehouseRecivingReport(string DateFrom, string DateTo)
+        public async Task<IReadOnlyList<WarehouseReport>> WarehouseReceivingReport(string DateFrom, string DateTo)
         {
 
             var warehouse = _context.WarehouseReceived.Where(x => x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo))
@@ -154,35 +131,86 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
         }
 
-        public async Task<IReadOnlyList<MoveOrderReport>> MoveOrderReport(string DateFrom, string DateTo)
+     public async Task<IReadOnlyList<MoveOrderReport>> MoveOrderReport(string DateFrom, string DateTo)
+{
+    var soh = _context.WarehouseReceived
+        .GroupBy(x => new { x.ItemCode })
+        .Select(x => new SOHDTO
         {
-            var orders = (from moveorder in _context.MoveOrders
-                          where moveorder.PreparedDate >= DateTime.Parse(DateFrom) && moveorder.PreparedDate <= DateTime.Parse(DateTo) && moveorder.IsActive == true
-                          join transactmoveorder in _context.TransactMoveOrder
-                          on moveorder.OrderNo equals transactmoveorder.OrderNo into leftJ
-                          from transactmoveorder in leftJ.DefaultIfEmpty()
-                        
-                          select new MoveOrderReport
-                          {
-                              MoveOrderId = moveorder.OrderNo,
-                              CustomerCode = moveorder.FarmCode,
-                              CustomerName = moveorder.FarmName,
-                              ItemCode = moveorder.ItemCode,
-                              ItemDescription = moveorder.ItemDescription,
-                              Uom = moveorder.Uom,
-                              Category = moveorder.Category,
-                              Quantity = moveorder.QuantityOrdered,
-                              ExpirationDate = moveorder.ExpirationDate.ToString(),
-                              TransactionType = moveorder.DeliveryStatus,
-                              MoveOrderBy = moveorder.PreparedBy,
-                              MoveOrderDate = moveorder.PreparedDate.ToString(),
-                              TransactedBy = transactmoveorder.PreparedBy,
-                              TransactedDate = transactmoveorder.PreparedDate.ToString()
-                          });
+            ItemCode = x.Key.ItemCode,
+            ActualGood = x.Sum(g => g.ActualGood)
+        });
 
-            return await orders.ToListAsync();
+    var unitCost = _context.POSummary
+        .GroupBy(x => new { x.ItemCode, x.UnitPrice })
+        .Select(x => new TOTALCOSTDTO
+        {
+            ItemCode = x.Key.ItemCode,
+            TotalCost = x.Sum(g => g.UnitPrice)
+        });
 
-        }
+    var orders = (
+        from moveorder in _context.MoveOrders
+        where moveorder.PreparedDate >= DateTime.Parse(DateFrom) &&
+              moveorder.PreparedDate <= DateTime.Parse(DateTo) &&
+              moveorder.IsActive == true
+        join transactmoveorder in _context.TransactMoveOrder
+            on moveorder.OrderNo equals transactmoveorder.OrderNo into leftJ
+        from transactmoveorder in leftJ.DefaultIfEmpty()
+        join stockOnHand in soh
+            on moveorder.ItemCode equals stockOnHand.ItemCode into leftj1
+        from stockOnHand in leftj1.DefaultIfEmpty()
+        join UC in unitCost
+            on moveorder.ItemCode equals UC.ItemCode into leftj2
+        from UC in leftj2.DefaultIfEmpty()
+        group new
+        {
+            moveorder,
+            stockOnHand,
+            UC,
+            transactmoveorder
+        } by new
+        {
+            moveorder.OrderNo,
+            moveorder.FarmCode,
+            moveorder.FarmName,
+            moveorder.ItemCode,
+            moveorder.ItemDescription,
+            moveorder.Uom,
+            moveorder.Category,
+            MoveOrderPreparedBy = moveorder.PreparedBy,
+            moveorder.QuantityOrdered,
+            moveorder.ExpirationDate,
+            moveorder.DeliveryStatus,
+            TransactMoveorderPreparedDate = moveorder.PreparedDate,
+            transactmoveorder.PreparedBy,
+            transactmoveorder.PreparedDate,
+            stockOnHand.ActualGood,
+            TotalCost = UC.TotalCost * stockOnHand.ActualGood,
+            WeightedAverageUnitCost = ((UC.TotalCost * stockOnHand.ActualGood) / stockOnHand.ActualGood== null ? 1 : (UC.TotalCost * stockOnHand.ActualGood) / stockOnHand.ActualGood)
+        } into result
+        select new MoveOrderReport
+        {
+            MoveOrderId = result.Key.OrderNo,
+            CustomerCode = result.Key.FarmCode,
+            CustomerName = result.Key.FarmName,
+            ItemCode = result.Key.ItemCode,
+            ItemDescription = result.Key.ItemDescription,
+            Uom = result.Key.Uom,
+            Category = result.Key.Category,
+            Quantity = result.Key.QuantityOrdered,
+            ExpirationDate = result.Key.ExpirationDate.ToString(),
+            TransactionType = result.Key.DeliveryStatus,
+            MoveOrderBy = result.Key.PreparedBy,
+            MoveOrderDate = result.Key.PreparedDate.ToString(),
+            TransactedBy = result.Key.PreparedBy,
+            TransactedDate = result.Key.PreparedDate.ToString(),
+            WeightedAverageUnitCost = result.Key.WeightedAverageUnitCost
+        });
+
+    return await orders.ToListAsync();
+}
+
 
         public async Task<IReadOnlyList<MiscellaneousReceiptReport>> MReceiptReport(string DateFrom, string DateTo)
         {
@@ -839,11 +867,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                                          CurrentStock = total.Key.SOH,
                                          PurchasedOrder = total.Key.ReceivePlus + total.Key.TransformPlus + total.Key.ReceiptPlus,
                                          OthersPlus = total.Key.MoveOrderPlus + total.Key.TransformOutPlus + total.Key.IssuePlus
-
                                      });
 
             return await movementInventory.ToListAsync();
 
         }
+        
+        
+        
     }
 }

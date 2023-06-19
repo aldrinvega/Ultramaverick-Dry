@@ -11,7 +11,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE
     {
 
         Task<IReadOnlyList<QCReport>> QcRecevingReport(string DateFrom, string DateTo);
-        Task<IReadOnlyList<WarehouseReport>> WarehouseRecivingReport(string DateFrom, string DateTo);
+        Task<IReadOnlyList<WarehouseReport>> WarehouseReceivingReport(string DateFrom, string DateTo);
         Task<IReadOnlyList<TransformationReport>> TransformationReport(string DateFrom, string DateTo);
         Task<IReadOnlyList<MoveOrderReport>> MoveOrderReport(string DateFrom, string DateTo);
         Task<IReadOnlyList<MiscellaneousReceiptReport>> MReceiptReport(string DateFrom, string DateTo);

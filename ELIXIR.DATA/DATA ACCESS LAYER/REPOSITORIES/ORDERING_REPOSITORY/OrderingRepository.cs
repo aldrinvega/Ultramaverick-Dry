@@ -1941,11 +1941,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                       x.FarmName,
                                       x.IsActive,
                                       x.IsApproved,
-                                      x.IsMove
+                                      x.IsMove,
+                                      x.IsCancelledOrder
 
                                   }).Where(x => x.Key.IsActive == true)
                                     .Where(x => x.Key.IsApproved == true)
                                     .Where(x => x.Key.IsMove == false)
+                                  .Where(x => x.Key.IsCancelledOrder == null)
                                     .Select(x => new OrderDto
                                     {
                                         Farm = x.Key.FarmName,

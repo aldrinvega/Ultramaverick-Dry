@@ -30,7 +30,7 @@ namespace ELIXIR.API.Controllers.REPORT_CONTROLLER
         public async Task<IActionResult> WarehouseReceivingReport([FromQuery] string DateFrom, [FromQuery] string DateTo)
         {
 
-            var orders = await _unitOfWork.Report.WarehouseRecivingReport(DateFrom, DateTo);
+            var orders = await _unitOfWork.Report.WarehouseReceivingReport(DateFrom, DateTo);
 
             return Ok(orders);
 
