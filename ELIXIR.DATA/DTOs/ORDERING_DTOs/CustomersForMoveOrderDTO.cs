@@ -28,5 +28,35 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
             get;
             set;
         }
+
+        public string CompanyCode
+        {
+            get;
+            set;
+        }
+
+        public string CompanyName
+        {
+            get;
+            set;
+        }
+
+        public string DepartmentName
+        {
+            get;
+            set;
+        }
+
+        public string LocationName
+        {
+            get;
+            set;
+        }
+        
+        public string FarmType
+        {
+            get;
+            set;
+        }
     }
 }

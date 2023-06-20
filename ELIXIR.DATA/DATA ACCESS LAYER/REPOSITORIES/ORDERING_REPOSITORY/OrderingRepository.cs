@@ -749,14 +749,23 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                      order => order.FarmName,
                      customer => customer.CustomerName,
                      (order, customer) => new { Order = order, Customer = customer })
-                    
+            .Join(
+                _context.Farms,
+                joined => joined.Customer.FarmTypeId,
+                farm => farm.Id,
+                (joined, farm) => new {OrderCustomer = joined, Farm = farm})
             .GroupBy(x => new
             {
-                x.Order.FarmName,
-                x.Order.IsActive,
-                x.Order.IsApproved,   
-                x.Order.IsMove,
-                x.Customer.Id
+                x.OrderCustomer.Order.FarmName,
+                x.OrderCustomer.Order.IsActive,
+                x.OrderCustomer.Order.IsApproved,
+                x.OrderCustomer.Order.IsMove,
+                x.OrderCustomer.Customer.Id,
+                x.OrderCustomer.Customer.CompanyCode,
+                x.OrderCustomer.Customer.CompanyName,
+                x.OrderCustomer.Customer.DepartmentName,
+                x.OrderCustomer.Customer.LocationName,
+                FarmType = x.Farm.FarmName
             })
             .Where(x => x.Key.IsActive == true)
             .Where(x => x.Key.IsApproved == true)
@@ -766,7 +775,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     Farm = x.Key.FarmName,
                     IsActive = x.Key.IsActive,
                     IsApproved = x.Key.IsApproved != null,
-                    CustomerId = x.Key.Id  
+                    CustomerId = x.Key.Id,
+                    CompanyCode = x.Key.CompanyCode,
+                    CompanyName = x.Key.CompanyName,
+                    DepartmentName = x.Key.DepartmentName,
+                    LocationName = x.Key.LocationName,
+                    FarmType = x.Key.FarmType
                  });
 
             return await PagedList<CustomersForMoveOrderDTO>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);

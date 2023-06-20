@@ -1075,7 +1075,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             AccountTitle = result.Issue.AccountTitles
         })
         .ToList();
-
     consolidatedReports.AddRange(miscellaneousReceipts);
     consolidatedReports.AddRange(miscellaneousIssues);
 
