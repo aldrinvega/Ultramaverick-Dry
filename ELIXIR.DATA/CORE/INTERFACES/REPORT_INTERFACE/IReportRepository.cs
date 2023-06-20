@@ -25,6 +25,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE
 
         Task<IReadOnlyList<InventoryMovementReport>> InventoryMovementReport(string DateFrom, string DateTo, string PlusOne);
 
+        Task<IReadOnlyList<ConsolidatedReport>> ConsolidatedReport(string dateFrom, string dateTo);
+
 
     }
 }

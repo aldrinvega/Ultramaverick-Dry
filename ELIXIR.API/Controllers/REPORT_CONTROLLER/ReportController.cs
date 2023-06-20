@@ -124,5 +124,14 @@ namespace ELIXIR.API.Controllers.REPORT_CONTROLLER
 
         }
 
+        [HttpGet]
+        [Route("ConsolidatedReport")]
+        public async Task<IActionResult> ConsolidatedReports([FromQuery] string dateFrom, [FromQuery] string dateTo)
+        {
+            var consolidatedReport = await _unitOfWork.Report.ConsolidatedReport(dateFrom, dateTo);
+
+            return Ok(consolidatedReport);
+        }
+
     }
 }

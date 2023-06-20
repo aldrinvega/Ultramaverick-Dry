@@ -742,22 +742,31 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         public async Task<PagedList<CustomersForMoveOrderDTO>> GetAllListForMoveOrderPagination(UserParams userParams)
         {
 
-            var orders = _context.Orders
+            var orders = 
+                _context.Orders
             .Join(
                      _context.Customers,
                      order => order.FarmName,
                      customer => customer.CustomerName,
                      (order, customer) => new { Order = order, Customer = customer })
-                    .Where(x => x.Order.IsActive == true)
-                    .Where(x => x.Order.IsApproved == true)
-                    .Where(x => x.Order.IsMove == false)
-                    .Where(x => x.Order.IsCancelledOrder == null)
+                    
+            .GroupBy(x => new
+            {
+                x.Order.FarmName,
+                x.Order.IsActive,
+                x.Order.IsApproved,   
+                x.Order.IsMove,
+                x.Customer.Id
+            })
+            .Where(x => x.Key.IsActive == true)
+            .Where(x => x.Key.IsApproved == true)
+            .Where(x => x.Key.IsMove == false)
                     .Select(x => new CustomersForMoveOrderDTO
                 {
-                    Farm = x.Order.FarmName,
-                    IsActive = x.Order.IsActive,
-                    IsApproved = x.Order.IsApproved != null,
-                    CustomerId = x.Customer.Id  
+                    Farm = x.Key.FarmName,
+                    IsActive = x.Key.IsActive,
+                    IsApproved = x.Key.IsApproved != null,
+                    CustomerId = x.Key.Id  
                  });
 
             return await PagedList<CustomersForMoveOrderDTO>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
@@ -765,9 +774,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         public async Task<IReadOnlyList<TotalListOfPreparedDateDTO>> TotalListOfApprovedPreparedDate(string farm)
             {
 
-            var orders = _context.Orders.GroupBy(x => new
-            {
-
+            var orders = _context.Orders
+                .Where(x => x.IsCancelledOrder == null)
+                .GroupBy(x => new
+            {   
                 x.OrderNoPKey,
                 x.FarmName,
                 x.FarmCode,
@@ -775,16 +785,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.PreparedDate,
                 x.IsApproved,
                 x.IsMove,
-                x.IsReject,
-                x.Remarks,
-                x.IsCancelledOrder
+                x.Remarks
 
             }).Where(x => x.Key.FarmName == farm)
             .Where(x => x.Key.IsApproved == true)
             .Where(x => x.Key.PreparedDate != null)
             .Where(x => x.Key.IsMove == false)
-            .Where(x => x.Key.IsCancelledOrder == null)
-
           .Select(x => new OrderDto
           {
               Id = x.Key.OrderNoPKey,
@@ -794,9 +800,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
               TotalOrders = x.Sum(order => order.AllocatedQuantity ?? (int)order.QuantityOrdered),
               PreparedDate = x.Key.PreparedDate.ToString(),
               IsMove = x.Key.IsMove,
-              IsReject = x.Key.IsReject != null,
               Remarks = x.Key.Remarks
-
           });
 
             var customer = _context.Customers.GroupBy(x => new
@@ -835,6 +839,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                 }).ToListAsync();
 
             return oderResult;
+            
             }
         public async Task<bool> GenerateNumber(GenerateOrderNo generate)
         {
