@@ -210,6 +210,14 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         }
 
+        [HttpPost]
+        [Route("AddnewOrdersTest")]
+        public async Task<IActionResult> AddNewOrdersTest([FromBody] Ordering[] order)
+        {
+            var orders = await _unitOfWork.Order.AddNewOrdersTest(order);
+            return Ok();
+        }
+
         [HttpGet]
         [Route("GetAllListOfOrdersPagination")]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetAllListOfOrdersPagination(

@@ -421,6 +421,18 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
 
         }
+        public async Task<bool> AddNewOrdersTest(Ordering[] orders)
+        {
+
+            foreach (var order in orders)
+            {
+                order.IsActive = true;
+
+                await _context.Orders.AddAsync(order);
+                await _context.SaveChangesAsync();
+            }
+            return true;
+        }
         public async Task<bool> ValidateCustomerName(Ordering orders)
         {
             var customername = await _context.Customers.Where(x => x.Id == orders.CustomerId)

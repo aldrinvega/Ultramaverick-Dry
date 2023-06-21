@@ -16,13 +16,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
     public class ReportRepository : IReportRepository
     {
         private readonly StoreContext _context;
-
         public ReportRepository(StoreContext context)
         {
             _context = context;
 
         }
-
         public async Task<IReadOnlyList<QCReport>> QcRecevingReport(string DateFrom, string DateTo)
         {
             var items = (from rawmaterials in _context.RawMaterials
@@ -72,7 +70,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             return await report.ToListAsync();
 
         }
-
         public async Task<IReadOnlyList<WarehouseReport>> WarehouseReceivingReport(string DateFrom, string DateTo)
         {
 
@@ -101,7 +98,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             return await warehouse.ToListAsync();
 
         }
-
         public async Task<IReadOnlyList<TransformationReport>> TransformationReport(string DateFrom, string DateTo)
         {
 
@@ -135,7 +131,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             return await transform.ToListAsync();
 
         }
-
         public async Task<IReadOnlyList<MoveOrderReport>> MoveOrderReport(string DateFrom, string DateTo)
         {
             var soh = _context.WarehouseReceived
@@ -218,8 +213,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
             return await orders.ToListAsync();
         }
-
-
         public async Task<IReadOnlyList<MiscellaneousReceiptReport>> MReceiptReport(string DateFrom, string DateTo)
         {
 
@@ -254,7 +247,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
 
         }
-
         public async Task<IReadOnlyList<MiscellaneousIssueReport>> MIssueReport(string DateFrom, string DateTo)
         {
 
@@ -286,7 +278,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
             return await issues.ToListAsync();
         }
-
         public async Task<IReadOnlyList<WarehouseReport>> NearlyExpireItemsReport(int expirydays)
         {
             var preparationOut = _context.Transformation_Preparation.Where(x => x.IsActive == true)
@@ -402,7 +393,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .ToListAsync();
 
         }
-
         public async Task<IReadOnlyList<MoveOrderReport>> TransactedMoveOrderReport(string DateFrom, string DateTo)
         {
             var orders = (from transact in _context.TransactMoveOrder
@@ -483,7 +473,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
             return await orders.ToListAsync();
         }
-
         public async Task<IReadOnlyList<CancelledOrderReport>> CancelledOrderedReports(string DateFrom, string DateTo)
         {
 
@@ -510,9 +499,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             return await orders.ToListAsync();
 
         }
-
-        public async Task<IReadOnlyList<InventoryMovementReport>> InventoryMovementReport(string DateFrom,
-            string DateTo, string PlusOne)
+        public async Task<IReadOnlyList<InventoryMovementReport>> InventoryMovementReport(string DateFrom, string DateTo, string PlusOne)
         {
             var dateToday = DateTime.Now.ToString("MM/dd/yyyy");
 
@@ -895,7 +882,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             return await movementInventory.ToListAsync();
 
         }
-
         public async Task<IReadOnlyList<ConsolidatedReport>> ConsolidatedReport(string dateFrom, string dateTo)
         {
             var consolidatedReports = new List<ConsolidatedReport>();
@@ -1080,6 +1066,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
     return consolidatedReports;
         }
+        
     }
 }
 

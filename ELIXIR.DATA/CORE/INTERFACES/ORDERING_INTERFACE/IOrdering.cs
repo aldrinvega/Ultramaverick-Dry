@@ -110,5 +110,9 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<bool> ValidateIfForAllocation(List<Ordering> orders);
         Task<bool> CancelForPendingAllocation(string customer);
         Task<bool> ManualAllocationForOrders(List<ManualAllocation> manualAllocations);
+        
+        
+        //Testing
+        Task<bool> AddNewOrdersTest(Ordering[] orders);
     }
 }
