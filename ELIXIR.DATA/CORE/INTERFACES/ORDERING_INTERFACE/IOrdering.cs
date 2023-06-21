@@ -21,7 +21,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<IReadOnlyList<OrderDto>> GetAllListOfPreparedDate();
         Task<bool> ApprovePreparedDate(List<Ordering> orders);
         Task<bool> RejectPreparedDate(List<Ordering> orders);
-        Task<bool> AddNewOrders(Ordering orders);
+        Task<bool> ValidateNewOrders(Ordering orders);
+        
         Task<IReadOnlyList<OrderDto>> OrderSummary(string DateFrom, string DateTo);
         Task<bool> ValidateCustomerName(Ordering orders);
         Task<bool> ValidateCustomerCode(Ordering orders);
@@ -112,7 +113,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<bool> ManualAllocationForOrders(List<ManualAllocation> manualAllocations);
         
         
-        //Testing
-        Task<bool> AddNewOrdersTest(Ordering[] orders);
+        //Orders
+        Task<bool> AddNewOrders(Ordering[] orders);
     }
 }

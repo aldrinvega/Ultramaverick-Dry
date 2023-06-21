@@ -118,8 +118,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         }
 
         [HttpPost]
-        [Route("AddNewOrders")]
-        public async Task<IActionResult> AddNewOrders([FromBody] Ordering[] order)
+        [Route("ValidateNewOrders")]
+        public async Task<IActionResult> ValidateNewOrders([FromBody] Ordering[] order)
         {
 
             List<Ordering> notExistFarmName = new List<Ordering>();
@@ -177,7 +177,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 orderList.Add(items);
 
                 
-                await _unitOfWork.Order.AddNewOrders(items);
+                await _unitOfWork.Order.ValidateNewOrders(items);
             }
 
 
@@ -211,10 +211,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         }
 
         [HttpPost]
-        [Route("AddnewOrdersTest")]
+        [Route("AddNewOrder")]
         public async Task<IActionResult> AddNewOrdersTest([FromBody] Ordering[] order)
         {
-            var orders = await _unitOfWork.Order.AddNewOrdersTest(order);
+            var orders = await _unitOfWork.Order.AddNewOrders(order);
             return Ok();
         }
 

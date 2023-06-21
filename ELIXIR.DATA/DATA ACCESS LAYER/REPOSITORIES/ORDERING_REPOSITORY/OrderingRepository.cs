@@ -411,7 +411,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                           });
             return await orders.ToListAsync();
         }
-        public async Task<bool> AddNewOrders(Ordering orders)
+        public async Task<bool> ValidateNewOrders(Ordering orders)
         {
 
             orders.IsActive = true;
@@ -421,7 +421,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return true;
 
         }
-        public async Task<bool> AddNewOrdersTest(Ordering[] orders)
+        public async Task<bool> AddNewOrders(Ordering[] orders)
         {
 
             foreach (var order in orders)
