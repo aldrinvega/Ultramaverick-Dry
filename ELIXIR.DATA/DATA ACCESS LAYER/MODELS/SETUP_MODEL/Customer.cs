@@ -77,8 +77,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
         }
         public List<Ordering> Orders
         {
-            get; set;
-        } = new List<Ordering>();
+            get;
+            set;
+        } = new();
 
     }
 

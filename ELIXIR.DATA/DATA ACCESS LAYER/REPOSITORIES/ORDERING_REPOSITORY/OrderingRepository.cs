@@ -440,11 +440,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                                                        .FirstOrDefaultAsync();
 
             if (customername == null)
+            {
                 return false;
-
-
+            }
             return true;
-            
         }
         public async Task<bool> ValidateCustomerCode(Ordering orders)
         {

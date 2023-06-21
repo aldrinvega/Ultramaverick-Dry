@@ -147,7 +147,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 {
                     duplicateList.Add(items);
                 }
-
                 else if (validateFarmName == false)
                 {
                     notExistFarmName.Add(items);
@@ -203,10 +202,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 return Ok("Successfully add new orders!");
             }
 
-            else
-            {
-                return BadRequest(resultList);
-            }
+            return BadRequest(resultList);
 
         }
 
