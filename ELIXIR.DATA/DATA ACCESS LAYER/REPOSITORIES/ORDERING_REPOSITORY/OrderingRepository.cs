@@ -219,13 +219,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 }
                 return false;
             }
-
-            if (existingOrder.QuantityOrdered >= orders.QuantityOrdered)
-            {
-                existingOrder.QuantityOrdered = orders.QuantityOrdered;
-                return true;
-            }
-            return false;
+            
+            existingOrder.QuantityOrdered = orders.QuantityOrdered;
+            return true;
         }
         public async Task<bool> SchedulePreparedDate(Ordering orders)
         {
@@ -519,25 +515,23 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             //                              });
 
             var customers = _context.Customers
-                            .Include(x => x.Orders)
-                            .Where(x => x.IsActive == true)
-                            .Where(x => x.Orders.Any(x => x.IsActive == true))
-                            .Where(x => x.Orders.Any(x => x.PreparedDate == null))
-                            .Where(x => x.Orders.Any(x => x.ForAllocation == null))
-                            .Select(x => new CustomerListForPreparationSchedule
-                            {
-                             Id = x.Id,
-                             CustomerCode = x.CustomerCode,
-                             CustomerName = x.CustomerName,
-                             DepartmentName = x.DepartmentName,
-                             CompanyName = x.CompanyName,
-                             LocationName = x.LocationName,
-                             FarmName = x.FarmType.FarmName,
-                             });
+                .Include(x => x.Orders)
+                .Where(x => x.IsActive == true &&
+                            x.Orders.Any(o => o.IsActive == true &&
+                                              o.PreparedDate == null &&
+                                              o.ForAllocation == null))
+                .Select(x => new CustomerListForPreparationSchedule
+                {
+                    Id = x.Id,
+                    CustomerCode = x.CustomerCode,
+                    CustomerName = x.CustomerName,
+                    DepartmentName = x.DepartmentName,
+                    CompanyName = x.CompanyName,
+                    LocationName = x.LocationName,
+                    FarmName = x.FarmType.FarmName
+                });
 
             return await PagedList<CustomerListForPreparationSchedule>.CreateAsync(customers, userParams.PageNumber, userParams.PageSize);
-
-
         }
         public async Task<IReadOnlyList<OrderDto>> GetOrdersForNotification()
         {
@@ -601,23 +595,26 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     }
                     return true;
                 }
-        public async Task<bool> CancelOrders(Ordering orders)
+        public async Task<bool> CancelOrders(Ordering[] orders)
         {
-            var existing = await _context.Orders.Where(x => x.Id == orders.Id)
-                                                .Where(x => x.IsActive == true)
-                                                .Where(x => x.IsCancelledOrder == true)
-                                                .Where(x => x.IsCancelledOrder == null)
-                                                .FirstOrDefaultAsync();
 
-            if (existing == null)
-                return false;
+            foreach (var order in orders)
+            {
+                var existing = await _context.Orders.Where(x => x.Id == order.Id)
+                    .Where(x => x.IsActive == true)
+                    .Where(x => x.IsCancelledOrder == true || x.IsCancelledOrder == null)
+                    .FirstOrDefaultAsync();
 
-            existing.IsActive = false;
-            existing.IsCancelBy = orders.IsCancelBy;
-            existing.IsCancel = true;
-            existing.CancelDate = DateTime.Now;
-            existing.Remarks = orders.Remarks;
+                if (existing == null)
+                    return false;
 
+                existing.IsActive = false;
+                existing.IsCancelBy = order.IsCancelBy;
+                existing.IsCancel = true;
+                existing.CancelDate = DateTime.Now;
+                existing.Remarks = order.Remarks;
+            }
+            
             return true;
                                                
         }
@@ -770,6 +767,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.OrderCustomer.Order.FarmName,
                 x.OrderCustomer.Order.IsActive,
                 x.OrderCustomer.Order.IsApproved,
+                x.OrderCustomer.Order.PreparedDate,
                 x.OrderCustomer.Order.IsMove,
                 x.OrderCustomer.Customer.Id,
                 x.OrderCustomer.Customer.CompanyCode,
@@ -780,8 +778,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             })
             .Where(x => x.Key.IsActive == true)
             .Where(x => x.Key.IsApproved == true)
+            .Where(x => x.Key.PreparedDate != null)
             .Where(x => x.Key.IsMove == false)
-                    .Select(x => new CustomersForMoveOrderDTO
+            .Select(x => new CustomersForMoveOrderDTO
                 {
                     Farm = x.Key.FarmName,
                     IsActive = x.Key.IsActive,

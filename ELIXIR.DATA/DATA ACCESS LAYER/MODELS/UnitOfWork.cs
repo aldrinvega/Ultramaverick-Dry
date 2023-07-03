@@ -25,7 +25,9 @@ using ELIXIR.DATA.SERVICES;
 using Microsoft.AspNetCore.SignalR;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.CORE.INTERFACES.CANCELLED_INTERFACE;
+using ELIXIR.DATA.CORE.INTERFACES.LABTEST_INTERFACE;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.CANCELLED_ORDERS;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.LABTEST_REPOSITORY;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
 {
@@ -84,8 +86,16 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
 
         //Cancelled Orders
         public ICancelledOrders CancelledOrders { get; set; }
-        
+
         //public IOrderHub Hub { get; set; }
+        
+        //LabTest
+        
+        public ILabTestInterface LaboratoryTest
+        {
+            get;
+            set;
+        }
         
 
         public UnitOfWork(
@@ -142,6 +152,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
 
             //Cancelled Orders
             CancelledOrders = new CancelledOrdersRepository(_context);
+
+            LaboratoryTest = new LabTestRepository(_context);
         }
         public async Task CompleteAsync()
         {

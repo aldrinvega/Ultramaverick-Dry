@@ -140,7 +140,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 var validateFarmCode = await _unitOfWork.Order.ValidateCustomerCode(items);
                 var validateRawMaterial = await _unitOfWork.Order.ValidateRawMaterial(items);
                 var validateUom = await _unitOfWork.Order.ValidateUom(items);
-                var validateDateNeeded = await _unitOfWork.Order.ValidateOrderAndDateNeeded(items);
+                // var validateDateNeeded = await _unitOfWork.Order.ValidateOrderAndDateNeeded(items);
                
 
                 if (validateDuplicate == false)
@@ -166,10 +166,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 {
                     notExistUom.Add(items);
                 }
-                else if (validateDateNeeded == false)
-                {
-                    previousdateNeeded.Add(items);
-                }
+                // else if (validateDateNeeded == false)
+                // {
+                //     previousdateNeeded.Add(items);
+                // }
 
                 else 
                     filteredOrders.Add(items);
@@ -242,7 +242,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpPut]
         [Route("CancelOrders")]
-        public async Task<IActionResult> CancelOrders([FromBody] Ordering orders)
+        public async Task<IActionResult> CancelOrders([FromBody] Ordering[] orders)
         {
 
             var validate = await _unitOfWork.Order.CancelOrders(orders);
@@ -349,8 +349,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             return Ok(orders);
 
         }
-
-
+        
         [HttpGet]
         [Route("GetAllOutOfStockByItemCodeAndOrderDate")]
         public async Task<IActionResult> GetAllOutOfStockByItemCodeAndOrderDate([FromQuery] string itemcode,
@@ -362,8 +361,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             return Ok(orders);
 
         }
-
-
+        
         [HttpPost]
         [Route("PrepareItemsForMoveOrder")]
         public async Task<IActionResult> PrepareItemsForMoveOrder([FromBody] MoveOrder order)

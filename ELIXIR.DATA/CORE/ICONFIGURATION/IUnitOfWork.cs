@@ -9,6 +9,7 @@ using ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.TRANSFORMATION_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.WAREHOUSE_INTERFACE;
 using System.Threading.Tasks;
+using ELIXIR.DATA.CORE.INTERFACES.LABTEST_INTERFACE;
 
 namespace ELIXIR.DATA.CORE.ICONFIGURATION
 {
@@ -65,6 +66,13 @@ namespace ELIXIR.DATA.CORE.ICONFIGURATION
         
         //Cancelled Orders
         ICancelledOrders CancelledOrders { get; set; }
+        
+        //LabTest 
+        ILabTestInterface LaboratoryTest
+        {
+            get;
+            set;
+        }
 
         Task CompleteAsync();
 

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
+using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 
 namespace ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE
 {

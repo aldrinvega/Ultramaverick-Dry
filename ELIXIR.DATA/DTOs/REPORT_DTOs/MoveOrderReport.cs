@@ -8,8 +8,8 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
 {
     public class MoveOrderReport
     {
-        public int MoveOrderId { get; set; }
-        public int OrderNo { get; set; }
+        public int? MoveOrderId { get; set; }
+        public int? OrderNo { get; set; }
         public string CustomerCode { get; set; }
         public string CustomerName { get; set; }
         public string FarmType { get; set; }
@@ -19,7 +19,7 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public string ItemDescription { get; set; }
         public string Uom { get; set; }
         public string Category { get; set; }
-        public decimal Quantity { get; set; }
+        public decimal? Quantity { get; set; }
         public string ExpirationDate { get; set; }
         public string TransactionType { get; set; }
         public string MoveOrderBy { get; set; }
@@ -30,7 +30,18 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public string BatchNo { get; set; }
         public string DeliveryDate { get; set; }
 
-        public decimal WeightedAverageUnitCost
+        public string PreparedDate
+        {
+            get;
+            set;
+        }
+
+        public decimal? UnitPrice
+        {
+            get;
+            set;
+        }
+        public decimal? WeightedAverageUnitCost
         {
             get;
             set;

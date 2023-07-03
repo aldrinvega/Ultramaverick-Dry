@@ -11,8 +11,10 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
+using ELIXIR.DATA.DTOs.REPORT_DTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
@@ -100,6 +102,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         {
             get; set;
         }
+
+        public DbSet<MoveOrderReport> MoveOrderReports
+        {
+            get;
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CheckListString>()
@@ -112,6 +120,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                         c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                         c => c.ToList()
                         ));
+
+            modelBuilder.Entity<MoveOrderReport>(entity =>
+            {
+                entity.HasNoKey();
+            });
         }
     }
 }
