@@ -8,6 +8,7 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
 {
     public class CustomersForMoveOrderDTO
     {
+
         public string Farm
         {
             get;
@@ -24,6 +25,17 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
             set;
         }
         public int CustomerId
+        {
+            get;
+            set;
+        }
+
+        public string CustomerCode
+        {
+            get;
+            set;
+        }
+        public string CustomerName
         {
             get;
             set;

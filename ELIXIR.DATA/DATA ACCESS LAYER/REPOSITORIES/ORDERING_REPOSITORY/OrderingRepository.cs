@@ -115,7 +115,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
                               select new ReserveInventory
                               {
-
                                   ItemCode = total.Key.ItemCode,
                                   Reserve = total.Key.ActualGood - ((total.Key.QuantityOrdered != null ? total.Key.QuantityOrdered : 0) + (total.Key.Quantity != null ? total.Key.Quantity : 0))
                               });
@@ -129,9 +128,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.CompanyName,
                 x.CompanyCode
             });
-
-    
-           
+            
             var orders = (from ordering in _context.Orders
                 where ordering.FarmName == farms && ordering.PreparedDate == null && ordering.IsActive == true &&
                       ordering.ForAllocation == null && ordering.IsCancelledOrder == null
@@ -255,7 +252,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             return await orders.Where(x => x.IsApproved != true)
                                .ToListAsync();
-
         }
         public async Task<bool> ApprovePreparedDate(List<Ordering> orders)
         {
@@ -515,21 +511,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             //                              });
 
             var customers = _context.Customers
-                .Include(x => x.Orders)
-                .Where(x => x.IsActive == true &&
-                            x.Orders.Any(o => o.IsActive == true &&
-                                              o.PreparedDate == null &&
-                                              o.ForAllocation == null))
-                .Select(x => new CustomerListForPreparationSchedule
-                {
-                    Id = x.Id,
-                    CustomerCode = x.CustomerCode,
-                    CustomerName = x.CustomerName,
-                    DepartmentName = x.DepartmentName,
-                    CompanyName = x.CompanyName,
-                    LocationName = x.LocationName,
-                    FarmName = x.FarmType.FarmName
-                });
+    .Include(x => x.Orders)
+    .Where(x => x.IsActive == true &&
+                x.Orders.Any(o => o.IsActive == true &&
+                                    o.PreparedDate == null &&
+                                    o.ForAllocation == null))
+    .Select(x => new CustomerListForPreparationSchedule
+    {
+        Id = x.Id,
+        CustomerCode = x.CustomerCode,
+        CustomerName = x.CustomerName,
+        DepartmentName = x.DepartmentName,
+        CompanyName = x.CompanyName,
+        LocationName = x.LocationName,
+        FarmName = x.FarmType.FarmName
+    });
 
             return await PagedList<CustomerListForPreparationSchedule>.CreateAsync(customers, userParams.PageNumber, userParams.PageSize);
         }
@@ -660,7 +656,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         {
             var orders = _context.Orders.Select(x => new OrderDto
             {
-
                 OrderDate = x.OrderDate.ToString("MM/dd/yyyy"),
                 DateNeeded = x.DateNeeded.ToString("MM/dd/yyyy"),
                 Farm = x.FarmName,
@@ -670,7 +665,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 ItemDescription = x.ItemDescription,
                 Uom = x.Uom,
                 QuantityOrder = x.AllocatedQuantity == null ? x.QuantityOrdered : (decimal)x.AllocatedQuantity
-
             });
             return await orders.Where(x => x.Farm == farm)
                                .ToListAsync();
@@ -750,7 +744,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         public async Task<PagedList<CustomersForMoveOrderDTO>> GetAllListForMoveOrderPagination(UserParams userParams)
         {
 
-            var orders = 
+            var orders =
                 _context.Orders
             .Join(
                      _context.Customers,
@@ -761,7 +755,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 _context.Farms,
                 joined => joined.Customer.FarmTypeId,
                 farm => farm.Id,
-                (joined, farm) => new {OrderCustomer = joined, Farm = farm})
+                (joined, farm) => new { OrderCustomer = joined, Farm = farm })
             .GroupBy(x => new
             {
                 x.OrderCustomer.Order.FarmName,
@@ -774,24 +768,26 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 x.OrderCustomer.Customer.CompanyName,
                 x.OrderCustomer.Customer.DepartmentName,
                 x.OrderCustomer.Customer.LocationName,
+                x.OrderCustomer.Order.IsCancelledOrder,
                 FarmType = x.Farm.FarmName
             })
             .Where(x => x.Key.IsActive == true)
             .Where(x => x.Key.IsApproved == true)
             .Where(x => x.Key.PreparedDate != null)
             .Where(x => x.Key.IsMove == false)
+            .Where(x => x.Key.IsCancelledOrder == null)
             .Select(x => new CustomersForMoveOrderDTO
-                {
-                    Farm = x.Key.FarmName,
-                    IsActive = x.Key.IsActive,
-                    IsApproved = x.Key.IsApproved != null,
-                    CustomerId = x.Key.Id,
-                    CompanyCode = x.Key.CompanyCode,
-                    CompanyName = x.Key.CompanyName,
-                    DepartmentName = x.Key.DepartmentName,
-                    LocationName = x.Key.LocationName,
-                    FarmType = x.Key.FarmType
-                 });
+            {
+                Farm = x.Key.FarmName,
+                IsActive = x.Key.IsActive,
+                IsApproved = x.Key.IsApproved != null,
+                CustomerId = x.Key.Id,
+                CompanyCode = x.Key.CompanyCode,
+                CompanyName = x.Key.CompanyName,
+                DepartmentName = x.Key.DepartmentName,
+                LocationName = x.Key.LocationName,
+                FarmType = x.Key.FarmType
+            });
 
             return await PagedList<CustomersForMoveOrderDTO>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
@@ -1069,7 +1065,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     Id = x.Id,
                     OrderNo = x.OrderNoPKey,
                     Farm = x.FarmName,
-                    FarmCode = x.FarmCode, 
+                    FarmCode = x.FarmCode,
                     FarmType = x.FarmType, 
                     ItemCode = x.ItemCode, 
                     ItemDescription = x.ItemDescription, 
@@ -1082,8 +1078,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 });
 
                 return await orders.Where(x => x.Id == orderid)
-                                   .FirstOrDefaultAsync();
-             
+                    .FirstOrDefaultAsync();
         }
         public async Task<ItemStocks> GetActualItemQuantityInWarehouse(int id, string itemcode)
         {

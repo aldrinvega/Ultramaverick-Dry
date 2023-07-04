@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20230602052044_AddReasonColumntoMiscEntity")]
-    partial class AddReasonColumntoMiscEntity
+    [Migration("20230704031841_AddAccountTitleEntity")]
+    partial class AddAccountTitleEntity
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -732,9 +732,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("Checlist_Type")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PO_ReceivingId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("PO_Summary_Id")
                         .HasColumnType("int");
 
@@ -748,8 +745,6 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ChecklistStringId");
-
-                    b.HasIndex("PO_ReceivingId");
 
                     b.ToTable("CheckListStrings");
                 });
@@ -878,6 +873,36 @@ namespace ELIXIR.DATA.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("QC_Reject");
+                });
+
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.AccountTitle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("AccountTitleCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AccountTitleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AccountTitleName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AccountTitles");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Analysis", b =>
@@ -1997,13 +2022,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.CheckListString", b =>
-                {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL.PO_Receiving", null)
-                        .WithMany("Checklist")
-                        .HasForeignKey("PO_ReceivingId");
-                });
-
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", b =>
                 {
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.FarmType", "FarmType")
@@ -2081,11 +2099,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Navigation("Department");
 
                     b.Navigation("UserRole");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL.PO_Receiving", b =>
-                {
-                    b.Navigation("Checklist");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", b =>

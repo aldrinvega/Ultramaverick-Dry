@@ -873,6 +873,36 @@ namespace ELIXIR.DATA.Migrations
                     b.ToTable("QC_Reject");
                 });
 
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.AccountTitle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("AccountTitleCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AccountTitleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AccountTitleName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AccountTitles");
+                });
+
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Analysis", b =>
                 {
                     b.Property<int>("Id")

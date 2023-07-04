@@ -74,6 +74,12 @@ namespace ELIXIR.DATA.CORE.ICONFIGURATION
             set;
         }
 
+        IAccountTitleRepository AccountTitle
+        {
+            get;
+            set;
+        }
+
         Task CompleteAsync();
 
 

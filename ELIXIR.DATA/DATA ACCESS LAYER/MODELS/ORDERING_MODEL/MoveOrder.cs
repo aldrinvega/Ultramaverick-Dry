@@ -50,6 +50,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
         public string CompanyCode { get; set; }
         public string AddedBy { get; set; }
         public string CheckedBy { get; set; }
-        public DateTime TimeStamp { get; set; } = DateTime.Now;
+        public DateTime? TimeStamp { get; set; } = DateTime.Now;
     }
 }

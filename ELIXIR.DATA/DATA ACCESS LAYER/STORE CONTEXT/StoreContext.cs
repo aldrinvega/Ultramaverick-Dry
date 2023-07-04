@@ -103,7 +103,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
             get; set;
         }
 
-        public DbSet<MoveOrderReport> MoveOrderReports
+        public DbSet<AccountTitle> AccountTitles
         {
             get;
         }
@@ -121,10 +121,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                         c => c.ToList()
                         ));
 
-            modelBuilder.Entity<MoveOrderReport>(entity =>
-            {
-                entity.HasNoKey();
-            });
         }
     }
 }

@@ -96,6 +96,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
             get;
             set;
         }
+
+        public IAccountTitleRepository AccountTitle
+        {
+            get;
+            set;
+        }
         
 
         public UnitOfWork(
@@ -148,12 +154,16 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
             QcChecklist = new ChecklistRepository(_context);
 
             LabtestMasterlist = new LabTestMasterList(_context);
+            
             ProductType = new ProductTypeRepository(_context);
 
             //Cancelled Orders
             CancelledOrders = new CancelledOrdersRepository(_context);
 
             LaboratoryTest = new LabTestRepository(_context);
+
+            AccountTitle = new AccountTitleRepository(_context);
+            
         }
         public async Task CompleteAsync()
         {
