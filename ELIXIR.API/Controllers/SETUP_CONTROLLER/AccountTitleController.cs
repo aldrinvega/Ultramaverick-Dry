@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.ICONFIGURATION;
 using ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -75,6 +77,28 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             {
                 return Conflict(e.Message);
             }
+        }
+
+        [HttpGet]
+        [Route("GetAllAccountTitleAsyncPagination")]
+        public async Task<IActionResult> GetAllAccountTitleAsyncPagination([FromRoute]bool status, [FromQuery] UserParams userParams)
+        {
+            var accountTitles = await _unitOfWork.AccountTitle.GetAllAccountTitleAsyncPagination(status, userParams);
+            
+            Response.AddPaginationHeader(accountTitles.PageSize, accountTitles.CurrentPage, accountTitles.TotalPages, accountTitles.TotalCount, accountTitles.HasNextPage, accountTitles.HasPreviousPage);
+
+            var accountTitle = new
+            {
+                accountTitles,
+                accountTitles.PageSize,
+                accountTitles.CurrentPage,
+                accountTitles.TotalCount,
+                accountTitles.TotalPages,
+                accountTitles.HasPreviousPage,
+                accountTitles.HasNextPage
+            };
+
+            return Ok(accountTitles);
         }
     }
 }

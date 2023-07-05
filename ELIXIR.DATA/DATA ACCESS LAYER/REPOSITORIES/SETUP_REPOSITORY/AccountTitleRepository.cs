@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
@@ -64,6 +65,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             }
 
             return accountTitle;
+        }
+
+        public async Task<PagedList<AccountTitle>> GetAllAccountTitleAsyncPagination(bool status, UserParams userParams)
+        {
+            var accountTitle = _context.AccountTitles.Where(x => x.IsActive == status);
+
+            return await PagedList<AccountTitle>.CreateAsync(accountTitle, userParams.PageSize, userParams.PageSize);
+
         }
     }
 }
