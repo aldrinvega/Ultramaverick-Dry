@@ -8,5 +8,6 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
     {
         Task<bool> AddNewAccountTitle(IEnumerable<AccountTitle> accountTitle);
         Task<bool> UpdateAccountTitle(AccountTitle accountTitle);
+        Task<IEnumerable<AccountTitle>> GetAllAccountTitleAsync();
     }
 }

@@ -61,5 +61,20 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 });
             }
         }
+
+        [HttpGet]
+        [Route("GetAllAccountTitleAsync")]
+        public async Task<IActionResult> GetAllAccountTitlesAsync()
+        {
+            try
+            {
+                var accountTitles = await _unitOfWork.AccountTitle.GetAllAccountTitleAsync();
+                return Ok(accountTitles);
+            }
+            catch (Exception e)
+            {
+                return Conflict(e.Message);
+            }
+        }
     }
 }

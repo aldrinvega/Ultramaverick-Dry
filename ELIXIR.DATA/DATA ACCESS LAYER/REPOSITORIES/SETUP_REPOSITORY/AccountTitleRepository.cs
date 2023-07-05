@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
@@ -52,6 +53,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<IEnumerable<AccountTitle>> GetAllAccountTitleAsync()
+        {
+            var accountTitle = await _context.AccountTitles.Where(a => a.IsActive == true).ToListAsync();
+            if (accountTitle == null)
+            {
+                throw new Exception();
+            }
+
+            return accountTitle;
         }
     }
 }
