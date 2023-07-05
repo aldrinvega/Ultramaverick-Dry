@@ -28,6 +28,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                         AccountTitleId = ac.AccountTitleId,
                         AccountTitleName = ac.AccountTitleName,
                         AccountTitleCode = ac.AccountTitleCode,
+                        CreatedAt = ac.CreatedAt,
+                        UpdatedAt = ac.UpdatedAt,
                         IsActive = false
                     }).RunAsync();
             }

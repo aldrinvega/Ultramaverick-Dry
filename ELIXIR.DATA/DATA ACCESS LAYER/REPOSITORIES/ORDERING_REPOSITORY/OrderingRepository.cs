@@ -524,7 +524,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         DepartmentName = x.DepartmentName,
         CompanyName = x.CompanyName,
         LocationName = x.LocationName,
-        FarmName = x.FarmType.FarmName
+        FarmName = x.FarmType.FarmName,
+        Orders = x.Orders
     });
 
             return await PagedList<CustomerListForPreparationSchedule>.CreateAsync(customers, userParams.PageNumber, userParams.PageSize);

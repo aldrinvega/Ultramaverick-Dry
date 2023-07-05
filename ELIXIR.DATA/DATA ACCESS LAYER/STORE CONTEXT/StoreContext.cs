@@ -4,6 +4,7 @@ using System.Linq;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL;
@@ -11,10 +12,8 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.TRANSFORMATION_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
-using ELIXIR.DATA.DTOs.REPORT_DTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
@@ -22,18 +21,42 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
     public class StoreContext : DbContext
     {
         public StoreContext(DbContextOptions<StoreContext> options) : base(options) { }
-      
-        public virtual DbSet<User> Users { get; set; }
 
-        public virtual DbSet<UserRole> Roles { get; set; }
+        public virtual DbSet<User> Users
+        {
+            get;
+            set;
+        }
 
-        public virtual DbSet<Department> Departments { get; set; }
+        public virtual DbSet<UserRole> Roles
+        {
+            get;
+            set;
+        }
 
-        public virtual DbSet<Module> Modules { get; set; }
+        public virtual DbSet<Department> Departments
+        {
+            get;
+            set;
+        }
 
-        public virtual DbSet<UserRole_Modules> RoleModules { get; set; }
+        public virtual DbSet<Module> Modules
+        {
+            get;
+            set;
+        }
 
-        public virtual DbSet<MainMenu> MainMenus { get; set; }
+        public virtual DbSet<UserRole_Modules> RoleModules
+        {
+            get;
+            set;
+        }
+
+        public virtual DbSet<MainMenu> MainMenus
+        {
+            get;
+            set;
+        }
 
         public virtual DbSet<UOM> UOMS { get; set; }
 
@@ -86,18 +109,31 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public virtual DbSet<MiscellaneousReceipt> MiscellaneousReceipts { get; set; }
 
         public virtual DbSet<MiscellaneousIssue> MiscellaneousIssues { get; set; }
+        
         public virtual DbSet<MiscellaneousIssueDetails> MiscellaneousIssueDetails { get; set; }
+        
         public virtual DbSet<Transaction> Transactions { get; set; }
+        
         public virtual DbSet<ChecklistForCompliants> ChecklistForCompliant { get; set; }
+        
         public virtual DbSet<CheckListInputs> CheckListInput { get; set; }
+        
         public virtual DbSet<CheckListString> CheckListStrings { get; set; }
+        
         public virtual DbSet<Analysis> Analyses { get; set; }
+        
         public virtual DbSet<Parameters> Parameters { get; set; }
+        
         public virtual DbSet<SampleType> SampleTypes { get; set; }
+        
         public virtual DbSet<TypeOfSwab> TypeOfSwabs { get; set; }
+        
         public virtual DbSet<ProductCondition> ProductConditions { get; set; }
+        
         public virtual DbSet<Disposition> Dispositions { get; set; }
+        
         public virtual DbSet<ProductType> ProductTypes { get; set; }
+        
         public virtual DbSet<CancelledOrders> CancelledOrders
         {
             get; set;
@@ -106,10 +142,104 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public DbSet<AccountTitle> AccountTitles
         {
             get;
+            set;
         }
+        
+        //LabTest
+        
+        public virtual DbSet<LabTestRequests> LabTestRequests
+        {
+            get;
+            set;
+        }
+        public virtual DbSet<OnGoingLabTest> OnGoingLabTests
+        {
+            get;
+            set;
+        }
+
+        public virtual DbSet<ReturnedItems> ReturnedItems
+        {
+            get;
+            set;
+        }
+
+        public virtual DbSet<RejectedItems> RejectedItems
+        {
+            get;
+            set;
+        }
+        
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<LabTestRequests>()
+                .Property(e => e.Analysis)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, null),
+                    new ValueComparer<List<string>>(
+                        (c1, c2) => c1.SequenceEqual(c2),
+                        c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                        c => c.ToList()
+                        ));
+            
+            modelBuilder.Entity<LabTestRequests>()
+                .Property(e => e.Disposition)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, null),
+                    new ValueComparer<List<string>>(
+                        (c1, c2) => c1.SequenceEqual(c2),
+                        c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                        c => c.ToList()
+                    ));
+            
+            modelBuilder.Entity<LabTestRequests>()
+                .Property(e => e.Parameters)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, null),
+                    new ValueComparer<List<string>>(
+                        (c1, c2) => c1.SequenceEqual(c2),
+                        c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                        c => c.ToList()
+                    ));
+            
+            modelBuilder.Entity<LabTestRequests>()
+                .Property(e => e.ProductCondition)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, null),
+                    new ValueComparer<List<string>>(
+                        (c1, c2) => c1.SequenceEqual(c2),
+                        c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                        c => c.ToList()
+                    ));
+            
+            modelBuilder.Entity<LabTestRequests>()
+                .Property(e => e.SampleType)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, null),
+                    new ValueComparer<List<string>>(
+                        (c1, c2) => c1.SequenceEqual(c2),
+                        c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                        c => c.ToList()
+                    ));
+            
+            modelBuilder.Entity<LabTestRequests>()
+                .Property(e => e.TypeOfSwab)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, null),
+                    new ValueComparer<List<string>>(
+                        (c1, c2) => c1.SequenceEqual(c2),
+                        c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                        c => c.ToList()
+                    ));
+            
             modelBuilder.Entity<CheckListString>()
                 .Property(e => e.Value)
                 .HasConversion(
@@ -119,7 +249,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                         (c1, c2) => c1.SequenceEqual(c2),
                         c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                         c => c.ToList()
-                        ));
+                    ));
 
         }
     }
