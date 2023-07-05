@@ -71,7 +71,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         {
             var accountTitle = _context.AccountTitles.Where(x => x.IsActive == status);
 
-            return await PagedList<AccountTitle>.CreateAsync(accountTitle, userParams.PageSize, userParams.PageSize);
+            return await PagedList<AccountTitle>.CreateAsync(accountTitle, userParams.PageNumber, userParams.PageSize);
 
         }
     }

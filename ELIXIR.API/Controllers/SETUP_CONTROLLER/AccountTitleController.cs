@@ -44,7 +44,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             {
                 await _unitOfWork.AccountTitle.UpdateAccountTitle(accountTitle);
                 string status;
-                if (accountTitle.IsActive == true)
+                if (accountTitle.IsActive)
                 {
                     status = "Activated";
                 }
@@ -53,6 +53,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                     status = "Inactivated";
                 }
 
+                await _unitOfWork.CompleteAsync();
                 return Ok($"Account Title {accountTitle.AccountTitleName} is successfully {status}");
             }
             catch (Exception e)
@@ -80,8 +81,8 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpGet]
-        [Route("GetAllAccountTitleAsyncPagination")]
-        public async Task<IActionResult> GetAllAccountTitleAsyncPagination([FromRoute]bool status, [FromQuery] UserParams userParams)
+        [Route("GetAllAccountTitleAsyncPagination/{status}")]
+        public async Task<IActionResult> GetAllAccountTitleAsyncPagination([FromRoute] bool status, [FromQuery] UserParams userParams)
         {
             var accountTitles = await _unitOfWork.AccountTitle.GetAllAccountTitleAsyncPagination(status, userParams);
             
