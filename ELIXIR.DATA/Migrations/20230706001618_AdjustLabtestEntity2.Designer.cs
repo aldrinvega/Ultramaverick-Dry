@@ -4,14 +4,16 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20230706001618_AdjustLabtestEntity2")]
+    partial class AdjustLabtestEntity2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -286,32 +288,6 @@ namespace ELIXIR.DATA.Migrations
                     b.ToTable("MiscellaneousReceipts");
                 });
 
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL.AcceptedLabRequest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Disposition")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ExtendedExpirationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("LabTestRequestsId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LabTestRequestsId");
-
-                    b.ToTable("AcceptedLabRequests");
-                });
-
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL.LabTestRequests", b =>
                 {
                     b.Property<int>("Id")
@@ -328,22 +304,13 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DateNeeded")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateRequested")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Disposition")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Parameters")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductCondition")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SampleType")
@@ -352,78 +319,15 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TestType")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("TypeOfSwab")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("WarehouseReceivingId")
+                    b.Property<int>("WarehouseReceivedId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("WarehouseReceivingId");
 
                     b.ToTable("LabTestRequests");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL.RejectedItems", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<DateTime>("AllowableDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Disposition")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("LabTestRequestId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LabTestRequestId");
-
-                    b.ToTable("RejectedItems");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL.ReturnedItems", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<DateTime>("AllowableDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("LabTestRequestId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LabTestRequestId");
-
-                    b.ToTable("ReturnedItems");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.Module", b =>
@@ -2091,7 +1995,9 @@ namespace ELIXIR.DATA.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LabTestRequestId");
+                    b.HasIndex("LabTestRequestId")
+                        .IsUnique()
+                        .HasFilter("[LabTestRequestId] IS NOT NULL");
 
                     b.ToTable("WarehouseReceived");
                 });
@@ -2124,50 +2030,6 @@ namespace ELIXIR.DATA.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Warehouse_Reject");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL.AcceptedLabRequest", b =>
-                {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL.LabTestRequests", "LabTestRequests")
-                        .WithMany()
-                        .HasForeignKey("LabTestRequestsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LabTestRequests");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL.LabTestRequests", b =>
-                {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL.WarehouseReceiving", "WarehouseReceived")
-                        .WithMany()
-                        .HasForeignKey("WarehouseReceivingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("WarehouseReceived");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL.RejectedItems", b =>
-                {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL.LabTestRequests", "LabTestRequests")
-                        .WithMany()
-                        .HasForeignKey("LabTestRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LabTestRequests");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL.ReturnedItems", b =>
-                {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL.LabTestRequests", "LabTestRequest")
-                        .WithMany()
-                        .HasForeignKey("LabTestRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LabTestRequest");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.Module", b =>
@@ -2291,10 +2153,15 @@ namespace ELIXIR.DATA.Migrations
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL.WarehouseReceiving", b =>
                 {
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL.LabTestRequests", "LabTestRequests")
-                        .WithMany()
-                        .HasForeignKey("LabTestRequestId");
+                        .WithOne("WarehouseReceived")
+                        .HasForeignKey("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL.WarehouseReceiving", "LabTestRequestId");
 
                     b.Navigation("LabTestRequests");
+                });
+
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL.LabTestRequests", b =>
+                {
+                    b.Navigation("WarehouseReceived");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", b =>

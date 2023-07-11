@@ -64,24 +64,32 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
         public async Task<IActionResult> ReceiveRawMaterialsInWarehouse(string itemcode, [FromBody] WarehouseReceiving warehouse)
         {
             if (itemcode != warehouse.ItemCode)
+            {
                 return BadRequest();
+            }
 
-             var validateScanbarcode = await _unitOfWork.Warehouse.ScanBarcode(warehouse);
+            var validateScanbarcode = await _unitOfWork.Warehouse.ScanBarcode(warehouse);
 
             if (validateScanbarcode == false)
+            {
                 return BadRequest("Already scan all available items in list!");
-            
+            }
+
             var actualgood = await _unitOfWork.Warehouse.ReceiveMaterialsFromWarehouse(warehouse);
             
             if (actualgood == false)
+            {
                 return BadRequest("Receive failed! please check your input on actual good.");
-            
+            }
+
             var validatetotal = await _unitOfWork.Warehouse.ValidateActualAndRejectInput(warehouse);
             
             if (validatetotal == false)
+            {
                 return BadRequest("Received failed! actual good and reject are not equal to total goods.");
+            }
 
-            await _unitOfWork.Warehouse.CheckOrderInAllocationModule(warehouse);
+            // await _unitOfWork.Warehouse.CheckOrderInAllocationModule(warehouse);
             
             await _unitOfWork.CompleteAsync();
             //return new JsonResult("Successfully Received Raw Materials!");
@@ -108,13 +116,17 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
                 var validate = await _unitOfWork.Warehouse.RejectRawMaterialsByWarehouse(items);
 
                 if (validate == false)
+                {
                     return BadRequest("Reject failed!, you're trying to reject greater amount in total reject");
+                }
 
 
                 var validareject = await _unitOfWork.Warehouse.ValidateTotalReject(items);
 
                 if (validareject == false)
+                {
                     return BadRequest("Reject failed, there is no materials for reject!");
+                }
             }
 
             await _unitOfWork.CompleteAsync();

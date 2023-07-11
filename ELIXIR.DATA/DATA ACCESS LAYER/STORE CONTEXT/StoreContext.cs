@@ -152,28 +152,50 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
             get;
             set;
         }
-        public virtual DbSet<OnGoingLabTest> OnGoingLabTests
+
+        public virtual DbSet<ReceiveRequest> ReceiveRequests
         {
             get;
             set;
         }
-
+        // public virtual DbSet<OnGoingLabTest> OnGoingLabTests
+        // {
+        //     get;
+        //     set;
+        // }
+        //
         public virtual DbSet<ReturnedItems> ReturnedItems
         {
             get;
             set;
         }
-
+        
         public virtual DbSet<RejectedItems> RejectedItems
         {
             get;
             set;
         }
-        
-        
+
+        public virtual DbSet<LabTestResult> LabTestResults
+        {
+            get;
+            set;
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ReceiveRequest>()
+                .HasOne(l => l.LabTestRequests)
+                .WithMany()
+                .HasForeignKey(l => l.LabTestRequestsId);
+            
+            modelBuilder.Entity<LabTestRequests>()
+                .HasOne(l => l.WarehouseReceived)
+                .WithMany()
+                .HasForeignKey(l => l.WarehouseReceivingId);
+            
+            //AcceptedLabRequest
+            
             modelBuilder.Entity<LabTestRequests>()
                 .Property(e => e.Analysis)
                 .HasConversion(
@@ -184,17 +206,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                         c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                         c => c.ToList()
                         ));
-            
-            modelBuilder.Entity<LabTestRequests>()
-                .Property(e => e.Disposition)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, null),
-                    v => JsonSerializer.Deserialize<List<string>>(v, null),
-                    new ValueComparer<List<string>>(
-                        (c1, c2) => c1.SequenceEqual(c2),
-                        c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                        c => c.ToList()
-                    ));
             
             modelBuilder.Entity<LabTestRequests>()
                 .Property(e => e.Parameters)

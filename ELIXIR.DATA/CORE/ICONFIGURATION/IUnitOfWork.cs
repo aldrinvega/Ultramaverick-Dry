@@ -68,7 +68,7 @@ namespace ELIXIR.DATA.CORE.ICONFIGURATION
         ICancelledOrders CancelledOrders { get; set; }
         
         //LabTest 
-        ILabTestInterface LaboratoryTest
+        ILabTestRepository LaboratoryTest
         {
             get;
             set;

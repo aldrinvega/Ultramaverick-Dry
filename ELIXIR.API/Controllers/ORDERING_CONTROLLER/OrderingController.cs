@@ -31,7 +31,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("GetAllListofOrders")]
         public async Task<IActionResult> GetAllListofOrders([FromQuery] string farms)
         {
-            var orders = await _unitOfWork.Order.GetAllListofOrders(farms);
+            var orders = await _unitOfWork.Order.GetAllListOfOrders(farms);
             return Ok(orders);
         }
 
@@ -286,10 +286,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [HttpGet]
         [Route("GetAllListForMoveOrderPagination")]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetAllListForMoveOrderPagination(
-            [FromQuery] UserParams userParams)
+            [FromQuery] UserParams userParams, [FromQuery] string dateTo, string dateFrom)
         {
 
-            var orders = await _unitOfWork.Order.GetAllListForMoveOrderPagination(userParams);
+            var orders = await _unitOfWork.Order.GetAllListForMoveOrderPagination(userParams, dateTo, dateTo);
 
             Response.AddPaginationHeader(orders.CurrentPage, orders.PageSize, orders.TotalCount, orders.TotalPages,
                 orders.HasNextPage, orders.HasPreviousPage);
@@ -908,7 +908,5 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             await _unitOfWork.QcChecklist.AddChecklists(input);
             return Ok("Goods");
         }
-        
-
     }
 }

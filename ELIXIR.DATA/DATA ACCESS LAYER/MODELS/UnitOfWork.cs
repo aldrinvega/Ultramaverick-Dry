@@ -91,7 +91,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
         
         //LabTest
         
-        public ILabTestInterface LaboratoryTest
+        public ILabTestRepository LaboratoryTest
         {
             get;
             set;
@@ -163,6 +163,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
             LaboratoryTest = new LabTestRepository(_context);
 
             AccountTitle = new AccountTitleRepository(_context);
+            
+            
             
         }
         public async Task CompleteAsync()

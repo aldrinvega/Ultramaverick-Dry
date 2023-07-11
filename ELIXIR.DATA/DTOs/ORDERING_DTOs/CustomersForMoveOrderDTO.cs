@@ -70,5 +70,11 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
             get;
             set;
         }
+
+        public string PreparedDate
+        {
+            get;
+            set;
+        }
     }
 }

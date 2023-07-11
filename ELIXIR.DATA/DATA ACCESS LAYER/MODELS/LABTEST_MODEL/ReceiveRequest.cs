@@ -3,20 +3,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL
 {
-    public class ReturnedItems : BaseEntity
+    public class ReceiveRequest : BaseEntity
     {
         [ForeignKey("LabTestRequests")]
-        public int LabTestRequestId
+        public int LabTestRequestsId
         {
             get;
             set;
         }
 
-        public DateTime CreatedAt
+        public DateTime ExtendedExpirationDate
         {
             get;
             set;
-        } = DateTime.Now;
+        }
 
         public string Status
         {
@@ -24,19 +24,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL
             set;
         }
 
-        public DateTime AllowableDate
+        public string Disposition
         {
             get;
             set;
         }
 
-        public string Reason
-        {
-            get;
-            set;
-        }
-
-        public LabTestRequests LabTestRequest
+        public virtual LabTestRequests LabTestRequests
         {
             get;
             set;

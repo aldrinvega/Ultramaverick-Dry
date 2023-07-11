@@ -6,7 +6,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL
     public class RejectedItems : BaseEntity
     {
         [ForeignKey("LabTestRequests")]
-        public int? LabTestRequestId
+        public int LabTestRequestId
         {
             get;
             set;
@@ -24,7 +24,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL
             set;
         }
 
-        public string Reason
+        public DateTime AllowableDate
+        {
+            get;
+            set;
+        }
+
+        public string Disposition
         {
             get;
             set;

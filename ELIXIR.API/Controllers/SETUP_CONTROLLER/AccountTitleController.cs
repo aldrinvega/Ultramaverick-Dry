@@ -39,7 +39,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         public async Task<IActionResult> UpdateAccountTitleStatus(AccountTitle accountTitle)
         {
             
-
             try
             {
                 await _unitOfWork.AccountTitle.UpdateAccountTitle(accountTitle);
@@ -99,7 +98,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 accountTitles.HasNextPage
             };
 
-            return Ok(accountTitles);
+            return Ok(accountTitle);
         }
     }
 }

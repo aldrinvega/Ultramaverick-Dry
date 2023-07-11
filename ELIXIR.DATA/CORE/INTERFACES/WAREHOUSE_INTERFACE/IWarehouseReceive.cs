@@ -46,7 +46,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.WAREHOUSE_INTERFACE
 
         Task<PagedList<WarehouseReceivingDto>> GetAllWarehouseIdWithPagination(UserParams userParams);
         Task<PagedList<WarehouseReceivingDto>> GetAllWarehouseIdWithPaginationOrig(UserParams userParams, string search);
-        Task<bool> CheckOrderInAllocationModule(WarehouseReceiving warehouseReceiving);
+        // Task<bool> CheckOrderInAllocationModule(WarehouseReceiving warehouseReceiving);
 
     }
 }

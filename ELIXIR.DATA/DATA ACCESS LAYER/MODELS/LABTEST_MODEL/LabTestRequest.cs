@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
-using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL
 {
@@ -13,20 +12,39 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL
             get;
             set;
         }
+
         [ForeignKey("WarehouseReceiving")]
-        public int? WarehouseId
+        public int WarehouseReceivingId
+        {
+            get;
+            set;
+        }
+
+        public int Quantity
+        {
+            get;
+            set;
+        }
+
+        public string TestType
+        {
+            get;
+            set;
+        }
+
+        public DateTime DateRequested
+        {
+            get;
+            set;
+        } = DateTime.Now;
+
+        public DateTime DateNeeded
         {
             get;
             set;
         }
 
         public List<string> Analysis
-        {
-            get;
-            set;
-        }
-
-        public List<string> Disposition
         {
             get;
             set;
@@ -61,6 +79,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL
             get;
             set;
         } = DateTime.Now;
+
+        public string Remarks
+        {
+            get;
+            set;
+        }
 
         public string Status
         {

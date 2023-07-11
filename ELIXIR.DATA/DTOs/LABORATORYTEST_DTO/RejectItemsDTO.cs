@@ -1,65 +1,58 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace ELIXIR.DATA.DTOs.LABORATORYTEST_DTO
 {
-    public class RequestedItemsForLabtest
+    public class RejectItemsDTO
     {
-        public int BatchId
-        {
-            get;
-            set;
-        }
-        
-        public int WarehouseReceivingId
+        public int WarehouseId
         {
             get;
             set;
         }
 
-        public List<string> Analysis
+        public string SampleName
         {
             get;
             set;
         }
 
-        public List<string> Disposition
+        public string CreatedAt
         {
             get;
             set;
         }
 
-        public List<string> Parameters
+        public DateTime? OriginalExpirationDate
         {
             get;
             set;
         }
 
-        public List<string> ProductCondition
+        public int Quantity
         {
             get;
             set;
         }
 
-        public List<string> SampleType
+        public DateTime AllowableDate
         {
             get;
             set;
         }
 
-        public List<string> TypeOfSwab
+        public int DaysToExpire
         {
             get;
             set;
         }
-
-        public DateTime CreatedAt
-        {
-            get;
-            set;
-        } = DateTime.Now;
 
         public string Status
+        {
+            get;
+            set;
+        }
+
+        public string Disposition
         {
             get;
             set;

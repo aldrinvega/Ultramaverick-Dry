@@ -15,7 +15,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
     public interface IOrdering
     {
 
-        Task<IReadOnlyList<OrderDto>> GetAllListofOrders(string farms);
+        Task<IReadOnlyList<OrderDto>> GetAllListOfOrders(string farms);
         Task<bool> EditQuantityOrder(Ordering orders);
         Task<bool> SchedulePreparedDate(Ordering orders);
         Task<IReadOnlyList<OrderDto>> GetAllListOfPreparedDate();
@@ -34,7 +34,9 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<bool> CancelOrders(Ordering[] orders);
         Task<IReadOnlyList<OrderDto>> GetAllListOfCancelledOrders();
         Task<bool> ReturnCancellOrdersInList(Ordering orders);
-        Task<PagedList<CustomersForMoveOrderDTO>> GetAllListForMoveOrderPagination(UserParams userParams);
+
+        Task<PagedList<CustomersForMoveOrderDTO>> GetAllListForMoveOrderPagination(UserParams userParams,
+            string dateFrom, string dateTo);
         Task<IReadOnlyList<TotalListOfPreparedDateDTO>> TotalListOfApprovedPreparedDate(string farm);
         Task<IReadOnlyList<OrderDto>> DetailedListOfOrders(string farm);
         Task<IReadOnlyList<OrderDto>> GetAllListForApprovalOfSchedule();
