@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL
 {
@@ -46,6 +47,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL
         [Column(TypeName = "Date")]
         public DateTime? Expiration { 
             get; 
+            set;
+        }
+        
+        [Column(TypeName = "Date")]
+        public DateTime? ExtendedExpiration
+        {
+            get;
             set;
         }
 
@@ -129,6 +137,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL
             get; 
             set;
         }
+        [ForeignKey("LabTestRequests")]
+        public int? LabTestRequestId
+        {
+            get;
+            set;
+        }
 
+        public LabTestRequests LabTestRequests
+        {
+            get;
+            set;
+        }
     }
 }

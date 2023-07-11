@@ -148,35 +148,35 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
             
         }
 
-        public async Task<bool> CheckOrderInAllocationModule(WarehouseReceiving warehouseReceiving)
-        {
-
-            var totalOrders = await _context.Orders.Where(x => x.ForAllocation == true)
-                        .Where(x => x.ItemCode == warehouseReceiving.ItemCode).ToListAsync();
-            var totalAllocated = await _context.Orders.Where(x => x.ItemCode == warehouseReceiving.ItemCode)
-                        .SumAsync(x => x.QuantityOrdered);
-
-            if (totalOrders == null)
-                       return true;
-            var orderingReserve = await _context.Orders.Where(x => x.IsActive == true)
-                                            .Where(x => x.PreparedDate != null)
-                                            .Where(x => x.ItemCode == warehouseReceiving.ItemCode)
-                                            .SumAsync(order => order.AllocatedQuantity ?? (int)order.QuantityOrdered);
-
-            var receivedStocks = await _context.WarehouseReceived
-                .Where(x => x.ItemCode == warehouseReceiving.ItemCode)
-                .Where(x => x.IsActive == true)
-                .SumAsync(x => x.ActualGood);
-
-            var reserve = receivedStocks - orderingReserve;
-
-            foreach (var order in totalOrders)
-            {
-                if (reserve >= totalAllocated)
-                    order.ForAllocation = null;
-            }
-            return true;
-        }
+        // public async Task<bool> CheckOrderInAllocationModule(WarehouseReceiving warehouseReceiving)
+        // {
+        //
+        //     var totalOrders = await _context.Orders.Where(x => x.ForAllocation == true)
+        //                 .Where(x => x.ItemCode == warehouseReceiving.ItemCode).ToListAsync();
+        //     var totalAllocated = await _context.Orders.Where(x => x.ItemCode == warehouseReceiving.ItemCode)
+        //                 .SumAsync(x => x.QuantityOrdered);
+        //
+        //     if (totalOrders == null)
+        //                return true;
+        //     var orderingReserve = await _context.Orders.Where(x => x.IsActive == true)
+        //                                     .Where(x => x.PreparedDate != null)
+        //                                     .Where(x => x.ItemCode == warehouseReceiving.ItemCode)
+        //                                     .SumAsync(order => order.AllocatedQuantity ?? (int)order.QuantityOrdered);
+        //
+        //     var receivedStocks = await _context.WarehouseReceived
+        //         .Where(x => x.ItemCode == warehouseReceiving.ItemCode)
+        //         .Where(x => x.IsActive == true)
+        //         .SumAsync(x => x.ActualGood);
+        //
+        //     var reserve = receivedStocks - orderingReserve;
+        //
+        //     foreach (var order in totalOrders)
+        //     {
+        //         if (reserve >= totalAllocated)
+        //             order.ForAllocation = null;
+        //     }
+        //     return true;
+        // }
 
         public async Task<bool> AddMaterialsInWarehouse(WarehouseReceiving warehouse)
         {

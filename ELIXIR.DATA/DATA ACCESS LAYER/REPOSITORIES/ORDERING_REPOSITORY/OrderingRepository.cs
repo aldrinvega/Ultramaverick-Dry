@@ -10,13 +10,11 @@ using System;
 using System.Collections.Generic;
  using System.Linq;
  using System.Threading.Tasks;
- using ELIXIR.DATA.DTOs;
  using ELIXIR.DATA.SERVICES;
  using Microsoft.AspNetCore.SignalR;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
-using OfficeOpenXml.Style;
 
-namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
+ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 {
     public class OrderingRepository : IOrdering
     {
@@ -27,7 +25,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             _context = context;
             _clients = clients;
         }
-        public async Task<IReadOnlyList<OrderDto>> GetAllListofOrders(string farms)
+        public async Task<IReadOnlyList<OrderDto>> GetAllListOfOrders(string farms)
         {
             var datenow = DateTime.Now;
 
@@ -742,7 +740,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return getCount;
 
         }
-        public async Task<PagedList<CustomersForMoveOrderDTO>> GetAllListForMoveOrderPagination(UserParams userParams)
+        public async Task<PagedList<CustomersForMoveOrderDTO>> GetAllListForMoveOrderPagination(UserParams userParams, string dateFrom, string dateTo)
         {
 
             var orders =
@@ -775,6 +773,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             .Where(x => x.Key.IsActive == true)
             .Where(x => x.Key.IsApproved == true)
             .Where(x => x.Key.PreparedDate != null)
+            .Where(x => x.Key.PreparedDate >= DateTime.Parse(dateFrom) && x.Key.PreparedDate <= DateTime.Parse(dateTo))
             .Where(x => x.Key.IsMove == false)
             .Where(x => x.Key.IsCancelledOrder == null)
             .Select(x => new CustomersForMoveOrderDTO
@@ -788,7 +787,19 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 DepartmentName = x.Key.DepartmentName,
                 LocationName = x.Key.LocationName,
                 FarmType = x.Key.FarmType
-            });
+            }).Distinct();
+
+            var query = orders.ToQueryString();
+
+            // var customers = _context.Customers
+            //     .Include(x => x.Orders)
+            //     .Where(x => x.IsActive == true &&
+            //                 x.Orders.Any(o => o.IsActive == true &&
+            //                                   o.PreparedDate == null &&
+            //                                   o.ForAllocation == null))
+            //     .ToListAsync();
+            //
+            // var result = _mapper.<a
 
             return await PagedList<CustomersForMoveOrderDTO>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
