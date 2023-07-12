@@ -742,52 +742,42 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
         }
         public async Task<PagedList<CustomersForMoveOrderDTO>> GetAllListForMoveOrderPagination(UserParams userParams, string dateFrom, string dateTo)
         {
-
-            var orders =
-                _context.Orders
-            .Join(
-                     _context.Customers,
-                     order => order.FarmName,
-                     customer => customer.CustomerName,
-                     (order, customer) => new { Order = order, Customer = customer })
-            .Join(
-                _context.Farms,
-                joined => joined.Customer.FarmTypeId,
-                farm => farm.Id,
-                (joined, farm) => new { OrderCustomer = joined, Farm = farm })
-            .GroupBy(x => new
-            {
-                x.OrderCustomer.Order.FarmName,
-                x.OrderCustomer.Order.IsActive,
-                x.OrderCustomer.Order.IsApproved,
-                x.OrderCustomer.Order.PreparedDate,
-                x.OrderCustomer.Order.IsMove,
-                x.OrderCustomer.Customer.Id,
-                x.OrderCustomer.Customer.CompanyCode,
-                x.OrderCustomer.Customer.CompanyName,
-                x.OrderCustomer.Customer.DepartmentName,
-                x.OrderCustomer.Customer.LocationName,
-                x.OrderCustomer.Order.IsCancelledOrder,
-                FarmType = x.Farm.FarmName
-            })
-            .Where(x => x.Key.IsActive == true)
-            .Where(x => x.Key.IsApproved == true)
-            .Where(x => x.Key.PreparedDate != null)
-            .Where(x => x.Key.PreparedDate >= DateTime.Parse(dateFrom) && x.Key.PreparedDate < DateTime.Parse(dateTo).AddDays(1))
-            .Where(x => x.Key.IsMove == false)
-            .Where(x => x.Key.IsCancelledOrder == null)
-            .Select(x => new CustomersForMoveOrderDTO
-            {
-                Farm = x.Key.FarmName,
-                IsActive = x.Key.IsActive,
-                IsApproved = x.Key.IsApproved != null,
-                CustomerId = x.Key.Id,
-                CompanyCode = x.Key.CompanyCode,
-                CompanyName = x.Key.CompanyName,
-                DepartmentName = x.Key.DepartmentName,
-                LocationName = x.Key.LocationName,
-                FarmType = x.Key.FarmType
-            }).Distinct();
+            DateTime dateFromParsed = DateTime.Parse(dateFrom);
+            DateTime dateToParsed = DateTime.Parse(dateTo).AddDays(1).AddTicks(-1);
+                               
+                               var orders = _context.Orders
+                                   .Join(_context.Customers, order => order.FarmName, customer => customer.CustomerName, (order, customer) => new { Order = order, Customer = customer })
+                                   .Join(_context.Farms, joined => joined.Customer.FarmTypeId, farm => farm.Id, (joined, farm) => new { OrderCustomer = joined, Farm = farm })
+                                   .GroupBy(x => new
+                                   {
+                                       x.OrderCustomer.Order.FarmName,
+                                       x.OrderCustomer.Order.IsActive,
+                                       x.OrderCustomer.Order.IsApproved,
+                                       x.OrderCustomer.Order.PreparedDate,
+                                       x.OrderCustomer.Order.IsMove,
+                                       x.OrderCustomer.Customer.Id,
+                                       x.OrderCustomer.Customer.CompanyCode,
+                                       x.OrderCustomer.Customer.CompanyName,
+                                       x.OrderCustomer.Customer.DepartmentName,
+                                       x.OrderCustomer.Customer.LocationName,
+                                       x.OrderCustomer.Order.IsCancelledOrder,
+                                       FarmType = x.Farm.FarmName
+                                   })
+                                   .Where(x => x.Key.IsActive == true && x.Key.IsApproved == true && x.Key.PreparedDate != null 
+                                           && x.Key.PreparedDate >= dateFromParsed && x.Key.PreparedDate <= dateToParsed 
+                                           && x.Key.IsMove == false && x.Key.IsCancelledOrder == null)
+                                   .Select(x => new CustomersForMoveOrderDTO
+                                   {
+                                       Farm = x.Key.FarmName,
+                                       IsActive = x.Key.IsActive,
+                                       IsApproved = x.Key.IsApproved != null,
+                                       CustomerId = x.Key.Id,
+                                       CompanyCode = x.Key.CompanyCode,
+                                       CompanyName = x.Key.CompanyName,
+                                       DepartmentName = x.Key.DepartmentName,
+                                       LocationName = x.Key.LocationName,
+                                       FarmType = x.Key.FarmType
+                                   });
 
             var query = orders.ToQueryString();
 

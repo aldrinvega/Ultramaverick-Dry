@@ -289,7 +289,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             [FromQuery] UserParams userParams, [FromQuery] string dateTo, string dateFrom)
         {
 
-            var orders = await _unitOfWork.Order.GetAllListForMoveOrderPagination(userParams, dateTo, dateTo);
+            var orders = await _unitOfWork.Order.GetAllListForMoveOrderPagination(userParams, dateFrom, dateTo);
 
             Response.AddPaginationHeader(orders.CurrentPage, orders.PageSize, orders.TotalCount, orders.TotalPages,
                 orders.HasNextPage, orders.HasPreviousPage);
