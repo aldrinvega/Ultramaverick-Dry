@@ -773,7 +773,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
             .Where(x => x.Key.IsActive == true)
             .Where(x => x.Key.IsApproved == true)
             .Where(x => x.Key.PreparedDate != null)
-            .Where(x => x.Key.PreparedDate >= DateTime.Parse(dateFrom) && x.Key.PreparedDate <= DateTime.Parse(dateTo))
+            .Where(x => x.Key.PreparedDate >= DateTime.Parse(dateFrom) && x.Key.PreparedDate < DateTime.Parse(dateTo).AddDays(1))
             .Where(x => x.Key.IsMove == false)
             .Where(x => x.Key.IsCancelledOrder == null)
             .Select(x => new CustomersForMoveOrderDTO
