@@ -457,14 +457,14 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                 foreach (Customer customer in customers)
                 {
 
-                    var farmId = await _unitOfWork.Customers.ValidateFarmId(customer.FarmTypeId);
+                    //var farmId = await _unitOfWork.Customers.ValidateFarmId(customer.FarmTypeId);
 
-                    if (farmId == false)
-                        //farmtype in database
-                        return BadRequest("Customer Type doesn't exist, Please add data first!");
+                    //if (farmId == false)
+                    //    //farmtype in database
+                    //    return BadRequest("Customer Type doesn't exist, Please add data first!");
                      
-                    if (await _unitOfWork.Customers.CustomerCodeExist(customer.CustomerCode))
-                        return BadRequest("Customer already Exist!, Please try something else!");
+                    //if (await _unitOfWork.Customers.CustomerCodeExist(customer.CustomerCode))
+                    //    return BadRequest("Customer already Exist!, Please try something else!");
 
                     await _unitOfWork.Imports.AddNewCustomers(customer);
                 }

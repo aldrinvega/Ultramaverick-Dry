@@ -74,7 +74,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                             AddedBy = cd.AddedByUser != null ? cd.AddedByUser.FullName : "N/A" 
                         }).ToList()
                     });
-
                 return await PagedList<GetAllChecklistsQueryResult>.CreateAsync(result, request.PageNumber,
                     request.PageSize);
             }

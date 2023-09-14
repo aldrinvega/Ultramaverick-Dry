@@ -608,7 +608,22 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.IMPORT_REPOSITORY
             customer.IsActive = true;
             customer.DateAdded = DateTime.Now;
 
-            await _context.Customers.AddAsync(customer);
+            var result = await _context.Customers.Upsert(customer)
+                    .On(c => c.CustomerName)
+                    .WhenMatched(c => new Customer()
+                    {
+                        CustomerCode = customer.CustomerCode,
+                        CustomerName = customer.CustomerName,
+                        FarmTypeId = customer.FarmTypeId,
+                        CompanyName = customer.CompanyName,
+                        CompanyCode = customer.CompanyCode,
+                        MobileNumber = customer.MobileNumber,
+                        LeadMan = customer.LeadMan,
+                        Address = customer.Address,
+                        DepartmentName = customer.DepartmentName,
+                        AddedBy = customer.AddedBy
+                    }).RunAsync();
+
             return true;
         }
     }

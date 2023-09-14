@@ -29,12 +29,20 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 var existingChecklistDescription =
                     await _context.ChecklistDescriptions.FirstOrDefaultAsync(x => x.Id == request.Id,
                         cancellationToken);
+                var isChecklistAlreadyExist =
+                    await _context.ChecklistDescriptions.AnyAsync(
+                        x => x.ChecklistDescription == request.ChecklistDescription, cancellationToken);
 
+                if (isChecklistAlreadyExist)
+                {
+                    throw new Exception("Checklist description is already exist");
+                }
+                
                 if (existingChecklistDescription == null)
                 {
                     throw new Exception("Checklist description is not found");
                 }
-
+                
                 existingChecklistDescription.ChecklistDescription = request.ChecklistDescription;
                 existingChecklistDescription.ProductTypeId = request.ProductTypeId;
                 existingChecklistDescription.UpdatedAt = DateTime.Now;
