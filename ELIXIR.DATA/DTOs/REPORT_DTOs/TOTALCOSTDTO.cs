@@ -13,5 +13,11 @@
             get;
             set;
         }
+
+        public decimal Delivered
+        {
+            get;
+            set;
+        }
     }
 }

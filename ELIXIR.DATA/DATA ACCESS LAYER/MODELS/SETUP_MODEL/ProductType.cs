@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
 {
@@ -13,5 +14,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
         public DateTime DateAdded  { get; set; } = DateTime.Now;
         public string AddedBy { get; set; }
         public string ModifiedBy { get; set; }
+        
+        public virtual ICollection<ChecklistDescriptions> ChecklistDescription { get; set; }
     }
 }

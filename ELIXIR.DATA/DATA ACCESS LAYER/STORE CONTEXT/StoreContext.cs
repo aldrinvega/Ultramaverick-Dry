@@ -182,6 +182,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
             set;
         }
 
+        public virtual DbSet<ChecklistDescriptions> ChecklistDescriptions { get; set; } 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ReceiveRequest>()
@@ -262,6 +264,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                         c => c.ToList()
                     ));
 
+            modelBuilder.Entity<ChecklistDescriptions>()
+                .HasOne(x => x.AddedByUser)
+                .WithMany()
+                .HasForeignKey(x => x.AddedBy);
         }
     }
 }

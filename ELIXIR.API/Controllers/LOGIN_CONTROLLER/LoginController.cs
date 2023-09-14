@@ -27,7 +27,5 @@ namespace ELIXIR.API.Controllers
             return Ok(response);
 
         }
-
-
     }
 }

@@ -13,6 +13,7 @@ using System.Collections.Generic;
  using ELIXIR.DATA.SERVICES;
  using Microsoft.AspNetCore.SignalR;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
+ using ELIXIR.DATA.DTOs.REPORT_DTOs;
 
  namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 {
@@ -1410,6 +1411,18 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
        public async Task<IReadOnlyList<MoveOrderDto>> ViewMoveOrderForApproval(int orderid)
         {
             
+            var unitCost = _context.POSummary
+                .GroupBy(x => new { x.ItemCode, x.UnitPrice, x.Delivered })
+                .Select(x => new TOTALCOSTDTO
+                {
+                    ItemCode = x.Key.ItemCode,
+                    TotalCost = x.Key.Delivered * x.Key.UnitPrice,
+                    Delivered = x.Key.Delivered
+                });
+
+            var totalAmount = unitCost.Sum(x => x.TotalCost);
+            var totalGood = unitCost.Sum(x => x.Delivered);
+            
             var orders = _context.MoveOrders.Where(x => x.IsActive == true)
                 .Select(x => new MoveOrderDto
             {
@@ -1431,7 +1444,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
             var unitCosts = from posummary in _context.POSummary
                 join wr in _context.WarehouseReceived on posummary.PO_Number equals wr.PO_Number into LeftJ
                 from wr in LeftJ.DefaultIfEmpty()
-                join order in orders on wr != null ? wr.Id : (int?)null equals order.BarcodeNo  
+                join order in orders on wr != null ? wr.Id : (int?)null equals order.BarcodeNo
                 group wr by new
                 {
                     wr.Id,
@@ -1447,13 +1460,13 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
                     order.Expiration,
                     order.DeliveryStatus,
                     order.PreparedBy,
-                    order.CheckedBy
+                    order.CheckedBy,
+                    WeigtedAverageUnitCost = (totalGood / totalAmount) != 0 ? (totalGood / totalAmount) : 0
                 }
                 into total
                 select new MoveOrderDto
                 {
                     Id = total.Key.Id,
-                    UnitPrice = total.Key.UnitPrice,
                     OrderNo = total.Key.OrderNo,
                     BarcodeNo = total.Key.BarcodeNo,
                     ItemCode = total.Key.ItemCode,
@@ -1465,7 +1478,8 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
                     Expiration = total.Key.Expiration,
                     DeliveryStatus = total.Key.DeliveryStatus,
                     PreparedBy = total.Key.PreparedBy,
-                    CheckedBy = total.Key.CheckedBy
+                    CheckedBy = total.Key.CheckedBy,
+                    UnitPrice = total.Key.WeigtedAverageUnitCost
                 };
 
             return await unitCosts.Where(x => x.OrderNo == orderid).ToListAsync();
@@ -1549,6 +1563,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
                 x.ApproveDateTempo,
                 x.IsPrint,
                 x.IsTransact,
+                
                 x.IsActive,
             }).Where(x => x.Key.IsApprove == true)
               .Where(x => x.Key.DeliveryStatus != null)
@@ -2545,7 +2560,5 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 
             return existing != null;
         }
-
-
     }
 }

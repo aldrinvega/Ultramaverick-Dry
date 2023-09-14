@@ -4,6 +4,7 @@ using ELIXIR.DATA.DTOs;
 using ELIXIR.DATA.DTOs.USER_DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
 
 namespace ELIXIR.DATA.CORE.INTERFACES
 {

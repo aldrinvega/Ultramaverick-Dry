@@ -27,6 +27,12 @@ namespace ELIXIR.DATA.DTOs.WAREHOUSE_DTOs
         public decimal TotalReject { get; set; }
         public DateTime ManufacturingDateTime { get; set; }
 
+        public decimal UnitCost
+        {
+            get;
+            set;
+        }
+
 
     }
 }

@@ -131,7 +131,31 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
             if (customer.AddedBy == null)
                 customer.AddedBy = customer.AddedBy;
-
+            await _context.Customers.Upsert(new Customer
+                {
+                    CustomerCode = customer.CustomerCode,
+                    CustomerName = customer.CustomerName,
+                    FarmTypeId = customer.FarmTypeId,
+                    CompanyName = customer.CompanyName,
+                    CompanyCode = customer.CompanyCode,
+                    MobileNumber = customer.MobileNumber,
+                    LeadMan = customer.LeadMan,
+                    Address = customer.Address,
+                    DepartmentName = customer.DepartmentName
+                }).On(c => c.CustomerName)
+                .WhenMatched(v => new Customer
+                {
+                    CustomerCode = customer.CustomerCode,
+                    CustomerName = customer.CustomerName,
+                    FarmTypeId = customer.FarmTypeId,
+                    CompanyName = customer.CompanyName,
+                    CompanyCode = customer.CompanyCode,
+                    MobileNumber = customer.MobileNumber,
+                    LeadMan = customer.LeadMan,
+                    Address = customer.Address,
+                    DepartmentName = customer.DepartmentName
+                }).RunAsync();
+    
             await _context.Customers.AddAsync(customer);
             return true;
         }

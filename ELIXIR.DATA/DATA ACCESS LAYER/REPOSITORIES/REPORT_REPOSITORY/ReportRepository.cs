@@ -142,12 +142,16 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 });
 
             var unitCost = _context.POSummary
-                .GroupBy(x => new { x.ItemCode, x.UnitPrice })
+                .GroupBy(x => new { x.ItemCode, x.UnitPrice, x.Delivered })
                 .Select(x => new TOTALCOSTDTO
                 {
                     ItemCode = x.Key.ItemCode,
-                    TotalCost = x.Sum(g => g.UnitPrice)
+                    TotalCost = x.Key.Delivered * x.Key.UnitPrice,
+                    Delivered = x.Key.Delivered
                 });
+
+            var totalAmount = unitCost.Sum(x => x.TotalCost);
+            var totalGood = unitCost.Sum(x => x.Delivered);
 
             var orders = (
                 from moveorder in _context.MoveOrders
@@ -186,10 +190,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     transactmoveorder.PreparedBy,
                     transactmoveorder.PreparedDate,
                     stockOnHand.ActualGood,
-                    TotalCost = UC.TotalCost * stockOnHand.ActualGood,
-                    WeightedAverageUnitCost = ((UC.TotalCost * stockOnHand.ActualGood) / stockOnHand.ActualGood == null
-                        ? 1
-                        : (UC.TotalCost * stockOnHand.ActualGood) / stockOnHand.ActualGood)
+                    UC.TotalCost,
+                    TotalGood = totalGood, 
+                    WeigtedAverageUnitCost = (totalGood / totalAmount) != 0 ? (totalGood / totalAmount) : 0
                 }
                 into result
                 select new MoveOrderReport
@@ -208,7 +211,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     MoveOrderDate = result.Key.PreparedDate.ToString(),
                     TransactedBy = result.Key.PreparedBy,
                     TransactedDate = result.Key.PreparedDate.ToString(),
-                    WeightedAverageUnitCost = result.Key.WeightedAverageUnitCost
+                    WeightedAverageUnitCost = result.Key.WeigtedAverageUnitCost
                 });
 
             return await orders.ToListAsync();

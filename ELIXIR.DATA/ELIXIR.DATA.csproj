@@ -9,6 +9,7 @@
     <PackageReference Include="EPPlus" Version="5.8.4" />
     <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
     <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="5.1.0" />
+    <PackageReference Include="MediatR" Version="12.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
@@ -30,10 +31,9 @@
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
     <PackageReference Include="xunit.extensibility.core" Version="2.4.1" />
     <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="5.13.7" />
-
   </ItemGroup>
 
-
-
-
+  <ItemGroup>
+    <Folder Include="DATA ACCESS LAYER\REPOSITORIES\RECEIVING_CHECKLIST\" />
+  </ItemGroup>
 </Project>

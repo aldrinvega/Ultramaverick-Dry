@@ -25,6 +25,11 @@ namespace ELIXIR.DATA.DTOs.MISCELLANEOUS_DTOs
         public string Remarks { get; set; }
         public bool IsActive { get; set; }
         public string TransactionDate { get; set; }
+        public decimal? UnitCost
+        {
+            get;
+            set;
+        }
 
     }
 }

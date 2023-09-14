@@ -19,7 +19,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
             get; 
             set; 
         }
-
-
+        
     }
 }

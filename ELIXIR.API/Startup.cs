@@ -16,6 +16,9 @@ using System.Linq;
 using ELIXIR.API.ERRORS;
 using ELIXIR.DATA.SERVICES;
 using System.Text.Json.Serialization;
+using MediatR;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY;
+using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.AddNewChecklistDescription;
 
 namespace ELIXIR.API
 {
@@ -40,6 +43,8 @@ namespace ELIXIR.API
             //    options.JsonSerializerOptions.MaxDepth = 32;
             //});
 
+            services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(AddNewChecklistDescriptionCommand).Assembly));
+            services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(GetAllChecklists.GetAllChecklistsQuery).Assembly));
             services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             services.AddControllers().AddJsonOptions(x =>
@@ -69,7 +74,7 @@ namespace ELIXIR.API
             services.AddScoped(typeof(IUserService), typeof(UserService));
       
             services.AddDbContext<StoreContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("LiveConnection")));
+            options.UseSqlServer(Configuration.GetConnectionString("DevConnection")));
 
             services.Configure<ApiBehaviorOptions>(options =>
             {
@@ -95,6 +100,8 @@ namespace ELIXIR.API
             //    options.HttpsPort = 82;
             //});
 
+            
+           
             services.AddApplicationServices();
 
             services.AddSwaggerDocumentation();

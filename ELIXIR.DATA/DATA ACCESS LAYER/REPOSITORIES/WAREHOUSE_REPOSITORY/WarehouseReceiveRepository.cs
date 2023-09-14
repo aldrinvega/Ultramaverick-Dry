@@ -3,7 +3,6 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
-using ELIXIR.DATA.DTOs.INVENTORY_DTOs;
 using ELIXIR.DATA.DTOs.RECEIVING_DTOs;
 using ELIXIR.DATA.DTOs.TRANSFORMATION_DTOs;
 using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
@@ -11,10 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Internal;
-using OfficeOpenXml.Style;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
 {
@@ -92,13 +88,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
         {
             //var ActualGood = warehouse.ActualGood - warehouse.TotalReject;
            
-
-
+            
             var scanbarcode = (from posummary in _context.POSummary
                                join receive in _context.QC_Receiving on posummary.Id equals receive.PO_Summary_Id
                                select new WareHouseScanBarcode
                                {
-
                                    Id = receive.Id,
                                    ItemCode = posummary.ItemCode,
                                    ItemDescription = posummary.ItemDescription,
@@ -112,7 +106,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                    ExpirationDays = receive.Expiry_Date.HasValue ? (int)Math.Round(receive.Expiry_Date.Value.Subtract(DateTime.Now).TotalDays) : 0,
                                    IsActive = receive.IsActive,
                                    IsWarehouseReceived = receive.IsWareHouseReceive != null,
-                                   ExpiryIsApprove = receive.ExpiryIsApprove != null
+                                   ExpiryIsApprove = receive.ExpiryIsApprove != null,
+                                   UnitCost = posummary.UnitPrice
                                }).Where(x => x.IsWarehouseReceived == false)
                                  .Where(x => x.IsActive == true)
                                  .Where(x => x.ExpiryIsApprove == true)
@@ -136,6 +131,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
             warehouse.IsActive = true;
             warehouse.QcReceivingId = scanbarcode.Id;
             warehouse.TransactionType = "Receiving";
+            warehouse.UnitCost = scanbarcode.UnitCost;
 
             var qcreceived = _context.QC_Receiving.FirstOrDefault(x => x.Id == scanbarcode.Id);
             qcreceived.IsWareHouseReceive = true; 

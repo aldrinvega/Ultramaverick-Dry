@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES
 {

@@ -6,11 +6,9 @@ using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.INTERFACES.ORDER_HUB;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
-using ELIXIR.DATA.DTOs;
 using ELIXIR.DATA.SERVICES;
 using Microsoft.AspNetCore.SignalR;
 namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER

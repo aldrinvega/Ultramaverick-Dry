@@ -14,6 +14,13 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs
         public string ItemCategory { get; set; }
         public string Uom { get; set; }
         public decimal Price { get; set; }
+
+        public decimal? AvgUnitCost
+        {
+            get;
+            set;
+        }
+
         public decimal SOH { get; set; }
         public decimal Reserve { get; set; }
         public decimal BufferLevel { get; set; }
@@ -35,10 +42,16 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs
         public decimal TransformFrom { get; set; }
         public decimal TransformTo { get; set; }
 
+        public decimal? UnitCost
+        {
+            get;
+            set;
+        }
 
-
-
-
-
+        public decimal? TotalCost
+        {
+            get;
+            set;
+        }
     }
 }
