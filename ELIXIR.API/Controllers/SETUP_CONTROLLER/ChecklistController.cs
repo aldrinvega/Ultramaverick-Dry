@@ -2,7 +2,7 @@
 using System;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.AddNewChecklistDescription;
+using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.AddNewChecklistQuestions;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY;
 using System.Security.Claims;
@@ -20,8 +20,8 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             _mediator = mediator;
         }
 
-        [HttpPost("AddNewChecklistDescription")]
-        public async Task<IActionResult> Add([FromBody] AddNewChecklistDescriptionCommand command)
+        [HttpPost("AddNewChecklistQuestion")]
+        public async Task<IActionResult> Add([FromBody] AddNewChecklistQuestionCommand command)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             }
         }
         
-        [HttpGet("GetAllChecklistsDescriptions")]
+        [HttpGet("GetAllChecklistsQuestion")]
         public async Task<IActionResult> Get([FromQuery] GetAllChecklistsDescription.GetAllChecklistsDescriptionQuery query)
         {
             try
@@ -117,7 +117,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             }
         }
 
-        [HttpPatch("UpdateChecklistStatus")]
+        [HttpPatch("UpdateChecklistQuestionStatus")]
         public async Task<IActionResult> UpdateChecklistStatus(
             [FromQuery] UpdateChecklistStatus.UpdateChecklistStatusCommand command)
         {
@@ -135,9 +135,9 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             }
         }
         
-        [HttpPut("UpdateChecklistDescription/{id:int}")]
+        [HttpPut("UpdateChecklistQuestion/{id:int}")]
         public async Task<IActionResult> UpdateChecklistDescription(
-            [FromBody] UpdateChecklistDescription.UpdateChecklistDescriptionCommand command, int id)
+            [FromBody] UpdateChecklistQuestion.UpdateChecklistDescriptionCommand command, int id)
         {
             try
             {

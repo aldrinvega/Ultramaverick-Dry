@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using MediatR;
@@ -22,11 +23,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         {
             public int ProductTypeId { get; set; }
             public string ProductType { get; set; }
-            public List<ChecklistDescriptions> ChecklistDescription { get; set; }
-            public class ChecklistDescriptions
+            public List<ChecklistQuestion> ChecklistQuestions { get; set; }
+
+            public class ChecklistQuestion
             {
                 public int Id { get; set; }
                 public string ChecklistDescription { get; set; }
+                public bool IsOpenField { get; set; }
                 public bool IsActive { get; set; }
                 public DateTime CreatedAt { get; set; }
                 public DateTime UpdatedAt { get; set; }
@@ -47,7 +50,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 CancellationToken cancellationToken)
             {
                 IQueryable<ProductType> checklistDescriptions = _context.ProductTypes
-                    .Include(x => x.ChecklistDescription);
+                    .Include(x => x.ChecklistQuestions);
 
                 if (!string.IsNullOrEmpty(request.ProductType))
                 {
@@ -64,14 +67,15 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                     {
                         ProductTypeId = x.Id,
                         ProductType = x.ProductTypeName,
-                        ChecklistDescription = x.ChecklistDescription.Select(cd => new GetAllChecklistsQueryResult.ChecklistDescriptions
+                        ChecklistQuestions = x.ChecklistQuestions.Select(cd => new GetAllChecklistsQueryResult.ChecklistQuestion
                         {
                             Id = cd.Id,
-                            ChecklistDescription = cd.ChecklistDescription,
+                            ChecklistDescription = cd.ChecklistQuestion,
+                            IsOpenField = cd.IsOpenField,
                             IsActive = cd.IsActive,
                             CreatedAt = cd.CreatedAt,
                             UpdatedAt = cd.UpdatedAt,
-                            AddedBy = cd.AddedByUser != null ? cd.AddedByUser.FullName : "N/A" 
+                            AddedBy = cd.AddedByUser != null ? cd.AddedByUser.FullName : "N/A",
                         }).ToList()
                     });
                 return await PagedList<GetAllChecklistsQueryResult>.CreateAsync(result, request.PageNumber,

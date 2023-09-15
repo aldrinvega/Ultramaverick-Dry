@@ -4,14 +4,16 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20230915062957_AddNewChecklistAnswerEntity")]
+    partial class AddNewChecklistAnswerEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -881,6 +883,41 @@ namespace ELIXIR.DATA.Migrations
                     b.ToTable("CheckListStrings");
                 });
 
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistAnswers", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<int>("AddedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ChecklistAnswer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ChecklistQuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddedBy")
+                        .IsUnique();
+
+                    b.HasIndex("ChecklistQuestionId");
+
+                    b.ToTable("ChecklistAnswers");
+                });
+
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistForCompliants", b =>
                 {
                     b.Property<int>("ChecklistCompliantId")
@@ -915,6 +952,9 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<int>("AddedBy")
                         .HasColumnType("int");
 
+                    b.Property<string>("AnswerType")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ChecklistQuestion")
                         .HasColumnType("nvarchar(max)");
 
@@ -922,9 +962,6 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsOpenField")
                         .HasColumnType("bit");
 
                     b.Property<int>("ProductTypeId")
@@ -2277,6 +2314,25 @@ namespace ELIXIR.DATA.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistAnswers", b =>
+                {
+                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL.User", "AddedByUser")
+                        .WithOne()
+                        .HasForeignKey("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistAnswers", "AddedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistQuestions", "ChecklistQuestions")
+                        .WithMany()
+                        .HasForeignKey("ChecklistQuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ChecklistQuestions");
+                });
+
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistQuestions", b =>
                 {
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL.User", "AddedByUser")
@@ -2286,7 +2342,7 @@ namespace ELIXIR.DATA.Migrations
                         .IsRequired();
 
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.ProductType", "ProductType")
-                        .WithMany("ChecklistQuestions")
+                        .WithMany("ChecklistDescription")
                         .HasForeignKey("ProductTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2395,7 +2451,7 @@ namespace ELIXIR.DATA.Migrations
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.ProductType", b =>
                 {
-                    b.Navigation("ChecklistQuestions");
+                    b.Navigation("ChecklistDescription");
                 });
 #pragma warning restore 612, 618
         }

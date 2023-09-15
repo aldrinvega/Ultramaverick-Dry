@@ -5,7 +5,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY;
 
 namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
 {
-    public static class ChecklistMappingExtension
+    /*public static class ChecklistMappingExtension
     {
         public static GetAllChecklists.GetAllChecklistsQueryResult
             ChecklistsQueryResult(this ProductType productType)
@@ -17,7 +17,7 @@ namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
                 ChecklistDescription = productType.ChecklistDescription.Select(x => new GetAllChecklists.GetAllChecklistsQueryResult.ChecklistDescriptions
                 {
                     Id = x.Id,
-                    ChecklistDescription = x.ChecklistDescription,
+                    ChecklistDescription = x.ChecklistQuestion,
                     IsActive = x.IsActive,
                     CreatedAt = x.CreatedAt,
                     UpdatedAt = x.UpdatedAt,
@@ -25,5 +25,5 @@ namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
                 }).ToList()
             };
         }
-    }
+    }*/
 }

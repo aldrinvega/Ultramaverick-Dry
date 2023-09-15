@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 {
-    public class UpdateChecklistDescription
+    public class UpdateChecklistQuestion
     {
         public class UpdateChecklistDescriptionCommand : IRequest<Unit>
         {
@@ -27,11 +27,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             public async Task<Unit> Handle(UpdateChecklistDescriptionCommand request, CancellationToken cancellationToken)
             {
                 var existingChecklistDescription =
-                    await _context.ChecklistDescriptions.FirstOrDefaultAsync(x => x.Id == request.Id,
+                    await _context.ChecklistQuestions.FirstOrDefaultAsync(x => x.Id == request.Id, 
                         cancellationToken);
                 var isChecklistAlreadyExist =
-                    await _context.ChecklistDescriptions.AnyAsync(
-                        x => x.ChecklistDescription == request.ChecklistDescription, cancellationToken);
+                    await _context.ChecklistQuestions.AnyAsync(
+                        x => x.ChecklistQuestion == request.ChecklistDescription && x.ProductTypeId == request.ProductTypeId, cancellationToken);
 
                 if (isChecklistAlreadyExist)
                 {
@@ -43,7 +43,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                     throw new Exception("Checklist description is not found");
                 }
                 
-                existingChecklistDescription.ChecklistDescription = request.ChecklistDescription;
+                existingChecklistDescription.ChecklistQuestion = request.ChecklistDescription;
                 existingChecklistDescription.ProductTypeId = request.ProductTypeId;
                 existingChecklistDescription.UpdatedAt = DateTime.Now;
 

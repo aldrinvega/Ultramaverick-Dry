@@ -24,10 +24,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         public class GetAllChecklistsDescriptionQueryResult
         {
                 public int Id { get; set; }
-                public string ChecklistDescription { get; set; }
+                public string ChecklistQustion { get; set; }
                 public bool IsActive { get; set; }
                 public DateTime CreatedAt { get; set; }
                 public DateTime UpdatedAt { get; set; }
+                public bool IsOpenField { get; set; }
                 public string AddedBy { get; set; }
                 public int ProductTypeId { get; set; }
                 public string ProductType { get; set; }
@@ -45,13 +46,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             public async Task<PagedList<GetAllChecklistsDescriptionQueryResult>> Handle(GetAllChecklistsDescriptionQuery request,
                 CancellationToken cancellationToken)
             {
-                IQueryable<ChecklistDescriptions> checklistDescriptions = _context.ChecklistDescriptions
+                IQueryable<ChecklistQuestions> checklistDescriptions = _context.ChecklistQuestions
                     .Include(x => x.ProductType);
 
                 if (!string.IsNullOrEmpty(request.Search))
                 {
                     checklistDescriptions =
-                        checklistDescriptions.Where(x => x.ChecklistDescription.Contains(request.Search));
+                        checklistDescriptions.Where(x => x.ChecklistQuestion.Contains(request.Search));
                 }
                 if (!string.IsNullOrEmpty(request.ProductType))
                 {
@@ -68,7 +69,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                     .Select(cd => new GetAllChecklistsDescriptionQueryResult
                     {
                         Id = cd.Id,
-                        ChecklistDescription = cd.ChecklistDescription,
+                        ChecklistQustion = cd.ChecklistQuestion,
+                        IsOpenField = cd.IsOpenField,
                         IsActive = cd.IsActive,
                         CreatedAt = cd.CreatedAt,
                         UpdatedAt = cd.UpdatedAt,

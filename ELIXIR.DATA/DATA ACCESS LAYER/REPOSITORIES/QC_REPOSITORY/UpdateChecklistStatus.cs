@@ -26,7 +26,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             public async Task<Unit> Handle(UpdateChecklistStatusCommand request, CancellationToken cancellationToken)
             {
                 var existingChecklistDescription =
-                    await _context.ChecklistDescriptions.FirstOrDefaultAsync(x => x.Id == request.ChecklistId,
+                    await _context.ChecklistQuestions.FirstOrDefaultAsync(x => x.Id == request.ChecklistId,
                         cancellationToken);
 
                 if (existingChecklistDescription == null)

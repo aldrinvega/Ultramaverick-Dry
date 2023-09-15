@@ -18,7 +18,7 @@ using ELIXIR.DATA.SERVICES;
 using System.Text.Json.Serialization;
 using MediatR;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY;
-using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.AddNewChecklistDescription;
+using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.AddNewChecklistQuestions;
 
 namespace ELIXIR.API
 {
@@ -43,7 +43,7 @@ namespace ELIXIR.API
             //    options.JsonSerializerOptions.MaxDepth = 32;
             //});
 
-            services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(AddNewChecklistDescriptionCommand).Assembly));
+            services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(AddNewChecklistQuestionCommand).Assembly));
             services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(GetAllChecklists.GetAllChecklistsQuery).Assembly));
             services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
@@ -74,7 +74,7 @@ namespace ELIXIR.API
             services.AddScoped(typeof(IUserService), typeof(UserService));
       
             services.AddDbContext<StoreContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("LiveConnection")));
+            options.UseSqlServer(Configuration.GetConnectionString("DevConnection")));
 
             services.Configure<ApiBehaviorOptions>(options =>
             {
@@ -99,9 +99,7 @@ namespace ELIXIR.API
             //    options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
             //    options.HttpsPort = 82;
             //});
-
             
-           
             services.AddApplicationServices();
 
             services.AddSwaggerDocumentation();
