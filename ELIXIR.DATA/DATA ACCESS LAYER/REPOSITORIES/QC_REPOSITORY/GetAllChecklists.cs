@@ -28,7 +28,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             public class ChecklistQuestion
             {
                 public int Id { get; set; }
-                public string ChecklistDescription { get; set; }
+                public string ChecklistsQuestions { get; set; }
                 public bool IsOpenField { get; set; }
                 public bool IsActive { get; set; }
                 public DateTime CreatedAt { get; set; }
@@ -70,7 +70,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                         ChecklistQuestions = x.ChecklistQuestions.Select(cd => new GetAllChecklistsQueryResult.ChecklistQuestion
                         {
                             Id = cd.Id,
-                            ChecklistDescription = cd.ChecklistQuestion,
+                            ChecklistsQuestions = cd.ChecklistQuestion,
                             IsOpenField = cd.IsOpenField,
                             IsActive = cd.IsActive,
                             CreatedAt = cd.CreatedAt,

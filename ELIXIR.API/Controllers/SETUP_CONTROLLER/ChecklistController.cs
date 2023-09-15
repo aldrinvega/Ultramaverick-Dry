@@ -80,30 +80,30 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             }
         }
         
-        [HttpGet("GetAllChecklistsQuestion")]
+        [HttpGet("GetAllChecklistsQuestions")]
         public async Task<IActionResult> Get([FromQuery] GetAllChecklistsDescription.GetAllChecklistsDescriptionQuery query)
         {
             try
             {
-                var checklistsDescription = await _mediator.Send(query);
+                var checklistsQuestions = await _mediator.Send(query);
 
                 Response.AddPaginationHeader(
-                    checklistsDescription.CurrentPage,
-                    checklistsDescription.PageSize,
-                    checklistsDescription.TotalCount,
-                    checklistsDescription.TotalPages,
-                    checklistsDescription.HasPreviousPage,
-                    checklistsDescription.HasNextPage
+                    checklistsQuestions.CurrentPage,
+                    checklistsQuestions.PageSize,
+                    checklistsQuestions.TotalCount,
+                    checklistsQuestions.TotalPages,
+                    checklistsQuestions.HasPreviousPage,
+                    checklistsQuestions.HasNextPage
                 );
 
                 var result = new {
-                    checklistsDescription,
-                    checklistsDescription.CurrentPage,
-                    checklistsDescription.PageSize,
-                    checklistsDescription.TotalCount,
-                    checklistsDescription.TotalPages,
-                    checklistsDescription.HasPreviousPage,
-                    checklistsDescription.HasNextPage
+                    checklistsQuestions,
+                    checklistsQuestions.CurrentPage,
+                    checklistsQuestions.PageSize,
+                    checklistsQuestions.TotalCount,
+                    checklistsQuestions.TotalPages,
+                    checklistsQuestions.HasPreviousPage,
+                    checklistsQuestions.HasNextPage
                 };
                 
                 return Ok(result);

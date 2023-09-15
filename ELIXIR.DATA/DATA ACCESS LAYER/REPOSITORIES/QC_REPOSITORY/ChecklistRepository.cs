@@ -19,8 +19,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         {
             _context = context;
         }
-
-
+        
         #region Add Checklist
         public async Task<bool> AddChecklists(Checklists input)
         {

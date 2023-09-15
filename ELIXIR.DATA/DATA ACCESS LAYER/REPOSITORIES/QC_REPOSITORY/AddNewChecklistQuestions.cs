@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
@@ -15,9 +16,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         
         public class AddNewChecklistQuestionCommand : IRequest<Unit>
         {
+            [Required]
             public string ChecklistQuestion{ get; set; }
+            [Required]
             public int ProductTypeId { get; set; }
+            [Required]
             public int AddedBy { get; set; }
+            [Required]
             public bool IsOpenField { get; set; }
         }
 
