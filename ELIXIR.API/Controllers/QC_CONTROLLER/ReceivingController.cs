@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.COMMON;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.EXCEPTIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
+using MediatR;
 
 namespace ELIXIR.API.Controllers.QC_CONTROLLER
 {
@@ -21,9 +22,11 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
     public class ReceivingController : BaseApiController
     {
         private readonly IUnitOfWork _unitOfWork;
-        public ReceivingController(IUnitOfWork unitofwork)
+        private readonly IMediator _mediator;
+        public ReceivingController(IUnitOfWork unitofwork, IMediator mediator)
         {
             _unitOfWork = unitofwork;
+            _mediator = mediator;
         }
 
         [HttpPost]
@@ -32,7 +35,7 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
         {
             if (ModelState.IsValid)
             {
-                await _unitOfWork.QcChecklist.AddChecklists(input);
+                await _mediator.Send(input.Checklist);
                 await _unitOfWork.Receives.AddNewReceivingInformation(input.PO_Receiving);
                 
                 // Save all changes to the database

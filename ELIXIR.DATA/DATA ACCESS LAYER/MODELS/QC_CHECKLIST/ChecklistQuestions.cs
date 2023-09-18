@@ -8,7 +8,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
     public class ChecklistQuestions : BaseEntity
     {
         public string ChecklistQuestion { get; set; }
-        public int ProductTypeId { get; set; }
+        public int ChecklistTypeId { get; set; }
         public bool IsActive { get; set; } = true;
         public int AddedBy { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
@@ -16,6 +16,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
         public bool IsOpenField { get; set; }
 
         public virtual User AddedByUser { get; set; }
-        public virtual ProductType ProductType { get; set; }
+        public virtual ChecklistTypes ChecklistType { get; set; }
     }
 }

@@ -4,14 +4,16 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20230915094331_AddChecklistTypeEntity")]
+    partial class AddChecklistTypeEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -881,32 +883,6 @@ namespace ELIXIR.DATA.Migrations
                     b.ToTable("CheckListStrings");
                 });
 
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistCompliance", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Compliance")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("QcChecklistId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RootCause")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QcChecklistId");
-
-                    b.ToTable("ChecklistCompliances");
-                });
-
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistForCompliants", b =>
                 {
                     b.Property<int>("ChecklistCompliantId")
@@ -929,79 +905,6 @@ namespace ELIXIR.DATA.Migrations
                     b.HasKey("ChecklistCompliantId");
 
                     b.ToTable("ChecklistForCompliant");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistOpenFieldAnswer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("ChecklistQuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QcChecklistId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Remarks")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChecklistQuestionId");
-
-                    b.HasIndex("QcChecklistId");
-
-                    b.ToTable("QChecklistOpenFieldAnswers");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistOtherObservation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Observation")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("QcChecklistId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QcChecklistId");
-
-                    b.ToTable("ChecklistOtherObservations");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistProductDimension", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Actual")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ChecklistQuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QcChecklistId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Standard")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChecklistQuestionId");
-
-                    b.HasIndex("QcChecklistId");
-
-                    b.ToTable("QChecklistProductDimensions");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistQuestions", b =>
@@ -1041,44 +944,6 @@ namespace ELIXIR.DATA.Migrations
                     b.ToTable("ChecklistQuestions");
                 });
 
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistReviewVerificationLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("DispositionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MonitoredBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NotedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("QcChecklistId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QtyAccepted")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QtyRejected")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ReviewedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VerifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QcChecklistId");
-
-                    b.ToTable("ChecklistReviewVerificationLogs");
-                });
-
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistTypes", b =>
                 {
                     b.Property<int>("Id")
@@ -1106,26 +971,6 @@ namespace ELIXIR.DATA.Migrations
                     b.HasIndex("ProductTypeId");
 
                     b.ToTable("ChecklistTypes");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.QCChecklist", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ReceivingId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReceivingId");
-
-                    b.ToTable("QcChecklists");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL.PO_Receiving", b =>
@@ -2463,66 +2308,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistCompliance", b =>
-                {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.QCChecklist", "QcChecklist")
-                        .WithMany()
-                        .HasForeignKey("QcChecklistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("QcChecklist");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistOpenFieldAnswer", b =>
-                {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistQuestions", "ChecklistQuestions")
-                        .WithMany()
-                        .HasForeignKey("ChecklistQuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.QCChecklist", "QcChecklist")
-                        .WithMany()
-                        .HasForeignKey("QcChecklistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ChecklistQuestions");
-
-                    b.Navigation("QcChecklist");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistOtherObservation", b =>
-                {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.QCChecklist", "QcChecklist")
-                        .WithMany()
-                        .HasForeignKey("QcChecklistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("QcChecklist");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistProductDimension", b =>
-                {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistQuestions", "ChecklistQuestions")
-                        .WithMany()
-                        .HasForeignKey("ChecklistQuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.QCChecklist", "QcChecklist")
-                        .WithMany()
-                        .HasForeignKey("QcChecklistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ChecklistQuestions");
-
-                    b.Navigation("QcChecklist");
-                });
-
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistQuestions", b =>
                 {
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL.User", "AddedByUser")
@@ -2542,17 +2327,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Navigation("ChecklistType");
                 });
 
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistReviewVerificationLog", b =>
-                {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.QCChecklist", "QcChecklist")
-                        .WithMany()
-                        .HasForeignKey("QcChecklistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("QcChecklist");
-                });
-
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistTypes", b =>
                 {
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.ProductType", "ProductType")
@@ -2560,17 +2334,6 @@ namespace ELIXIR.DATA.Migrations
                         .HasForeignKey("ProductTypeId");
 
                     b.Navigation("ProductType");
-                });
-
-            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.QCChecklist", b =>
-                {
-                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL.PO_Receiving", "PoReceiving")
-                        .WithMany()
-                        .HasForeignKey("ReceivingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PoReceiving");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", b =>

@@ -4,13 +4,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
+namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions
 {
     public class GetAllChecklists
     {
@@ -23,7 +22,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         {
             public int ProductTypeId { get; set; }
             public string ProductType { get; set; }
-            public List<ChecklistQuestion> ChecklistQuestions { get; set; }
+            public List<ChecklistTypesCollection> ChecklistTypes { get; set; }
+
+            public class ChecklistTypesCollection
+            {
+                public int Id { get; set; }
+                public string ChecklistType { get; set; }
+                public List<ChecklistQuestion> ChecklistQuestions { get; set; }
+            }
 
             public class ChecklistQuestion
             {
@@ -50,7 +56,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 CancellationToken cancellationToken)
             {
                 IQueryable<ProductType> checklistDescriptions = _context.ProductTypes
-                    .Include(x => x.ChecklistQuestions);
+                    .Include(x => x.ChecklistTypes)
+                    .ThenInclude(ct => ct.ChecklistQuestions);
 
                 if (!string.IsNullOrEmpty(request.ProductType))
                 {
@@ -67,15 +74,20 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                     {
                         ProductTypeId = x.Id,
                         ProductType = x.ProductTypeName,
-                        ChecklistQuestions = x.ChecklistQuestions.Select(cd => new GetAllChecklistsQueryResult.ChecklistQuestion
+                        ChecklistTypes = x.ChecklistTypes.Select(cd => new GetAllChecklistsQueryResult.ChecklistTypesCollection
                         {
                             Id = cd.Id,
-                            ChecklistsQuestions = cd.ChecklistQuestion,
-                            IsOpenField = cd.IsOpenField,
-                            IsActive = cd.IsActive,
-                            CreatedAt = cd.CreatedAt,
-                            UpdatedAt = cd.UpdatedAt,
-                            AddedBy = cd.AddedByUser != null ? cd.AddedByUser.FullName : "N/A",
+                            ChecklistType = cd.ChecklistType,
+                            ChecklistQuestions = cd.ChecklistQuestions.Select(x => new GetAllChecklistsQueryResult.ChecklistQuestion
+                            {
+                                Id = x.Id,
+                                ChecklistsQuestions = x.ChecklistQuestion,
+                                IsOpenField = x.IsOpenField,
+                                IsActive = x.IsActive,
+                                CreatedAt = x.CreatedAt,
+                                UpdatedAt = x.UpdatedAt,
+                                AddedBy = x.AddedByUser.FullName
+                            }).ToList()
                         }).ToList()
                     });
                 return await PagedList<GetAllChecklistsQueryResult>.CreateAsync(result, request.PageNumber,

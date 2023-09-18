@@ -10,7 +10,7 @@ namespace ELIXIR.DATA.Migrations
             migrationBuilder.DropTable(
                 name: "ChecklistAnswers");
 
-            migrationBuilder.DropColumn(
+            migrationBuilder.DropColumn( 
                 name: "AnswerType",
                 table: "ChecklistQuestions");
 

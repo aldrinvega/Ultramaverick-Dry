@@ -20,8 +20,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             _context = context;
         }
         
-        #region Add Checklist
-        public async Task<bool> AddChecklists(Checklists input)
+        /*#region Add Checklist
+        /*public async Task<bool> AddChecklists(Checklists input)
         {
             foreach (var newChecklistString in input.ChecklistsString.Select(checklistString => new CheckListString
                      {
@@ -37,7 +37,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             return true;
         }
 
-        #endregion
+        #endregion#1#*/
         public async Task<bool> UpdateReceivingId(int receivingId)
         {
             var checklistString = await _context.CheckListStrings.Where(x => x.ReceivingId == null).ToListAsync();

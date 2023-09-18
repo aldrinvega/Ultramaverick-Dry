@@ -1,5 +1,4 @@
 ﻿using ELIXIR.DATA.CORE.ICONFIGURATION;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using ELIXIR.DATA.JWT.AUTHENTICATION;
 using Microsoft.Extensions.Configuration;
@@ -32,10 +31,14 @@ namespace ELIXIR.DATA.JWT.SERVICES
                                                        && x.Password == request.Password
                                                        && x.IsActive != false);
            if(user == null)
-              return null;
+           {
+               return null;
+           }
 
            var token = generateJwtToken(user);
+           
               return new AuthenticateResponse(user, token);
+            
         }
 
         private string generateJwtToken(User user)

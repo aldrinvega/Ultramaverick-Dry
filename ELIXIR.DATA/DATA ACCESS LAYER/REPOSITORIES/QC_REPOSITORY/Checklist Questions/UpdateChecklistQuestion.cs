@@ -5,7 +5,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
+namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions
 {
     public class UpdateChecklistQuestion
     {
@@ -13,7 +13,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         {
             public int Id { get; set; }
             public string ChecklistDescription { get; set; }
-            public int ProductTypeId { get; set; }
+            public int ChecklistTypeId { get; set; }
         }
         public class Handler : IRequestHandler<UpdateChecklistDescriptionCommand, Unit>
         {
@@ -31,7 +31,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                         cancellationToken);
                 var isChecklistAlreadyExist =
                     await _context.ChecklistQuestions.AnyAsync(
-                        x => x.ChecklistQuestion == request.ChecklistDescription && x.ProductTypeId == request.ProductTypeId, cancellationToken);
+                        x => x.ChecklistQuestion == request.ChecklistDescription && x.ChecklistTypeId == request.ChecklistTypeId, cancellationToken);
 
                 if (isChecklistAlreadyExist)
                 {
@@ -44,7 +44,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 }
                 
                 existingChecklistDescription.ChecklistQuestion = request.ChecklistDescription;
-                existingChecklistDescription.ProductTypeId = request.ProductTypeId;
+                existingChecklistDescription.ChecklistTypeId = request.ChecklistTypeId;
                 existingChecklistDescription.UpdatedAt = DateTime.Now;
 
                 await _context.SaveChangesAsync(cancellationToken);

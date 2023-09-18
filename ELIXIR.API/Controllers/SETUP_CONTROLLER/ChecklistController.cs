@@ -6,6 +6,10 @@ using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.AddNewChec
 using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY;
 using System.Security.Claims;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Operation;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Types;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 {
@@ -43,6 +47,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             }
         }
         
+        [Authorize]
         [HttpGet("GetAllChecklists")]
         public async Task<IActionResult> Get([FromQuery] GetAllChecklists.GetAllChecklistsQuery query)
         {
@@ -144,6 +149,40 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 command.Id = id;
                 await _mediator.Send(command);
                 return Ok();
+            }
+            catch (Exception e)
+            {
+                return Conflict(new
+                {
+                    e.Message
+                });
+            }
+        }
+        
+        [HttpPost("AddNewChecklistType")]
+        public async Task<IActionResult> Add([FromBody] AddNewChecklistType.AddNewChecklistTypeCommand command)
+        {
+            try
+            {
+                await _mediator.Send(command);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Conflict(new
+                {
+                    e.Message
+                });
+            }
+        }
+
+        [HttpPost("AddNewChecklist")]
+        public async Task<IActionResult> AddNewChecklist(AddNewChecklist.AddNewChecklistCommand command)
+        {
+            try
+            {
+                await _mediator.Send(command);
+                return Ok("Done");
             }
             catch (Exception e)
             {

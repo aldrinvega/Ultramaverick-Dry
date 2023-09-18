@@ -19,7 +19,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             [Required]
             public string ChecklistQuestion{ get; set; }
             [Required]
-            public int ProductTypeId { get; set; }
+            public int ChecklistTypeId { get; set; }
             [Required]
             public int AddedBy { get; set; }
             [Required]
@@ -39,7 +39,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             {
                 var existingChecklistDesc =
                     await _context.ChecklistQuestions.FirstOrDefaultAsync(x =>
-                        x.ChecklistQuestion == request.ChecklistQuestion && x.ProductTypeId == request.ProductTypeId, cancellationToken);
+                        x.ChecklistQuestion == request.ChecklistQuestion && x.ChecklistTypeId == request.ChecklistTypeId, cancellationToken);
 
                 if (existingChecklistDesc != null)
                 {
@@ -49,7 +49,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 var checklistDesc = new ChecklistQuestions
                 {
                     ChecklistQuestion = request.ChecklistQuestion,
-                    ProductTypeId = request.ProductTypeId,
+                    ChecklistTypeId = request.ChecklistTypeId,
                     IsOpenField = request.IsOpenField,
                     AddedBy = request.AddedBy, 
                 };

@@ -67,24 +67,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public virtual DbSet<Disposition> Dispositions { get; set; }
         public virtual DbSet<ProductType> ProductTypes { get; set; }
         public virtual DbSet<CancelledOrders> CancelledOrders { get; set; }
-        public DbSet<AccountTitle> AccountTitles { get; set; }
-
-        //LabTest
-
+        public virtual DbSet<AccountTitle> AccountTitles { get; set; }
+        public virtual DbSet<ChecklistTypes> ChecklistTypes { get; set; }
         public virtual DbSet<LabTestRequests> LabTestRequests { get; set; }
         public virtual DbSet<ReceiveRequest> ReceiveRequests { get; set; }
-
-        // public virtual DbSet<OnGoingLabTest> OnGoingLabTests
-        // {
-        //     get;
-        //     set;
-        // }
-        //
         public virtual DbSet<ReturnedItems> ReturnedItems { get; set; }
         public virtual DbSet<RejectedItems> RejectedItems { get; set; }
         public virtual DbSet<LabTestResult> LabTestResults { get; set; }
         public virtual DbSet<ChecklistQuestions> ChecklistQuestions { get; set; }
-
+        public virtual DbSet<QCChecklist> QcChecklists { get; set; }
+        public virtual DbSet<ChecklistOpenFieldAnswer> QChecklistOpenFieldAnswers { get; set; }
+        public virtual DbSet<ChecklistProductDimension> QChecklistProductDimensions { get; set; }
+        public virtual DbSet<ChecklistOtherObservation> ChecklistOtherObservations { get; set; }
+        public virtual DbSet<ChecklistCompliance> ChecklistCompliances { get; set; }
+        public virtual DbSet<ChecklistReviewVerificationLog> ChecklistReviewVerificationLogs { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ReceiveRequest>()
@@ -169,6 +166,49 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                 .HasOne(x => x.AddedByUser)
                 .WithMany()
                 .HasForeignKey(x => x.AddedBy);
+            
+            ///New Checklist Entities
+
+            modelBuilder.Entity<QCChecklist>()
+                .HasOne(x => x.PoReceiving)
+                .WithMany()
+                .HasForeignKey(x => x.ReceivingId);
+            
+            modelBuilder.Entity<ChecklistOpenFieldAnswer>()
+                .HasOne(x => x.QcChecklist)
+                .WithMany()
+                .HasForeignKey(x => x.QcChecklistId);
+            
+            modelBuilder.Entity<ChecklistOpenFieldAnswer>()
+                .HasOne(x => x.ChecklistQuestions)
+                .WithMany()
+                .HasForeignKey(x => x.ChecklistQuestionId);
+            
+            modelBuilder.Entity<ChecklistProductDimension>()
+                .HasOne(x => x.ChecklistQuestions)
+                .WithMany()
+                .HasForeignKey(x => x.ChecklistQuestionId);
+            
+            modelBuilder.Entity<ChecklistProductDimension>()
+                .HasOne(x => x.QcChecklist)
+                .WithMany()
+                .HasForeignKey(x => x.QcChecklistId);
+            
+            modelBuilder.Entity<ChecklistOtherObservation>()
+                .HasOne(x => x.QcChecklist)
+                .WithMany()
+                .HasForeignKey(x => x.QcChecklistId);
+            
+            modelBuilder.Entity<ChecklistCompliance>()
+                .HasOne(x => x.QcChecklist)
+                .WithMany()
+                .HasForeignKey(x => x.QcChecklistId);
+            
+            modelBuilder.Entity<ChecklistReviewVerificationLog>()
+                .HasOne(x => x.QcChecklist)
+                .WithMany()
+                .HasForeignKey(x => x.QcChecklistId);
+            
             
         }
     }

@@ -15,6 +15,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
         public string AddedBy { get; set; }
         public string ModifiedBy { get; set; }
         
-        public virtual ICollection<ChecklistQuestions> ChecklistQuestions { get; set; }
+        public virtual ICollection<ChecklistTypes> ChecklistTypes { get; set; }
     }
 }

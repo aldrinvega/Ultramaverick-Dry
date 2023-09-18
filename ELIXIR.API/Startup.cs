@@ -18,6 +18,8 @@ using ELIXIR.DATA.SERVICES;
 using System.Text.Json.Serialization;
 using MediatR;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions;
+using ELIXIR.DATA.JWT.AUTHENTICATION;
 using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.AddNewChecklistQuestions;
 
 namespace ELIXIR.API
@@ -124,7 +126,7 @@ namespace ELIXIR.API
         {
 
             System.IO.Directory.SetCurrentDirectory(env.ContentRootPath);
-
+            
             app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
             app.UseHsts();
