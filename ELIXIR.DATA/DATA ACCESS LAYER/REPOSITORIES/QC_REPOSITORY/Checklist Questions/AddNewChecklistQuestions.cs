@@ -8,7 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
+namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions
 {
     
     public class AddNewChecklistQuestions : ControllerBase
@@ -20,6 +20,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             public string ChecklistQuestion{ get; set; }
             [Required]
             public int ChecklistTypeId { get; set; }
+            
+            public int? ProductTypeId { get; set; }
             [Required]
             public int AddedBy { get; set; }
             [Required]
@@ -39,7 +41,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
             {
                 var existingChecklistDesc =
                     await _context.ChecklistQuestions.FirstOrDefaultAsync(x =>
-                        x.ChecklistQuestion == request.ChecklistQuestion && x.ChecklistTypeId == request.ChecklistTypeId, cancellationToken);
+                        x.ChecklistQuestion == request.ChecklistQuestion && x.ProductTypeId == request.ProductTypeId, cancellationToken);
 
                 if (existingChecklistDesc != null)
                 {
@@ -50,6 +52,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 {
                     ChecklistQuestion = request.ChecklistQuestion,
                     ChecklistTypeId = request.ChecklistTypeId,
+                    ProductTypeId = request.ProductTypeId,
                     IsOpenField = request.IsOpenField,
                     AddedBy = request.AddedBy, 
                 };

@@ -15,8 +15,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Typ
         {
             [Required]
             public string ChecklistType { get; set; }
-            [Required]
-            public int ProductTypeId { get; set; }
         }
         public class Handler : IRequestHandler<AddNewChecklistTypeCommand, Unit>
         {
@@ -40,8 +38,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Typ
 
                 var checklistType = new ChecklistTypes
                 {
-                    ChecklistType = request.ChecklistType,
-                    ProductTypeId = request.ProductTypeId
+                    ChecklistType = request.ChecklistType
                 };
 
                 await _context.ChecklistTypes.AddAsync(checklistType, cancellationToken);

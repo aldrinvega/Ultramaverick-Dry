@@ -4,14 +4,16 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20230918061235_AdjustChecklistQquestion")]
+    partial class AdjustChecklistQquestion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1017,7 +1019,7 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("ChecklistQuestion")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ChecklistTypeId")
+                    b.Property<int>("ChecklistTypeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -2538,7 +2540,9 @@ namespace ELIXIR.DATA.Migrations
 
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistTypes", "ChecklistType")
                         .WithMany("ChecklistQuestions")
-                        .HasForeignKey("ChecklistTypeId");
+                        .HasForeignKey("ChecklistTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.ProductType", "ProductType")
                         .WithMany()

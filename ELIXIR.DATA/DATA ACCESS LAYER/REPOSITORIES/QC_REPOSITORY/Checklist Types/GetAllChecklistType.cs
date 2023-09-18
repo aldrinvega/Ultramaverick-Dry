@@ -1,0 +1,70 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+
+namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Types
+{
+    public class GetAllChecklistType
+    {
+        public class GetAllChecklistTypeQuery : UserParams, IRequest<PagedList<GetAllChecklistTypeResult>>
+        {
+            public string Search { get; set; }
+            public bool? Status { get; set; }
+        }
+
+        public class GetAllChecklistTypeResult
+        {
+            
+            public IList<ChecklistTypeCollection> ChecklistTypes { get; set; }
+
+            public class ChecklistTypeCollection
+            {
+                public int Id { get; set; }
+                public string ChecklistType { get; set; }
+            }
+        }
+        
+        public class Handler : IRequestHandler<GetAllChecklistTypeQuery, PagedList<GetAllChecklistTypeResult>>
+        {
+            private readonly StoreContext _context;
+
+            public Handler(StoreContext context)
+            {
+                _context = context;
+            }
+
+            public async Task<PagedList<GetAllChecklistTypeResult>> Handle(GetAllChecklistTypeQuery request, CancellationToken cancellationToken)
+            {
+                IQueryable<ChecklistTypes> checklistTypes = _context.ChecklistTypes;
+
+                if (!string.IsNullOrEmpty(request.Search))
+                {
+                    checklistTypes = checklistTypes.Where(x => x.ChecklistType == request.Search);
+                }
+                
+                if (request.Status != null)
+                {
+                    checklistTypes = checklistTypes.Where(x => x.IsActive == request.Status);
+                }
+
+                var result = checklistTypes.Select(x => new GetAllChecklistTypeResult
+                {
+                    ChecklistTypes = checklistTypes.Select(x => new GetAllChecklistTypeResult.ChecklistTypeCollection
+                    {
+                        Id = x.Id,
+                        ChecklistType = x.ChecklistType
+                    }).ToList()
+                });
+
+                return await PagedList<GetAllChecklistTypeResult>.CreateAsync(result, request.PageNumber,
+                    request.PageSize);
+            }
+        }
+    }
+}

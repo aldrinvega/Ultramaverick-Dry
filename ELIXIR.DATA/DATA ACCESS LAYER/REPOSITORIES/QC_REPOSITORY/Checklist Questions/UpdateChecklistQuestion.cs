@@ -13,7 +13,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
         {
             public int Id { get; set; }
             public string ChecklistDescription { get; set; }
-            public int ChecklistTypeId { get; set; }
+            public int ProductTypeId { get; set; }
         }
         public class Handler : IRequestHandler<UpdateChecklistDescriptionCommand, Unit>
         {
@@ -31,7 +31,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                         cancellationToken);
                 var isChecklistAlreadyExist =
                     await _context.ChecklistQuestions.AnyAsync(
-                        x => x.ChecklistQuestion == request.ChecklistDescription && x.ChecklistTypeId == request.ChecklistTypeId, cancellationToken);
+                        x => x.ChecklistQuestion == request.ChecklistDescription && x.ProductTypeId == request.ProductTypeId, cancellationToken);
 
                 if (isChecklistAlreadyExist)
                 {
@@ -44,7 +44,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                 }
                 
                 existingChecklistDescription.ChecklistQuestion = request.ChecklistDescription;
-                existingChecklistDescription.ChecklistTypeId = request.ChecklistTypeId;
+                existingChecklistDescription.ProductTypeId = request.ProductTypeId;
                 existingChecklistDescription.UpdatedAt = DateTime.Now;
 
                 await _context.SaveChangesAsync(cancellationToken);

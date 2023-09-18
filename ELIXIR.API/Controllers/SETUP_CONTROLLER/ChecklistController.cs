@@ -2,7 +2,7 @@
 using System;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.AddNewChecklistQuestions;
+using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions.AddNewChecklistQuestions;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY;
 using System.Security.Claims;
@@ -47,7 +47,6 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             }
         }
         
-        [Authorize]
         [HttpGet("GetAllChecklists")]
         public async Task<IActionResult> Get([FromQuery] GetAllChecklists.GetAllChecklistsQuery query)
         {
@@ -183,6 +182,60 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             {
                 await _mediator.Send(command);
                 return Ok("Done");
+            }
+            catch (Exception e)
+            {
+                return Conflict(new
+                {
+                    e.Message
+                });
+            }
+        }
+
+        [HttpGet("GetAllChecklistTypes")]
+        public async Task<IActionResult> GetAllChecklistType([FromQuery]GetAllChecklistType.GetAllChecklistTypeQuery query)
+        {
+            try
+            {
+                var checklistsTypes = await _mediator.Send(query);
+
+                Response.AddPaginationHeader(
+                    checklistsTypes.CurrentPage,
+                    checklistsTypes.PageSize,
+                    checklistsTypes.TotalCount,
+                    checklistsTypes.TotalPages,
+                    checklistsTypes.HasPreviousPage,
+                    checklistsTypes.HasNextPage
+                );
+
+                var result = new {
+                    checklistsTypes,
+                    checklistsTypes.CurrentPage,
+                    checklistsTypes.PageSize,
+                    checklistsTypes.TotalCount,
+                    checklistsTypes.TotalPages,
+                    checklistsTypes.HasPreviousPage,
+                    checklistsTypes.HasNextPage
+                };
+                
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return Conflict(new
+                {
+                    e.Message
+                });
+            }
+        }
+
+        [HttpPut("UpdateChecklistType")]
+        public async Task<IActionResult> UpdateChecklistType(UpdateChecklistType.UpdateChecklistTypeCommand command)
+        {
+            try
+            {
+                await _mediator.Send(command);
+                return Ok("Checklist type updated successfully");
             }
             catch (Exception e)
             {

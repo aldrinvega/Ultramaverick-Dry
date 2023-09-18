@@ -47,7 +47,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
             {
                 IQueryable<ChecklistQuestions> checklistDescriptions = _context.ChecklistQuestions
                     .Include(x => x.ChecklistType)
-                    .ThenInclude(x => x.ProductType);
+                    .Include(x => x.ProductType);
 
                 if (!string.IsNullOrEmpty(request.Search))
                 {
@@ -57,7 +57,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                 if (!string.IsNullOrEmpty(request.ProductType))
                 {
                     checklistDescriptions =
-                        checklistDescriptions.Where(x => x.ChecklistType.ProductType.ProductTypeName.Contains(request.ProductType));
+                        checklistDescriptions.Where(x => x.ProductType.ProductTypeName.Contains(request.ProductType));
                 }
 
                 if (request.Status != null)
@@ -76,8 +76,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                         CreatedAt = cd.CreatedAt,
                         UpdatedAt = cd.UpdatedAt,
                         AddedBy = cd.AddedByUser != null ? cd.AddedByUser.FullName : "N/A",
-                        ProductType = cd.ChecklistType.ProductType.ProductTypeName,
-                        ProductTypeId = cd.ChecklistType.ProductTypeId
+                        ProductType = cd.ProductType.ProductTypeName,
+                        ProductTypeId = cd.ProductTypeId
                     }).OrderBy(x => x.UpdatedAt);
 
                 return await PagedList<GetAllChecklistsDescriptionQueryResult>.CreateAsync(result, request.PageNumber,

@@ -208,8 +208,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                 .HasOne(x => x.QcChecklist)
                 .WithMany()
                 .HasForeignKey(x => x.QcChecklistId);
-            
-            
         }
     }
 }
