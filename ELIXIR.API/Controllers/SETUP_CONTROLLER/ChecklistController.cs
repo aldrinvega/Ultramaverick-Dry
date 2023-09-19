@@ -259,12 +259,14 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpPatch("UpdateChecklistTypeStatus/{id:int}")]
-        public async Task<IActionResult> UpdateChecklistTypeStatus(
-            [FromQuery]UpdateChecklistTypeStatus.UpdateChecklistTypeStatusCommand command, int id)
+        public async Task<IActionResult> UpdateChecklistTypeStatus( int id)
         {
             try
             {
-                command.ChecklistTypeId = id;
+                var command = new UpdateChecklistTypeStatus.UpdateChecklistTypeStatusCommand
+                {
+                    ChecklistTypeId = id
+                };
 
                 await _mediator.Send(command);
                 return Ok("Checklist Type status updated successfully");

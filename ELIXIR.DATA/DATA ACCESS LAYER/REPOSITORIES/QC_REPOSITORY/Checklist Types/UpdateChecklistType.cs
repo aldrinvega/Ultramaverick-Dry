@@ -14,7 +14,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Typ
         {
             public int ChecklistTypeId { get; set; }
             public string ChecklistType { get; set; }
-            public int ProductTypeId { get; set; }
+            public int? ProductTypeId { get; set; }
             public int ModifiedBy { get; set; }
         }
         
