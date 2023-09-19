@@ -235,7 +235,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
         
         [HttpPut("UpdateChecklistType/{id}")]
-        public async Task<IActionResult> UpdateChecklistType([FromQuery]UpdateChecklistType.UpdateChecklistTypeCommand command, int id)
+        public async Task<IActionResult> UpdateChecklistType([FromBody]UpdateChecklistType.UpdateChecklistTypeCommand command, int id)
         {
             try
             {
