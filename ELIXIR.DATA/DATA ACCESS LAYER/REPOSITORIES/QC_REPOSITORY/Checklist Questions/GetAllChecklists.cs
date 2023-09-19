@@ -53,15 +53,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
             {
                 IQueryable<ChecklistTypes> checklistDescriptions = _context.ChecklistTypes
                     .Include(ct => ct.ChecklistQuestions)
-                    .ThenInclude(x => x.ProductType);
+                    .Include(x => x.ProductType);
 
                 if (!string.IsNullOrEmpty(request.ProductType))
                 {
-                    checklistDescriptions = checklistDescriptions
-                        .Where(ct => ct.ChecklistQuestions.Where(x => x.ProductTypeId != null && x.ProductType.ProductTypeName.Contains(request.ProductType))
-                            .Any(cq => cq.ProductTypeId != null));
+                    checklistDescriptions =
+                        checklistDescriptions.Where(x => x.ProductType.ProductTypeName == request.ProductType);
                 }
-
+                
                 if (!string.IsNullOrEmpty(request.ChecklistType))
                 {
                     checklistDescriptions =
@@ -81,8 +80,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                     ChecklistQuestions = x.ChecklistQuestions.Select(x =>
                         new GetAllChecklistsQueryResult.ChecklistQuestion
                         {
-                            ProductTypeId = x.ProductTypeId,
-                            ProductType = x.ProductType.ProductTypeName,
+                            ProductTypeId = x.ChecklistType.ProductTypeId,
+                            ProductType = x.ChecklistType.ProductType.ProductTypeName,
                             Id = x.Id,
                             ChecklistsQuestions = x.ChecklistQuestion,
                             IsOpenField = x.IsOpenField,
@@ -91,7 +90,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                             UpdatedAt = x.UpdatedAt,
                             AddedBy = x.AddedByUser.FullName
                         }).ToList()
-                
                  });
                 
                 return await PagedList<GetAllChecklistsQueryResult>.CreateAsync(result, request.PageNumber,

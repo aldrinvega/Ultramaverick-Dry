@@ -16,6 +16,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
         {
             public string Search { get; set; }
             public string ProductType { get; set; }
+            public string ChecklistType { get; set; }
             public bool? Status { get; set; }
         }
         public class GetAllChecklistsDescriptionQueryResult
@@ -47,7 +48,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
             {
                 IQueryable<ChecklistQuestions> checklistDescriptions = _context.ChecklistQuestions
                     .Include(x => x.ChecklistType)
-                    .Include(x => x.ProductType);
+                    .ThenInclude(x => x.ProductType);
 
                 if (!string.IsNullOrEmpty(request.Search))
                 {
@@ -57,7 +58,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                 if (!string.IsNullOrEmpty(request.ProductType))
                 {
                     checklistDescriptions =
-                        checklistDescriptions.Where(x => x.ProductType.ProductTypeName.Contains(request.ProductType));
+                        checklistDescriptions.Where(x => x.ChecklistType.ProductType.ProductTypeName.Contains(request.ProductType));
+                }
+                
+                if (!string.IsNullOrEmpty(request.ChecklistType))
+                {
+                    checklistDescriptions =
+                        checklistDescriptions.Where(x => x.ChecklistType.ChecklistType.Contains(request.ChecklistType));
                 }
 
                 if (request.Status != null)
@@ -76,8 +83,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                         CreatedAt = cd.CreatedAt,
                         UpdatedAt = cd.UpdatedAt,
                         AddedBy = cd.AddedByUser != null ? cd.AddedByUser.FullName : "N/A",
-                        ProductType = cd.ProductType.ProductTypeName,
-                        ProductTypeId = cd.ProductTypeId
+                        ProductType = cd.ChecklistType.ProductType.ProductTypeName,
+                        ProductTypeId = cd.ChecklistType.ProductTypeId
                     }).OrderBy(x => x.UpdatedAt);
 
                 return await PagedList<GetAllChecklistsDescriptionQueryResult>.CreateAsync(result, request.PageNumber,

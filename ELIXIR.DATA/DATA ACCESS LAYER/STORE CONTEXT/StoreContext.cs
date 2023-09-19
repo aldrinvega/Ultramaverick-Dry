@@ -208,6 +208,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                 .HasOne(x => x.QcChecklist)
                 .WithMany()
                 .HasForeignKey(x => x.QcChecklistId);
+            
+            modelBuilder.Entity<ChecklistTypes>()
+                .HasOne(x => x.AddedByUser)
+                .WithMany()
+                .HasForeignKey(x => x.AddedBy);
+            
+            modelBuilder.Entity<ChecklistTypes>()
+                .HasOne(x => x.ModifiedByUser)
+                .WithMany()
+                .HasForeignKey(x => x.ModifiedBy);
+
+            modelBuilder.Entity<ChecklistQuestions>()
+                .HasOne(x => x.ModifiedByUser)
+                .WithMany()
+                .HasForeignKey(x => x.ModifiedBy);
         }
     }
 }

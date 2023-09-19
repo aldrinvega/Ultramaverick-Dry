@@ -163,6 +163,11 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         {
             try
             {
+                if (User.Identity is ClaimsIdentity identity 
+                    && int.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.AddedBy = userId;
+                }
                 await _mediator.Send(command);
                 return Ok();
             }
@@ -228,14 +233,41 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 });
             }
         }
-
-        [HttpPut("UpdateChecklistType")]
-        public async Task<IActionResult> UpdateChecklistType(UpdateChecklistType.UpdateChecklistTypeCommand command)
+        
+        [HttpPut("UpdateChecklistType/{id}")]
+        public async Task<IActionResult> UpdateChecklistType([FromQuery]UpdateChecklistType.UpdateChecklistTypeCommand command, int id)
         {
             try
             {
+                if (User.Identity is ClaimsIdentity identity 
+                    && int.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.ModifiedBy = userId;
+                }
+                
+                command.ChecklistTypeId = id;
                 await _mediator.Send(command);
                 return Ok("Checklist type updated successfully");
+            }
+            catch (Exception e)
+            {
+                return Conflict(new
+                {
+                    e.Message
+                });
+            }
+        }
+
+        [HttpPatch("UpdateChecklistTypeStatus/{id:int}")]
+        public async Task<IActionResult> UpdateChecklistTypeStatus(
+            [FromQuery]UpdateChecklistTypeStatus.UpdateChecklistTypeStatusCommand command, int id)
+        {
+            try
+            {
+                command.ChecklistTypeId = id;
+
+                await _mediator.Send(command);
+                return Ok("Checklist Type status updated successfully");
             }
             catch (Exception e)
             {

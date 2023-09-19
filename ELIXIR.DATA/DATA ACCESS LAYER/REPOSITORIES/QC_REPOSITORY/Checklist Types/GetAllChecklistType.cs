@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Types
 {
@@ -20,14 +18,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Typ
 
         public class GetAllChecklistTypeResult
         {
+            public int Id { get; set; }
+            public string ChecklistType { get; set; }
+            public bool IsActive { get; set; }
+            public string AddedBy { get; set; }
+            public string ModifiedBy { get; set; }
             
-            public IList<ChecklistTypeCollection> ChecklistTypes { get; set; }
-
-            public class ChecklistTypeCollection
-            {
-                public int Id { get; set; }
-                public string ChecklistType { get; set; }
-            }
         }
         
         public class Handler : IRequestHandler<GetAllChecklistTypeQuery, PagedList<GetAllChecklistTypeResult>>
@@ -55,11 +51,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Typ
 
                 var result = checklistTypes.Select(x => new GetAllChecklistTypeResult
                 {
-                    ChecklistTypes = checklistTypes.Select(x => new GetAllChecklistTypeResult.ChecklistTypeCollection
-                    {
-                        Id = x.Id,
-                        ChecklistType = x.ChecklistType
-                    }).ToList()
+                    Id = x.Id,
+                    ChecklistType = x.ChecklistType,
+                    IsActive = x.IsActive,
+                    AddedBy = x.AddedByUser.FullName,
+                    ModifiedBy = x.ModifiedByUser.FullName
                 });
 
                 return await PagedList<GetAllChecklistTypeResult>.CreateAsync(result, request.PageNumber,

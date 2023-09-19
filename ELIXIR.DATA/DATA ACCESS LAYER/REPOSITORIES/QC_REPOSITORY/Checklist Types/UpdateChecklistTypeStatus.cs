@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
@@ -8,17 +7,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Types
 {
-    public class UpdateChecklistType
+    public class UpdateChecklistTypeStatus
     {
-        public class UpdateChecklistTypeCommand : IRequest<Unit>
+        public class UpdateChecklistTypeStatusCommand : IRequest<Unit>
         {
             public int ChecklistTypeId { get; set; }
-            public string ChecklistType { get; set; }
-            public int ProductTypeId { get; set; }
-            public int ModifiedBy { get; set; }
         }
-        
-        public class Handler : IRequestHandler<UpdateChecklistTypeCommand, Unit>
+
+        public class Handler : IRequestHandler<UpdateChecklistTypeStatusCommand, Unit>
         {
             private readonly StoreContext _context;
 
@@ -27,7 +23,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Typ
                 _context = context;
             }
 
-            public async Task<Unit> Handle(UpdateChecklistTypeCommand request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(UpdateChecklistTypeStatusCommand request, CancellationToken cancellationToken)
             {
                 var existingChecklistType =
                     await _context.ChecklistTypes.FirstOrDefaultAsync(x => x.Id == request.ChecklistTypeId,
@@ -35,11 +31,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Typ
 
                 if (existingChecklistType == null)
                 {
-                    throw new Exception("Checklist type is not exist");
+                    throw new Exception("Checklist Type not found");
                 }
 
-                existingChecklistType.ChecklistType = request.ChecklistType;
-                existingChecklistType.ProductTypeId = request.ProductTypeId;
+                existingChecklistType.IsActive = !existingChecklistType.IsActive;
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Unit.Value;
