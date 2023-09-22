@@ -8,7 +8,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
     public class ChecklistTypes : BaseEntity
     {
         public string ChecklistType  { get; set; }
-        public int? ProductTypeId { get; set; }
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdateAt { get; set; }
@@ -17,7 +16,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
 
         public User AddedByUser { get; set; }
         public User ModifiedByUser { get; set; }
-        public ProductType ProductType { get; set; }
         public ICollection<ChecklistQuestions> ChecklistQuestions { get; set; }
     }
 }

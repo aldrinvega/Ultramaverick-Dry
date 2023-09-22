@@ -141,7 +141,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         
         [HttpPut("UpdateChecklistQuestion/{id:int}")]
         public async Task<IActionResult> UpdateChecklistDescription(
-            [FromBody] UpdateChecklistQuestion.UpdateChecklistDescriptionCommand command, int id)
+            [FromBody] UpdateChecklistQuestion.UpdateChecklistQuestionCommand command, int id)
         {
             try
             {

@@ -9,13 +9,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
 {
     public class UpdateChecklistQuestion
     {
-        public class UpdateChecklistDescriptionCommand : IRequest<Unit>
+        public class UpdateChecklistQuestionCommand : IRequest<Unit>
         {
             public int Id { get; set; }
-            public string ChecklistDescription { get; set; }
+            public string ChecklistQuestion { get; set; }
             public int ChecklistTypeId { get; set; }
         }
-        public class Handler : IRequestHandler<UpdateChecklistDescriptionCommand, Unit>
+        public class Handler : IRequestHandler<UpdateChecklistQuestionCommand, Unit>
         {
             private readonly StoreContext _context;
 
@@ -24,28 +24,28 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                 _context = context;
             }
 
-            public async Task<Unit> Handle(UpdateChecklistDescriptionCommand request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(UpdateChecklistQuestionCommand request, CancellationToken cancellationToken)
             {
-                var existingChecklistDescription =
+                var existingChecklistQuestion =
                     await _context.ChecklistQuestions.FirstOrDefaultAsync(x => x.Id == request.Id, 
                         cancellationToken);
                 var isChecklistAlreadyExist =
                     await _context.ChecklistQuestions.AnyAsync(
-                        x => x.ChecklistQuestion == request.ChecklistDescription && x.ChecklistTypeId == request.ChecklistTypeId, cancellationToken);
+                        x => x.ChecklistQuestion == request.ChecklistQuestion && x.ChecklistTypeId == request.ChecklistTypeId, cancellationToken);
 
                 if (isChecklistAlreadyExist)
                 {
-                    throw new Exception("Checklist description is already exist");
+                    throw new Exception("Checklist question is already exist");
                 }
                 
-                if (existingChecklistDescription == null)
+                if (existingChecklistQuestion == null)
                 {
-                    throw new Exception("Checklist description is not found");
+                    throw new Exception("Checklist question is not found");
                 }
-                
-                existingChecklistDescription.ChecklistQuestion = request.ChecklistDescription;
-                existingChecklistDescription.ChecklistTypeId = request.ChecklistTypeId;
-                existingChecklistDescription.UpdatedAt = DateTime.Now;
+
+                existingChecklistQuestion.ChecklistQuestion = request.ChecklistQuestion;
+                existingChecklistQuestion.ChecklistTypeId = request.ChecklistTypeId;
+                existingChecklistQuestion.UpdatedAt = DateTime.Now;
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Unit.Value;

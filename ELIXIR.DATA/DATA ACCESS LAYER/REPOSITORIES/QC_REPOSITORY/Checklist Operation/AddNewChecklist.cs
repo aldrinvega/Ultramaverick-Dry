@@ -63,7 +63,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                 var qcChecklist = new QCChecklist
                 {
                     ReceivingId = request.ReceivingId,
-
                 };
 
                 await _context.QcChecklists.AddAsync(qcChecklist, cancellationToken);
@@ -118,7 +117,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                 };
 
                 await _context.ChecklistCompliances.AddAsync(checklistCompliance, cancellationToken);
-
 
                 await _context.SaveChangesAsync(cancellationToken);
 

@@ -15,13 +15,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
     {
         public class GetAllChecklistsQuery : UserParams, IRequest<PagedList<GetAllChecklistsQueryResult>>
         {
-            public string ProductType { get; set; }
-            public string ChecklistType { get; set; }
+            public int? ProductTypeId { get; set; }
+            public int? ChecklistTypeId { get; set; }
             public bool? Status { get; set; }
         }
         public class GetAllChecklistsQueryResult
         {
-                public int Id { get; set; }
+                public int ChecklistTypeId { get; set; }
                 public string ChecklistType { get; set; } 
                 public List<ChecklistQuestion> ChecklistQuestions { get; set; }
 
@@ -53,18 +53,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
             {
                 IQueryable<ChecklistTypes> checklistDescriptions = _context.ChecklistTypes
                     .Include(ct => ct.ChecklistQuestions)
-                    .Include(x => x.ProductType);
+                    .ThenInclude(x => x.ProductType);
 
-                if (!string.IsNullOrEmpty(request.ProductType))
+                if(request.ChecklistTypeId != null)
                 {
-                    checklistDescriptions =
-                        checklistDescriptions.Where(x => x.ProductType.ProductTypeName == request.ProductType);
-                }
-                
-                if (!string.IsNullOrEmpty(request.ChecklistType))
-                {
-                    checklistDescriptions =
-                        checklistDescriptions.Where(x => x.ChecklistType.Contains(request.ChecklistType));
+                    checklistDescriptions = checklistDescriptions.Where(x => x.Id == request.ChecklistTypeId);
                 }
 
                 if (request.Status != null)
@@ -75,13 +68,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                 var result = checklistDescriptions.Select(x => new GetAllChecklistsQueryResult
                 {
 
-                    Id = x.Id,
+                    ChecklistTypeId = x.Id,
                     ChecklistType = x.ChecklistType,
                     ChecklistQuestions = x.ChecklistQuestions.Select(x =>
                         new GetAllChecklistsQueryResult.ChecklistQuestion
                         {
-                            ProductTypeId = x.ChecklistType.ProductTypeId,
-                            ProductType = x.ChecklistType.ProductType.ProductTypeName,
+                            ProductTypeId = x.ProductTypeId,
+                            ProductType = x.ProductType.ProductTypeName,
                             Id = x.Id,
                             ChecklistsQuestions = x.ChecklistQuestion,
                             IsOpenField = x.IsOpenField,
@@ -89,7 +82,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                             CreatedAt = x.CreatedAt,
                             UpdatedAt = x.UpdatedAt,
                             AddedBy = x.AddedByUser.FullName
-                        }).ToList()
+                        }).Where(x => x.ProductTypeId == request.ProductTypeId).ToList()
                  });
                 
                 return await PagedList<GetAllChecklistsQueryResult>.CreateAsync(result, request.PageNumber,

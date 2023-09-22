@@ -14,7 +14,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Typ
         {
             public int ChecklistTypeId { get; set; }
             public string ChecklistType { get; set; }
-            public int? ProductTypeId { get; set; }
             public int ModifiedBy { get; set; }
         }
         
@@ -38,8 +37,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Typ
                     throw new Exception("Checklist type is not exist");
                 }
 
+                if(existingChecklistType.ChecklistType == request.ChecklistType)
+                {
+                    throw new Exception($"{request.ChecklistType} is already exist, try something else");
+                }
+
                 existingChecklistType.ChecklistType = request.ChecklistType;
-                existingChecklistType.ProductTypeId = request.ProductTypeId;
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Unit.Value;

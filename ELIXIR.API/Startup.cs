@@ -16,10 +16,7 @@ using System.Linq;
 using ELIXIR.API.ERRORS;
 using ELIXIR.DATA.SERVICES;
 using System.Text.Json.Serialization;
-using MediatR;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions;
-using ELIXIR.DATA.JWT.AUTHENTICATION;
 using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions.AddNewChecklistQuestions;
 
 namespace ELIXIR.API
@@ -76,7 +73,7 @@ namespace ELIXIR.API
             services.AddScoped(typeof(IUserService), typeof(UserService));
       
             services.AddDbContext<StoreContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("DevConnection")));
+            options.UseSqlServer(Configuration.GetConnectionString("LiveConnection")));
 
             services.Configure<ApiBehaviorOptions>(options =>
             {

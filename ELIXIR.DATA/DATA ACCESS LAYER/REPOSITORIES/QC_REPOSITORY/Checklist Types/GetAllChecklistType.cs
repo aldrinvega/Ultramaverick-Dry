@@ -23,7 +23,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Typ
             public bool IsActive { get; set; }
             public string AddedBy { get; set; }
             public string ModifiedBy { get; set; }
-            
+
         }
         
         public class Handler : IRequestHandler<GetAllChecklistTypeQuery, PagedList<GetAllChecklistTypeResult>>
