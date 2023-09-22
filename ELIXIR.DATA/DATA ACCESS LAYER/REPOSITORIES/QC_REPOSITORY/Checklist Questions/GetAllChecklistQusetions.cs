@@ -29,7 +29,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                 public bool IsActive { get; set; }
                 public DateTime CreatedAt { get; set; }
                 public DateTime UpdatedAt { get; set; }
-                public bool IsOpenField { get; set; }
+                public AnswerType AnswerType { get; set; }
                 public string AddedBy { get; set; }
                 
         }
@@ -78,7 +78,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                         Id = cd.Id,
                         ChecklistQuestion = cd.ChecklistQuestion,
                         ChecklistType = cd.ChecklistType.ChecklistType,
-                        IsOpenField = cd.IsOpenField,
+                        AnswerType = cd.AnswerType,
                         IsActive = cd.IsActive,
                         CreatedAt = cd.CreatedAt,
                         UpdatedAt = cd.UpdatedAt,

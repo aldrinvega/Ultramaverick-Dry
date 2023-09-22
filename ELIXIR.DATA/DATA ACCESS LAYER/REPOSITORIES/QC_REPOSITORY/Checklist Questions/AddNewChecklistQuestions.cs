@@ -24,7 +24,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
             [Required]
             public int AddedBy { get; set; }
             [Required]
-            public bool IsOpenField { get; set; }
+            public AnswerType AnswerType { get; set; }
         }
 
         public class Handler : IRequestHandler<AddNewChecklistQuestionCommand, Unit>
@@ -52,7 +52,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                     ChecklistQuestion = request.ChecklistQuestion,
                     ChecklistTypeId = request.ChecklistTypeId,
                     ProductTypeId = request.ProductTypeId,
-                    IsOpenField = request.IsOpenField,
+                    AnswerType = request.AnswerType,
                     AddedBy = request.AddedBy,
                 };
 

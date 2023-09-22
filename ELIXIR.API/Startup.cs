@@ -18,6 +18,7 @@ using ELIXIR.DATA.SERVICES;
 using System.Text.Json.Serialization;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions;
 using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions.AddNewChecklistQuestions;
+using FluentValidation;
 
 namespace ELIXIR.API
 {

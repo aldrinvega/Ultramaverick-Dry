@@ -16,8 +16,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
         public int? ModifiedBy { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; }
-        public bool IsOpenField { get; set; }
-
+        public AnswerType AnswerType { get; set; }
         public virtual User ModifiedByUser { get; set; }
         public virtual User AddedByUser { get; set; }
         public virtual ChecklistTypes ChecklistType { get; set; }
