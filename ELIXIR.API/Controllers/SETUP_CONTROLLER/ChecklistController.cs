@@ -46,7 +46,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 });
             }
         }
-        
+
         [HttpGet("GetAllChecklists")]
         public async Task<IActionResult> Get([FromQuery] GetAllChecklists.GetAllChecklistsQuery query)
         {
@@ -63,16 +63,17 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                     checklists.HasNextPage
                 );
 
-                var result = new {
-                        checklists,
-                        checklists.CurrentPage,
-                        checklists.PageSize,
-                        checklists.TotalCount,
-                        checklists.TotalPages,
-                        checklists.HasPreviousPage,
-                        checklists.HasNextPage
+                var result = new
+                {
+                    checklists,
+                    checklists.CurrentPage,
+                    checklists.PageSize,
+                    checklists.TotalCount,
+                    checklists.TotalPages,
+                    checklists.HasPreviousPage,
+                    checklists.HasNextPage
                 };
-                
+
                 return Ok(result);
             }
             catch (Exception e)
@@ -83,7 +84,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 });
             }
         }
-        
+
         [HttpGet("GetAllChecklistsQuestions")]
         public async Task<IActionResult> Get([FromQuery] GetAllChecklistsDescription.GetAllChecklistsDescriptionQuery query)
         {
@@ -100,7 +101,8 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                     checklistsQuestions.HasNextPage
                 );
 
-                var result = new {
+                var result = new
+                {
                     checklistsQuestions,
                     checklistsQuestions.CurrentPage,
                     checklistsQuestions.PageSize,
@@ -109,7 +111,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                     checklistsQuestions.HasPreviousPage,
                     checklistsQuestions.HasNextPage
                 };
-                
+
                 return Ok(result);
             }
             catch (Exception e)
@@ -138,7 +140,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 });
             }
         }
-        
+
         [HttpPut("UpdateChecklistQuestion/{id:int}")]
         public async Task<IActionResult> UpdateChecklistDescription(
             [FromBody] UpdateChecklistQuestion.UpdateChecklistQuestionCommand command, int id)
@@ -157,13 +159,13 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 });
             }
         }
-        
+
         [HttpPost("AddNewChecklistType")]
         public async Task<IActionResult> Add([FromBody] AddNewChecklistType.AddNewChecklistTypeCommand command)
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity 
+                if (User.Identity is ClaimsIdentity identity
                     && int.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
                     command.AddedBy = userId;
@@ -198,7 +200,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpGet("GetAllChecklistTypes")]
-        public async Task<IActionResult> GetAllChecklistType([FromQuery]GetAllChecklistType.GetAllChecklistTypeQuery query)
+        public async Task<IActionResult> GetAllChecklistType([FromQuery] GetAllChecklistType.GetAllChecklistTypeQuery query)
         {
             try
             {
@@ -213,7 +215,8 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                     checklistsTypes.HasNextPage
                 );
 
-                var result = new {
+                var result = new
+                {
                     checklistsTypes,
                     checklistsTypes.CurrentPage,
                     checklistsTypes.PageSize,
@@ -222,7 +225,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                     checklistsTypes.HasPreviousPage,
                     checklistsTypes.HasNextPage
                 };
-                
+
                 return Ok(result);
             }
             catch (Exception e)
@@ -233,18 +236,18 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 });
             }
         }
-        
+
         [HttpPut("UpdateChecklistType/{id}")]
-        public async Task<IActionResult> UpdateChecklistType([FromBody]UpdateChecklistType.UpdateChecklistTypeCommand command, int id)
+        public async Task<IActionResult> UpdateChecklistType([FromBody] UpdateChecklistType.UpdateChecklistTypeCommand command, int id)
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity 
+                if (User.Identity is ClaimsIdentity identity
                     && int.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
                     command.ModifiedBy = userId;
                 }
-                
+
                 command.ChecklistTypeId = id;
                 await _mediator.Send(command);
                 return Ok("Checklist type updated successfully");
@@ -259,7 +262,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpPatch("UpdateChecklistTypeStatus/{id:int}")]
-        public async Task<IActionResult> UpdateChecklistTypeStatus( int id)
+        public async Task<IActionResult> UpdateChecklistTypeStatus(int id)
         {
             try
             {
@@ -270,6 +273,28 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
                 await _mediator.Send(command);
                 return Ok("Checklist Type status updated successfully");
+            }
+            catch (Exception e)
+            {
+                return Conflict(new
+                {
+                    e.Message
+                });
+            }
+        }
+
+        [HttpGet("GetChecklistAnswerById/{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            try
+            {
+                var query = new GetChecklistByReceivingId.GetChecklistByReceivingIdQuery
+                {
+                    ReceivingId = id
+                };
+                var checklists = await _mediator.Send(query);
+
+                return Ok(checklists);
             }
             catch (Exception e)
             {

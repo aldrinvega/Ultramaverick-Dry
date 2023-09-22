@@ -2,9 +2,9 @@
 {
     public class ChecklistOtherObservation : BaseEntity
     {
-        public int QcChecklistId { get; set; }
+        public int QCChecklistId { get; set; }
         public string Observation { get; set; }
 
-        public virtual QCChecklist QcChecklist { get; set; }
+        public virtual QCChecklist QCChecklist { get; set; }
     }
 }

@@ -35,6 +35,7 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
         {
             if (ModelState.IsValid)
             {
+                input.Checklist.ReceivingId = input.PO_Receiving.PO_Summary_Id;
                 await _mediator.Send(input.Checklist);
                 await _unitOfWork.Receives.AddNewReceivingInformation(input.PO_Receiving);
                 

@@ -81,6 +81,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public virtual DbSet<ChecklistOtherObservation> ChecklistOtherObservations { get; set; }
         public virtual DbSet<ChecklistCompliance> ChecklistCompliances { get; set; }
         public virtual DbSet<ChecklistReviewVerificationLog> ChecklistReviewVerificationLogs { get; set; }
+        public virtual DbSet<ChecklistAnswers> ChecklistAnswers { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -175,11 +176,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                 .HasForeignKey(x => x.ReceivingId);
             
             modelBuilder.Entity<ChecklistOpenFieldAnswer>()
-                .HasOne(x => x.QcChecklist)
-                .WithMany()
-                .HasForeignKey(x => x.QcChecklistId);
-            
-            modelBuilder.Entity<ChecklistOpenFieldAnswer>()
                 .HasOne(x => x.ChecklistQuestions)
                 .WithMany()
                 .HasForeignKey(x => x.ChecklistQuestionId);
@@ -188,26 +184,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                 .HasOne(x => x.ChecklistQuestions)
                 .WithMany()
                 .HasForeignKey(x => x.ChecklistQuestionId);
-            
-            modelBuilder.Entity<ChecklistProductDimension>()
-                .HasOne(x => x.QcChecklist)
-                .WithMany()
-                .HasForeignKey(x => x.QcChecklistId);
-            
-            modelBuilder.Entity<ChecklistOtherObservation>()
-                .HasOne(x => x.QcChecklist)
-                .WithMany()
-                .HasForeignKey(x => x.QcChecklistId);
-            
-            modelBuilder.Entity<ChecklistCompliance>()
-                .HasOne(x => x.QcChecklist)
-                .WithMany()
-                .HasForeignKey(x => x.QcChecklistId);
-            
-            modelBuilder.Entity<ChecklistReviewVerificationLog>()
-                .HasOne(x => x.QcChecklist)
-                .WithMany()
-                .HasForeignKey(x => x.QcChecklistId);
             
             modelBuilder.Entity<ChecklistTypes>()
                 .HasOne(x => x.AddedByUser)

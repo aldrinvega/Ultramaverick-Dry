@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using MediatR;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Operation
 {
@@ -13,9 +14,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
         {
             public int ReceivingId { get; set; }
             public IList<ChecklistOpenFieldAnswer> OpenFieldAnswers { get; set; }
+            public IList<ChecklistAnswer> ChecklistAnswers { get; set; }
             public IList<ChecklistProductDimension> ProductDimensions { get; set; }
             public ReviewVerificationLogs ReviewVerificationLog { get; set; }
             public ChecklistCompliances ChecklistCompliance { get; set; }
+            public ChecklistOtherObservation ChecklistOtherObservations { get; set; }
+
+            public class ChecklistAnswer
+            {
+                public int ChecklistQuestionId { get; set; }
+                public bool Status { get; set; }
+            }
 
             public class ChecklistOpenFieldAnswer
             {
@@ -47,6 +56,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                 public string ComplianceDescription { get; set; }
                 public string RootCause { get; set; }
             }
+
+            public class ChecklistOtherObservation
+            {
+                public string Observation { get; set; }
+            }
         }
 
         public class Handler : IRequestHandler<AddNewChecklistCommand, Unit>
@@ -66,12 +80,25 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                 };
 
                 await _context.QcChecklists.AddAsync(qcChecklist, cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
+
+                foreach (var checklistAnswer in request.ChecklistAnswers)
+                {
+                    var checklistAnswers = new ChecklistAnswers
+                    {
+                        QCChecklistId = qcChecklist.Id,
+                        ChecklistQuestionsId = checklistAnswer.ChecklistQuestionId,
+                        Status = checklistAnswer.Status
+                    };
+
+                    await _context.ChecklistAnswers.AddAsync(checklistAnswers, cancellationToken);
+                }
 
                 foreach (var openFieldAnswer in request.OpenFieldAnswers)
                 {
                     var checklistOpenFieldAnswer = new ChecklistOpenFieldAnswer
                     {
-                        QcChecklistId = qcChecklist.Id,
+                        QCChecklistId = qcChecklist.Id,
                         ChecklistQuestionId = openFieldAnswer.ChecklistQuestionId,
                         Remarks = openFieldAnswer.Remarks,
                     };
@@ -83,7 +110,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                 {
                     var checklistProductDimension = new ChecklistProductDimension
                     {
-                        QcChecklistId = qcChecklist.Id,
+                        QCChecklistId = qcChecklist.Id,
                         ChecklistQuestionId = productDimension.ChecklistQuestionId,
                         Standard = productDimension.Standard,
                         Actual = productDimension.Actual,
@@ -95,7 +122,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
 
                 var reviewVerificationLog = new ChecklistReviewVerificationLog
                 {
-                    QcChecklistId = qcChecklist.Id,
+                    QCChecklistId = qcChecklist.Id,
                     DispositionId = request.ReviewVerificationLog.DispositionId,
                     QtyAccepted = request.ReviewVerificationLog.QtyAccepted,
                     QtyRejected = request.ReviewVerificationLog.QtyRejected,
@@ -110,13 +137,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
 
                 var checklistCompliance = new ChecklistCompliance
                 {
-                    QcChecklistId = qcChecklist.Id,
+                    QCChecklistId = qcChecklist.Id,
                     Compliance = request.ChecklistCompliance.Compliance,
                     Description = request.ChecklistCompliance.ComplianceDescription,
                     RootCause = request.ChecklistCompliance.RootCause,
                 };
 
                 await _context.ChecklistCompliances.AddAsync(checklistCompliance, cancellationToken);
+
+                var checklistOtherObservation = new ChecklistOtherObservation
+                {
+                    QCChecklistId = qcChecklist.Id,
+                    Observation = request.ChecklistOtherObservations.Observation,
+                };
+
+                await _context.ChecklistOtherObservations.AddAsync(checklistOtherObservation, cancellationToken);
 
                 await _context.SaveChangesAsync(cancellationToken);
 

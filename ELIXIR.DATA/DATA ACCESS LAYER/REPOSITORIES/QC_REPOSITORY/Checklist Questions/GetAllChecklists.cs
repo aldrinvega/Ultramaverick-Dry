@@ -21,9 +21,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
         }
         public class GetAllChecklistsQueryResult
         {
-                public int ChecklistTypeId { get; set; }
-                public string ChecklistType { get; set; } 
-                public List<ChecklistQuestion> ChecklistQuestions { get; set; }
+             public int ChecklistTypeId { get; set; }
+             public string ChecklistType { get; set; }
+             public List<ChecklistQuestion> ChecklistQuestions { get; set; }
 
             public class ChecklistQuestion
             {
