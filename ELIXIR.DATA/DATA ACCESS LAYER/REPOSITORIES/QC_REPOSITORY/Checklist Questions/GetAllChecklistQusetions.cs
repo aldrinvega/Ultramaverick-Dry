@@ -25,7 +25,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                 public int? ProductTypeId { get; set; }
                 public string ProductType { get; set; }
                 public string ChecklistQuestion { get; set; }
-                public string ChecklistType { get; set; }
+            public int ChecklistTypeId { get; set; }
+            public string ChecklistType { get; set; }
                 public bool IsActive { get; set; }
                 public DateTime CreatedAt { get; set; }
                 public DateTime UpdatedAt { get; set; }
@@ -77,6 +78,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                     {
                         Id = cd.Id,
                         ChecklistQuestion = cd.ChecklistQuestion,
+                        ChecklistTypeId = cd.ChecklistTypeId,
                         ChecklistType = cd.ChecklistType.ChecklistType,
                         AnswerType = cd.AnswerType,
                         IsActive = cd.IsActive,

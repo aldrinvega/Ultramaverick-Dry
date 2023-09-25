@@ -67,10 +67,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
 
                 var result = checklistDescriptions.Select(x => new GetAllChecklistsQueryResult
                 {
-
                     ChecklistTypeId = x.Id,
                     ChecklistType = x.ChecklistType,
-                    ChecklistQuestions = x.ChecklistQuestions.Select(x =>
+                    ChecklistQuestions = x.ChecklistQuestions
+                    .Where(q => q.ChecklistTypeId != null)
+                    .Select(x =>
                         new GetAllChecklistsQueryResult.ChecklistQuestion
                         {
                             ProductTypeId = x.ProductTypeId,

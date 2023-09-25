@@ -15,6 +15,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Typ
         {
             [Required]
             public string ChecklistType { get; set; }
+            public int? OrderId { get; set; }
             public int AddedBy { get; set; }
         }
         public class Handler : IRequestHandler<AddNewChecklistTypeCommand, Unit>
@@ -40,6 +41,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Typ
                 var checklistType = new ChecklistTypes
                 {
                     ChecklistType = request.ChecklistType,
+                    OrderId = request.OrderId,
                     AddedBy = request.AddedBy
                 };
 
