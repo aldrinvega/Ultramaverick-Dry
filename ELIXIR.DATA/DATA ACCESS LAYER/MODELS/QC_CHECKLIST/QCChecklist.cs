@@ -2,12 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
 {
     public class QCChecklist : BaseEntity
     {
         public int ReceivingId { get; set; }
+        public int? ProductTypeId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public virtual PO_Receiving PoReceiving { get; set; }
@@ -17,5 +19,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
         public virtual IEnumerable<ChecklistProductDimension> ProductDimension { get; set; }
         public virtual ChecklistCompliance ChecklistCompliance { get; set; }
         public virtual ChecklistReviewVerificationLog ChecklistReviewVerificationLog { get; set; }
+        public virtual ProductType ProductType { get; set; }
     }
 }

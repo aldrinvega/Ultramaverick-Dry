@@ -13,6 +13,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
         public class AddNewChecklistCommand : IRequest<Unit>
         {
             public int ReceivingId { get; set; }
+            public int? ProductTypeId { get; set; }
             public IList<ChecklistOpenFieldAnswer> OpenFieldAnswers { get; set; }
             public IList<ChecklistAnswer> ChecklistAnswers { get; set; }
             public IList<ChecklistProductDimension> ProductDimensions { get; set; }
@@ -77,6 +78,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                 var qcChecklist = new QCChecklist
                 {
                     ReceivingId = request.ReceivingId,
+                    ProductTypeId = request.ProductTypeId,
                 };
 
                 await _context.QcChecklists.AddAsync(qcChecklist, cancellationToken);

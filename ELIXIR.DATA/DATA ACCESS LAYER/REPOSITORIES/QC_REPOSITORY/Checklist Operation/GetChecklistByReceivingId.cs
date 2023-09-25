@@ -23,6 +23,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
         public class GetChecklistByReceivingIdResult
         {
             public int ReceivingId { get; set; }
+            public int? ProductTypeId { get; set; }
+            public string ProductType { get; set; }
             public IList<ChecklistOpenFieldAnswer> OpenFieldAnswers { get; set; }
             public IList<ChecklistAnswer> ChecklistAnswers { get; set; }
             public IList<ChecklistProductDimension> ProductDimensions { get; set; }
@@ -33,18 +35,27 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
             public class ChecklistAnswer
             {
                 public int ChecklistQuestionId { get; set; }
+                public string ChecklistQuestion { get; set; }
+                public int ChecklistTypeId { get; set; }
+                public string ChecklistType { get; set; }
                 public bool Status { get; set; }
             }
 
             public class ChecklistOpenFieldAnswer
             {
                 public int ChecklistQuestionId { get; set; }
+                public string ChecklistQuestion { get; set; }
+                public int ChecklistTypeId { get; set; }
+                public string ChecklistType { get; set; }
                 public string Remarks { get; set; }
             }
 
             public class ChecklistProductDimension
             {
                 public int ChecklistQuestionId { get; set; }
+                public string ChecklistQuestion { get; set; }
+                public int ChecklistTypeId { get; set; }
+                public string ChecklistType { get; set; }
                 public string Standard { get; set; }
                 public string Actual { get; set; }
             }
@@ -85,9 +96,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
             public async Task<GetChecklistByReceivingIdResult> Handle(GetChecklistByReceivingIdQuery request, CancellationToken cancellationToken)
             {
                 var qCChecklist = await _context.QcChecklists
+                    .Include(x => x.ProductType)
                     .Include(q => q.ChecklistAnswers)
                 .Include(q => q.OpenFieldAnswers)
+                    .ThenInclude(x => x.ChecklistQuestions)
+                        .ThenInclude(x => x.ChecklistType)
                 .Include(q => q.ProductDimension)
+                    .ThenInclude(x => x.ChecklistQuestions)
                 .Include(q => q.ChecklistReviewVerificationLog)
                 .Include(q => q.ChecklistCompliance)
                 .Include(q => q.ChecklistOtherObservation)
@@ -95,22 +110,33 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                 var result = new GetChecklistByReceivingIdResult
                 {
                     ReceivingId = qCChecklist.ReceivingId,
+                    ProductTypeId = qCChecklist.ProductTypeId,
+                    ProductType = qCChecklist.ProductType.ProductTypeName,
                     OpenFieldAnswers = qCChecklist.OpenFieldAnswers
                          .Select(o => new GetChecklistByReceivingIdResult.ChecklistOpenFieldAnswer
                          {
                              ChecklistQuestionId = o.ChecklistQuestionId,
+                             ChecklistQuestion = o.ChecklistQuestions.ChecklistQuestion,
+                             ChecklistType = o.ChecklistQuestions.ChecklistType.ChecklistType,
+                             ChecklistTypeId = o.ChecklistQuestions.ChecklistTypeId,
                              Remarks = o.Remarks
                          }).ToList(),
                     ChecklistAnswers = qCChecklist.ChecklistAnswers
                          .Select(a => new GetChecklistByReceivingIdResult.ChecklistAnswer
                          {
                              ChecklistQuestionId = a.ChecklistQuestionsId,
+                             ChecklistQuestion = a.ChecklistQuestions.ChecklistQuestion,
+                             ChecklistType = a.ChecklistQuestions.ChecklistType.ChecklistType,
+                             ChecklistTypeId = a.ChecklistQuestions.ChecklistTypeId,
                              Status = a.Status
                          }).ToList(),
                     ProductDimensions = qCChecklist.ProductDimension
                          .Select(pd => new GetChecklistByReceivingIdResult.ChecklistProductDimension
                          {
                              ChecklistQuestionId = pd.ChecklistQuestionId,
+                             ChecklistQuestion = pd.ChecklistQuestions.ChecklistQuestion,
+                             ChecklistType = pd.ChecklistQuestions.ChecklistType.ChecklistType,
+                             ChecklistTypeId = pd.ChecklistQuestions.ChecklistTypeId,
                              Standard = pd.Standard,
                              Actual = pd.Actual
                          }).ToList(),
