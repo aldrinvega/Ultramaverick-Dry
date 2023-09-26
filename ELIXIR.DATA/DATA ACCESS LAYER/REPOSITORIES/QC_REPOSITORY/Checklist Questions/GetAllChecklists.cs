@@ -29,6 +29,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
             {
                 public int? ProductTypeId { get; set; }
                 public string ProductType { get; set; }
+                public int? OrderId { get; set; }
                 public int Id { get; set; }
                 public string ChecklistsQuestions { get; set; }
                 public AnswerType AnswerType { get; set; }
@@ -53,7 +54,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
             {
                 IQueryable<ChecklistTypes> checklistDescriptions = _context.ChecklistTypes
                     .Include(ct => ct.ChecklistQuestions)
-                    .ThenInclude(x => x.ProductType);
+                    .ThenInclude(x => x.ProductType)
+                    .OrderBy(x => x.OrderId);
 
                 if(request.ChecklistTypeId != null)
                 {
@@ -62,7 +64,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
 
                 if (request.Status != null)
                 {
-                    checklistDescriptions = checklistDescriptions.Where(x => x.IsActive == request.Status);
+                    checklistDescriptions = checklistDescriptions
+                        .Where(x => x.ChecklistQuestions.Any(q => q.IsActive == request.Status));
                 }
 
                 var result = checklistDescriptions.Select(x => new GetAllChecklistsQueryResult
@@ -76,6 +79,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                         {
                             ProductTypeId = x.ProductTypeId,
                             ProductType = x.ProductType.ProductTypeName,
+                            OrderId = x.OrderId,
                             Id = x.Id,
                             ChecklistsQuestions = x.ChecklistQuestion,
                             AnswerType = x.AnswerType,
@@ -83,8 +87,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                             CreatedAt = x.CreatedAt,
                             UpdatedAt = x.UpdatedAt,
                             AddedBy = x.AddedByUser.FullName
-                        }).Where(x => x.ProductTypeId == request.ProductTypeId).ToList()
-                 });
+                        }).Where(x => x.ProductTypeId == request.ProductTypeId)
+                          .Where(x => x.IsActive == request.Status).ToList()
+                });
                 
                 return await PagedList<GetAllChecklistsQueryResult>.CreateAsync(result, request.PageNumber,
                     request.PageSize);

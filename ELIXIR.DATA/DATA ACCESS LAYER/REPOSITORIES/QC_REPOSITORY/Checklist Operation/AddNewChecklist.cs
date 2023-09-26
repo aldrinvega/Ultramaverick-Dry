@@ -17,9 +17,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
             public IList<ChecklistOpenFieldAnswer> OpenFieldAnswers { get; set; }
             public IList<ChecklistAnswer> ChecklistAnswers { get; set; }
             public IList<ChecklistProductDimension> ProductDimensions { get; set; }
-            public ReviewVerificationLogs ReviewVerificationLog { get; set; }
+
+           /* public ReviewVerificationLogs ReviewVerificationLog { get; set; }
             public ChecklistCompliances ChecklistCompliance { get; set; }
-            public ChecklistOtherObservation ChecklistOtherObservations { get; set; }
+            public ChecklistOtherObservation ChecklistOtherObservations { get; set; }*/
 
             public class ChecklistAnswer
             {
@@ -40,7 +41,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                 public string Actual { get; set; }
             }
 
-            public class ReviewVerificationLogs
+            /*public class ReviewVerificationLogs
             {
                 public int DispositionId { get; set; }
                 public int QtyAccepted { get; set; }
@@ -61,7 +62,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
             public class ChecklistOtherObservation
             {
                 public string Observation { get; set; }
-            }
+            }*/
         }
 
         public class Handler : IRequestHandler<AddNewChecklistCommand, Unit>
@@ -122,7 +123,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
 
                 }
 
-                var reviewVerificationLog = new ChecklistReviewVerificationLog
+               /* var reviewVerificationLog = new ChecklistReviewVerificationLog
                 {
                     QCChecklistId = qcChecklist.Id,
                     DispositionId = request.ReviewVerificationLog.DispositionId,
@@ -153,7 +154,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                     Observation = request.ChecklistOtherObservations.Observation,
                 };
 
-                await _context.ChecklistOtherObservations.AddAsync(checklistOtherObservation, cancellationToken);
+                await _context.ChecklistOtherObservations.AddAsync(checklistOtherObservation, cancellationToken);*/
 
                 await _context.SaveChangesAsync(cancellationToken);
 

@@ -21,18 +21,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
         }
         public class GetAllChecklistsDescriptionQueryResult
         {
-                public int Id { get; set; }
-                public int? ProductTypeId { get; set; }
-                public string ProductType { get; set; }
-                public string ChecklistQuestion { get; set; }
+            public int Id { get; set; }
+            public int? ProductTypeId { get; set; }
+            public string ProductType { get; set; }
+            public string ChecklistQuestion { get; set; }
             public int ChecklistTypeId { get; set; }
             public string ChecklistType { get; set; }
-                public bool IsActive { get; set; }
-                public DateTime CreatedAt { get; set; }
-                public DateTime UpdatedAt { get; set; }
-                public AnswerType AnswerType { get; set; }
-                public string AddedBy { get; set; }
-                
+            public bool IsActive { get; set; }
+            public DateTime CreatedAt { get; set; }
+            public DateTime UpdatedAt { get; set; }
+            public AnswerType AnswerType { get; set; }
+            public string AddedBy { get; set; }
         }
         
         public class Handler : IRequestHandler<GetAllChecklistsDescriptionQuery, PagedList<GetAllChecklistsDescriptionQueryResult>>
