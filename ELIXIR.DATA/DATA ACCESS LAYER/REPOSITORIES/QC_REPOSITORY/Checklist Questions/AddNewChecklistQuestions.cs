@@ -40,7 +40,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
             {
                 var existingChecklistDesc =
                     await _context.ChecklistQuestions.FirstOrDefaultAsync(x =>
-                        x.ChecklistQuestion == request.ChecklistQuestion && x.ChecklistTypeId == request.ChecklistTypeId, cancellationToken);
+                        x.ChecklistQuestion == request.ChecklistQuestion && x.ChecklistTypeId == request.ChecklistTypeId || x.ProductTypeId == request.ProductTypeId, cancellationToken);
 
                 if (existingChecklistDesc != null)
                 {

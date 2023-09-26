@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions
@@ -18,46 +16,60 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
             public string ChecklistQuestion { get; set; }
             public AnswerType AnswerType { get; set; }
             public int ChecklistTypeId { get; set; }
+            public int? ProductTypeId { get; set; }
         }
+
+
         public class Handler : IRequestHandler<UpdateChecklistQuestionCommand, Unit>
         {
             private readonly StoreContext _context;
 
             public Handler(StoreContext context)
             {
-                _context = context;
+                _context = context ?? throw new ArgumentNullException(nameof(context));
             }
 
             public async Task<Unit> Handle(UpdateChecklistQuestionCommand request, CancellationToken cancellationToken)
             {
-                var existingChecklistQuestion =
-                    await _context.ChecklistQuestions.FirstOrDefaultAsync(x => x.Id == request.Id, 
-                        cancellationToken);
-                var isChecklistAlreadyExist =
-                    await _context.ChecklistQuestions.Where(x => x.ChecklistQuestion == request.ChecklistQuestion).FirstOrDefaultAsync(cancellationToken);
-                    
-                if (isChecklistAlreadyExist.ChecklistQuestion == request.ChecklistQuestion &&
-                    isChecklistAlreadyExist.AnswerType == request.AnswerType &&
-                    isChecklistAlreadyExist.ChecklistTypeId == request.ChecklistTypeId
-                    )
+                var existingChecklistQuestion = await _context.ChecklistQuestions.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+
+                if (existingChecklistQuestion == null)
                 {
-                    return Unit.Value;
+                    throw new Exception("Checklist question not found");
                 }
 
-                if(isChecklistAlreadyExist.ChecklistQuestion == request.ChecklistQuestion && isChecklistAlreadyExist.ChecklistTypeId != request.ChecklistTypeId)
-                
-                if (existingChecklistQuestion == null)
+                if (existingChecklistQuestion.ChecklistQuestion == request.ChecklistQuestion && 
+                    existingChecklistQuestion.ChecklistTypeId != request.ChecklistTypeId &&
+                    existingChecklistQuestion.ProductTypeId != request.ProductTypeId &&
+                    existingChecklistQuestion.AnswerType == request.AnswerType
+                    )
                 {
                     throw new Exception("Checklist question is already exist");
                 }
 
-                existingChecklistQuestion.ChecklistQuestion = request.ChecklistQuestion;
-                existingChecklistQuestion.ChecklistTypeId = request.ChecklistTypeId;
-                existingChecklistQuestion.AnswerType = request.AnswerType;
-                existingChecklistQuestion.UpdatedAt = DateTime.Now;
+                if (IsUpdated(existingChecklistQuestion, request))
+                {
+                    existingChecklistQuestion.ChecklistQuestion = request.ChecklistQuestion;
+                    existingChecklistQuestion.ChecklistTypeId = request.ChecklistTypeId;
+                    existingChecklistQuestion.ProductTypeId = request.ProductTypeId;
+                    existingChecklistQuestion.AnswerType = request.AnswerType;
+                    existingChecklistQuestion.UpdatedAt = DateTime.Now;
 
-                await _context.SaveChangesAsync(cancellationToken);
+                    await _context.SaveChangesAsync(cancellationToken);
+                }
+                else
+                {
+                    throw new Exception("No changes");
+                }
+
                 return Unit.Value;
+            }
+
+            private static bool IsUpdated(ChecklistQuestions existingQuestion, UpdateChecklistQuestionCommand request)
+            {
+                return existingQuestion.ChecklistQuestion != request.ChecklistQuestion ||
+                       existingQuestion.AnswerType != request.AnswerType ||
+                       existingQuestion.ChecklistTypeId != request.ChecklistTypeId;
             }
         }
     }
