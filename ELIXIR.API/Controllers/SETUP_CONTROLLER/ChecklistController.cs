@@ -10,6 +10,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Operati
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Types;
 using Microsoft.AspNetCore.Authorization;
+using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Types.SortChecklistTypes;
 
 namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 {
@@ -295,6 +296,24 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                 var checklists = await _mediator.Send(query);
 
                 return Ok(checklists);
+            }
+            catch (Exception e)
+            {
+                return Conflict(new
+                {
+                    e.Message
+                });
+            }
+        }
+
+        [HttpPatch("SortChecklistTypes")]
+        public async Task<IActionResult> SortChecklistTypes([FromBody]SortChecklistTypesCommand command)
+        {
+            try
+            {
+                await _mediator.Send(command);
+
+                return Ok("Checklist Type sorted Successfully");
             }
             catch (Exception e)
             {

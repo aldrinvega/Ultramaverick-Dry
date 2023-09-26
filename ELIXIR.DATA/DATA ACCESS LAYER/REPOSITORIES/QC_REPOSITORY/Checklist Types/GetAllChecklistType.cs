@@ -37,7 +37,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Typ
 
             public async Task<PagedList<GetAllChecklistTypeResult>> Handle(GetAllChecklistTypeQuery request, CancellationToken cancellationToken)
             {
-                IQueryable<ChecklistTypes> checklistTypes = _context.ChecklistTypes;
+                IQueryable<ChecklistTypes> checklistTypes = _context.ChecklistTypes.OrderBy(x => x.OrderId);
 
                 if (!string.IsNullOrEmpty(request.Search))
                 {
