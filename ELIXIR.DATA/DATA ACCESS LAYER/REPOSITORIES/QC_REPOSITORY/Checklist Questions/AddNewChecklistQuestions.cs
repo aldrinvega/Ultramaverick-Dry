@@ -40,12 +40,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
             {
                 var existingChecklistDesc =
                     await _context.ChecklistQuestions.FirstOrDefaultAsync(x =>
-                        x.ChecklistQuestion == request.ChecklistQuestion && x.ChecklistTypeId == request.ChecklistTypeId || x.ProductTypeId == request.ProductTypeId, cancellationToken);
+                        x.ChecklistQuestion == request.ChecklistQuestion && x.ChecklistTypeId == request.ChecklistTypeId, cancellationToken);
 
-                if (existingChecklistDesc != null)
+
+                if (existingChecklistDesc != null && existingChecklistDesc.ProductTypeId == request.ProductTypeId)
                 {
                     throw new Exception($"{request.ChecklistQuestion} is already exist.");
                 }
+
 
                 var checklistDesc = new ChecklistQuestions
                 {

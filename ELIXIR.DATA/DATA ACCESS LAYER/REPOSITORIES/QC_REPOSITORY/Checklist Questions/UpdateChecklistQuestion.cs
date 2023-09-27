@@ -38,7 +38,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
                     throw new Exception("Checklist question not found");
                 }
 
-                if (existingChecklistQuestion.ChecklistQuestion == request.ChecklistQuestion && 
+                if (existingChecklistQuestion.ChecklistQuestion == request.ChecklistQuestion &&
                     existingChecklistQuestion.ChecklistTypeId != request.ChecklistTypeId &&
                     existingChecklistQuestion.ProductTypeId != request.ProductTypeId &&
                     existingChecklistQuestion.AnswerType == request.AnswerType
@@ -69,7 +69,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Que
             {
                 return existingQuestion.ChecklistQuestion != request.ChecklistQuestion ||
                        existingQuestion.AnswerType != request.AnswerType ||
-                       existingQuestion.ChecklistTypeId != request.ChecklistTypeId;
+                       existingQuestion.ChecklistTypeId != request.ChecklistTypeId ||
+                       existingQuestion.ProductTypeId != request.ProductTypeId;
             }
         }
     }

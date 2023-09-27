@@ -291,7 +291,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             {
                 var query = new GetChecklistByReceivingId.GetChecklistByReceivingIdQuery
                 {
-                    ReceivingId = id
+                    Id = id
                 };
                 var checklists = await _mediator.Send(query);
 
