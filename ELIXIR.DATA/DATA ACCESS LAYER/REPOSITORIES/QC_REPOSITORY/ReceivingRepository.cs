@@ -8,15 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using Microsoft.JSInterop.Implementation;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 {
@@ -31,7 +25,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
         public async Task<bool> AddNewReceivingInformation(PO_Receiving receiving)
         {
             await _context.QC_Receiving.AddAsync(receiving);
-            var validateIfExpriable= await _context.RawMaterials.Where(x => x.ItemCode == receiving.ItemCode)
+            var validateIfExpriable = await _context.RawMaterials.Where(x => x.ItemCode == receiving.ItemCode)
                 .Where(x => x.IsExpirable == false).FirstOrDefaultAsync();
             
             DateTime dateAdd = DateTime.Now.AddDays(30);

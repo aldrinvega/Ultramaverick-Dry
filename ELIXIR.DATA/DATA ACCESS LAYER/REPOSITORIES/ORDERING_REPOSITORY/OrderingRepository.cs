@@ -405,11 +405,22 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
         public async Task<bool> ValidateNewOrders(Ordering orders)
         {
 
-            orders.IsActive = true;
+             var result = await _context.Orders.Upsert(orders)
+                    .On(c => c.FarmCode)
+                    .On(c => c.FarmName)
+                    .On(c => c.ItemCode)
+                    .WhenMatched(c => new Ordering()
+                    {
+                        
+                    }).RunAsync();
+            
+            return true;
+
+ /*           orders.IsActive = true;
 
             await _context.Orders.AddAsync(orders);
 
-            return true;
+            return true;*/
 
         }
         public async Task<bool> AddNewOrders(Ordering[] orders)
@@ -1461,7 +1472,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
                     order.DeliveryStatus,
                     order.PreparedBy,
                     order.CheckedBy,
-                    WeigtedAverageUnitCost = (totalGood / totalAmount) != 0 ? (totalGood / totalAmount) : 0
+                    /*WeigtedAverageUnitCost = (totalGood / totalAmount) != 0 ? (totalGood / totalAmount) : 0*/
                 }
                 into total
                 select new MoveOrderDto
@@ -1478,8 +1489,8 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
                     Expiration = total.Key.Expiration,
                     DeliveryStatus = total.Key.DeliveryStatus,
                     PreparedBy = total.Key.PreparedBy,
-                    CheckedBy = total.Key.CheckedBy,
-                    UnitPrice = total.Key.WeigtedAverageUnitCost
+                    CheckedBy = total.Key.CheckedBy
+                    /*UnitPrice = total.Key.WeigtedAverageUnitCost*/
                 };
 
             return await unitCosts.Where(x => x.OrderNo == orderid).ToListAsync();
@@ -1858,40 +1869,35 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
                                        .Where(x => x.ItemCode == itemcode)
                                        .FirstOrDefaultAsync();
         }
-        public async Task<bool> SetBeingPrepared(List<Ordering> moveOrders)
+        public async Task<bool> SetBeingPrepared(Ordering moveOrders)
         {
-            foreach (var moveOrder in moveOrders)
-            {
-                var existingOrder = await _context.Orders.Where(x => x.OrderNoPKey == moveOrder.OrderNoPKey)
+            
+                var existingOrder = await _context.Orders.Where(x => x.OrderNoPKey == moveOrders.OrderNoPKey)
                     .Where(x => x.IsBeingPrepared == null || x.IsBeingPrepared == false)
                     .FirstOrDefaultAsync();
                     
-                if (existingOrder == null)
-                    return false;
+            if (existingOrder == null)
+                return false;
 
-                existingOrder.IsBeingPrepared = moveOrder.IsBeingPrepared;
-                existingOrder.SetBy = moveOrder.SetBy;
-            }
-
+            existingOrder.IsBeingPrepared = moveOrders.IsBeingPrepared;
+            existingOrder.SetBy = moveOrders.SetBy;
+            
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<bool>UnsetBeingPrepared(List<Ordering> orderNos)
+        public async Task<bool>UnsetBeingPrepared(Ordering orderNo)
         {
-            foreach (var orderNo in orderNos)
-            {
-                var existingOrder = await _context.Orders.Where(x => x.IsBeingPrepared == true)
-                    .Where(x => x.OrderNoPKey == orderNo.OrderNoPKey)
-                    .Where(x => x.SetBy == orderNo.SetBy)
-                      .FirstOrDefaultAsync();
+            var existingOrder = await _context.Orders.Where(x => x.IsBeingPrepared == true)
+                .Where(x => x.OrderNoPKey == orderNo.OrderNoPKey)
+                .Where(x => x.SetBy == orderNo.SetBy)
+                  .FirstOrDefaultAsync();
 
-                if (existingOrder == null)
-                    return false;
+            if (existingOrder == null)
+                return false;
 
                 existingOrder.IsBeingPrepared = orderNo.IsBeingPrepared;
                 existingOrder.SetBy = null;
-            }
-
+            
             await _context.SaveChangesAsync();
             return true;
         }

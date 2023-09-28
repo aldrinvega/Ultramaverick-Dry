@@ -31,17 +31,16 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
 
         [HttpPost]
         [Route("AddNewReceivingInformationInPO")]
-        public async Task<IActionResult> CreateNewReceivingInformation(Checklists input)
+        public async Task<IActionResult> CreateNewReceivingInformation(PO_Receiving input)
         {
             if (ModelState.IsValid)
             {
-                input.Checklist.ReceivingId = input.PO_Receiving.PO_Summary_Id;
-                await _mediator.Send(input.Checklist);
-                await _unitOfWork.Receives.AddNewReceivingInformation(input.PO_Receiving);
+                
+                await _unitOfWork.Receives.AddNewReceivingInformation(input);
                 
                 // Save all changes to the database
                 await _unitOfWork.CompleteAsync();
-                return Ok(input.PO_Receiving);
+                return Ok(input);
             }
 
             return new JsonResult("Something went wrong!") { StatusCode = 500 };

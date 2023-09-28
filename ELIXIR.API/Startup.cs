@@ -143,7 +143,7 @@ namespace ELIXIR.API
             {
                 endpoints.MapSwagger();
                 endpoints.MapControllers();
-                endpoints.MapHub<OrderHub>("/moveOrder");
+                endpoints.MapHub<OrderHub>("moveorder");
             });
         }
     }

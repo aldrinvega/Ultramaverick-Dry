@@ -284,7 +284,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             }
         }
 
-        [HttpGet("GetChecklistAnswerById/{id}")]
+        /*[HttpGet("GetChecklistAnswerById/{id}")]
         public async Task<IActionResult> Get(int id)
         {
             try
@@ -304,7 +304,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                     e.Message
                 });
             }
-        }
+        }*/
 
         [HttpPatch("SortChecklistTypes")]
         public async Task<IActionResult> SortChecklistTypes([FromBody]SortChecklistTypesCommand command)

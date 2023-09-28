@@ -131,7 +131,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             foreach (Ordering items in order)
             {
-
                 var validateDuplicate = await _unitOfWork.Order.ValidateExistingOrders(items);
                 var validateFarmName = await _unitOfWork.Order.ValidateCustomerName(items);
                 var validateFarmCode = await _unitOfWork.Order.ValidateCustomerCode(items);
@@ -789,7 +788,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpPost]
         [Route("SetBeingPrepared")]
-        public async Task<IActionResult> SetBeingPrepared([FromBody] List<Ordering> moveOrders)
+        public async Task<IActionResult> SetBeingPrepared([FromBody] Ordering moveOrders)
         {
             var result = await _unitOfWork.Order.SetBeingPrepared(moveOrders);
 
@@ -806,7 +805,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpPost]
         [Route("UnsetBeingPrepared")]
-        public async Task<IActionResult> UnsetBeingPrepared([FromBody] List<Ordering> orderNos)
+        public async Task<IActionResult> UnsetBeingPrepared([FromBody] Ordering orderNos)
         {
 
             var result = await _unitOfWork.Order.UnsetBeingPrepared(orderNos);

@@ -1613,7 +1613,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  TransformFrom = transformfrom.WeighingScale != null ? transformfrom.WeighingScale : 0,
                                  TransformTo = transformto.Quantity != null ? transformto.Quantity : 0,
                                  avgUnitCost.AvgUnitCost,
-                                 avgUnitCost.TotalDifference
+                                 avgUnitCost.TotalDifference,
+                                 UnitCost = avgUnitCost.UnitCost
                                  //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
 
                              } into total
@@ -1641,7 +1642,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  TransformFrom = total.Key.TransformFrom,
                                  TransformTo = total.Key.TransformTo,
                                  AvgUnitCost = total.Key.AvgUnitCost,
-                                 TotalCost = total.Key.TotalDifference
+                                 TotalCost = total.Key.TotalDifference,
+                                 UnitCost = total.Key.UnitCost,
                              }).Where(x => x.ItemDescription.ToLower()
                                 .Contains(search.Trim().ToLower()));
             
