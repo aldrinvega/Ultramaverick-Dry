@@ -31,18 +31,14 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
 
         [HttpPost]
         [Route("AddNewReceivingInformationInPO")]
-        public async Task<IActionResult> CreateNewReceivingInformation(PO_Receiving input)
+        public async Task<IActionResult> CreateNewReceivingInformation([FromBody]PO_Receiving input)
         {
             if (ModelState.IsValid)
             {
-                
                 await _unitOfWork.Receives.AddNewReceivingInformation(input);
-                
-                // Save all changes to the database
                 await _unitOfWork.CompleteAsync();
                 return Ok(input);
             }
-
             return new JsonResult("Something went wrong!") { StatusCode = 500 };
         }
         
@@ -52,12 +48,9 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
         {
             if (ModelState.IsValid)
             {
-
                 foreach (PO_Reject items in reject)
                 {
-
                     await _unitOfWork.Receives.AddNewRejectInfo(items);
-
                 }
 
                 await _unitOfWork.CompleteAsync();
