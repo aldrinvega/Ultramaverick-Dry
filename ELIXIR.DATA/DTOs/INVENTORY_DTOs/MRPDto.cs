@@ -13,7 +13,7 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs
         public string ItemDescription { get; set; }
         public string ItemCategory { get; set; }
         public string Uom { get; set; }
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
 
         public decimal? AvgUnitCost
         {
@@ -29,8 +29,8 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs
         public decimal MoveOrderOut { get; set; }
         public decimal IssueOut { get; set; }
         public decimal QCReceiving { get; set; }
-        public decimal TotalPrice { get; set; }
-
+        public decimal? TotalPrice { get; set; }
+        public decimal TotalPrice1 { get; set; }
         public decimal SuggestedPo { get; set; }
         public decimal AverageIssuance { get; set; }
         public decimal DaysLevel { get; set; }

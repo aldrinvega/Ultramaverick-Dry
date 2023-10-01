@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 
@@ -15,10 +16,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
         public virtual PO_Receiving PoReceiving { get; set; }
         public virtual IEnumerable<ChecklistAnswers> ChecklistAnswers { get; set; }
         public virtual IEnumerable<ChecklistOpenFieldAnswer> OpenFieldAnswers { get; set; }
-        public virtual ChecklistOtherObservation ChecklistOtherObservation { get; set; }
         public virtual IEnumerable<ChecklistProductDimension> ProductDimension { get; set; }
-        public virtual ChecklistCompliance ChecklistCompliance { get; set; }
-        public virtual ChecklistReviewVerificationLog ChecklistReviewVerificationLog { get; set; }
         public virtual ProductType ProductType { get; set; }
     }
 }

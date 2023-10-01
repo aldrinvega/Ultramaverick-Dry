@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
 
@@ -20,5 +21,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
         public virtual User AddedByUser { get; set; }
         public virtual ChecklistTypes ChecklistType { get; set; }
         public virtual ProductType ProductType { get; set; }
+
+        public virtual IEnumerable<ChecklistAnswers> ChecklistAnswers { get; set; }
+        public virtual IEnumerable<ChecklistOpenFieldAnswer> OpenFieldAnswers { get; set; }
+        public virtual IEnumerable<ChecklistProductDimension> ProductDimension { get; set; }
     }
 }

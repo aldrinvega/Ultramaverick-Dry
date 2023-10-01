@@ -141,17 +141,63 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     ActualGood = x.Sum(g => g.ActualGood)
                 });
 
-            var unitCost = _context.POSummary
-                .GroupBy(x => new { x.ItemCode, x.UnitPrice, x.Delivered })
-                .Select(x => new TOTALCOSTDTO
-                {
-                    ItemCode = x.Key.ItemCode,
-                    TotalCost = x.Key.Delivered * x.Key.UnitPrice,
-                    Delivered = x.Key.Delivered
-                });
+            var individualDifferences = from wr in _context.WarehouseReceived
+                                        join mo in _context.MoveOrders
+                                            on wr.Id equals mo.WarehouseId
+                                            into moveOrders
+                                        from mo in moveOrders.DefaultIfEmpty()
+                                        where wr.IsActive && wr.IsWarehouseReceive
+                                        select new
+                                        {
+                                            wr.ItemCode,
+                                            wr.ActualGood,
+                                            QuantityOrdered = mo != null ? mo.QuantityOrdered : 0,
+                                            CostByWarehouse = wr.UnitCost * (wr.ActualGood - (mo != null ? mo.QuantityOrdered : 0))
+                                        };
 
-            var totalAmount = unitCost.Sum(x => x.TotalCost);
-            var totalGood = unitCost.Sum(x => x.Delivered);
+            string queryString = individualDifferences.ToQueryString();
+
+
+
+            // Calculate the sum of differences per ItemCode
+            var totalDifferences = individualDifferences
+             .GroupBy(id => id.ItemCode)
+             .Select(g => new
+             {
+                 ItemCode = g.Key,
+                 TotalDifference = g.Sum(id => id.CostByWarehouse)
+             });
+
+            string queryString2 = totalDifferences.ToQueryString();
+
+            // Calculate the average UnitCost per ItemCode
+            var averageUnitCosts = individualDifferences
+             .GroupBy(id => id.ItemCode)
+             .Select(g => new
+             {
+                 ItemCode = g.Key,
+                 AvgUnitCost = g.Average(id => (id.ActualGood - id.QuantityOrdered) == 0 ? 0 : id.CostByWarehouse / (id.ActualGood - id.QuantityOrdered))
+             });
+
+            string queryString3 = averageUnitCosts.ToQueryString();
+
+            // Combine the results
+            var finalResult = from id in individualDifferences
+                              join td in totalDifferences
+                                  on id.ItemCode equals td.ItemCode
+                              join auc in averageUnitCosts
+                                  on id.ItemCode equals auc.ItemCode
+                              select new
+                              {
+                                  id.ItemCode,
+                                  id.ActualGood,
+                                  id.QuantityOrdered,
+                                  Difference = id.CostByWarehouse,
+                                  TotalDifference = td.TotalDifference,
+                                  AvgUnitCost = auc.AvgUnitCost
+                              };
+
+            string queryString4 = finalResult.ToQueryString();
 
             var orders = (
                 from moveorder in _context.MoveOrders
@@ -164,7 +210,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 join stockOnHand in soh
                     on moveorder.ItemCode equals stockOnHand.ItemCode into leftj1
                 from stockOnHand in leftj1.DefaultIfEmpty()
-                join UC in unitCost
+                join UC in finalResult
                     on moveorder.ItemCode equals UC.ItemCode into leftj2
                 from UC in leftj2.DefaultIfEmpty()
                 group new
@@ -190,9 +236,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     transactmoveorder.PreparedBy,
                     transactmoveorder.PreparedDate,
                     stockOnHand.ActualGood,
-                    UC.TotalCost,
-                    TotalGood = totalGood, 
-                    WeigtedAverageUnitCost = (totalGood / totalAmount) != 0 ? (totalGood / totalAmount) : 0
+                    UC.AvgUnitCost,
                 }
                 into result
                 select new MoveOrderReport
@@ -211,7 +255,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     MoveOrderDate = result.Key.PreparedDate.ToString(),
                     TransactedBy = result.Key.PreparedBy,
                     TransactedDate = result.Key.PreparedDate.ToString(),
-                    WeightedAverageUnitCost = result.Key.WeigtedAverageUnitCost
+                    WeightedAverageUnitCost = Math.Round((decimal)result.Key.AvgUnitCost, 2)
                 });
 
             return await orders.ToListAsync();

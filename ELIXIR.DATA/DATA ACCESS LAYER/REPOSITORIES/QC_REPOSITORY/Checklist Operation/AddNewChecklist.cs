@@ -14,9 +14,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
         {
             public int ReceivingId { get; set; }
             public int? ProductTypeId { get; set; }
-            public IList<ChecklistOpenFieldAnswer> OpenFieldAnswers { get; set; }
+            public IList<ChecklistOpenFieldAnswerCollection> OpenFieldAnswers { get; set; }
             public IList<ChecklistAnswer> ChecklistAnswers { get; set; }
-            public IList<ChecklistProductDimension> ProductDimensions { get; set; }
+            public IList<ChecklistProductDimensionCollection> ProductDimensions { get; set; }
 
            /* public ReviewVerificationLogs ReviewVerificationLog { get; set; }
             public ChecklistCompliances ChecklistCompliance { get; set; }
@@ -28,13 +28,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                 public bool Status { get; set; }
             }
 
-            public class ChecklistOpenFieldAnswer
+            public class ChecklistOpenFieldAnswerCollection
             {
                 public int ChecklistQuestionId { get; set; }
                 public string Remarks { get; set; }
             }
 
-            public class ChecklistProductDimension
+            public class ChecklistProductDimensionCollection
             {
                 public int ChecklistQuestionId { get; set; }
                 public string Standard { get; set; }
@@ -120,7 +120,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                     };
 
                     await _context.QChecklistProductDimensions.AddAsync(checklistProductDimension, cancellationToken);
-
                 }
 
                /* var reviewVerificationLog = new ChecklistReviewVerificationLog

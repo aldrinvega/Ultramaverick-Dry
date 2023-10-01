@@ -14,14 +14,15 @@ using System.Collections.Generic;
  using Microsoft.AspNetCore.SignalR;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
  using ELIXIR.DATA.DTOs.REPORT_DTOs;
+using ELIXIR.DATA.CORE.INTERFACES.ORDER_HUB;
 
- namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
+namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 {
     public class OrderingRepository : IOrdering
     {
         private readonly StoreContext _context;
-        private readonly IHubContext<OrderHub> _clients;
-        public OrderingRepository(StoreContext context, IHubContext<OrderHub> clients)
+        private readonly IHubContext<OrderHub, IOrderHub> _clients;
+        public OrderingRepository(StoreContext context, IHubContext<OrderHub, IOrderHub> clients)
         {
             _context = context;
             _clients = clients;
@@ -405,22 +406,11 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
         public async Task<bool> ValidateNewOrders(Ordering orders)
         {
 
-             var result = await _context.Orders.Upsert(orders)
-                    .On(c => c.FarmCode)
-                    .On(c => c.FarmName)
-                    .On(c => c.ItemCode)
-                    .WhenMatched(c => new Ordering()
-                    {
-                        
-                    }).RunAsync();
-            
-            return true;
-
- /*           orders.IsActive = true;
+            orders.IsActive = true;
 
             await _context.Orders.AddAsync(orders);
 
-            return true;*/
+            return true;
 
         }
         public async Task<bool> AddNewOrders(Ordering[] orders)
@@ -461,7 +451,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
         }
         public async Task<bool> ValidateRawMaterial(Ordering orders)
         {
-            var rawmaterial = await _context.RawMaterials.Where(x => x.ItemCode == orders.ItemCode)
+            var rawmaterial = await _context.RawMaterials.Where(x => x.ItemCode == orders.ItemCode && x.ItemDescription == orders.ItemDescription)
                                                          .Where(x => x.IsActive == true)
                                                          .FirstOrDefaultAsync();
 
@@ -1422,7 +1412,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
        public async Task<IReadOnlyList<MoveOrderDto>> ViewMoveOrderForApproval(int orderid)
         {
             
-            var unitCost = _context.POSummary
+            /*var unitCost = _context.POSummary
                 .GroupBy(x => new { x.ItemCode, x.UnitPrice, x.Delivered })
                 .Select(x => new TOTALCOSTDTO
                 {
@@ -1432,7 +1422,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
                 });
 
             var totalAmount = unitCost.Sum(x => x.TotalCost);
-            var totalGood = unitCost.Sum(x => x.Delivered);
+            var totalGood = unitCost.Sum(x => x.Delivered);*/
             
             var orders = _context.MoveOrders.Where(x => x.IsActive == true)
                 .Select(x => new MoveOrderDto
@@ -1452,7 +1442,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
                 CheckedBy = x.CheckedBy
             });
             
-            var unitCosts = from posummary in _context.POSummary
+            /*var unitCosts = from posummary in _context.POSummary
                 join wr in _context.WarehouseReceived on posummary.PO_Number equals wr.PO_Number into LeftJ
                 from wr in LeftJ.DefaultIfEmpty()
                 join order in orders on wr != null ? wr.Id : (int?)null equals order.BarcodeNo
@@ -1472,7 +1462,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
                     order.DeliveryStatus,
                     order.PreparedBy,
                     order.CheckedBy,
-                    /*WeigtedAverageUnitCost = (totalGood / totalAmount) != 0 ? (totalGood / totalAmount) : 0*/
+                    *//*WeigtedAverageUnitCost = (totalGood / totalAmount) != 0 ? (totalGood / totalAmount) : 0*//*
                 }
                 into total
                 select new MoveOrderDto
@@ -1490,10 +1480,10 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
                     DeliveryStatus = total.Key.DeliveryStatus,
                     PreparedBy = total.Key.PreparedBy,
                     CheckedBy = total.Key.CheckedBy
-                    /*UnitPrice = total.Key.WeigtedAverageUnitCost*/
-                };
+                    *//*UnitPrice = total.Key.WeigtedAverageUnitCost*//*
+                };*/
 
-            return await unitCosts.Where(x => x.OrderNo == orderid).ToListAsync();
+            return await orders.Where(x => x.OrderNo == orderid).ToListAsync();
 
         }
        public async Task<IReadOnlyList<MoveOrderDto>> ViewMoveOrderForApprovalOriginal(int orderid)
@@ -1555,7 +1545,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
                     ApprovedDate = x.Key.ApproveDateTempo.ToString(),
                     IsPrint = x.Key.IsPrint != null,
                     IsTransact = x.Key.IsTransact,
-                });
+                }).OrderBy(x => x.PreparedDate);
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
         public async Task<PagedList<MoveOrderDto>> Approvedination(UserParams userParams)
@@ -1594,7 +1584,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
                  ApprovedDate = x.Key.ApproveDateTempo.ToString(),
                  IsPrint = x.Key.IsPrint != null,
                  IsTransact = x.Key.IsTransact,
-             });
+             }).OrderBy(x => x.PreparedDate);
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
@@ -1714,18 +1704,20 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
-        public async Task<bool> UpdatePrintStatus(MoveOrder moveorder)
+        public async Task<bool> UpdatePrintStatus(int[] orderNo)
         {
-            var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
-                                                  .ToListAsync();
-            if (existing == null)
-                return false;
-
-            foreach (var items in existing)
+            foreach (var orders in orderNo)
             {
-                items.IsPrint = true;
-            }
+                var existing = await _context.MoveOrders.Where(x => x.OrderNo == orders)
+                                                  .ToListAsync();
+                if (existing == null)
+                    return false;
 
+                foreach (var items in existing)
+                {
+                    items.IsPrint = !items.IsPrint;
+                }
+            }
             return true;
 
         }
@@ -1870,35 +1862,38 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
                                        .FirstOrDefaultAsync();
         }
         public async Task<bool> SetBeingPrepared(Ordering moveOrders)
-        {
-            
+        { 
                 var existingOrder = await _context.Orders.Where(x => x.OrderNoPKey == moveOrders.OrderNoPKey)
                     .Where(x => x.IsBeingPrepared == null || x.IsBeingPrepared == false)
                     .FirstOrDefaultAsync();
-                    
-            if (existingOrder == null)
-                return false;
 
-            existingOrder.IsBeingPrepared = moveOrders.IsBeingPrepared;
-            existingOrder.SetBy = moveOrders.SetBy;
+                if (existingOrder == null)
+                    return false;
+
+                existingOrder.IsBeingPrepared = moveOrders.IsBeingPrepared;
+                existingOrder.SetBy = moveOrders.SetBy;
+
+                await _context.SaveChangesAsync();
+                
             
-            await _context.SaveChangesAsync();
             return true;
+
         }
         public async Task<bool>UnsetBeingPrepared(Ordering orderNo)
         {
-            var existingOrder = await _context.Orders.Where(x => x.IsBeingPrepared == true)
+            
+                var existingOrder = await _context.Orders.Where(x => x.IsBeingPrepared == true)
                 .Where(x => x.OrderNoPKey == orderNo.OrderNoPKey)
                 .Where(x => x.SetBy == orderNo.SetBy)
                   .FirstOrDefaultAsync();
 
-            if (existingOrder == null)
-                return false;
+                if (existingOrder == null)
+                    return false;
 
                 existingOrder.IsBeingPrepared = orderNo.IsBeingPrepared;
                 existingOrder.SetBy = null;
-            
-            await _context.SaveChangesAsync();
+
+                await _context.SaveChangesAsync();
             return true;
         }
         //-----------------TRANSACT MOVE ORDER------------------------

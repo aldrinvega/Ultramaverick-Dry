@@ -8,6 +8,6 @@
         public string Actual { get; set; }
 
         public virtual QCChecklist QCChecklist { get; set; }
-        public virtual ChecklistQuestions ChecklistQuestions { get; set; }
+        public virtual ChecklistQuestions ChecklistQuestion { get; set; }
     }
 }

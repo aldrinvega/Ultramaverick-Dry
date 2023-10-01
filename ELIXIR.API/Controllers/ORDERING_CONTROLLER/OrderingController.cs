@@ -517,7 +517,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpPut]
         [Route("UpdatePrintStatus")]
-        public async Task<IActionResult> UpdatePrintStatus([FromBody] MoveOrder moveorder)
+        public async Task<IActionResult> UpdatePrintStatus([FromBody] int[] moveorder)
         {
 
             await _unitOfWork.Order.UpdatePrintStatus(moveorder);
@@ -788,32 +788,38 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpPost]
         [Route("SetBeingPrepared")]
-        public async Task<IActionResult> SetBeingPrepared([FromBody] Ordering moveOrders)
+        public async Task<IActionResult> SetBeingPrepared([FromBody] Ordering[] moveOrders)
         {
-            var result = await _unitOfWork.Order.SetBeingPrepared(moveOrders);
-
-            if (result)
+            foreach(Ordering item in moveOrders)
             {
-                // Call the SignalR hub method to broadcast the update
-                await _hub.Clients.All.SetBeingPrepared(moveOrders);
-                return Ok();
-            }
+                var result = await _unitOfWork.Order.SetBeingPrepared(item);
 
+                if (result)
+                {
+                    // Call the SignalR hub method to broadcast the update
+                    await _hub.Clients.All.SetBeingPrepared(item);
+                    return Ok();
+                }
+            }
+           
             return new JsonResult("Someone is already preparing!");
 
         }
 
         [HttpPost]
         [Route("UnsetBeingPrepared")]
-        public async Task<IActionResult> UnsetBeingPrepared([FromBody] Ordering orderNos)
+        public async Task<IActionResult> UnsetBeingPrepared([FromBody] Ordering[] orderNos)
         {
-
-            var result = await _unitOfWork.Order.UnsetBeingPrepared(orderNos);
-
-            if (result)
+            foreach (Ordering item in orderNos)
             {
-                await _hub.Clients.All.SetBeingPrepared(orderNos);
-                return Ok();
+
+                var result = await _unitOfWork.Order.UnsetBeingPrepared(item);
+
+                if (result)
+                {
+                    await _hub.Clients.All.SetBeingPrepared(item);
+                    return Ok();
+                }
             }
 
             return new JsonResult("Something Wrong");

@@ -284,14 +284,14 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             }
         }
 
-        /*[HttpGet("GetChecklistAnswerById/{id}")]
+        [HttpGet("GetChecklistAnswerById/{id}")]
         public async Task<IActionResult> Get(int id)
         {
             try
             {
                 var query = new GetChecklistByReceivingId.GetChecklistByReceivingIdQuery
                 {
-                    Id = id
+                    ReceivingId = id
                 };
                 var checklists = await _mediator.Send(query);
 
@@ -304,7 +304,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
                     e.Message
                 });
             }
-        }*/
+        }
 
         [HttpPatch("SortChecklistTypes")]
         public async Task<IActionResult> SortChecklistTypes([FromBody]SortChecklistTypesCommand command)

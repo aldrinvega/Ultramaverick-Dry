@@ -7,7 +7,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST
 {
     public class ChecklistTypes : BaseEntity
     {
-        public string ChecklistType  { get; set; }
+        public string ChecklistType { get; set; }
         public int? OrderId { get; set; }
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;

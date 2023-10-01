@@ -1,10 +1,4 @@
-﻿/*using ELIXIR.DATA.CORE.INTERFACES.QC_INTERFACE;
-using ELIXIR.DATA.CORE.INTERFACES.WAREHOUSE_INTERFACE;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.LABTEST_MODEL;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
+﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -19,7 +13,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
     {
         public class GetChecklistByReceivingIdQuery : IRequest<GetChecklistByReceivingIdResult>
         {
-            public int? Id { get; set; }
+            public int? ReceivingId { get; set; }
         }
 
         public class GetChecklistByReceivingIdResult
@@ -51,43 +45,45 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
             public string ProductType { get; set; }
 
 
-            public class ChecklistQuestionsForOpenField
+
+            public int ChecklistType { get; set; }
+            public IEnumerable<ChecklistAnswer> ChecklistAnswers { get; set; }
+            public IEnumerable<ChecklistOpenFieldAnswer> ChecklistOpenFieldAnswers { get; set; }
+            public IEnumerable<ChecklistProductDimension> ChecklistProductDimensions { get; set; }
+           
+            public class ChecklistAnswer
             {
-                public int ChecklistQuestionId { get; set; }
-                public string ChecklistQuestion { get; set; }
+                public int QCChecklistId { get; set; }
                 public int ChecklistTypeId { get; set; }
                 public string ChecklistType { get; set; }
-                public string Remarks { get; set; }
-            }
-            public class ChecklistQuestionsForYesOrNo
-            {
                 public int ChecklistQuestionId { get; set; }
                 public string ChecklistQuestion { get; set; }
-                public int ChecklistTypeId { get; set; }
-                public string ChecklistType { get; set; }
                 public bool Status { get; set; }
             }
 
-            public class ChecklistQuestionForProductDimentions
+            public class ChecklistOpenFieldAnswer
             {
-                public int ChecklistQuestionId { get; set; }
-                public string ChecklistQuestion { get; set; }
+                public int QCChecklistId { get; set; }
                 public int ChecklistTypeId { get; set; }
                 public string ChecklistType { get; set; }
+                public int ChecklistQuestionId { get; set; }
+                public string ChecklistQuestion { get; set; }
+                public string Remarks { get; set; }
+            }
+
+            public class ChecklistProductDimension
+            {
+                public int QCChecklistId { get; set; }
+                public int ChecklistTypeId { get; set; }
+                public string ChecklistType { get; set; }
+                public int ChecklistQuestionId { get; set; }
+                public string ChecklistQuestion { get; set; }
                 public string Standard { get; set; }
                 public string Actual { get; set; }
             }
 
-        }
 
-        public class Handler : IRequestHandler<GetChecklistByReceivingIdQuery, GetChecklistByReceivingIdResult>
-        {
-            private readonly StoreContext _context;
 
-            public Handler(StoreContext context)
-            {
-                _context = context;
-            }
 
             public class Handler : IRequestHandler<GetChecklistByReceivingIdQuery, GetChecklistByReceivingIdResult>
             {
@@ -98,70 +94,88 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                     _context = context;
                 }
 
+                public StoreContext Context => _context;
+
                 public async Task<GetChecklistByReceivingIdResult> Handle(GetChecklistByReceivingIdQuery request, CancellationToken cancellationToken)
                 {
                     var qCChecklist = await _context.QcChecklists
-                        .Include(x => x.PoReceiving)
-                        .Include(x => x.ProductType)
-                        .Include(q => q.ChecklistAnswers)
-                            .ThenInclude(ans => ans.ChecklistQuestions)
-                                .ThenInclude(cht => cht.ChecklistType)
-                        .Include(q => q.OpenFieldAnswers)
+                       .Include(x => x.PoReceiving)
+                       .Include(x => x.ProductType)
+                       .Include(x => x.OpenFieldAnswers)
+                            .ThenInclude(x => x.ChecklistQuestion)
+                                .ThenInclude(x => x.ChecklistType)
+                        .Include(x => x.ProductDimension)
+                            .ThenInclude(x => x.ChecklistQuestion)
+                                .ThenInclude(x => x.ChecklistType)
+                        .Include(x => x.ChecklistAnswers)
                             .ThenInclude(x => x.ChecklistQuestions)
                                 .ThenInclude(x => x.ChecklistType)
-                        .Include(q => q.ProductDimension)
-                            .ThenInclude(x => x.ChecklistQuestions)
-                        .Include(q => q.ChecklistReviewVerificationLog)
-                        .Include(q => q.ChecklistCompliance)
-                        .Include(q => q.ChecklistOtherObservation)
-                   .FirstOrDefaultAsync(x => x.Id == request.Id) ?? throw new Exception("No receving checklist data found");
+                   .Where(x => x.Id == request.ReceivingId).FirstOrDefaultAsync(cancellationToken) ?? throw new Exception("No receving checklist data found");
 
-                    // Determine the answer type (you need to adjust this part based on how you fetch it)
-                    int answerType = qCChecklist; // Replace 'AnswerType' with the actual property that holds the answer type.
-
-                    // Create a result variable with common properties
-                    GetChecklistByReceivingIdResult result = new GetChecklistByReceivingIdResult
+                    var resut = new GetChecklistByReceivingIdResult
                     {
-                        // Populate common properties here
+                        ReceivingId = qCChecklist.ReceivingId,
+                        PO_Summary_Id = qCChecklist.PoReceiving.PO_Summary_Id,
+                        Manufacturing_Date = qCChecklist.PoReceiving.Manufacturing_Date,
+                        Expected_Delivery = qCChecklist.PoReceiving.Expected_Delivery,
+                        Expiry_Date = qCChecklist.PoReceiving.Expiry_Date,
+                        Actual_Delivered = qCChecklist.PoReceiving.Actual_Delivered,
+                        ItemCode = qCChecklist.PoReceiving.ItemCode,
+                        Batch_No = qCChecklist.PoReceiving.Batch_No,
+                        TotalReject = qCChecklist.PoReceiving.TotalReject,
+                        IsActive = qCChecklist.PoReceiving.IsActive,
+                        CancelDate = qCChecklist.PoReceiving.CancelDate,
+                        CancelBy = qCChecklist.PoReceiving.CancelBy,
+                        Reason = qCChecklist.PoReceiving.Reason,
+                        ExpiryIsApprove = qCChecklist.PoReceiving.ExpiryIsApprove,
+                        IsNearlyExpire = qCChecklist.PoReceiving.IsNearlyExpire,
+                        ExpiryApproveBy = qCChecklist.PoReceiving.ExpiryApproveBy,
+                        ExpiryDateOfApprove = qCChecklist.PoReceiving.ExpiryDateOfApprove,
+                        QC_ReceiveDate = qCChecklist.PoReceiving.QC_ReceiveDate,
+                        ConfirmRejectByQc = qCChecklist.PoReceiving.ConfirmRejectByQc,
+                        IsWareHouseReceive = qCChecklist.PoReceiving.IsWareHouseReceive,
+                        CancelRemarks = qCChecklist.PoReceiving.CancelRemarks,
+                        QcBy = qCChecklist.PoReceiving.QcBy,
+                        MonitoredBy = qCChecklist.PoReceiving.MonitoredBy,
+                        ProductTypeId = qCChecklist.ProductTypeId,
+                        ProductType = qCChecklist.ProductType.ProductTypeName,
+                        ChecklistAnswers = qCChecklist.ChecklistAnswers
+                                .Select(cq => new ChecklistAnswer
+                                {
+                                    QCChecklistId = cq.Id,
+                                    ChecklistType = cq.ChecklistQuestions.ChecklistType.ChecklistType,
+                                    ChecklistQuestion= cq.ChecklistQuestions.ChecklistQuestion,
+                                    ChecklistQuestionId = cq.ChecklistQuestionsId,
+                                    Status = cq.Status
+                                }),
+                        ChecklistProductDimensions = qCChecklist.ProductDimension
+                        .Select(ca => new ChecklistProductDimension
+                        {
+                            QCChecklistId = ca.QCChecklistId,
+                            ChecklistQuestionId = ca.ChecklistQuestionId,
+                            ChecklistQuestion = ca.ChecklistQuestion.ChecklistQuestion,
+                            Standard = ca.Standard,
+                            Actual = ca.Actual
+                        }),
+                        ChecklistOpenFieldAnswers = qCChecklist.OpenFieldAnswers
+                                .Select(cq => new ChecklistOpenFieldAnswer
+                                {
+                                    QCChecklistId = cq.Id,
+                                    ChecklistType = cq.ChecklistQuestion.ChecklistType.ChecklistType,
+                                    ChecklistQuestion = cq.ChecklistQuestion.ChecklistQuestion,
+                                    ChecklistQuestionId = cq.ChecklistQuestionId,
+                                    Remarks = cq.Remarks
+                                }),
                     };
 
-                    // Use a switch statement to handle different answer types
-                    switch (answerType)
-                    {
-                        case 1:
-                        case 2:
-                            result.ChecklistQuestionsForYesOrNo = qCChecklist.ChecklistAnswers
-                                .Select(a => new GetChecklistByReceivingIdResult.ChecklistQuestionsForYesOrNo
-                                {
-                                    ChecklistQuestionId = a.ChecklistQuestionsId,
-                                    ChecklistQuestion = a.ChecklistQuestions.ChecklistQuestion,
-                                    ChecklistType = a.ChecklistQuestions.ChecklistType.ChecklistType,
-                                    ChecklistTypeId = a.ChecklistQuestions.ChecklistTypeId,
-                                    Status = a.Status
-                                }).ToList();
-                            break;
-                        case 3:
-                            result.ChecklistQuestionForProductDimentions = qCChecklist.ProductDimension
-                                .Select(pd => new GetChecklistByReceivingIdResult.ChecklistQuestionForProductDimentions
-                                {
-                                    ChecklistQuestionId = pd.ChecklistQuestionId,
-                                    ChecklistQuestion = pd.ChecklistQuestions.ChecklistQuestion,
-                                    ChecklistType = pd.ChecklistQuestions.ChecklistType.ChecklistType,
-                                    ChecklistTypeId = pd.ChecklistQuestions.ChecklistTypeId,
-                                    Standard = pd.Standard,
-                                    Actual = pd.Actual
-                                }).ToList();
-                            break;
-                        default:
-                            // Handle other cases or throw an exception for unsupported answer types.
-                            throw new Exception("Unsupported answer type");
-                    }
-
-                    return result;
+                    return resut;
                 }
+
             }
 
         }
+    
     }
 }
-*/
+    
+

@@ -500,8 +500,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                              from transformfrom in leftJ13.DefaultIfEmpty()
 
                              group new { 
-
-                                         posummary, 
+                                         posummary,
                                          warehouse,
                                          moveorders,
                                          qcreceive,
@@ -522,7 +521,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  rawmaterial.UOM.UOM_Code, 
                                  rawmaterial.ItemCategory.ItemCategoryName,
                                  rawmaterial.BufferLevel,
-                                 UnitPrice = posummary.UnitPrice != null ? posummary.UnitPrice : 0,
                                  SuggestedPo = suggestedpo.Ordered != null ? suggestedpo.Ordered : 0,
                                  WarehouseActualGood = warehouse.ActualGood != null ? warehouse.ActualGood : 0,
                                  ReceiptIn = receiptin.Quantity != null ? receiptin.Quantity : 0,
@@ -546,7 +544,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  Uom = total.Key.UOM_Code,
                                  ItemCategory = total.Key.ItemCategoryName,
                                  BufferLevel = total.Key.BufferLevel,
-                                 Price = total.Key.UnitPrice,
                                  ReceiveIn = total.Key.WarehouseActualGood,
                                  MoveOrderOut = total.Key.MoveOrderOut,
                                  QCReceiving = total.Key.QcReceiving,
@@ -928,8 +925,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                  CostByWarehouse = wr.UnitCost * (wr.ActualGood - (mo != null ? mo.QuantityOrdered : 0))
              };
 
-         // Calculate the sum of differences per ItemCode
-         var totalDifferences = individualDifferences
+            string queryString = individualDifferences.ToQueryString();
+
+
+
+            // Calculate the sum of differences per ItemCode
+            var totalDifferences = individualDifferences
              .GroupBy(id => id.ItemCode)
              .Select(g => new
              {
@@ -937,17 +938,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                  TotalDifference = g.Sum(id => id.CostByWarehouse)
              });
 
-         // Calculate the average UnitCost per ItemCode
-         var averageUnitCosts = individualDifferences
+            string queryString2 = totalDifferences.ToQueryString();
+
+            // Calculate the average UnitCost per ItemCode
+            var averageUnitCosts = individualDifferences
              .GroupBy(id => id.ItemCode)
              .Select(g => new
              {
                  ItemCode = g.Key,
-                 AvgUnitCost = g.Average(id => id.CostByWarehouse / (id.ActualGood - id.QuantityOrdered))
+                 AvgUnitCost = g.Average(id => (id.ActualGood - id.QuantityOrdered) == 0 ? 0 : id.CostByWarehouse / (id.ActualGood - id.QuantityOrdered))
              });
 
-// Combine the results
-         var finalResult = from id in individualDifferences
+            string queryString3 = averageUnitCosts.ToQueryString();
+
+            // Combine the results
+            var finalResult = from id in individualDifferences
              join td in totalDifferences
                  on id.ItemCode equals td.ItemCode
              join auc in averageUnitCosts
@@ -961,6 +966,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                  TotalDifference = td.TotalDifference,
                  AvgUnitCost = auc.AvgUnitCost
              };
+
+            string queryString4 = finalResult.ToQueryString();
 
             var inventory = (from rawmaterial in _context.RawMaterials
                              join posummary in getPoSummary
@@ -1027,7 +1034,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                              on rawmaterial.ItemCode equals transformfrom.ItemCode
                              into leftJ13
                              from transformfrom in leftJ13.DefaultIfEmpty()
-                             
+
                              join avgUnitCost in finalResult
                                  on rawmaterial.ItemCode equals avgUnitCost.ItemCode
                                  into avgCostJoin
@@ -1035,7 +1042,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
                              group new
                              {
-
                                  posummary,
                                  warehouse,
                                  moveorders,
@@ -1058,14 +1064,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  rawmaterial.UOM.UOM_Code,
                                  rawmaterial.ItemCategory.ItemCategoryName,
                                  rawmaterial.BufferLevel,
-                                 UnitPrice = posummary.UnitPrice != null ? posummary.UnitPrice : 0,
                                  SuggestedPo = suggestedpo.Ordered != null ? suggestedpo.Ordered : 0,
                                  WarehouseActualGood = warehouse.ActualGood != null ? warehouse.ActualGood : 0,
                                  ReceiptIn = receiptin.Quantity != null ? receiptin.Quantity : 0,
                                  MoveOrderOut = moveorders.QuantityOrdered != null ? moveorders.QuantityOrdered : 0,
                                  QcReceiving = qcreceive.QuantityOrdered != null ? qcreceive.QuantityOrdered : 0,
                                  IssueOut = issueout.Quantity != null ? issueout.Quantity : 0,
-                                 TotalPrice = posummary.TotalPrice != null ? posummary.TotalPrice : 0,
                                  SOH = SOH.SOH != null ? SOH.SOH : 0,
                                  Reserve = Reserve.Reserve != null ? Reserve.Reserve : 0,
                                  AverageIssuance = averageissuance.ActualGood != null ? averageissuance.ActualGood : 0,
@@ -1073,7 +1077,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  TransformFrom = transformfrom.WeighingScale != null ? transformfrom.WeighingScale : 0,
                                  TransformTo = transformto.Quantity != null ? transformto.Quantity : 0,
                                  avgUnitCost.AvgUnitCost,
-                                 avgUnitCost.TotalDifference
+                                 /*avgUnitCost.Difference*/
                                  //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
 
                              } into total
@@ -1085,13 +1089,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  Uom = total.Key.UOM_Code,
                                  ItemCategory = total.Key.ItemCategoryName,
                                  BufferLevel = total.Key.BufferLevel,
-                                 Price = total.Key.UnitPrice,
                                  ReceiveIn = total.Key.WarehouseActualGood,
                                  MoveOrderOut = total.Key.MoveOrderOut,
                                  QCReceiving = total.Key.QcReceiving,
                                  ReceiptIn = total.Key.ReceiptIn,
                                  IssueOut = total.Key.IssueOut,
-                                 TotalPrice = Math.Round(Convert.ToDecimal(total.Key.TotalPrice), 2),
+                                /* Price = total.Key.Difference,*/
+                                 TotalPrice = total.Key.AvgUnitCost,
                                  SOH = total.Key.SOH - total.Key.IssueOut,
                                  Reserve = total.Key.Reserve - total.Key.IssueOut,
                                  SuggestedPo = total.Key.SuggestedPo,
@@ -1099,9 +1103,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  DaysLevel = Math.Round(Convert.ToDecimal(total.Key.Reserve / (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)), 2),
                                  ReserveUsage = total.Key.ReserveUsage,
                                  TransformFrom = total.Key.TransformFrom,
-                                 TransformTo = total.Key.TransformTo,
-                                 AvgUnitCost = total.Key.AvgUnitCost,
-                                 TotalCost = total.Key.TotalDifference
+                                 TransformTo = total.Key.TransformTo
                              });
             return await PagedList<MRPDto>.CreateAsync(inventory, userParams.PageNumber, userParams.PageSize);
         }
@@ -1109,7 +1111,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
         {
             var EndDate = DateTime.Now;
             var StartDate = EndDate.AddDays(-30);
-            
+
 
             var getPoSummary = _context.POSummary.Where(x => x.IsActive == true)
               .GroupBy(x => new
@@ -1186,7 +1188,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     Quantity = x.Sum(x => x.Quantity)
                 });
 
-            var getTransformation = _context.Transformation_Preparation.Where(x => x.IsActive == true)                                                          
+            var getTransformation = _context.Transformation_Preparation.Where(x => x.IsActive == true)
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -1324,7 +1326,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                   });
 
             var getTransformOutPerMonth = _context.Transformation_Preparation.Where(x => x.PreparedDate >= StartDate && x.PreparedDate <= EndDate)
-                                                                             .Where(x => x.IsActive == true)                                                                         
+                                                                             .Where(x => x.IsActive == true)
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -1451,56 +1453,54 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
             //}).Distinct();
 
             // var xx = getLastUsed;
-            
+
             var individualDifferences = from wr in _context.WarehouseReceived
-             join mo in _context.MoveOrders
-                 on wr.Id equals mo.WarehouseId
-                 into moveOrders
-             from mo in moveOrders.DefaultIfEmpty()
-             where wr.IsActive && wr.IsWarehouseReceive
-             select new
-             {
-                 wr.ItemCode,
-                 wr.ActualGood,
-                 wr.UnitCost,
-                 QuantityOrdered = mo != null ? mo.QuantityOrdered : 0,
-                 CostByWarehouse = wr.UnitCost * (wr.ActualGood - (mo != null ? mo.QuantityOrdered : 0))
-             };
+                                        join mo in _context.MoveOrders
+                                            on wr.Id equals mo.WarehouseId
+                                            into moveOrders
+                                        from mo in moveOrders.DefaultIfEmpty()
+                                        where wr.IsActive && wr.IsWarehouseReceive
+                                        select new
+                                        {
+                                            wr.ItemCode,
+                                            wr.ActualGood,
+                                            QuantityOrdered = mo != null ? mo.QuantityOrdered : 0,
+                                            CostByWarehouse = wr.UnitCost * (wr.ActualGood - (mo != null ? mo.QuantityOrdered : 0))
+                                        };
 
-         // Calculate the sum of differences per ItemCode
-         var totalDifferences = individualDifferences
-             .GroupBy(id => id.ItemCode)
-             .Select(g => new
-             {
-                 ItemCode = g.Key,
-                 TotalDifference = g.Sum(id => id.CostByWarehouse)
-             });
+            // Calculate the sum of differences per ItemCode
+            var totalDifferences = individualDifferences
+                .GroupBy(id => id.ItemCode)
+                .Select(g => new
+                {
+                    ItemCode = g.Key,
+                    TotalDifference = g.Sum(id => id.CostByWarehouse)
+                });
 
-         // Calculate the average UnitCost per ItemCode
-         var averageUnitCosts = individualDifferences
-             .GroupBy(id => id.ItemCode)
-             .Select(g => new
-             {
-                 ItemCode = g.Key,
-                 AvgUnitCost = g.Average(id => id.CostByWarehouse / (id.ActualGood - id.QuantityOrdered))
-             });
+            // Calculate the average UnitCost per ItemCode
+            var averageUnitCosts = individualDifferences
+                .GroupBy(id => id.ItemCode)
+                .Select(g => new
+                {
+                    ItemCode = g.Key,
+                    AvgUnitCost = g.Average(id => (id.ActualGood - id.QuantityOrdered) == 0 ? 0 : id.CostByWarehouse / (id.ActualGood - id.QuantityOrdered))
+                });
 
-// Combine the results
-         var finalResult = from id in individualDifferences
-             join td in totalDifferences
-                 on id.ItemCode equals td.ItemCode
-             join auc in averageUnitCosts
-                 on id.ItemCode equals auc.ItemCode
-             select new
-             {
-                 id.ItemCode,
-                 id.ActualGood,
-                 id.QuantityOrdered,
-                 Difference = id.CostByWarehouse,
-                 td.TotalDifference,
-                 auc.AvgUnitCost,
-                 id.UnitCost
-             };
+            // Combine the results
+            var finalResult = from id in individualDifferences
+                              join td in totalDifferences
+                                  on id.ItemCode equals td.ItemCode
+                              join auc in averageUnitCosts
+                                  on id.ItemCode equals auc.ItemCode
+                              select new
+                              {
+                                  id.ItemCode,
+                                  id.ActualGood,
+                                  id.QuantityOrdered,
+                                  Difference = id.CostByWarehouse,
+                                  TotalDifference = td.TotalDifference,
+                                  AvgUnitCost = auc.AvgUnitCost
+                              };
 
             var inventory = (from rawmaterial in _context.RawMaterials
                              join posummary in getPoSummary
@@ -1598,14 +1598,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  rawmaterial.UOM.UOM_Code,
                                  rawmaterial.ItemCategory.ItemCategoryName,
                                  rawmaterial.BufferLevel,
-                                 UnitPrice = posummary.UnitPrice != null ? posummary.UnitPrice : 0,
                                  SuggestedPo = suggestedpo.Ordered != null ? suggestedpo.Ordered : 0,
                                  WarehouseActualGood = warehouse.ActualGood != null ? warehouse.ActualGood : 0,
                                  ReceiptIn = receiptin.Quantity != null ? receiptin.Quantity : 0,
                                  MoveOrderOut = moveorders.QuantityOrdered != null ? moveorders.QuantityOrdered : 0,
                                  QcReceiving = qcreceive.QuantityOrdered != null ? qcreceive.QuantityOrdered : 0,
                                  IssueOut = issueout.Quantity != null ? issueout.Quantity : 0,
-                                 TotalPrice = posummary.TotalPrice != null ? posummary.TotalPrice : 0,
                                  SOH = SOH.SOH != null ? SOH.SOH : 0,
                                  Reserve = Reserve.Reserve != null ? Reserve.Reserve : 0,
                                  AverageIssuance = averageissuance.ActualGood != null ? averageissuance.ActualGood : 0,
@@ -1613,8 +1611,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  TransformFrom = transformfrom.WeighingScale != null ? transformfrom.WeighingScale : 0,
                                  TransformTo = transformto.Quantity != null ? transformto.Quantity : 0,
                                  avgUnitCost.AvgUnitCost,
-                                 avgUnitCost.TotalDifference,
-                                 UnitCost = avgUnitCost.UnitCost
+                                 /*avgUnitCost.Difference,*/
                                  //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
 
                              } into total
@@ -1626,13 +1623,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  Uom = total.Key.UOM_Code,
                                  ItemCategory = total.Key.ItemCategoryName,
                                  BufferLevel = total.Key.BufferLevel,
-                                 Price = total.Key.UnitPrice,
                                  ReceiveIn = total.Key.WarehouseActualGood,
                                  MoveOrderOut = total.Key.MoveOrderOut,
                                  QCReceiving = total.Key.QcReceiving,
                                  ReceiptIn = total.Key.ReceiptIn,
                                  IssueOut = total.Key.IssueOut,
-                                 TotalPrice = Math.Round(Convert.ToDecimal(total.Key.TotalPrice), 2),
+                                 /*Price = total.Key.Difference,*/
+                                 TotalPrice = total.Key.AvgUnitCost,
                                  SOH = total.Key.SOH - total.Key.IssueOut,
                                  Reserve = total.Key.Reserve - total.Key.IssueOut,
                                  SuggestedPo = total.Key.SuggestedPo,
@@ -1640,10 +1637,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  DaysLevel = Math.Round(Convert.ToDecimal(total.Key.Reserve / (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)), 2),
                                  ReserveUsage = total.Key.ReserveUsage,
                                  TransformFrom = total.Key.TransformFrom,
-                                 TransformTo = total.Key.TransformTo,
-                                 AvgUnitCost = total.Key.AvgUnitCost,
-                                 TotalCost = total.Key.TotalDifference,
-                                 UnitCost = total.Key.UnitCost,
+                                 TransformTo = total.Key.TransformTo
                              }).Where(x => x.ItemDescription.ToLower()
                                 .Contains(search.Trim().ToLower()));
             

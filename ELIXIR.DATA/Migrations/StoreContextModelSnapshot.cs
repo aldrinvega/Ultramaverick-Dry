@@ -670,7 +670,7 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CustomerId")
+                    b.Property<int?>("CustomerId")
                         .HasColumnType("int");
 
                     b.Property<string>("CustomerName")
@@ -964,7 +964,7 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int>("ChecklistQuestionId")
+                    b.Property<int>("ChecklistQuestionsId")
                         .HasColumnType("int");
 
                     b.Property<int>("QCChecklistId")
@@ -975,7 +975,7 @@ namespace ELIXIR.DATA.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChecklistQuestionId");
+                    b.HasIndex("ChecklistQuestionsId");
 
                     b.HasIndex("QCChecklistId");
 
@@ -1016,6 +1016,9 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<int>("ChecklistQuestionId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ChecklistQuestionsId")
+                        .HasColumnType("int");
+
                     b.Property<int>("QCChecklistId")
                         .HasColumnType("int");
 
@@ -1024,7 +1027,7 @@ namespace ELIXIR.DATA.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChecklistQuestionId");
+                    b.HasIndex("ChecklistQuestionsId");
 
                     b.HasIndex("QCChecklistId");
 
@@ -2515,9 +2518,7 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Customer", "Customer")
                         .WithMany("Orders")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CustomerId");
 
                     b.Navigation("Customer");
                 });
@@ -2525,7 +2526,7 @@ namespace ELIXIR.DATA.Migrations
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistAnswers", b =>
                 {
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistQuestions", "ChecklistQuestions")
-                        .WithMany()
+                        .WithMany("ChecklistAnswers")
                         .HasForeignKey("ChecklistQuestionsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2555,8 +2556,8 @@ namespace ELIXIR.DATA.Migrations
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistOpenFieldAnswer", b =>
                 {
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistQuestions", "ChecklistQuestions")
-                        .WithMany()
-                        .HasForeignKey("ChecklistQuestionId")
+                        .WithMany("ChecklistOpenFieldAnswers")
+                        .HasForeignKey("ChecklistQuestionsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -2585,10 +2586,8 @@ namespace ELIXIR.DATA.Migrations
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistProductDimension", b =>
                 {
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistQuestions", "ChecklistQuestions")
-                        .WithMany()
-                        .HasForeignKey("ChecklistQuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("ProductDimensions")
+                        .HasForeignKey("ChecklistQuestionsId");
 
                     b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.QCChecklist", "QCChecklist")
                         .WithMany("ProductDimension")
@@ -2769,6 +2768,15 @@ namespace ELIXIR.DATA.Migrations
                     b.Navigation("Department");
 
                     b.Navigation("UserRole");
+                });
+
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistQuestions", b =>
+                {
+                    b.Navigation("ChecklistAnswers");
+
+                    b.Navigation("ChecklistOpenFieldAnswers");
+
+                    b.Navigation("ProductDimensions");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_CHECKLIST.ChecklistTypes", b =>

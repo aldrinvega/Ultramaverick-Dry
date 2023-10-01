@@ -41,7 +41,7 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
             get;
             set;
         }
-        public decimal? WeightedAverageUnitCost
+        public decimal WeightedAverageUnitCost
         {
             get;
             set;

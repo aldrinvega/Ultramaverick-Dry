@@ -175,16 +175,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                 .WithMany()
                 .HasForeignKey(x => x.ReceivingId);
             
-            modelBuilder.Entity<ChecklistOpenFieldAnswer>()
-                .HasOne(x => x.ChecklistQuestions)
-                .WithMany()
-                .HasForeignKey(x => x.ChecklistQuestionId);
-            
-            modelBuilder.Entity<ChecklistProductDimension>()
-                .HasOne(x => x.ChecklistQuestions)
-                .WithMany()
-                .HasForeignKey(x => x.ChecklistQuestionId);
-            
             modelBuilder.Entity<ChecklistTypes>()
                 .HasOne(x => x.AddedByUser)
                 .WithMany()
@@ -199,6 +189,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                 .HasOne(x => x.ModifiedByUser)
                 .WithMany()
                 .HasForeignKey(x => x.ModifiedBy);
+
         }
     }
 }

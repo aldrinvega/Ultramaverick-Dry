@@ -27,13 +27,14 @@ using ELIXIR.DATA.CORE.INTERFACES.CANCELLED_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.LABTEST_INTERFACE;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.CANCELLED_ORDERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.LABTEST_REPOSITORY;
+using ELIXIR.DATA.CORE.INTERFACES.ORDER_HUB;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
 {
     public class UnitOfWork : IUnitOfWork, IDisposable
     {
         private readonly StoreContext _context;
-        private readonly IHubContext<OrderHub> _clients;
+        private readonly IHubContext<OrderHub, IOrderHub> _clients;
 
         private readonly ILogger _logger;
 
