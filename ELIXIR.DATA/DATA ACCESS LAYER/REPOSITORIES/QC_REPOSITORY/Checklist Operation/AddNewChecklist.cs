@@ -90,7 +90,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                     var checklistAnswers = new ChecklistAnswers
                     {
                         QCChecklistId = qcChecklist.Id,
-                        ChecklistQuestionsId = checklistAnswer.ChecklistQuestionId,
+                        ChecklistQuestionId = checklistAnswer.ChecklistQuestionId,
                         Status = checklistAnswer.Status
                     };
 

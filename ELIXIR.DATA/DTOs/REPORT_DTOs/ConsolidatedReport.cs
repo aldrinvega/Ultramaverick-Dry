@@ -28,6 +28,7 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
             set;
         }
 
+        public string UOM { get; set; }
         public decimal Quantity
         {
             get;

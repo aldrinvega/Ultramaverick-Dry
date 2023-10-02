@@ -128,7 +128,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             List<Ordering> filteredOrders = new List<Ordering>();
             List<Ordering> orderList = new List<Ordering>();
 
-
             foreach (Ordering items in order)
             {
                 var validateDuplicate = await _unitOfWork.Order.ValidateExistingOrders(items);

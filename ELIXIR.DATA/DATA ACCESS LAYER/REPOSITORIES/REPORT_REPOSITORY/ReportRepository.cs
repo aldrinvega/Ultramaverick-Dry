@@ -496,7 +496,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     TransactionType = total.Key.DeliveryStatus,
                     TransactedDate = total.Key.TransactedDate,
                     DeliveryDate = total.Key.DeliveryDate
-
                 });
             //select new MoveOrderReport
             //{
@@ -947,7 +946,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             warehouseReceived.PO_Number,
             warehouseReceived.Id,
             warehouseReceived.ItemCode,
-            warehouseReceived.MiscellaneousReceiptId
+            warehouseReceived.Uom,
+            warehouseReceived.MiscellaneousReceiptId,
+            warehouseReceived.UnitCost
         })
         .ToListAsync();
 
@@ -1002,7 +1003,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
     consolidatedReports = _context.QC_Receiving
         .Where(wr => wr.IsWareHouseReceive == true)
         .Join(
-            _context.RawMaterials,
+            _context.RawMaterials
+            .Include(rm => rm.UOM),
             receiving => receiving.ItemCode,
             rawMaterial => rawMaterial.ItemCode,
             (receiving, rawMaterialsGroup) => new { Receiving = receiving, RawMaterialsGroup = rawMaterialsGroup })
@@ -1014,6 +1016,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 TransactionDate = joinResult.Receiving.QC_ReceiveDate,
                 ItemCode = joinResult.Receiving.ItemCode,
                 ItemDescription = joinResult.RawMaterialsGroup.ItemDescription,
+                UOM = joinResult.RawMaterialsGroup.UOM.UOM_Description,
                 Quantity = joinResult.Receiving.Actual_Delivered,
                 WarehouseId = warehouseReceived
                     .Where(wr => wr.MiscellaneousReceiptId == joinResult.Receiving.Id)
