@@ -993,7 +993,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                         moveorder.LocationName,
                         moveorder.QuantityOrdered,
                         moveorder.WarehouseId,
-                        PreparedDate = transact.PreparedDate
+                        transact.PreparedDate
                     }).ToListAsync();
 
             var receiptInReport = await _context.MiscellaneousReceipts

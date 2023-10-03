@@ -1708,18 +1708,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         {
             foreach (var orders in orderNo)
             {
-                var existing = await _context.MoveOrders.Where(x => x.OrderNo == orders)
+                var existing = await _context.MoveOrders.Where(x => x.OrderNoPKey == orders)
                                                   .ToListAsync();
                 if (existing == null)
                     return false;
 
                 foreach (var items in existing)
                 {
-                    items.IsPrint = !items.IsPrint;
+                    items.IsPrint = true;
                 }
             }
             return true;
-
         }
         public async Task<MoveOrderDto> GetAllApprovedMoveOrder(int id)
         {
