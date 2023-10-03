@@ -1874,14 +1874,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 existingOrder.SetBy = moveOrders.SetBy;
 
                 await _context.SaveChangesAsync();
-                
-            
             return true;
 
         }
         public async Task<bool>UnsetBeingPrepared(Ordering orderNo)
         {
-            
                 var existingOrder = await _context.Orders.Where(x => x.IsBeingPrepared == true)
                 .Where(x => x.OrderNoPKey == orderNo.OrderNoPKey)
                 .Where(x => x.SetBy == orderNo.SetBy)

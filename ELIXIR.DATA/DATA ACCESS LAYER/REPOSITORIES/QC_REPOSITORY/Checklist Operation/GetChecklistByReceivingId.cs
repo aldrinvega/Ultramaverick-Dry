@@ -110,7 +110,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                         .Include(x => x.ChecklistAnswers)
                             .ThenInclude(x => x.ChecklistQuestion)
                                 .ThenInclude(x => x.ChecklistType)
-                   .Where(x => x.Id == request.ReceivingId).FirstOrDefaultAsync(cancellationToken) ?? throw new Exception("No receving checklist data found");
+                   .Where(x => x.ReceivingId == request.ReceivingId).FirstOrDefaultAsync(cancellationToken) ?? throw new Exception("No receving checklist data found");
 
                     var resut = new GetChecklistByReceivingIdResult
                     {
@@ -152,6 +152,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                         .Select(ca => new ChecklistProductDimension
                         {
                             QCChecklistId = ca.QCChecklistId,
+                            ChecklistType = ca.ChecklistQuestion.ChecklistType.ChecklistType,
                             ChecklistQuestionId = ca.ChecklistQuestionId,
                             ChecklistQuestion = ca.ChecklistQuestion.ChecklistQuestion,
                             Standard = ca.Standard,

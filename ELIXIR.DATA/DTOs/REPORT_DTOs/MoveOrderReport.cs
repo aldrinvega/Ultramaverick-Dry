@@ -12,7 +12,6 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public int? OrderNo { get; set; }
         public string CustomerCode { get; set; }
         public string CustomerName { get; set; }
-        public string FarmType { get; set; }
         public string FarmCode { get; set; }
         public string FarmName { get; set; }
         public string ItemCode { get; set; }
@@ -24,12 +23,9 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public string TransactionType { get; set; }
         public string MoveOrderBy { get; set; }
         public string MoveOrderDate { get; set; }
-        public string TransactedDate { get; set; }
-        public string DateNeeded { get; set; }
+        public DateTime? TransactedDate { get; set; }
         public string TransactedBy { get; set; }
-        public string BatchNo { get; set; }
         public string DeliveryDate { get; set; }
-
         public string PreparedDate
         {
             get;
@@ -46,8 +42,9 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
             get;
             set;
         }
-        
-
-
+        public string DepartmentName { get; set; }
+        public int WarehouseId { get; set; }
+        public string Location { get; set; }
+        public string AccountTitle { get; set; }
     }
 }

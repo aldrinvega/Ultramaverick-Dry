@@ -40,10 +40,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
             set;
         }
 
-        public bool IsActive 
+        public bool IsActive
         {
             get;
             set;
-        }
+        } = false;
     }
 }

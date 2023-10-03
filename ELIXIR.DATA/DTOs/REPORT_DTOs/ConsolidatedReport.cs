@@ -4,7 +4,7 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
 {
     public class ConsolidatedReport
     {
-        public int Id
+        public int? Id
         {
             get;
             set;
@@ -29,7 +29,7 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         }
 
         public string UOM { get; set; }
-        public decimal Quantity
+        public decimal? Quantity
         {
             get;
             set;

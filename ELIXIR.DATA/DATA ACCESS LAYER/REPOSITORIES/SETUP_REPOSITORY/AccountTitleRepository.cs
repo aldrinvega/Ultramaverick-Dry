@@ -24,8 +24,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             foreach (var ac in accountTitle)
             {
                 var result = await _context.AccountTitles.Upsert(ac)
-                    .On(c => c.AccountTitleId)
-                    .On(c => c.IsActive)
+                    .On(c => new { c.AccountTitleId, c.IsActive })
                     .WhenMatched(c => new AccountTitle()
                     {
                         AccountTitleId = ac.AccountTitleId,
@@ -33,10 +32,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                         AccountTitleCode = ac.AccountTitleCode,
                         CreatedAt = ac.CreatedAt,
                         UpdatedAt = ac.UpdatedAt,
-                        IsActive = false
                     }).RunAsync();
             }
-
             return true;
         }
 

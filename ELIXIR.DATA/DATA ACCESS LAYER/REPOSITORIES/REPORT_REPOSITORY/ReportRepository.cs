@@ -16,11 +16,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
     public class ReportRepository : IReportRepository
     {
         private readonly StoreContext _context;
+
         public ReportRepository(StoreContext context)
         {
             _context = context;
 
         }
+
         public async Task<IReadOnlyList<QCReport>> QcRecevingReport(string DateFrom, string DateTo)
         {
             var items = (from rawmaterials in _context.RawMaterials
@@ -70,6 +72,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             return await report.ToListAsync();
 
         }
+
         public async Task<IReadOnlyList<WarehouseReport>> WarehouseReceivingReport(string DateFrom, string DateTo)
         {
 
@@ -98,6 +101,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             return await warehouse.ToListAsync();
 
         }
+
         public async Task<IReadOnlyList<TransformationReport>> TransformationReport(string DateFrom, string DateTo)
         {
 
@@ -131,6 +135,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             return await transform.ToListAsync();
 
         }
+
         public async Task<IReadOnlyList<MoveOrderReport>> MoveOrderReport(string DateFrom, string DateTo)
         {
             var soh = _context.WarehouseReceived
@@ -142,18 +147,18 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 });
 
             var individualDifferences = from wr in _context.WarehouseReceived
-                                        join mo in _context.MoveOrders
-                                            on wr.Id equals mo.WarehouseId
-                                            into moveOrders
-                                        from mo in moveOrders.DefaultIfEmpty()
-                                        where wr.IsActive && wr.IsWarehouseReceive
-                                        select new
-                                        {
-                                            wr.ItemCode,
-                                            wr.ActualGood,
-                                            QuantityOrdered = mo != null ? mo.QuantityOrdered : 0,
-                                            CostByWarehouse = wr.UnitCost * (wr.ActualGood - (mo != null ? mo.QuantityOrdered : 0))
-                                        };
+                join mo in _context.MoveOrders
+                    on wr.Id equals mo.WarehouseId
+                    into moveOrders
+                from mo in moveOrders.DefaultIfEmpty()
+                where wr.IsActive && wr.IsWarehouseReceive
+                select new
+                {
+                    wr.ItemCode,
+                    wr.ActualGood,
+                    QuantityOrdered = mo != null ? mo.QuantityOrdered : 0,
+                    CostByWarehouse = wr.UnitCost * (wr.ActualGood - (mo != null ? mo.QuantityOrdered : 0))
+                };
 
             string queryString = individualDifferences.ToQueryString();
 
@@ -161,41 +166,44 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
             // Calculate the sum of differences per ItemCode
             var totalDifferences = individualDifferences
-             .GroupBy(id => id.ItemCode)
-             .Select(g => new
-             {
-                 ItemCode = g.Key,
-                 TotalDifference = g.Sum(id => id.CostByWarehouse)
-             });
+                .GroupBy(id => id.ItemCode)
+                .Select(g => new
+                {
+                    ItemCode = g.Key,
+                    TotalDifference = g.Sum(id => id.CostByWarehouse)
+                });
 
             string queryString2 = totalDifferences.ToQueryString();
 
             // Calculate the average UnitCost per ItemCode
             var averageUnitCosts = individualDifferences
-             .GroupBy(id => id.ItemCode)
-             .Select(g => new
-             {
-                 ItemCode = g.Key,
-                 AvgUnitCost = g.Average(id => (id.ActualGood - id.QuantityOrdered) == 0 ? 0 : id.CostByWarehouse / (id.ActualGood - id.QuantityOrdered))
-             });
+                .GroupBy(id => id.ItemCode)
+                .Select(g => new
+                {
+                    ItemCode = g.Key,
+                    AvgUnitCost = g.Average(id =>
+                        (id.ActualGood - id.QuantityOrdered) == 0
+                            ? 0
+                            : id.CostByWarehouse / (id.ActualGood - id.QuantityOrdered))
+                });
 
             string queryString3 = averageUnitCosts.ToQueryString();
 
             // Combine the results
             var finalResult = from id in individualDifferences
-                              join td in totalDifferences
-                                  on id.ItemCode equals td.ItemCode
-                              join auc in averageUnitCosts
-                                  on id.ItemCode equals auc.ItemCode
-                              select new
-                              {
-                                  id.ItemCode,
-                                  id.ActualGood,
-                                  id.QuantityOrdered,
-                                  Difference = id.CostByWarehouse,
-                                  TotalDifference = td.TotalDifference,
-                                  AvgUnitCost = auc.AvgUnitCost
-                              };
+                join td in totalDifferences
+                    on id.ItemCode equals td.ItemCode
+                join auc in averageUnitCosts
+                    on id.ItemCode equals auc.ItemCode
+                select new
+                {
+                    id.ItemCode,
+                    id.ActualGood,
+                    id.QuantityOrdered,
+                    Difference = id.CostByWarehouse,
+                    TotalDifference = td.TotalDifference,
+                    AvgUnitCost = auc.AvgUnitCost
+                };
 
             string queryString4 = finalResult.ToQueryString();
 
@@ -254,12 +262,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     MoveOrderBy = result.Key.PreparedBy,
                     MoveOrderDate = result.Key.PreparedDate.ToString(),
                     TransactedBy = result.Key.PreparedBy,
-                    TransactedDate = result.Key.PreparedDate.ToString(),
+                    TransactedDate = result.Key.PreparedDate,
                     WeightedAverageUnitCost = Math.Round((decimal)result.Key.AvgUnitCost, 2)
                 });
 
             return await orders.ToListAsync();
         }
+
         public async Task<IReadOnlyList<MiscellaneousReceiptReport>> MReceiptReport(string DateFrom, string DateTo)
         {
 
@@ -294,6 +303,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
 
         }
+
         public async Task<IReadOnlyList<MiscellaneousIssueReport>> MIssueReport(string DateFrom, string DateTo)
         {
 
@@ -325,6 +335,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
             return await issues.ToListAsync();
         }
+
         public async Task<IReadOnlyList<WarehouseReport>> NearlyExpireItemsReport(int expirydays)
         {
             var preparationOut = _context.Transformation_Preparation.Where(x => x.IsActive == true)
@@ -440,12 +451,15 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .ToListAsync();
 
         }
-        public async Task<IReadOnlyList<MoveOrderReport>> TransactedMoveOrderReport(string DateFrom, string DateTo)
+
+        public async Task<IReadOnlyList<MoveOrderReport>> TransactedMoveOrderReport(string dateFrom, string dateTo)
         {
+            DateTime fromDate = DateTime.Parse(dateFrom);
+            DateTime toDate = DateTime.Parse(dateTo);
+            
             var orders = (from transact in _context.TransactMoveOrder
                 where transact.IsActive == true && transact.IsTransact == true &&
-                      transact.PreparedDate >= DateTime.Parse(DateFrom) &&
-                      transact.PreparedDate <= DateTime.Parse(DateTo)
+                      transact.PreparedDate >= fromDate && transact.PreparedDate <= toDate
                 join moveorder in _context.MoveOrders
                     on transact.OrderNo equals moveorder.OrderNo into leftJ
                 from moveorder in leftJ.DefaultIfEmpty()
@@ -475,9 +489,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                         MoveOrderDate = moveorder.ApprovedDate.ToString(),
                         transact.PreparedBy,
                         moveorder.DeliveryStatus,
-                        TransactedDate = transact.PreparedDate.ToString(),
+                        TransactedDate = transact.PreparedDate,
                         DeliveryDate = transact.DeliveryDate.ToString()
-
                     }
                 into total
 
@@ -497,28 +510,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     TransactedDate = total.Key.TransactedDate,
                     DeliveryDate = total.Key.DeliveryDate
                 });
-            //select new MoveOrderReport
-            //{
-            //    OrderNo = moveorder.OrderNo,
-            //    CustomerName = moveorder.FarmName,
-            //    CustomerCode = moveorder.FarmCode,
-            //    FarmCode = moveorder.FarmCode,
-            //    FarmName = moveorder.FarmName,
-            //    FarmType = moveorder.FarmType,
-            //    ItemCode = moveorder.ItemCode, 
-            //    ItemDescription = moveorder.ItemDescription, 
-            //    Uom = moveorder.Uom,
-            //    Quantity = moveorder.QuantityOrdered, 
-            //    MoveOrderDate = moveorder.ApprovedDate.ToString(),
-            //    TransactedBy = transact.PreparedBy,
-            //    TransactionType = moveorder.DeliveryStatus,
-            //    TransactedDate = transact.PreparedDate.ToString(),          
-            //    BatchNo = moveorder.BatchNo,
-            //    DeliveryDate = transact.DeliveryDate.ToString()                         
-            //});
 
             return await orders.ToListAsync();
         }
+
         public async Task<IReadOnlyList<CancelledOrderReport>> CancelledOrderedReports(string DateFrom, string DateTo)
         {
 
@@ -545,7 +540,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             return await orders.ToListAsync();
 
         }
-        public async Task<IReadOnlyList<InventoryMovementReport>> InventoryMovementReport(string DateFrom, string DateTo, string PlusOne)
+
+        public async Task<IReadOnlyList<InventoryMovementReport>> InventoryMovementReport(string DateFrom,
+            string DateTo, string PlusOne)
         {
             var dateToday = DateTime.Now.ToString("MM/dd/yyyy");
 
@@ -928,195 +925,212 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             return await movementInventory.ToListAsync();
 
         }
+
         public async Task<IReadOnlyList<ConsolidatedReport>> ConsolidatedReport(string dateFrom, string dateTo)
         {
+            DateTime fromDate = DateTime.Parse(dateFrom);
+            DateTime toDate = DateTime.Parse(dateTo);
+            
             var consolidatedReports = new List<ConsolidatedReport>();
-    var rawMaterials = await _context.RawMaterials
-        .Select(rawMaterial => new
-        {
-            rawMaterial.ItemCode,
-            rawMaterial.ItemDescription,
-            rawMaterial.UOM
-        })
-        .ToListAsync();
+            var rawMaterials = await _context.RawMaterials
+                .Select(rawMaterial => new
+                {
+                    rawMaterial.ItemCode,
+                    rawMaterial.ItemDescription,
+                    rawMaterial.UOM
+                })
+                .ToListAsync();
 
-    var warehouseReceived = await _context.WarehouseReceived
-        .Select(warehouseReceived => new
-        {
-            warehouseReceived.PO_Number,
-            warehouseReceived.Id,
-            warehouseReceived.ItemCode,
-            warehouseReceived.Uom,
-            warehouseReceived.MiscellaneousReceiptId,
-            warehouseReceived.UnitCost
-        })
-        .ToListAsync();
+            var warehouseReceived = await _context.WarehouseReceived
+                .Where(x => x.ReceivingDate >= fromDate && x.ReceivingDate <= toDate)
+                .Select(warehouseReceived => new
+                    {
+                        warehouseReceived.PO_Number,
+                        warehouseReceived.Id,
+                        warehouseReceived.ItemCode,
+                        warehouseReceived.Uom,
+                        warehouseReceived.MiscellaneousReceiptId,
+                        warehouseReceived.UnitCost
+                    })
+                    .ToListAsync();
 
-    var receivingReports = await _context.QC_Receiving
-        .Where(wr => wr.IsWareHouseReceive == true)
-        .Select(receiving => new
-        {
-            receiving.Id,
-            receiving.QC_ReceiveDate,
-            receiving.ItemCode,
-            receiving.Actual_Delivered,
-            TransactionType = "Receiving"
-        })
-        .ToListAsync();
+            var receivingReports = await _context.QC_Receiving
+                .Where(wr => wr.IsWareHouseReceive == true)
+                .Select(receiving => new
+                {
+                    receiving.Id,
+                    receiving.QC_ReceiveDate,
+                    receiving.ItemCode,
+                    receiving.Actual_Delivered,
+                    TransactionType = "Receiving"
+                })
+                .ToListAsync();
 
-    var moveOrderReports = await _context.MoveOrders
-        .Where(moveOrder => moveOrder.IsTransact == true)
-        .Select(moveOrder => new
-        {
-            moveOrder.Id,
-            moveOrder.ItemCode,
-            moveOrder.ItemDescription,
-            moveOrder.OrderNo,
-            moveOrder.FarmName,
-            moveOrder.FarmCode,
-            moveOrder.Uom,
-            moveOrder.CompanyCode,
-            moveOrder.CompanyName,
-            moveOrder.DepartmentName,
-            moveOrder.AccountTitles,
-            moveOrder.LocationName,
-            moveOrder.QuantityOrdered,
-            moveOrder.WarehouseId,
-            moveOrder.PreparedDate
-        }).ToListAsync();
+            var moveOrderReports = await 
+                (from transact in _context.TransactMoveOrder
+                    where transact.IsActive == true && transact.IsTransact == true &&
+                          transact.PreparedDate >= fromDate && transact.PreparedDate <= toDate
+                    join moveorder in _context.MoveOrders
+                        on transact.OrderNo equals moveorder.OrderNo into leftJ
+                    from moveorder in leftJ.DefaultIfEmpty()
+                    join customer in _context.Customers
+                        on moveorder.FarmCode equals customer.CustomerCode
+                        into leftJ2
+                    from customer in leftJ2.DefaultIfEmpty()
+                    select new 
+                    {
+                        moveorder.Id,
+                        moveorder.ItemCode,
+                        moveorder.ItemDescription,
+                        moveorder.OrderNo,
+                        FarmName = customer.CustomerName,
+                        FarmCode = customer.CustomerCode,
+                        moveorder.Uom,
+                        moveorder.CompanyCode,
+                        moveorder.CompanyName,
+                        moveorder.DepartmentName,
+                        moveorder.AccountTitles,
+                        moveorder.LocationName,
+                        moveorder.QuantityOrdered,
+                        moveorder.WarehouseId,
+                        PreparedDate = transact.PreparedDate
+                    }).ToListAsync();
 
-    var receiptInReport = await _context.MiscellaneousReceipts
-        .Where(receipt => receipt.IsActive == true)
-        .Select(receiptIn => new
-        {
-            receiptIn.Id,
-            receiptIn.CompanyName,
-            receiptIn.CompanyCode,
-            receiptIn.DepartmentName,
-            receiptIn.AccountTitles,
-            receiptIn.LocationName,
-            receiptIn.TotalQuantity,
-            receiptIn.PreparedDate
-        })
-        .ToListAsync();
+            var receiptInReport = await _context.MiscellaneousReceipts
+                .Where(receipt => receipt.IsActive == true)
+                .Where(receipt => receipt.TransactionDate >= fromDate && receipt.TransactionDate <= toDate)
+                .Select(receiptIn => new
+                {
+                    receiptIn.Id,
+                    receiptIn.CompanyName,
+                    receiptIn.CompanyCode,
+                    receiptIn.DepartmentName,
+                    receiptIn.AccountTitles,
+                    receiptIn.LocationName,
+                    receiptIn.TotalQuantity,
+                    receiptIn.PreparedDate
+                })
+                .ToListAsync();
 
-    consolidatedReports = _context.QC_Receiving
-        .Where(wr => wr.IsWareHouseReceive == true)
-        .Join(
-            _context.RawMaterials
-            .Include(rm => rm.UOM),
-            receiving => receiving.ItemCode,
-            rawMaterial => rawMaterial.ItemCode,
-            (receiving, rawMaterialsGroup) => new { Receiving = receiving, RawMaterialsGroup = rawMaterialsGroup })
-        .AsEnumerable()
-        .Select(
-            (joinResult, rawMaterial) => new ConsolidatedReport
+            consolidatedReports = _context.QC_Receiving
+                .Where(wr => wr.IsWareHouseReceive == true)
+                .Where(wr => wr.QC_ReceiveDate >= fromDate && wr.QC_ReceiveDate <= toDate)
+                .Join(
+                    _context.RawMaterials
+                        .Include(rm => rm.UOM),
+                    receiving => receiving.ItemCode,
+                    rawMaterial => rawMaterial.ItemCode,
+                    (receiving, rawMaterialsGroup) =>
+                        new { Receiving = receiving, RawMaterialsGroup = rawMaterialsGroup })
+                .AsEnumerable()
+                .Select(
+                    (joinResult, rawMaterial) => new ConsolidatedReport
+                    {
+                        Id = joinResult.Receiving.Id,
+                        TransactionDate = joinResult.Receiving.QC_ReceiveDate,
+                        ItemCode = joinResult.Receiving.ItemCode,
+                        ItemDescription = joinResult.RawMaterialsGroup.ItemDescription,
+                        UOM = joinResult.RawMaterialsGroup.UOM.UOM_Description,
+                        Quantity = joinResult.Receiving.Actual_Delivered,
+                        WarehouseId = warehouseReceived
+                            .Where(wr => wr.MiscellaneousReceiptId == joinResult.Receiving.Id)
+                            .Select(wr => wr.Id)
+                            .FirstOrDefault(),
+                        TransactionType = "Receiving",
+                        CompanyCode = moveOrderReports
+                            .Where(mor => mor.ItemCode == joinResult.Receiving.ItemCode)
+                            .Select(mor => mor.CompanyCode)
+                            .FirstOrDefault(),
+                        CompanyName = moveOrderReports
+                            .Where(mor => mor.ItemCode == joinResult.Receiving.ItemCode)
+                            .Select(mor => mor.CompanyName)
+                            .FirstOrDefault(),
+                        DepartmentName = moveOrderReports
+                            .Where(mor => mor.ItemCode == joinResult.Receiving.ItemCode)
+                            .Select(mor => mor.DepartmentName)
+                            .FirstOrDefault(),
+                        LocationName = receiptInReport
+                            .Where(ro => ro.Id == joinResult.Receiving.Id)
+                            .Select(ro => ro.LocationName)
+                            .FirstOrDefault(),
+                        AccountTitle = receiptInReport
+                            .Where(ro => ro.Id == joinResult.Receiving.Id)
+                            .Select(ro => ro.AccountTitles)
+                            .FirstOrDefault()
+                    }).ToList();
+
+            foreach (var moveOrderReport in moveOrderReports)
             {
-                Id = joinResult.Receiving.Id,
-                TransactionDate = joinResult.Receiving.QC_ReceiveDate,
-                ItemCode = joinResult.Receiving.ItemCode,
-                ItemDescription = joinResult.RawMaterialsGroup.ItemDescription,
-                UOM = joinResult.RawMaterialsGroup.UOM.UOM_Description,
-                Quantity = joinResult.Receiving.Actual_Delivered,
-                WarehouseId = warehouseReceived
-                    .Where(wr => wr.MiscellaneousReceiptId == joinResult.Receiving.Id)
-                    .Select(wr => wr.Id)
-                    .FirstOrDefault(),
-                TransactionType = "Receiving",
-                CompanyCode = moveOrderReports
-                    .Where(mor => mor.ItemCode == joinResult.Receiving.ItemCode)
-                    .Select(mor => mor.CompanyCode)
-                    .FirstOrDefault(),
-                CompanyName = moveOrderReports
-                    .Where(mor => mor.ItemCode == joinResult.Receiving.ItemCode)
-                    .Select(mor => mor.CompanyName)
-                    .FirstOrDefault(),
-                DepartmentName = moveOrderReports
-                    .Where(mor => mor.ItemCode == joinResult.Receiving.ItemCode)
-                    .Select(mor => mor.DepartmentName)
-                    .FirstOrDefault(),
-                LocationName = receiptInReport
-                    .Where(ro => ro.Id == joinResult.Receiving.Id)
-                    .Select(ro => ro.LocationName)
-                    .FirstOrDefault(),
-                AccountTitle = receiptInReport
-                    .Where(ro => ro.Id == joinResult.Receiving.Id)
-                    .Select(ro => ro.AccountTitles)
-                    .FirstOrDefault()
-            }).ToList();
+                consolidatedReports.Add(new ConsolidatedReport
+                {
+                    Id = moveOrderReport.Id,
+                    TransactionDate = moveOrderReport.PreparedDate,
+                    ItemCode = moveOrderReport.ItemCode,
+                    ItemDescription = moveOrderReport.ItemDescription,
+                    Quantity = moveOrderReport.QuantityOrdered,
+                    WarehouseId = moveOrderReport.WarehouseId,
+                    TransactionType = "MoveOrder",
+                    CompanyCode = moveOrderReport.CompanyCode,
+                    CompanyName = moveOrderReport.CompanyName,
+                    DepartmentName = moveOrderReport.DepartmentName,
+                    LocationName = moveOrderReport.LocationName,
+                    AccountTitle = moveOrderReport.AccountTitles
+                });
+            }
 
-    foreach (var moveOrderReport in moveOrderReports.Where(moveOrderReport => consolidatedReports.All(cr => cr.ItemCode != moveOrderReport.ItemCode)))
-    {
-        consolidatedReports.Add(new ConsolidatedReport
-        {
-            Id = moveOrderReport.Id,
-            TransactionDate = moveOrderReport.PreparedDate,
-            ItemCode = moveOrderReport.ItemCode,
-            ItemDescription = moveOrderReport.ItemDescription,
-            Quantity = moveOrderReport.QuantityOrdered,
-            WarehouseId = moveOrderReport.WarehouseId,
-            TransactionType = "MoveOrder",
-            CompanyCode = moveOrderReport.CompanyCode,
-            CompanyName = moveOrderReport.CompanyName,
-            DepartmentName = moveOrderReport.DepartmentName,
-            LocationName = moveOrderReport.LocationName,
-            AccountTitle = moveOrderReport.AccountTitles
-        });
-    }
+            var miscellaneousReceipts = _context.WarehouseReceived
+                .Where(x => x.IsActive == true)
+                .Join(
+                    _context.MiscellaneousReceipts.Where(x =>
+                        x.TransactionDate >= fromDate && x.TransactionDate <= toDate),
+                    wr => wr.MiscellaneousReceiptId,
+                    miscReceipt => miscReceipt.Id,
+                    (wr, miscReceipt) => new { Warehouse = wr, MiscReceipt = miscReceipt })
+                .Select(result => new ConsolidatedReport
+                {
+                    Id = result.MiscReceipt.Id,
+                    TransactionDate = result.MiscReceipt.TransactionDate,
+                    ItemCode = result.Warehouse.ItemCode,
+                    ItemDescription = result.Warehouse.ItemDescription,
+                    Quantity = result.Warehouse.ActualGood,
+                    WarehouseId = result.Warehouse.Id,
+                    TransactionType = "Miscellaneous Receipt",
+                    CompanyCode = result.MiscReceipt.CompanyCode,
+                    CompanyName = result.MiscReceipt.CompanyName,
+                    DepartmentName = result.MiscReceipt.DepartmentName,
+                    LocationName = result.MiscReceipt.LocationName,
+                    AccountTitle = result.MiscReceipt.AccountTitles
+                })
+                .ToList();
 
-    var miscellaneousReceipts = _context.WarehouseReceived
-        .Where(x => x.IsActive == true)
-        .Join(
-            _context.MiscellaneousReceipts,
-            wr => wr.MiscellaneousReceiptId,
-            miscReceipt => miscReceipt.Id,
-            (wr, miscReceipt) => new { Warehouse = wr, MiscReceipt = miscReceipt })
-        .Select(result => new ConsolidatedReport
-        {
-            Id = result.MiscReceipt.Id,
-            TransactionDate = result.MiscReceipt.TransactionDate,
-            ItemCode = result.Warehouse.ItemCode,
-            ItemDescription = result.Warehouse.ItemDescription,
-            Quantity = result.Warehouse.ActualGood,
-            WarehouseId = result.Warehouse.Id,
-            TransactionType = "Miscellaneous Receipt",
-            CompanyCode = result.MiscReceipt.CompanyCode,
-            CompanyName = result.MiscReceipt.CompanyName,
-            DepartmentName = result.MiscReceipt.DepartmentName,
-            LocationName = result.MiscReceipt.LocationName,
-            AccountTitle = result.MiscReceipt.AccountTitles
-        })
-        .ToList();
+            var miscellaneousIssues = _context.MiscellaneousIssues
+                .Where(wr => wr.IsTransact == true)
+                .Where(x => x.TransactionDate >= fromDate && x.TransactionDate <= toDate)
+                .Join(
+                    _context.MiscellaneousIssueDetails,
+                    issue => issue.Id,
+                    details => details.IssuePKey,
+                    (issue, details) => new { Issue = issue, Details = details })
+                .Select(result => new ConsolidatedReport
+                {
+                    Id = result.Issue.Id,
+                    TransactionDate = result.Issue.TransactionDate,
+                    ItemCode = result.Details.ItemCode,
+                    ItemDescription = result.Details.ItemDescription,
+                    Quantity = result.Issue.TotalQuantity,
+                    WarehouseId = result.Details.WarehouseId,
+                    TransactionType = "Miscellaneous Issue",
+                    CompanyCode = result.Issue.CompanyCode,
+                    CompanyName = result.Issue.CompanyName,
+                    DepartmentName = result.Issue.DepartmentName,
+                    LocationName = result.Issue.LocationName,
+                    AccountTitle = result.Issue.AccountTitles
+                })
+                .ToList();
+            consolidatedReports.AddRange(miscellaneousReceipts);
+            consolidatedReports.AddRange(miscellaneousIssues);
 
-    var miscellaneousIssues = _context.MiscellaneousIssues
-        .Where(wr => wr.IsTransact == true)
-        .Join(
-            _context.MiscellaneousIssueDetails,
-            issue => issue.Id,
-            details => details.IssuePKey,
-            (issue, details) => new { Issue = issue, Details = details })
-        .Select(result => new ConsolidatedReport
-        {
-            Id = result.Issue.Id,
-            TransactionDate = result.Issue.TransactionDate,
-            ItemCode = result.Details.ItemCode,
-            ItemDescription = result.Details.ItemDescription,
-            Quantity = result.Issue.TotalQuantity,
-            WarehouseId = result.Details.WarehouseId,
-            TransactionType = "Miscellaneous Issue",
-            CompanyCode = result.Issue.CompanyCode,
-            CompanyName = result.Issue.CompanyName,
-            DepartmentName = result.Issue.DepartmentName,
-            LocationName = result.Issue.LocationName,
-            AccountTitle = result.Issue.AccountTitles
-        })
-        .ToList();
-    consolidatedReports.AddRange(miscellaneousReceipts);
-    consolidatedReports.AddRange(miscellaneousIssues);
-
-    return consolidatedReports;
+            return consolidatedReports;
         }
-        
     }
 }
-
