@@ -22,7 +22,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE
         //MRP
         Task<PoSummaryInventory> GetPOSummary();
 
-
+        Task<IReadOnlyList<MRPDto>> GetSample(string itemCode);
 
 
     }

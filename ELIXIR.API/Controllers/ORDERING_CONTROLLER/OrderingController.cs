@@ -518,14 +518,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("UpdatePrintStatus")]
         public async Task<IActionResult> UpdatePrintStatus([FromBody] int[] moveorder)
         {
-
             await _unitOfWork.Order.UpdatePrintStatus(moveorder);
-            await _unitOfWork.CompleteAsync();
-
             return Ok(moveorder);
         }
-
-
+        
         [HttpGet]
         [Route("GetAllForApprovalMoveOrderPagination")]
         public async Task<ActionResult<IEnumerable<MoveOrderDto>>> GetAllForApprovalMoveOrderPagination(

@@ -74,7 +74,7 @@ namespace ELIXIR.API
             services.AddScoped(typeof(IUserService), typeof(UserService));
       
             services.AddDbContext<StoreContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("LiveConnectionDevelopment")));
+            options.UseSqlServer(Configuration.GetConnectionString("LiveConnection")));
 
             services.Configure<ApiBehaviorOptions>(options =>
             {

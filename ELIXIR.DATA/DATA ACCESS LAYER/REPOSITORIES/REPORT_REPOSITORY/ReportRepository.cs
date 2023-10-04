@@ -1090,6 +1090,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 {
                     Id = result.MiscReceipt.Id,
                     TransactionDate = result.MiscReceipt.TransactionDate,
+                    UOM = result.Warehouse.Uom,
+                    UnitPrice = Math.Round((decimal)result.Warehouse.UnitCost, 2),
                     ItemCode = result.Warehouse.ItemCode,
                     ItemDescription = result.Warehouse.ItemDescription,
                     Quantity = result.Warehouse.ActualGood,
