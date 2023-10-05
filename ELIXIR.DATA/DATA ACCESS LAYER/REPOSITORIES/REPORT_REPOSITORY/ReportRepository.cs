@@ -20,7 +20,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
         public ReportRepository(StoreContext context)
         {
             _context = context;
-
         }
 
         public async Task<IReadOnlyList<QCReport>> QcRecevingReport(string DateFrom, string DateTo)
@@ -30,7 +29,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 join category in _context.ItemCategories
                     on rawmaterials.ItemCategoryId equals category.Id into leftJ
                 from category in leftJ.DefaultIfEmpty()
-
                 select new
                 {
                     ItemCode = rawmaterials.ItemCode,
@@ -43,16 +41,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 join posummary in _context.POSummary
                     on receiving.PO_Summary_Id equals posummary.Id into leftJ
                 from posummary in leftJ.DefaultIfEmpty()
-
                 join category in items
                     on posummary.ItemCode equals category.ItemCode
                     into leftJ2
                 from category in leftJ2.DefaultIfEmpty()
-
-
                 select new QCReport
                 {
-
                     Id = receiving.Id,
                     QcDate = receiving.QC_ReceiveDate.ToString(),
                     PONumber = posummary != null ? posummary.PO_Number : 0,
@@ -70,12 +64,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 });
 
             return await report.ToListAsync();
-
         }
 
         public async Task<IReadOnlyList<WarehouseReport>> WarehouseReceivingReport(string DateFrom, string DateTo)
         {
-
             var warehouse = _context.WarehouseReceived.Where(x =>
                     x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo))
                 .Where(x => x.IsActive == true)
@@ -95,27 +87,22 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     SupplierName = x.Supplier,
                     ReceivedBy = x.ReceivedBy,
                     TransactionType = x.TransactionType
-
                 });
 
             return await warehouse.ToListAsync();
-
         }
 
         public async Task<IReadOnlyList<TransformationReport>> TransformationReport(string DateFrom, string DateTo)
         {
-
             var transform = (from planning in _context.Transformation_Planning
                 where planning.ProdPlan >= DateTime.Parse(DateFrom) && planning.ProdPlan <= DateTime.Parse(DateTo) &&
                       planning.Status == true
                 join preparation in _context.Transformation_Preparation
                     on planning.Id equals preparation.TransformId into leftJ
                 from preparation in leftJ.DefaultIfEmpty()
-
                 join warehouse in _context.WarehouseReceived
                     on planning.Id equals warehouse.TransformId into left2
                 from warehouse in left2.DefaultIfEmpty()
-
                 select new TransformationReport
                 {
                     TransformationId = planning.Id,
@@ -129,11 +116,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     ItemDescription_Recipe = preparation.ItemDescription != null ? preparation.ItemDescription : null,
                     Recipe_Quantity = preparation.WeighingScale != null ? preparation.WeighingScale : 0,
                     DateTransformed = warehouse.ManufacturingDate.ToString()
-
                 });
 
             return await transform.ToListAsync();
-
         }
 
         public async Task<IReadOnlyList<MoveOrderReport>> MoveOrderReport(string DateFrom, string DateTo)
@@ -146,7 +131,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     ActualGood = x.Sum(g => g.ActualGood)
                 });
 
-            var individualDifferences = from wr in _context.WarehouseReceived
+            /*var individualDifferences = from wr in _context.WarehouseReceived
                 join mo in _context.MoveOrders
                     on wr.Id equals mo.WarehouseId
                     into moveOrders
@@ -204,8 +189,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     TotalDifference = td.TotalDifference,
                     AvgUnitCost = auc.AvgUnitCost
                 };
+                */
 
-            string queryString4 = finalResult.ToQueryString();
+            /*string queryString4 = finalResult.ToQueryString();*/
 
             var orders = (
                 from moveorder in _context.MoveOrders
@@ -218,14 +204,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 join stockOnHand in soh
                     on moveorder.ItemCode equals stockOnHand.ItemCode into leftj1
                 from stockOnHand in leftj1.DefaultIfEmpty()
-                join UC in finalResult
+                /*join UC in finalResult
                     on moveorder.ItemCode equals UC.ItemCode into leftj2
-                from UC in leftj2.DefaultIfEmpty()
+                from UC in leftj2.DefaultIfEmpty()*/
                 group new
                 {
                     moveorder,
                     stockOnHand,
-                    UC,
+                    /*UC,*/
                     transactmoveorder
                 } by new
                 {
@@ -244,7 +230,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     transactmoveorder.PreparedBy,
                     transactmoveorder.PreparedDate,
                     stockOnHand.ActualGood,
-                    UC.AvgUnitCost,
+                    /*UC.AvgUnitCost,*/
                 }
                 into result
                 select new MoveOrderReport
@@ -263,7 +249,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     MoveOrderDate = result.Key.PreparedDate.ToString(),
                     TransactedBy = result.Key.PreparedBy,
                     TransactedDate = result.Key.PreparedDate,
-                    WeightedAverageUnitCost = Math.Round((decimal)result.Key.AvgUnitCost, 2)
+                    /*WeightedAverageUnitCost = Math.Round((decimal)result.Key.AvgUnitCost, 2)*/
                 });
 
             return await orders.ToListAsync();
@@ -271,19 +257,15 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
         public async Task<IReadOnlyList<MiscellaneousReceiptReport>> MReceiptReport(string DateFrom, string DateTo)
         {
-
             var receipts = (from receiptHeader in _context.MiscellaneousReceipts
                 join receipt in _context.WarehouseReceived
                     on receiptHeader.Id equals receipt.MiscellaneousReceiptId into leftJ
                 from receipt in leftJ.DefaultIfEmpty()
-
                 where receipt.ReceivingDate >= DateTime.Parse(DateFrom) &&
                       receipt.ReceivingDate <= DateTime.Parse(DateTo) && receipt.IsActive == true &&
                       receipt.TransactionType == "MiscellaneousReceipt"
-
                 select new MiscellaneousReceiptReport
                 {
-
                     ReceiptId = receiptHeader.Id,
                     SupplierCode = receiptHeader.SupplierCode,
                     SupplierName = receiptHeader.Supplier,
@@ -296,29 +278,22 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     ExpirationDate = receipt.Expiration.ToString(),
                     TransactBy = receiptHeader.PreparedBy,
                     TransactDate = receipt.ReceivingDate.ToString()
-
                 });
 
             return await receipts.ToListAsync();
-
-
         }
 
         public async Task<IReadOnlyList<MiscellaneousIssueReport>> MIssueReport(string DateFrom, string DateTo)
         {
-
             var issues = (from issue in _context.MiscellaneousIssues
                 join issuedetails in _context.MiscellaneousIssueDetails
                     on issue.Id equals issuedetails.IssuePKey into leftJ
                 from issuedetails in leftJ.DefaultIfEmpty()
-
                 where issuedetails.PreparedDate >= DateTime.Parse(DateFrom) &&
                       issuedetails.PreparedDate <= DateTime.Parse(DateTo) && issuedetails.IsActive == true &&
                       issuedetails.IsTransact == true
-
                 select new MiscellaneousIssueReport
                 {
-
                     IssueId = issue.Id,
                     CustomerCode = issue.CustomerCode,
                     CustomerName = issue.Customer,
@@ -330,7 +305,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     ExpirationDate = issuedetails != null ? issuedetails.ExpirationDate.ToString() : null,
                     TransactBy = issue.PreparedBy,
                     TransactDate = issuedetails != null ? issuedetails.PreparedDate.ToString() : null
-
                 });
 
             return await issues.ToListAsync();
@@ -343,7 +317,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 {
                     x.ItemCode,
                     x.WarehouseId,
-
                 }).Select(x => new ItemStocks
                 {
                     ItemCode = x.Key.ItemCode,
@@ -357,7 +330,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 {
                     x.ItemCode,
                     x.WarehouseId,
-
                 }).Select(x => new ItemStocks
                 {
                     ItemCode = x.Key.ItemCode,
@@ -371,7 +343,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 {
                     x.ItemCode,
                     x.WarehouseId,
-
                 }).Select(x => new ItemStocks
                 {
                     ItemCode = x.Key.ItemCode,
@@ -385,17 +356,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     on warehouse.Id equals preparation.WarehouseId
                     into leftJ
                 from preparation in leftJ.DefaultIfEmpty()
-
                 join moveorder in moveorderOut
                     on warehouse.Id equals moveorder.WarehouseId
                     into leftJ2
                 from moveorder in leftJ2.DefaultIfEmpty()
-
                 join issue in issueOut
                     on warehouse.Id equals issue.WarehouseId
                     into leftJ3
                 from issue in leftJ3.DefaultIfEmpty()
-
                 group new
                     {
                         warehouse,
@@ -421,13 +389,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                         PreparationOut = preparation.Out != null ? preparation.Out : 0,
                         MoveOrderOut = moveorder.Out != null ? moveorder.Out : 0,
                         IssueOut = issue.Out != null ? issue.Out : 0
-
-
                     }
                 into total
-
                 orderby total.Key.ItemCode, total.Key.ExpirationDays ascending
-
                 select new WarehouseReport
                 {
                     WarehouseId = total.Key.Id,
@@ -444,19 +408,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     ExpirationDays = total.Key.ExpirationDays,
                     SupplierName = total.Key.Supplier,
                     ReceivedBy = total.Key.ReceivedBy
-
                 });
 
             return await warehouseInventory.Where(x => x.Quantity != 0)
                 .ToListAsync();
-
         }
 
         public async Task<IReadOnlyList<MoveOrderReport>> TransactedMoveOrderReport(string dateFrom, string dateTo)
         {
             DateTime fromDate = DateTime.Parse(dateFrom);
             DateTime toDate = DateTime.Parse(dateTo);
-            
+
             var orders = (from transact in _context.TransactMoveOrder
                 where transact.IsActive == true && transact.IsTransact == true &&
                       transact.PreparedDate >= fromDate && transact.PreparedDate <= toDate
@@ -464,19 +426,16 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     on transact.OrderNo equals moveorder.OrderNo into leftJ
                 from moveorder in leftJ.DefaultIfEmpty()
                 where moveorder.IsActive == true
-
                 join customer in _context.Customers
                     on moveorder.FarmCode equals customer.CustomerCode
                     into leftJ2
                 from customer in leftJ2.DefaultIfEmpty()
-
                 group new
                     {
                         transact,
                         moveorder,
                         customer
                     }
-
                     by new
                     {
                         moveorder.OrderNo,
@@ -493,10 +452,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                         DeliveryDate = transact.DeliveryDate.ToString()
                     }
                 into total
-
                 select new MoveOrderReport
                 {
-
                     OrderNo = total.Key.OrderNo,
                     CustomerName = total.Key.CustomerName,
                     CustomerCode = total.Key.CustomerCode,
@@ -516,14 +473,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
         public async Task<IReadOnlyList<CancelledOrderReport>> CancelledOrderedReports(string DateFrom, string DateTo)
         {
-
             var orders = (from ordering in _context.Orders
                 where ordering.OrderDate >= DateTime.Parse(DateFrom) && ordering.OrderDate <= DateTime.Parse(DateTo) &&
                       ordering.IsCancel == true && ordering.IsActive == false
-
                 select new CancelledOrderReport
                 {
-
                     OrderId = ordering.Id,
                     DateNeeded = ordering.DateNeeded.ToString(),
                     DateOrdered = ordering.OrderDate.ToString(),
@@ -538,7 +492,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 });
 
             return await orders.ToListAsync();
-
         }
 
         public async Task<IReadOnlyList<InventoryMovementReport>> InventoryMovementReport(string DateFrom,
@@ -551,7 +504,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new WarehouseInventory
                 {
                     ItemCode = x.Key.ItemCode,
@@ -565,7 +517,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new MoveOrderInventory
                 {
                     ItemCode = x.Key.ItemCode,
@@ -589,7 +540,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new TransformationInventory
                 {
                     ItemCode = x.Key.ItemCode,
@@ -601,7 +551,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new TransformationInventory
                 {
                     ItemCode = x.Key.ItemCode,
@@ -614,7 +563,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new IssueInventory
                 {
                     ItemCode = x.Key.ItemCode,
@@ -628,7 +576,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new IssueInventory
                 {
                     ItemCode = x.Key.ItemCode,
@@ -642,7 +589,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new ReceiptInventory
                 {
                     ItemCode = x.Key.ItemCode,
@@ -655,13 +601,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new ReceiptInventory
                 {
                     ItemCode = x.Key.ItemCode,
                     Quantity = x.Sum(x => x.ActualGood)
                 });
-
 
 
             var getTransformIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
@@ -670,7 +614,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new ReceiptInventory
                 {
                     ItemCode = x.Key.ItemCode,
@@ -683,7 +626,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new ReceiptInventory
                 {
                     ItemCode = x.Key.ItemCode,
@@ -697,7 +639,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new ReceiptInventory
                 {
                     ItemCode = x.Key.ItemCode,
@@ -710,7 +651,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new ReceiptInventory
                 {
                     ItemCode = x.Key.ItemCode,
@@ -722,12 +662,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new MoveOrderInventory
                 {
                     ItemCode = x.Key.ItemCode,
                     QuantityOrdered = x.Sum(x => x.QuantityOrdered)
-
                 });
 
 
@@ -735,7 +673,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new TransformationInventory
                 {
                     ItemCode = x.Key.ItemCode,
@@ -747,7 +684,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .GroupBy(x => new
                 {
                     x.ItemCode,
-
                 }).Select(x => new IssueInventory
                 {
                     ItemCode = x.Key.ItemCode,
@@ -759,23 +695,18 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     on warehouse.ItemCode equals preparation.ItemCode
                     into leftJ1
                 from preparation in leftJ1.DefaultIfEmpty()
-
                 join issue in getIssueOut
                     on warehouse.ItemCode equals issue.ItemCode
                     into leftJ2
                 from issue in leftJ2.DefaultIfEmpty()
-
                 join moveorder in getMoveOrderOut
                     on warehouse.ItemCode equals moveorder.ItemCode
                     into leftJ3
                 from moveorder in leftJ3.DefaultIfEmpty()
-
                 join receipt in getReceiptIn
                     on warehouse.ItemCode equals receipt.ItemCode
                     into leftJ4
                 from receipt in leftJ4.DefaultIfEmpty()
-
-
                 group new
                     {
                         warehouse,
@@ -784,21 +715,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                         receipt,
                         issue
                     }
-
                     by new
                     {
                         warehouse.ItemCode
-
                     }
                 into total
-
                 select new SOHInventory
                 {
                     ItemCode = total.Key.ItemCode,
                     SOH = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
                           total.Sum(x => x.preparation.WeighingScale == null ? 0 : x.preparation.WeighingScale) -
                           total.Sum(x => x.moveorder.QuantityOrdered == null ? 0 : x.moveorder.QuantityOrdered)
-
                 });
 
             var movementInventory = (from rawmaterial in _context.RawMaterials
@@ -806,67 +733,54 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     on rawmaterial.ItemCode equals moveorder.ItemCode
                     into leftJ
                 from moveorder in leftJ.DefaultIfEmpty()
-
                 join transformation in getTransformationByDate
                     on rawmaterial.ItemCode equals transformation.ItemCode
                     into leftJ2
                 from transformation in leftJ2.DefaultIfEmpty()
-
                 join issue in getIssueOutByDate
                     on rawmaterial.ItemCode equals issue.ItemCode
                     into leftJ3
                 from issue in leftJ3.DefaultIfEmpty()
-
                 join receive in getReceivetIn
                     on rawmaterial.ItemCode equals receive.ItemCode
                     into leftJ4
                 from receive in leftJ4.DefaultIfEmpty()
-
                 join transformIn in getTransformIn
                     on rawmaterial.ItemCode equals transformIn.ItemCode
                     into leftJ5
                 from transformIn in leftJ5.DefaultIfEmpty()
-
                 join receipt in getReceiptIn
                     on rawmaterial.ItemCode equals receipt.ItemCode
                     into leftJ6
                 from receipt in leftJ6.DefaultIfEmpty()
-
                 join SOH in getSOH
                     on rawmaterial.ItemCode equals SOH.ItemCode
                     into leftJ7
                 from SOH in leftJ7.DefaultIfEmpty()
-
                 join receivePlus in getReceivetInPlus
                     on rawmaterial.ItemCode equals receivePlus.ItemCode
                     into leftJ8
                 from receivePlus in leftJ8.DefaultIfEmpty()
-
                 join transformPlus in getTransformInPlus
                     on rawmaterial.ItemCode equals transformPlus.ItemCode
                     into leftJ9
                 from transformPlus in leftJ9.DefaultIfEmpty()
-
                 join receiptPlus in getReceiptInPlus
                     on rawmaterial.ItemCode equals receiptPlus.ItemCode
                     into leftJ10
                 from receiptPlus in leftJ10.DefaultIfEmpty()
-
                 join moveorderPlus in getMoveOrderOutByDatePlus
                     on rawmaterial.ItemCode equals moveorderPlus.ItemCode
                     into leftJ11
                 from moveorderPlus in leftJ11.DefaultIfEmpty()
-
                 join transformoutPlus in getTransformationByDatePlus
                     on rawmaterial.ItemCode equals transformoutPlus.ItemCode
                     into leftJ12
                 from transformoutPlus in leftJ12.DefaultIfEmpty()
-
                 join issuePlus in getIssueOutByDatePlus
                     on rawmaterial.ItemCode equals issuePlus.ItemCode
                     into leftJ13
                 from issuePlus in leftJ13.DefaultIfEmpty()
-
                 group new
                     {
                         rawmaterial,
@@ -902,12 +816,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                         MoveOrderPlus = moveorderPlus.QuantityOrdered != null ? moveorderPlus.QuantityOrdered : 0,
                         TransformOutPlus = transformoutPlus.WeighingScale != null ? transformoutPlus.WeighingScale : 0,
                         IssuePlus = issuePlus.Quantity != null ? issuePlus.Quantity : 0,
-
-
-
                     }
                 into total
-
                 select new InventoryMovementReport
                 {
                     ItemCode = total.Key.ItemCode,
@@ -923,14 +833,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 });
 
             return await movementInventory.ToListAsync();
-
         }
 
         public async Task<IReadOnlyList<ConsolidatedReport>> ConsolidatedReport(string dateFrom, string dateTo)
         {
             DateTime fromDate = DateTime.Parse(dateFrom);
             DateTime toDate = DateTime.Parse(dateTo);
-            
+
             var consolidatedReports = new List<ConsolidatedReport>();
             var rawMaterials = await _context.RawMaterials
                 .Select(rawMaterial => new
@@ -944,15 +853,15 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             var warehouseReceived = await _context.WarehouseReceived
                 .Where(x => x.ReceivingDate >= fromDate && x.ReceivingDate <= toDate)
                 .Select(warehouseReceived => new
-                    {
-                        warehouseReceived.PO_Number,
-                        warehouseReceived.Id,
-                        warehouseReceived.ItemCode,
-                        warehouseReceived.Uom,
-                        warehouseReceived.MiscellaneousReceiptId,
-                        warehouseReceived.UnitCost
-                    })
-                    .ToListAsync();
+                {
+                    warehouseReceived.PO_Number,
+                    warehouseReceived.Id,
+                    warehouseReceived.ItemCode,
+                    warehouseReceived.Uom,
+                    warehouseReceived.MiscellaneousReceiptId,
+                    warehouseReceived.UnitCost
+                })
+                .ToListAsync();
 
             var receivingReports = await _context.QC_Receiving
                 .Where(wr => wr.IsWareHouseReceive == true)
@@ -966,7 +875,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 })
                 .ToListAsync();
 
-            var moveOrderReports = await 
+            var moveOrderReports = await
                 (from transact in _context.TransactMoveOrder
                     where transact.IsActive == true && transact.IsTransact == true &&
                           transact.PreparedDate >= fromDate && transact.PreparedDate <= toDate
@@ -977,7 +886,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                         on moveorder.FarmCode equals customer.CustomerCode
                         into leftJ2
                     from customer in leftJ2.DefaultIfEmpty()
-                    select new 
+                    select new
                     {
                         moveorder.Id,
                         moveorder.ItemCode,
@@ -1078,32 +987,29 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 });
             }
 
-            var miscellaneousReceipts = _context.WarehouseReceived
-                .Where(x => x.IsActive == true)
-                .Join(
-                    _context.MiscellaneousReceipts.Where(x =>
-                        x.TransactionDate >= fromDate && x.TransactionDate <= toDate),
-                    wr => wr.MiscellaneousReceiptId,
-                    miscReceipt => miscReceipt.Id,
-                    (wr, miscReceipt) => new { Warehouse = wr, MiscReceipt = miscReceipt })
-                .Select(result => new ConsolidatedReport
+            var miscellaneousReceipts = await (from receiptInReports in _context.MiscellaneousReceipts
+                join warehouseRec in _context.WarehouseReceived
+                    on receiptInReports.Id equals warehouseRec.MiscellaneousReceiptId
+                where receiptInReports.IsActive
+                      && receiptInReports.TransactionDate >= fromDate
+                      && receiptInReports.TransactionDate <= toDate
+                      && warehouseRec.ReceivingDate >= fromDate
+                      && warehouseRec.ReceivingDate <= toDate
+                select new ConsolidatedReport
                 {
-                    Id = result.MiscReceipt.Id,
-                    TransactionDate = result.MiscReceipt.TransactionDate,
-                    UOM = result.Warehouse.Uom,
-                    UnitPrice = Math.Round((decimal)result.Warehouse.UnitCost, 2),
-                    ItemCode = result.Warehouse.ItemCode,
-                    ItemDescription = result.Warehouse.ItemDescription,
-                    Quantity = result.Warehouse.ActualGood,
-                    WarehouseId = result.Warehouse.Id,
+                    Id = receiptInReports.Id,
+                    TransactionDate = receiptInReports.TransactionDate,
+                    ItemCode = warehouseRec.ItemCode,
+                    ItemDescription = warehouseRec.ItemDescription,
+                    Quantity = receiptInReports.TotalQuantity,
+                    WarehouseId = warehouseRec.Id,
                     TransactionType = "Miscellaneous Receipt",
-                    CompanyCode = result.MiscReceipt.CompanyCode,
-                    CompanyName = result.MiscReceipt.CompanyName,
-                    DepartmentName = result.MiscReceipt.DepartmentName,
-                    LocationName = result.MiscReceipt.LocationName,
-                    AccountTitle = result.MiscReceipt.AccountTitles
-                })
-                .ToList();
+                    CompanyName = receiptInReports.CompanyName,
+                    CompanyCode = receiptInReports.CompanyCode,
+                    DepartmentName = receiptInReports.DepartmentName,
+                    AccountTitle = receiptInReports.AccountTitles,
+                    LocationName = receiptInReports.LocationName,
+                }).ToListAsync();
 
             var miscellaneousIssues = _context.MiscellaneousIssues
                 .Where(wr => wr.IsTransact == true)

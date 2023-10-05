@@ -24,18 +24,18 @@ namespace ELIXIR.API
 {
     public class Startup
     {
+        private readonly string _policyName = "CorsPolicy";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
-        private readonly string _policyName = "CorsPolicy";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             //     services.AddControllers()
             //.AddJsonOptions(options =>
             //{
@@ -44,46 +44,47 @@ namespace ELIXIR.API
             //});
 
             services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(AddNewChecklistQuestionCommand).Assembly));
-            services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(GetAllChecklists.GetAllChecklistsQuery).Assembly));
-            services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            services.AddMediatR(x =>
+                x.RegisterServicesFromAssemblies(typeof(GetAllChecklists.GetAllChecklistsQuery).Assembly));
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             services.AddControllers().AddJsonOptions(x =>
-             x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
             services.AddAuthentication(authOptions =>
-            {
-                authOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                authOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-           .AddJwtBearer(jwtOptions =>
-           {
-               var key = Configuration.GetValue<string>("JwtConfig:Key");
-               var keyBytes = Encoding.ASCII.GetBytes(key);
+                {
+                    authOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    authOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(jwtOptions =>
+                {
+                    var key = Configuration.GetValue<string>("JwtConfig:Key");
+                    var keyBytes = Encoding.ASCII.GetBytes(key);
 
-               jwtOptions.SaveToken = true;
-               jwtOptions.TokenValidationParameters = new TokenValidationParameters
-               {
-                   IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
-                   ValidateLifetime = true,
-                   ValidateAudience = false,
-                   ValidateIssuer = false,
-                   ClockSkew = TimeSpan.Zero
-               };
-
-           });
+                    jwtOptions.SaveToken = true;
+                    jwtOptions.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+                        ValidateLifetime = true,
+                        ValidateAudience = false,
+                        ValidateIssuer = false,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
             services.AddScoped(typeof(IUserService), typeof(UserService));
-      
+
             services.AddDbContext<StoreContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("LiveConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("LiveConnectionDevelopment")));
 
             services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.InvalidModelStateResponseFactory = actionContext =>
                 {
                     var errors = actionContext.ModelState
-                                  .Where(e => e.Value.Errors.Count > 0)
-                                  .SelectMany(x => x.Value.Errors)
-                                  .Select(x => x.ErrorMessage).ToArray();
+                        .Where(e => e.Value.Errors.Count > 0)
+                        .SelectMany(x => x.Value.Errors)
+                        .Select(x => x.ErrorMessage).ToArray();
 
                     var errorResponse = new ApiValidationError
                     {
@@ -99,20 +100,19 @@ namespace ELIXIR.API
             //    options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
             //    options.HttpsPort = 82;
             //});
-            
+
             services.AddApplicationServices();
 
             services.AddSwaggerDocumentation();
 
             services.AddCors(opt =>
             {
-                opt.AddPolicy(name : _policyName, builder =>
+                opt.AddPolicy(name: _policyName, builder =>
                 {
                     builder.AllowAnyOrigin()
-                           .AllowAnyHeader()
-                           .AllowAnyMethod();
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
                 });
-              
             });
 
             services.AddControllers();
@@ -122,9 +122,8 @@ namespace ELIXIR.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
             System.IO.Directory.SetCurrentDirectory(env.ContentRootPath);
-            
+
             app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
             app.UseHsts();

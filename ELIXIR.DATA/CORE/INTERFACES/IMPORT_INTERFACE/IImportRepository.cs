@@ -15,19 +15,19 @@ namespace ELIXIR.DATA.CORE.INTERFACES.IMPORT_INTERFACE
 {
     public interface IImportRepository
     {
-       //---PO SUMMARY--------
+        //---PO SUMMARY--------
         List<ImportPOSummary> InsertListOfPOSummary(List<ImportPOSummary> summarys);
         Task<bool> AddNewPoSummary(ImportPOSummary posumamry);
         Task<bool> ValidateExcelTemplate(IFormFile file);
         Task<bool> ValidateFileIfNull(IFormFile file);
         Task<bool> ValidateExcelPerRow(IFormFile file, int rowExcel);
         Task<bool> CheckPRNumber(string prnumber);
-        Task<bool> CheckItemCode(string rawmaterial);
+        Task<bool> CheckItemCode(string rawmaterial, string itemdescription);
         Task<bool> CheckUomCode(string uom);
         Task<bool> CheckSupplier(string supplier);
         Task<bool> ValidatePOAndItemcode(string ponumber, string itemcode);
         Task<bool> ValidatePOAndItemcodeManual(int ponumber, string itemcode);
-        Task<bool>ValidateExcelColumnNumber (string number);
+        Task<bool> ValidateExcelColumnNumber(string number);
         Task<bool> ValidateExcelColumnDecimal(string decimalnum);
         Task<bool> AddNewPORequest(ImportPOSummary posummary);
 
@@ -48,14 +48,13 @@ namespace ELIXIR.DATA.CORE.INTERFACES.IMPORT_INTERFACE
 
         //-----FORMULA-------
         List<TransformationRequirement> InsertListOfFormulaCode(List<TransformationRequirement> formulaCode);
-        Task <bool> ValidateFormulaCode(string code, string description, string version);
+        Task<bool> ValidateFormulaCode(string code, string description, string version);
         Task<bool> ValidateRawMaterialAndDescription(string itemcode, string description);
         Task<int> CheckFormulaCodeId(string code, string description, string version);
         Task<int> CheckRawMaterialId(string itemcode, string description);
         Task<bool> ValidateFormulaAndRawMaterial(int formula, int rawmaterial);
         Task<bool> ValidateExcelTemplateFormula(IFormFile file);
         Task<bool> ValidateExcelPerRowFormula(IFormFile file, int rowExcel);
-
 
 
         Task<bool> AddNewRawMaterialSummary(RawMaterial materials);
@@ -70,12 +69,11 @@ namespace ELIXIR.DATA.CORE.INTERFACES.IMPORT_INTERFACE
 
         Task<decimal> GetFormulaCodeQuantity(int id);
 
-        Task<bool> AddNewSupplierSummary(Supplier  supply);
+        Task<bool> AddNewSupplierSummary(Supplier supply);
 
 
         //Customer
 
         Task<bool> AddNewCustomers(Customer customer);
-
     }
 }

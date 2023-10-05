@@ -45,12 +45,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
             public string ProductType { get; set; }
 
 
-
             public int ChecklistType { get; set; }
             public IEnumerable<ChecklistAnswer> ChecklistAnswers { get; set; }
             public IEnumerable<ChecklistOpenFieldAnswer> ChecklistOpenFieldAnswers { get; set; }
             public IEnumerable<ChecklistProductDimension> ChecklistProductDimensions { get; set; }
-           
+
             public class ChecklistAnswer
             {
                 public int QCChecklistId { get; set; }
@@ -83,8 +82,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
             }
 
 
-
-
             public class Handler : IRequestHandler<GetChecklistByReceivingIdQuery, GetChecklistByReceivingIdResult>
             {
                 private readonly StoreContext _context;
@@ -96,21 +93,24 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
 
                 public StoreContext Context => _context;
 
-                public async Task<GetChecklistByReceivingIdResult> Handle(GetChecklistByReceivingIdQuery request, CancellationToken cancellationToken)
+                public async Task<GetChecklistByReceivingIdResult> Handle(GetChecklistByReceivingIdQuery request,
+                    CancellationToken cancellationToken)
                 {
                     var qCChecklist = await _context.QcChecklists
-                       .Include(x => x.PoReceiving)
-                       .Include(x => x.ProductType)
-                       .Include(x => x.OpenFieldAnswers)
-                            .ThenInclude(x => x.ChecklistQuestion)
-                                .ThenInclude(x => x.ChecklistType)
-                        .Include(x => x.ProductDimension)
-                            .ThenInclude(x => x.ChecklistQuestion)
-                                .ThenInclude(x => x.ChecklistType)
-                        .Include(x => x.ChecklistAnswers)
-                            .ThenInclude(x => x.ChecklistQuestion)
-                                .ThenInclude(x => x.ChecklistType)
-                   .Where(x => x.ReceivingId == request.ReceivingId).FirstOrDefaultAsync(cancellationToken) ?? throw new Exception("No receving checklist data found");
+                                          .Include(x => x.PoReceiving)
+                                          .Include(x => x.ProductType)
+                                          .Include(x => x.OpenFieldAnswers)
+                                          .ThenInclude(x => x.ChecklistQuestion)
+                                          .ThenInclude(x => x.ChecklistType)
+                                          .Include(x => x.ProductDimension)
+                                          .ThenInclude(x => x.ChecklistQuestion)
+                                          .ThenInclude(x => x.ChecklistType)
+                                          .Include(x => x.ChecklistAnswers)
+                                          .ThenInclude(x => x.ChecklistQuestions)
+                                          .ThenInclude(x => x.ChecklistType)
+                                          .Where(x => x.ReceivingId == request.ReceivingId)
+                                          .FirstOrDefaultAsync(cancellationToken) ??
+                                      throw new Exception("No receving checklist data found");
 
                     var resut = new GetChecklistByReceivingIdResult
                     {
@@ -140,43 +140,38 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                         ProductTypeId = qCChecklist.ProductTypeId,
                         ProductType = qCChecklist.ProductType.ProductTypeName,
                         ChecklistAnswers = qCChecklist.ChecklistAnswers
-                                .Select(cq => new ChecklistAnswer
-                                {
-                                    QCChecklistId = cq.Id,
-                                    ChecklistType = cq.ChecklistQuestion.ChecklistType.ChecklistType,
-                                    ChecklistQuestion= cq.ChecklistQuestion.ChecklistQuestion,
-                                    ChecklistQuestionId = cq.ChecklistQuestionId,
-                                    Status = cq.Status
-                                }),
+                            .Select(cq => new ChecklistAnswer
+                            {
+                                QCChecklistId = cq.Id,
+                                ChecklistType = cq.ChecklistQuestions.ChecklistType.ChecklistType,
+                                ChecklistQuestion = cq.ChecklistQuestions.ChecklistQuestion,
+                                ChecklistQuestionId = cq.ChecklistQuestionsId,
+                                Status = cq.Status
+                            }),
                         ChecklistProductDimensions = qCChecklist.ProductDimension
-                        .Select(ca => new ChecklistProductDimension
-                        {
-                            QCChecklistId = ca.QCChecklistId,
-                            ChecklistType = ca.ChecklistQuestion.ChecklistType.ChecklistType,
-                            ChecklistQuestionId = ca.ChecklistQuestionId,
-                            ChecklistQuestion = ca.ChecklistQuestion.ChecklistQuestion,
-                            Standard = ca.Standard,
-                            Actual = ca.Actual
-                        }),
+                            .Select(ca => new ChecklistProductDimension
+                            {
+                                QCChecklistId = ca.QCChecklistId,
+                                ChecklistType = ca.ChecklistQuestion.ChecklistType.ChecklistType,
+                                ChecklistQuestionId = ca.ChecklistQuestionId,
+                                ChecklistQuestion = ca.ChecklistQuestion.ChecklistQuestion,
+                                Standard = ca.Standard,
+                                Actual = ca.Actual
+                            }),
                         ChecklistOpenFieldAnswers = qCChecklist.OpenFieldAnswers
-                                .Select(cq => new ChecklistOpenFieldAnswer
-                                {
-                                    QCChecklistId = cq.Id,
-                                    ChecklistType = cq.ChecklistQuestion.ChecklistType.ChecklistType,
-                                    ChecklistQuestion = cq.ChecklistQuestion.ChecklistQuestion,
-                                    ChecklistQuestionId = cq.ChecklistQuestionId,
-                                    Remarks = cq.Remarks
-                                }),
+                            .Select(cq => new ChecklistOpenFieldAnswer
+                            {
+                                QCChecklistId = cq.Id,
+                                ChecklistType = cq.ChecklistQuestion.ChecklistType.ChecklistType,
+                                ChecklistQuestion = cq.ChecklistQuestion.ChecklistQuestion,
+                                ChecklistQuestionId = cq.ChecklistQuestionId,
+                                Remarks = cq.Remarks
+                            }),
                     };
 
                     return resut;
                 }
-
             }
-
         }
-    
     }
 }
-    
-

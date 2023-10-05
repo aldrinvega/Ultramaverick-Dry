@@ -20,8 +20,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 {
     public class OrderingRepository : IOrdering
     {
-        private readonly StoreContext _context;
         private readonly IHubContext<OrderHub, IOrderHub> _clients;
+        private readonly StoreContext _context;
 
         public OrderingRepository(StoreContext context, IHubContext<OrderHub, IOrderHub> clients)
         {
@@ -117,6 +117,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             var customer = _context.Customers.Select(x => new
             {
+                x.Id,
                 x.DepartmentName,
                 x.LocationName,
                 x.CustomerCode,
@@ -132,7 +133,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     on ordering.ItemCode equals warehouse.ItemCode
                     into leftJ
                 from warehouse in leftJ.DefaultIfEmpty()
-                join customers in customer on ordering.FarmCode equals customers.CustomerCode
+                join customers in customer on ordering.CustomerId equals customers.Id
                     into leftj1
                 from customers in leftj1.DefaultIfEmpty()
                 group new
@@ -1559,47 +1560,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<PagedList<MoveOrderDto>> Approvedination(UserParams userParams)
-        {
-            var orders = _context.MoveOrders.GroupBy(x => new
-                {
-                    x.OrderNo,
-                    x.FarmName,
-                    x.FarmCode,
-                    x.FarmType,
-                    x.PreparedDate,
-                    x.IsApprove,
-                    x.DeliveryStatus,
-                    x.IsPrepared,
-                    x.IsReject,
-                    x.ApproveDateTempo,
-                    x.IsPrint,
-                    x.IsTransact,
-
-                    x.IsActive,
-                }).Where(x => x.Key.IsApprove == true)
-                .Where(x => x.Key.DeliveryStatus != null)
-                .Where(x => x.Key.IsReject != true)
-                .Where(X => X.Key.IsActive == true)
-                .Select(x => new MoveOrderDto
-                {
-                    OrderNo = x.Key.OrderNo,
-                    FarmName = x.Key.FarmName,
-                    FarmCode = x.Key.FarmCode,
-                    Category = x.Key.FarmType,
-                    Quantity = x.Sum(y => y.QuantityOrdered),
-                    PreparedDate = x.Key.PreparedDate.ToString(),
-                    DeliveryStatus = x.Key.DeliveryStatus,
-                    IsApprove = x.Key.IsApprove != null,
-                    IsPrepared = x.Key.IsPrepared,
-                    ApprovedDate = x.Key.ApproveDateTempo.ToString(),
-                    IsPrint = x.Key.IsPrint != null,
-                    IsTransact = x.Key.IsTransact,
-                }).OrderBy(x => x.PreparedDate);
-
-            return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
-        }
-
         public async Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPaginationOrig(UserParams userParams, string search)
         {
             var orders = _context.MoveOrders
@@ -2537,6 +2497,47 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 .FirstOrDefaultAsync();
 
             return existing != null;
+        }
+
+        public async Task<PagedList<MoveOrderDto>> Approvedination(UserParams userParams)
+        {
+            var orders = _context.MoveOrders.GroupBy(x => new
+                {
+                    x.OrderNo,
+                    x.FarmName,
+                    x.FarmCode,
+                    x.FarmType,
+                    x.PreparedDate,
+                    x.IsApprove,
+                    x.DeliveryStatus,
+                    x.IsPrepared,
+                    x.IsReject,
+                    x.ApproveDateTempo,
+                    x.IsPrint,
+                    x.IsTransact,
+
+                    x.IsActive,
+                }).Where(x => x.Key.IsApprove == true)
+                .Where(x => x.Key.DeliveryStatus != null)
+                .Where(x => x.Key.IsReject != true)
+                .Where(X => X.Key.IsActive == true)
+                .Select(x => new MoveOrderDto
+                {
+                    OrderNo = x.Key.OrderNo,
+                    FarmName = x.Key.FarmName,
+                    FarmCode = x.Key.FarmCode,
+                    Category = x.Key.FarmType,
+                    Quantity = x.Sum(y => y.QuantityOrdered),
+                    PreparedDate = x.Key.PreparedDate.ToString(),
+                    DeliveryStatus = x.Key.DeliveryStatus,
+                    IsApprove = x.Key.IsApprove != null,
+                    IsPrepared = x.Key.IsPrepared,
+                    ApprovedDate = x.Key.ApproveDateTempo.ToString(),
+                    IsPrint = x.Key.IsPrint != null,
+                    IsTransact = x.Key.IsTransact,
+                }).OrderBy(x => x.PreparedDate);
+
+            return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
     }
 }

@@ -18,9 +18,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
             public IList<ChecklistAnswer> ChecklistAnswers { get; set; }
             public IList<ChecklistProductDimensionCollection> ProductDimensions { get; set; }
 
-           /* public ReviewVerificationLogs ReviewVerificationLog { get; set; }
-            public ChecklistCompliances ChecklistCompliance { get; set; }
-            public ChecklistOtherObservation ChecklistOtherObservations { get; set; }*/
+            /* public ReviewVerificationLogs ReviewVerificationLog { get; set; }
+             public ChecklistCompliances ChecklistCompliance { get; set; }
+             public ChecklistOtherObservation ChecklistOtherObservations { get; set; }*/
 
             public class ChecklistAnswer
             {
@@ -90,7 +90,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                     var checklistAnswers = new ChecklistAnswers
                     {
                         QCChecklistId = qcChecklist.Id,
-                        ChecklistQuestionId = checklistAnswer.ChecklistQuestionId,
+                        ChecklistQuestionsId = checklistAnswer.ChecklistQuestionId,
                         Status = checklistAnswer.Status
                     };
 
@@ -105,7 +105,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
                         ChecklistQuestionId = openFieldAnswer.ChecklistQuestionId,
                         Remarks = openFieldAnswer.Remarks,
                     };
-                    
+
                     await _context.QChecklistOpenFieldAnswers.AddAsync(checklistOpenFieldAnswer, cancellationToken);
                 }
 
@@ -121,39 +121,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
 
                     await _context.QChecklistProductDimensions.AddAsync(checklistProductDimension, cancellationToken);
                 }
-
-               /* var reviewVerificationLog = new ChecklistReviewVerificationLog
-                {
-                    QCChecklistId = qcChecklist.Id,
-                    DispositionId = request.ReviewVerificationLog.DispositionId,
-                    QtyAccepted = request.ReviewVerificationLog.QtyAccepted,
-                    QtyRejected = request.ReviewVerificationLog.QtyRejected,
-                    MonitoredBy = request.ReviewVerificationLog.MonitoredBy,
-                    ReviewedBy = request.ReviewVerificationLog.ReviewedBy,
-                    VerifiedBy = request.ReviewVerificationLog.VerifiedBy,
-                    NotedBy = request.ReviewVerificationLog.NotedBy,
-                };
-
-                await _context.ChecklistReviewVerificationLogs.AddAsync(reviewVerificationLog, cancellationToken);
-
-
-                var checklistCompliance = new ChecklistCompliance
-                {
-                    QCChecklistId = qcChecklist.Id,
-                    Compliance = request.ChecklistCompliance.Compliance,
-                    Description = request.ChecklistCompliance.ComplianceDescription,
-                    RootCause = request.ChecklistCompliance.RootCause,
-                };
-
-                await _context.ChecklistCompliances.AddAsync(checklistCompliance, cancellationToken);
-
-                var checklistOtherObservation = new ChecklistOtherObservation
-                {
-                    QCChecklistId = qcChecklist.Id,
-                    Observation = request.ChecklistOtherObservations.Observation,
-                };
-
-                await _context.ChecklistOtherObservations.AddAsync(checklistOtherObservation, cancellationToken);*/
 
                 await _context.SaveChangesAsync(cancellationToken);
 
