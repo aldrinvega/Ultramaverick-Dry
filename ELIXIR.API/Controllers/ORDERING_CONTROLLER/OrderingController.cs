@@ -588,13 +588,14 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [HttpGet]
         [Route("ApprovedMoveOrderPaginationOrig")]
         public async Task<ActionResult<IEnumerable<MoveOrderDto>>> ApprovedMoveOrderPaginationOrig(
-            [FromQuery] UserParams userParams, [FromQuery] string search)
+            [FromQuery] UserParams userParams, [FromQuery] string search /*string dateFrom, string dateTo*/)
         {
-            if (search == null)
+            if (search == null /*&& dateFrom == null && dateTo == null*/)
 
                 return await ApprovedMoveOrderPagination(userParams);
 
-            var moveorder = await _unitOfWork.Order.ApprovedMoveOrderPaginationOrig(userParams, search);
+            var moveorder =
+                await _unitOfWork.Order.ApprovedMoveOrderPaginationOrig(userParams, search /*, dateFrom, dateTo*/);
 
             Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount,
                 moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);

@@ -10,6 +10,7 @@ using System.Formats.Asn1;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 {
@@ -1039,6 +1040,51 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             consolidatedReports.AddRange(miscellaneousIssues);
 
             return consolidatedReports;
+        }
+
+        public async Task<IReadOnlyList<MoveOrderDto>> ApprovedMoveOrderReport(string dateFrom, string dateTo)
+        {
+            DateTime toDate = DateTime.Parse(dateTo);
+            DateTime fromDate = DateTime.Parse(dateFrom);
+
+            var orders = _context.MoveOrders
+                .Where(x => x.ApproveDateTempo >= fromDate && x.ApproveDateTempo <= toDate)
+                .Where(X => X.IsActive == true)
+                .GroupBy(x => new
+                {
+                    x.OrderNo,
+                    x.FarmName,
+                    x.FarmCode,
+                    x.FarmType,
+                    x.PreparedDate,
+                    x.IsApprove,
+                    x.DeliveryStatus,
+                    x.IsPrepared,
+                    x.IsReject,
+                    x.ApproveDateTempo,
+                    x.IsPrint,
+                    x.IsTransact
+                })
+                .Where(x => x.Key.IsApprove == true)
+                .Where(x => x.Key.DeliveryStatus != null)
+                .Where(x => x.Key.IsReject != true)
+                .Select(x => new MoveOrderDto
+                {
+                    OrderNo = x.Key.OrderNo,
+                    FarmName = x.Key.FarmName,
+                    FarmCode = x.Key.FarmCode,
+                    Category = x.Key.FarmType,
+                    Quantity = x.Sum(y => y.QuantityOrdered),
+                    PreparedDate = x.Key.PreparedDate.ToString(),
+                    DeliveryStatus = x.Key.DeliveryStatus,
+                    IsApprove = x.Key.IsApprove != null,
+                    IsPrepared = x.Key.IsPrepared,
+                    ApprovedDate = x.Key.ApproveDateTempo.ToString(),
+                    IsPrint = x.Key.IsPrint != null,
+                    IsTransact = x.Key.IsTransact
+                });
+
+            return await orders.ToListAsync();
         }
     }
 }
