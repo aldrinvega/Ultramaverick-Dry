@@ -14,7 +14,6 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 {
     public interface IOrdering
     {
-
         Task<IReadOnlyList<OrderDto>> GetAllListOfOrders(string farms);
         Task<bool> EditQuantityOrder(Ordering orders);
         Task<bool> SchedulePreparedDate(Ordering orders);
@@ -22,7 +21,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<bool> ApprovePreparedDate(List<Ordering> orders);
         Task<bool> RejectPreparedDate(List<Ordering> orders);
         Task<bool> ValidateNewOrders(Ordering orders);
-        
+
         Task<IReadOnlyList<OrderDto>> OrderSummary(string DateFrom, string DateTo);
         Task<bool> ValidateCustomerName(Ordering orders);
         Task<bool> ValidateCustomerCode(Ordering orders);
@@ -37,6 +36,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 
         Task<PagedList<CustomersForMoveOrderDTO>> GetAllListForMoveOrderPagination(UserParams userParams,
             string dateFrom, string dateTo);
+
         Task<IReadOnlyList<TotalListOfPreparedDateDTO>> TotalListOfApprovedPreparedDate(string farm);
         Task<IReadOnlyList<OrderDto>> DetailedListOfOrders(string farm);
         Task<IReadOnlyList<OrderDto>> GetAllListForApprovalOfSchedule();
@@ -59,7 +59,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 
         Task<PagedList<MoveOrderDto>> ForApprovalMoveOrderPaginationOrig(UserParams userParams, string search);
 
-        Task<IReadOnlyList<MoveOrderDto>>ViewMoveOrderForApproval (int orderid);
+        Task<IReadOnlyList<MoveOrderDto>> MultiplePrintingForMOS(List<int> orderIds);
+        Task<IReadOnlyList<MoveOrderDto>> ViewMoveOrderForApproval(int orderid);
         Task<IReadOnlyList<MoveOrderDto>> ViewMoveOrderForApprovalOriginal(int orderid);
 
         Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPagination(UserParams userParams);
@@ -89,9 +90,6 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<bool> TransanctListOfMoveOrders(TransactMoveOrder transact);
 
 
-
-
-
         //-----------------Notifaction---------------------
         Task<IReadOnlyList<OrderDto>> GetOrdersForNotification();
         Task<IReadOnlyList<OrderDto>> GetMoveOrdersForNotification();
@@ -113,8 +111,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<bool> ValidateIfForAllocation(List<Ordering> orders);
         Task<bool> CancelForPendingAllocation(string customer);
         Task<bool> ManualAllocationForOrders(List<ManualAllocation> manualAllocations);
-        
-        
+
+
         //Orders
         Task<bool> AddNewOrders(Ordering[] orders);
     }

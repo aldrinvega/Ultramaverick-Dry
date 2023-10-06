@@ -6,17 +6,19 @@ using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.INTERFACES.ORDER_HUB;
 using ELIXIR.DATA.SERVICES;
 using Microsoft.AspNetCore.SignalR;
+
 namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 {
     [ApiController]
     public class OrderingController : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IHubContext<OrderHub, IOrderHub> _hub;
+        private readonly IUnitOfWork _unitOfWork;
 
         public OrderingController(IUnitOfWork unitofwork, IHubContext<OrderHub, IOrderHub> hub)
         {
@@ -36,7 +38,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("EditOrderQuantity")]
         public async Task<IActionResult> EditOrderQuantity([FromBody] Ordering order)
         {
-
             var result = await _unitOfWork.Order.EditQuantityOrder(order);
             if (result == false)
                 return BadRequest("Quantity must not transcend the value of allocated quantity!");
@@ -48,7 +49,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("SchedulePreparedOrderedDate")]
         public async Task<IActionResult> SchedulePreparedOrderedDate([FromBody] Ordering[] order)
         {
-
             var generate = new GenerateOrderNo
             {
                 IsActive = true
@@ -59,11 +59,9 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             foreach (Ordering items in order)
             {
-
                 items.OrderNoPKey = generate.Id;
 
                 await _unitOfWork.Order.SchedulePreparedDate(items);
-
             }
 
             await _unitOfWork.CompleteAsync();
@@ -85,7 +83,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("RejectPreparedDate")]
         public async Task<IActionResult> RejectPreparedDate([FromBody] List<Ordering> order)
         {
-
             await _unitOfWork.Order.RejectPreparedDate(order);
             await _unitOfWork.CompleteAsync();
 
@@ -96,7 +93,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("GetAllListofPreparedDate")]
         public async Task<IActionResult> GetAllListofPreparedDate()
         {
-
             await _unitOfWork.Order.GetAllListOfPreparedDate();
             await _unitOfWork.CompleteAsync();
 
@@ -107,18 +103,15 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("OrderSummary")]
         public async Task<IActionResult> OrderSummary([FromQuery] string dateFrom, [FromQuery] string dateTo)
         {
-
             var orders = await _unitOfWork.Order.OrderSummary(dateFrom, dateTo);
 
             return Ok(orders);
-
         }
 
         [HttpPost]
         [Route("ValidateNewOrders")]
         public async Task<IActionResult> ValidateNewOrders([FromBody] Ordering[] order)
         {
-
             List<Ordering> notExistFarmName = new List<Ordering>();
             List<Ordering> notExistFarmCode = new List<Ordering>();
             List<Ordering> notExistRawMats = new List<Ordering>();
@@ -136,7 +129,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 var validateRawMaterial = await _unitOfWork.Order.ValidateRawMaterial(items);
                 var validateUom = await _unitOfWork.Order.ValidateUom(items);
                 // var validateDateNeeded = await _unitOfWork.Order.ValidateOrderAndDateNeeded(items);
-               
+
 
                 if (validateDuplicate == false)
                 {
@@ -166,11 +159,12 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 //     previousdateNeeded.Add(items);
                 // }
 
-                else 
+                else
                     filteredOrders.Add(items);
+
                 orderList.Add(items);
 
-                
+
                 await _unitOfWork.Order.ValidateNewOrders(items);
             }
 
@@ -184,7 +178,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 notExistRawMats,
                 notExistUom,
                 previousdateNeeded
-
             };
 
             if (notExistFarmName.Count == 0 && notExistFarmCode.Count == 0 && notExistRawMats.Count == 0
@@ -198,7 +191,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             }
 
             return BadRequest(resultList);
-
         }
 
         [HttpPost]
@@ -214,7 +206,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetAllListOfOrdersPagination(
             [FromQuery] UserParams userParams)
         {
-
             var orders = await _unitOfWork.Order.GetAllListofOrdersPagination(userParams);
 
             Response.AddPaginationHeader(orders.CurrentPage, orders.PageSize, orders.TotalCount, orders.TotalPages,
@@ -239,7 +230,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("CancelOrders")]
         public async Task<IActionResult> CancelOrders([FromBody] Ordering[] orders)
         {
-
             var validate = await _unitOfWork.Order.CancelOrders(orders);
 
             if (validate == false)
@@ -248,25 +238,21 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             await _unitOfWork.CompleteAsync();
 
             return Ok("Successfully cancel orders");
-
         }
 
         [HttpGet]
         [Route("GetAllListOfCancelledOrders")]
         public async Task<IActionResult> GetAllListOfCancelledOrders()
         {
-
             var orders = await _unitOfWork.Order.GetAllListOfCancelledOrders();
 
             return Ok(orders);
-
         }
 
         [HttpPut]
         [Route("ReturnCancelledOrders")]
         public async Task<IActionResult> ReturnCancelledOrders([FromBody] Ordering orders)
         {
-
             var validate = await _unitOfWork.Order.ReturnCancellOrdersInList(orders);
 
             if (validate == false)
@@ -275,7 +261,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             await _unitOfWork.CompleteAsync();
 
             return Ok("Successfully return orders");
-
         }
 
         [HttpGet]
@@ -283,7 +268,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetAllListForMoveOrderPagination(
             [FromQuery] UserParams userParams, [FromQuery] string dateTo, string dateFrom)
         {
-
             var orders = await _unitOfWork.Order.GetAllListForMoveOrderPagination(userParams, dateFrom, dateTo);
 
             Response.AddPaginationHeader(orders.CurrentPage, orders.PageSize, orders.TotalCount, orders.TotalPages,
@@ -316,52 +300,43 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("DetailedListOfOrders")]
         public async Task<IActionResult> DetailedListOfOrders([FromQuery] string farm)
         {
-
             var orders = await _unitOfWork.Order.DetailedListOfOrders(farm);
 
             return Ok(orders);
-
         }
 
         [HttpGet]
         [Route("GetAllListForScheduleApproval")]
         public async Task<IActionResult> GetAllListForScheduleApproval()
         {
-
             var orders = await _unitOfWork.Order.GetAllListForApprovalOfSchedule();
 
             return Ok(orders);
-
         }
 
         [HttpGet]
         [Route("GetAllOrdersForScheduleApproval")]
         public async Task<IActionResult> GetAllOrdersForScheduleApproval([FromQuery] int id)
         {
-
             var orders = await _unitOfWork.Order.GetAllOrdersForScheduleApproval(id);
 
             return Ok(orders);
-
         }
-        
+
         [HttpGet]
         [Route("GetAllOutOfStockByItemCodeAndOrderDate")]
         public async Task<IActionResult> GetAllOutOfStockByItemCodeAndOrderDate([FromQuery] string itemcode,
             [FromQuery] string orderdate)
         {
-
             var orders = await _unitOfWork.Order.GetAllOutOfStockByItemCodeAndOrderDate(itemcode, orderdate);
 
             return Ok(orders);
-
         }
-        
+
         [HttpPost]
         [Route("PrepareItemsForMoveOrder")]
         public async Task<IActionResult> PrepareItemsForMoveOrder([FromBody] MoveOrder order)
         {
-
             var details = await _unitOfWork.Order.GetMoveOrderDetailsForMoveOrder(order.OrderNoPKey);
 
             order.OrderNoPKey = details.Id;
@@ -380,9 +355,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             await _unitOfWork.Order.PrepareItemForMoveOrder(order);
             await _unitOfWork.CompleteAsync();
-            
-            return Ok(order);
 
+            return Ok(order);
         }
 
 
@@ -415,36 +389,29 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("ListOfPreparedItemsForMoveOrder")]
         public async Task<IActionResult> ListOfPreparedItemsForMoveOrder([FromQuery] int id)
         {
-
             var orders = await _unitOfWork.Order.ListOfPreparedItemsForMoveOrder(id);
 
             return Ok(orders);
-
         }
 
         [HttpPut]
         [Route("CancelPreparedItems")]
         public async Task<IActionResult> CancelPreparedItems([FromBody] MoveOrder moveorder)
         {
-
             await _unitOfWork.Order.CancelMoveOrder(moveorder);
             await _unitOfWork.CompleteAsync();
 
             return Ok("Successfully cancel prepared items");
-
         }
-       
+
 
         [HttpPut]
         [Route("AddPlateNumberInMoveOrder")]
         public async Task<IActionResult> AddPlateNumberInMoveOrder([FromBody] Ordering[] order)
         {
-
             foreach (Ordering items in order)
             {
-
                 await _unitOfWork.Order.AddPlateNumberInMoveOrder(items);
-
             }
 
             await _unitOfWork.CompleteAsync();
@@ -454,14 +421,11 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpPut]
         [Route("AddDeliveryStatus")]
-        public async Task<IActionResult> AddDeliveryStatus([FromBody]OrderDto[] order )
+        public async Task<IActionResult> AddDeliveryStatus([FromBody] OrderDto[] order)
         {
-
             foreach (OrderDto items in order)
             {
-
                 await _unitOfWork.Order.AddDeliveryStatus(items);
-
             }
 
             await _unitOfWork.CompleteAsync();
@@ -473,7 +437,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("ApproveListOfMoveOrder")]
         public async Task<IActionResult> ApproveListOfMoveOrder([FromBody] MoveOrder[] moveorder)
         {
-
             await _unitOfWork.Order.ApprovalForMoveOrder(moveorder);
             await _unitOfWork.CompleteAsync();
 
@@ -484,7 +447,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("RejectListOfMoveOrder")]
         public async Task<IActionResult> RejectListOfMoveOrder([FromBody] MoveOrder moveorder)
         {
-
             await _unitOfWork.Order.RejectForMoveOrder(moveorder);
             await _unitOfWork.CompleteAsync();
 
@@ -495,7 +457,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("RejectApproveListOfMoveOrder")]
         public async Task<IActionResult> RejectApproveListOfMoveOrder([FromBody] MoveOrder moveorder)
         {
-
             await _unitOfWork.Order.RejectApproveMoveOrder(moveorder);
             await _unitOfWork.CompleteAsync();
 
@@ -506,7 +467,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("ReturnMoveOrderForApproval")]
         public async Task<IActionResult> ReturnMoveOrderForApproval([FromBody] MoveOrder moveorder)
         {
-
             await _unitOfWork.Order.ReturnMoveOrderForApproval(moveorder);
             await _unitOfWork.CompleteAsync();
 
@@ -521,7 +481,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             await _unitOfWork.Order.UpdatePrintStatus(moveorder);
             return Ok(moveorder);
         }
-        
+
         [HttpGet]
         [Route("GetAllForApprovalMoveOrderPagination")]
         public async Task<ActionResult<IEnumerable<MoveOrderDto>>> GetAllForApprovalMoveOrderPagination(
@@ -551,7 +511,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         public async Task<ActionResult<IEnumerable<MoveOrderDto>>> GetAllForApprovalMoveOrderPaginationOrig(
             [FromQuery] UserParams userParams, [FromQuery] string search)
         {
-
             if (search == null)
 
                 return await GetAllForApprovalMoveOrderPagination(userParams);
@@ -577,6 +536,17 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
 
         [HttpGet]
+        [Route("PrintMultipleMoveOrderSlip")]
+        public async Task<IActionResult> PrintMultipleMoveOrderSlip([FromQuery] List<int> orderIds)
+        {
+            if (orderIds == null || !orderIds.Any())
+                return BadRequest("No order IDs provided");
+
+            var orders = await _unitOfWork.Order.MultiplePrintingForMOS(orderIds);
+            return Ok(orders);
+        }
+
+        [HttpGet]
         [Route("ViewMoveOrderForApproval")]
         public async Task<IActionResult> ViewMoveOrderForApproval([FromQuery] int id)
         {
@@ -589,7 +559,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             var order = await _unitOfWork.Order.ViewMoveOrderForApprovalOriginal(id);
             return Ok(order);
-
         }
 
         [HttpGet]
@@ -621,7 +590,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         public async Task<ActionResult<IEnumerable<MoveOrderDto>>> ApprovedMoveOrderPaginationOrig(
             [FromQuery] UserParams userParams, [FromQuery] string search)
         {
-
             if (search == null)
 
                 return await ApprovedMoveOrderPagination(userParams);
@@ -675,7 +643,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         public async Task<ActionResult<IEnumerable<MoveOrderDto>>> RejectedMoveOrderPaginationOrig(
             [FromQuery] UserParams userParams, [FromQuery] string search)
         {
-
             if (search == null)
 
                 return await RejectedMoveOrderPagination(userParams);
@@ -703,35 +670,29 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("GetAllApprovedMoveOrder")]
         public async Task<IActionResult> GetAllApprovedMoveOrder([FromQuery] int id)
         {
-
             var orders = await _unitOfWork.Order.GetAllApprovedMoveOrder(id);
 
             return Ok(orders);
-
         }
 
         [HttpPut]
         [Route("CancelOrdersInMoveOrder")]
         public async Task<IActionResult> CancelOrdersInMoveOrder([FromBody] Ordering order)
         {
-
             await _unitOfWork.Order.CancelControlInMoveOrder(order);
 
             await _unitOfWork.CompleteAsync();
 
             return Ok("Successfully cancel orders");
-
         }
 
         [HttpGet]
         [Route("GetAllApprovedOrderCalendar")]
         public async Task<IActionResult> GetAllApprovedOrderCalendar()
         {
-
             var orders = await _unitOfWork.Order.GetAllApprovedOrdersForCalendar();
 
             return Ok(orders);
-
         }
 
         //------------------TRANSACT MOVE ORDER-------------------------
@@ -740,32 +701,26 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("GetTotalListForMoveOrder")]
         public async Task<IActionResult> GetTotalListForMoveOrder([FromQuery] bool status)
         {
-
             var orders = await _unitOfWork.Order.TotalListForTransactMoveOrder(status);
 
             return Ok(orders);
-
         }
 
         [HttpGet]
         [Route("ListOfMoveOrdersForTransact")]
         public async Task<IActionResult> ListOfMoveOrdersForTransact([FromQuery] int orderid)
         {
-
             var orders = await _unitOfWork.Order.ListOfMoveOrdersForTransact(orderid);
 
             return Ok(orders);
-
         }
 
         [HttpPost]
         [Route("TransactListOfMoveOrders")]
         public async Task<IActionResult> TransactListOfMoveOrders([FromBody] TransactMoveOrder[] transact)
         {
-
             foreach (TransactMoveOrder items in transact)
             {
-
                 items.IsActive = true;
                 items.IsTransact = true;
                 items.PreparedDate = DateTime.Now;
@@ -776,7 +731,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             await _unitOfWork.CompleteAsync();
 
             return Ok(transact);
-
         }
 
         ////NEW METHODS////
@@ -785,7 +739,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("SetBeingPrepared")]
         public async Task<IActionResult> SetBeingPrepared([FromBody] Ordering[] moveOrders)
         {
-            foreach(Ordering item in moveOrders)
+            foreach (Ordering item in moveOrders)
             {
                 var result = await _unitOfWork.Order.SetBeingPrepared(item);
 
@@ -796,9 +750,8 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                     return Ok();
                 }
             }
-           
-            return new JsonResult("Someone is already preparing!");
 
+            return new JsonResult("Someone is already preparing!");
         }
 
         [HttpPost]
@@ -807,7 +760,6 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         {
             foreach (Ordering item in orderNos)
             {
-
                 var result = await _unitOfWork.Order.UnsetBeingPrepared(item);
 
                 if (result)
@@ -829,12 +781,12 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             await _unitOfWork.CompleteAsync();
             return Ok(orders);
         }
+
         [HttpGet]
         [Route("GetAllListOfOrdersForAllocationPagination")]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetAllListOfOrdersForAllocationPagination(
             [FromQuery] UserParams userParams)
         {
-
             var orders = await _unitOfWork.Order.GetAllListofOrdersForAllocationPagination(userParams);
 
             Response.AddPaginationHeader(orders.CurrentPage, orders.PageSize, orders.TotalCount, orders.TotalPages,
@@ -853,14 +805,13 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             return Ok(orderResult);
         }
+
         [HttpGet("GetAllListofOrdersForAllocation")]
         public async Task<IActionResult> GetAllListofOrdersForAllocation([FromQuery] string itemCode)
         {
-
             var orders = await _unitOfWork.Order.GetAllListofOrdersAllocation(itemCode);
 
             return Ok(orders);
-
         }
 
         [HttpPost("CancelForPendingAllocation")]
@@ -870,32 +821,31 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
             if (!order)
                 return BadRequest("Something went wrong");
-            
+
             return Ok();
         }
-        
+
         //Checklist
-        
+
         //[HttpGet("GetAllChecklistByPoSummaryId")]
-        
+
         //public async Task<IActionResult> GetAllChecklistByPoSummaryId()
         //{
         //    var checklist = await _unitOfWork.QcChecklist.GetAllChecklist();
-        
+
         //    if (checklist == null)
         //        return BadRequest("No Checklist Found");
         //    return Ok(checklist);
         //}
 
         [HttpPut("ManualAllocation")]
-
         public async Task<IActionResult> ManualAllocateOrders(List<ManualAllocation> order)
         {
             var isSuccess = await _unitOfWork.Order.ManualAllocationForOrders(order);
             await _unitOfWork.CompleteAsync();
-            if(isSuccess)
+            if (isSuccess)
                 return Ok("Manual Allocation Complete");
-            
+
             return new JsonResult("Something Wrong");
         }
 

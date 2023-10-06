@@ -1422,6 +1422,29 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
 
+        public async Task<IReadOnlyList<MoveOrderDto>> MultiplePrintingForMOS(List<int> orderIds)
+        {
+            var orders = _context.MoveOrders.Where(x => x.IsActive == true && orderIds.Contains(x.OrderNo))
+                .Select(x => new MoveOrderDto
+                {
+                    Id = x.Id,
+                    OrderNo = x.OrderNo,
+                    BarcodeNo = x.WarehouseId,
+                    ItemCode = x.ItemCode,
+                    ItemDescription = x.ItemDescription,
+                    Uom = x.Uom,
+                    FarmName = x.FarmName,
+                    ApprovedDate = x.ApprovedDate.ToString(),
+                    Quantity = x.QuantityOrdered,
+                    Expiration = x.ExpirationDate.ToString(),
+                    DeliveryStatus = x.DeliveryStatus,
+                    PreparedBy = x.PreparedBy,
+                    CheckedBy = x.CheckedBy
+                });
+
+            return await orders.ToListAsync();
+        }
+
         public async Task<IReadOnlyList<MoveOrderDto>> ViewMoveOrderForApproval(int orderid)
         {
             /*var unitCost = _context.POSummary
