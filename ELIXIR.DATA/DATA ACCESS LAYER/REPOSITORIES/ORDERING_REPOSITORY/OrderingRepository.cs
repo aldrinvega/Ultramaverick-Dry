@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using ELIXIR.DATA.SERVICES;
 using Microsoft.AspNetCore.SignalR;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
-using ELIXIR.DATA.DTOs.REPORT_DTOs;
 using ELIXIR.DATA.CORE.INTERFACES.ORDER_HUB;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
@@ -1422,13 +1421,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<IReadOnlyList<MoveOrderDto>> MultiplePrintingForMOS(List<int> orderIds)
+        public async Task<IReadOnlyList<MultiplePrintingDTO>> MultiplePrintingForMOS(List<int> orderIds)
         {
-            var orders = _context.MoveOrders.Where(x => x.IsActive == true && orderIds.Contains(x.OrderNo))
-                .Select(x => new MoveOrderDto
+            var moveOrdersList = await _context.MoveOrders
+                .Where(x => x.IsActive && orderIds.Contains(x.OrderNo))
+                .ToListAsync();
+
+            var groups = moveOrdersList
+                .GroupBy(x => x.OrderNo);
+
+            var result = new List<MultiplePrintingDTO>();
+
+            foreach (var group in groups)
+            {
+                var orderList = group.Select(x => new MultiplePrintingDTO.Order
                 {
-                    Id = x.Id,
-                    OrderNo = x.OrderNo,
                     BarcodeNo = x.WarehouseId,
                     ItemCode = x.ItemCode,
                     ItemDescription = x.ItemDescription,
@@ -1442,7 +1449,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     CheckedBy = x.CheckedBy
                 });
 
-            return await orders.ToListAsync();
+                var dto = new MultiplePrintingDTO
+                {
+                    OrderNo = group.Key,
+                    Orders = orderList
+                };
+
+                result.Add(dto);
+            }
+
+
+            return result;
         }
 
         public async Task<IReadOnlyList<MoveOrderDto>> ViewMoveOrderForApproval(int orderid)
