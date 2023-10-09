@@ -8,19 +8,13 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs
 {
     public class MRPDto
     {
-
         public string ItemCode { get; set; }
         public string ItemDescription { get; set; }
         public string ItemCategory { get; set; }
         public string Uom { get; set; }
-        public decimal? Price { get; set; }
+        public decimal? WeightedAverageUnitCost { get; set; }
 
-        public decimal? AvgUnitCost
-        {
-            get;
-            set;
-        }
-
+        public decimal? TotalCost { get; set; }
         public decimal SOH { get; set; }
         public decimal Reserve { get; set; }
         public decimal BufferLevel { get; set; }
@@ -28,30 +22,9 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs
         public decimal ReceiptIn { get; set; }
         public decimal MoveOrderOut { get; set; }
         public decimal IssueOut { get; set; }
-        public decimal QCReceiving { get; set; }
-        public decimal? TotalPrice { get; set; }
-        public decimal TotalPrice1 { get; set; }
         public decimal SuggestedPo { get; set; }
         public decimal AverageIssuance { get; set; }
         public decimal DaysLevel { get; set; }
-
-        public string LastUsed { get; set; }
-
         public decimal ReserveUsage { get; set; }
-
-        public decimal TransformFrom { get; set; }
-        public decimal TransformTo { get; set; }
-
-        public decimal? UnitCost
-        {
-            get;
-            set;
-        }
-
-        public decimal? TotalCost
-        {
-            get;
-            set;
-        }
     }
 }

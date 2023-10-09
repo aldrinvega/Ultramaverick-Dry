@@ -450,8 +450,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                         Reserve = Reserve.Reserve != null ? Reserve.Reserve : 0,
                         AverageIssuance = averageissuance.ActualGood != null ? averageissuance.ActualGood : 0,
                         ReserveUsage = reserveusage.Reserve != null ? reserveusage.Reserve : 0,
-                        TransformTo = transformto.Quantity != null ? transformto.Quantity : 0,
-                        TransformFrom = transformfrom.WeighingScale != null ? transformfrom.WeighingScale : 0,
                     }
                 into total
                 select new MRPDto
@@ -461,12 +459,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     Uom = total.Key.UOM_Code,
                     ItemCategory = total.Key.ItemCategoryName,
                     BufferLevel = total.Key.BufferLevel,
-                    ReceiveIn = total.Key.WarehouseActualGood,
+                    ReceiveIn = total.Key.QcReceiving,
                     MoveOrderOut = total.Key.MoveOrderOut,
-                    QCReceiving = total.Key.QcReceiving,
+                    /*QCReceiving = total.Key.QcReceiving,*/
                     ReceiptIn = total.Key.ReceiptIn,
                     IssueOut = total.Key.IssueOut,
-                    TotalPrice = Math.Round(Convert.ToDecimal(total.Key.TotalPrice), 2),
                     SOH = total.Key.SOH - total.Key.IssueOut,
                     Reserve = total.Key.Reserve - total.Key.IssueOut,
                     SuggestedPo = total.Key.SuggestedPo,
@@ -474,9 +471,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     DaysLevel = Math.Round(
                         Convert.ToDecimal(total.Key.Reserve /
                                           (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)), 2),
-                    ReserveUsage = total.Key.ReserveUsage,
-                    TransformFrom = total.Key.TransformFrom,
-                    TransformTo = total.Key.TransformTo,
+                    ReserveUsage = total.Key.ReserveUsage
                 });
 
             return await inventory.ToListAsync();
@@ -825,8 +820,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     TotalDifference = g.Sum(id => id.CostByWarehouse)
                 });
 
-            string queryString2 = totalDifferences.ToQueryString();
-
             // Calculate the average UnitCost per ItemCode
             var averageUnitCosts = individualDifferences
                 .GroupBy(id => id.ItemCode)
@@ -838,8 +831,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                             ? 0
                             : id.CostByWarehouse / (id.ActualGood - id.QuantityOrdered))
                 });
-
-            string queryString3 = averageUnitCosts.ToQueryString();
 
             // Combine the results
             var finalResult = from id in individualDifferences
@@ -857,7 +848,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     AvgUnitCost = auc.AvgUnitCost
                 };
 
-            string queryString4 = finalResult.ToQueryString();
 
             var inventory = (from rawmaterial in _context.RawMaterials
                 join posummary in getPoSummary
@@ -953,8 +943,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                         TransformFrom = transformfrom.WeighingScale != null ? transformfrom.WeighingScale : 0,
                         TransformTo = transformto.Quantity != null ? transformto.Quantity : 0,
                         avgUnitCost.AvgUnitCost,
-                        /*avgUnitCost.Difference*/
-                        //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
+                        avgUnitCost.Difference
                     }
                 into total
                 select new MRPDto
@@ -964,13 +953,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     Uom = total.Key.UOM_Code,
                     ItemCategory = total.Key.ItemCategoryName,
                     BufferLevel = total.Key.BufferLevel,
-                    ReceiveIn = total.Key.WarehouseActualGood,
+                    ReceiveIn = total.Key.QcReceiving,
                     MoveOrderOut = total.Key.MoveOrderOut,
-                    QCReceiving = total.Key.QcReceiving,
                     ReceiptIn = total.Key.ReceiptIn,
                     IssueOut = total.Key.IssueOut,
-                    /* Price = total.Key.Difference,*/
-                    TotalPrice = total.Key.AvgUnitCost,
+                    WeightedAverageUnitCost = total.Key.AvgUnitCost,
+                    TotalCost = total.Key.Difference,
                     SOH = total.Key.SOH - total.Key.IssueOut,
                     Reserve = total.Key.Reserve - total.Key.IssueOut,
                     SuggestedPo = total.Key.SuggestedPo,
@@ -978,9 +966,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     DaysLevel = Math.Round(
                         Convert.ToDecimal(total.Key.Reserve /
                                           (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)), 2),
-                    ReserveUsage = total.Key.ReserveUsage,
-                    TransformFrom = total.Key.TransformFrom,
-                    TransformTo = total.Key.TransformTo
+                    ReserveUsage = total.Key.ReserveUsage
                 });
             return await PagedList<MRPDto>.CreateAsync(inventory, userParams.PageNumber, userParams.PageSize);
         }
@@ -990,7 +976,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
         {
             var EndDate = DateTime.Now;
             var StartDate = EndDate.AddDays(-30);
-
 
             var getPoSummary = _context.POSummary.Where(x => x.IsActive == true)
                 .GroupBy(x => new
@@ -1447,7 +1432,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                         TransformFrom = transformfrom.WeighingScale != null ? transformfrom.WeighingScale : 0,
                         TransformTo = transformto.Quantity != null ? transformto.Quantity : 0,
                         avgUnitCost.AvgUnitCost,
-                        /*avgUnitCost.Difference,*/
+                        avgUnitCost.Difference
                         //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
                     }
                 into total
@@ -1458,13 +1443,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     Uom = total.Key.UOM_Code,
                     ItemCategory = total.Key.ItemCategoryName,
                     BufferLevel = total.Key.BufferLevel,
-                    ReceiveIn = total.Key.WarehouseActualGood,
+                    ReceiveIn = total.Key.QcReceiving,
                     MoveOrderOut = total.Key.MoveOrderOut,
-                    QCReceiving = total.Key.QcReceiving,
+                    /*QCReceiving = total.Key.QcReceiving,*/
                     ReceiptIn = total.Key.ReceiptIn,
                     IssueOut = total.Key.IssueOut,
-                    /*Price = total.Key.Difference,*/
-                    TotalPrice = total.Key.AvgUnitCost,
+                    WeightedAverageUnitCost = total.Key.AvgUnitCost,
                     SOH = total.Key.SOH - total.Key.IssueOut,
                     Reserve = total.Key.Reserve - total.Key.IssueOut,
                     SuggestedPo = total.Key.SuggestedPo,
@@ -1473,8 +1457,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                         Convert.ToDecimal(total.Key.Reserve /
                                           (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)), 2),
                     ReserveUsage = total.Key.ReserveUsage,
-                    TransformFrom = total.Key.TransformFrom,
-                    TransformTo = total.Key.TransformTo
+                    TotalCost = total.Key.Difference
                 }).Where(x => x.ItemDescription.ToLower()
                 .Contains(search.Trim().ToLower()));
 

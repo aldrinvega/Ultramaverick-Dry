@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 {
-
     public class InventoryController : BaseApiController
     {
         private IUnitOfWork _unitOfWork;
@@ -17,7 +16,6 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
         {
             _unitOfWork = unitOfWork;
         }
-
 
         [HttpGet]
         [Route("RawmaterialInventory")]
@@ -40,11 +38,13 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 
         [HttpGet]
         [Route("GetAllItemForInventoryPagination")]
-        public async Task<ActionResult<IEnumerable<MRPDto>>> GetAllItemForInventoryPagination([FromQuery] UserParams userParams)
+        public async Task<ActionResult<IEnumerable<MRPDto>>> GetAllItemForInventoryPagination(
+            [FromQuery] UserParams userParams)
         {
             var inventory = await _unitOfWork.Inventory.GetAllItemForInventoryPagination(userParams);
 
-            Response.AddPaginationHeader(inventory.CurrentPage, inventory.PageSize, inventory.TotalCount, inventory.TotalPages, inventory.HasNextPage, inventory.HasPreviousPage);
+            Response.AddPaginationHeader(inventory.CurrentPage, inventory.PageSize, inventory.TotalCount,
+                inventory.TotalPages, inventory.HasNextPage, inventory.HasPreviousPage);
 
             var inventoryResult = new
             {
@@ -62,16 +62,17 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 
         [HttpGet]
         [Route("GetAllItemForInventoryPaginationOrig")]
-        public async Task<ActionResult<IEnumerable<MRPDto>>> GetAllMiscellaneousIssuePaginationOrig([FromQuery] UserParams userParams, [FromQuery] string search)
+        public async Task<ActionResult<IEnumerable<MRPDto>>> GetAllMiscellaneousIssuePaginationOrig(
+            [FromQuery] UserParams userParams, [FromQuery] string search)
         {
-
             if (search == null)
 
                 return await GetAllItemForInventoryPagination(userParams);
 
             var inventory = await _unitOfWork.Inventory.GetAllItemForInventoryPaginationOrig(userParams, search);
 
-            Response.AddPaginationHeader(inventory.CurrentPage, inventory.PageSize, inventory.TotalCount, inventory.TotalPages, inventory.HasNextPage, inventory.HasPreviousPage);
+            Response.AddPaginationHeader(inventory.CurrentPage, inventory.PageSize, inventory.TotalCount,
+                inventory.TotalPages, inventory.HasNextPage, inventory.HasPreviousPage);
 
             var inventoryResult = new
             {
@@ -86,6 +87,5 @@ namespace ELIXIR.API.Controllers.INVENTORY_CONTROLLER
 
             return Ok(inventoryResult);
         }
-
     }
 }
