@@ -28,6 +28,6 @@ namespace ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE
             string PlusOne);
 
         Task<IReadOnlyList<ConsolidatedReport>> ConsolidatedReport(string dateFrom, string dateTo);
-        Task<IReadOnlyList<MoveOrderDto>> ApprovedMoveOrderReport(string dateFrom, string dateTo);
+        Task<IReadOnlyList<MoveOrderReport>> ApprovedMoveOrderReport(string dateFrom, string dateTo);
     }
 }

@@ -26,25 +26,17 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public DateTime? TransactedDate { get; set; }
         public string TransactedBy { get; set; }
         public string DeliveryDate { get; set; }
-        public string PreparedDate
-        {
-            get;
-            set;
-        }
 
-        public decimal? UnitPrice
-        {
-            get;
-            set;
-        }
-        public decimal WeightedAverageUnitCost
-        {
-            get;
-            set;
-        }
+        public string PreparedDate { get; set; }
+
+        public decimal? UnitPrice { get; set; }
+
+        public decimal WeightedAverageUnitCost { get; set; }
+
         public string DepartmentName { get; set; }
         public int WarehouseId { get; set; }
         public string Location { get; set; }
         public string AccountTitle { get; set; }
+        public string DeliveryStatus { get; set; }
     }
 }

@@ -1042,7 +1042,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             return consolidatedReports;
         }
 
-        public async Task<IReadOnlyList<MoveOrderDto>> ApprovedMoveOrderReport(string dateFrom, string dateTo)
+        public async Task<IReadOnlyList<MoveOrderReport>> ApprovedMoveOrderReport(string dateFrom, string dateTo)
         {
             DateTime toDate = DateTime.Parse(dateTo);
             DateTime fromDate = DateTime.Parse(dateFrom);
@@ -1052,7 +1052,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .Where(X => X.IsActive == true)
                 .GroupBy(x => new
                 {
+                    x.Id,
                     x.OrderNo,
+                    x.ItemCode,
+                    x.ItemDescription,
                     x.FarmName,
                     x.FarmCode,
                     x.FarmType,
@@ -1063,25 +1066,26 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     x.IsReject,
                     x.ApproveDateTempo,
                     x.IsPrint,
-                    x.IsTransact
+                    x.IsTransact,
+                    x.PreparedBy
                 })
                 .Where(x => x.Key.IsApprove == true)
                 .Where(x => x.Key.DeliveryStatus != null)
                 .Where(x => x.Key.IsReject != true)
-                .Select(x => new MoveOrderDto
+                .Select(x => new MoveOrderReport
                 {
+                    MoveOrderId = x.Key.Id,
                     OrderNo = x.Key.OrderNo,
-                    FarmName = x.Key.FarmName,
-                    FarmCode = x.Key.FarmCode,
+                    CustomerName = x.Key.FarmName,
+                    CustomerCode = x.Key.FarmCode,
+                    ItemCode = x.Key.ItemCode,
+                    ItemDescription = x.Key.ItemDescription,
+                    TransactionType = "Move Order",
                     Category = x.Key.FarmType,
                     Quantity = x.Sum(y => y.QuantityOrdered),
                     PreparedDate = x.Key.PreparedDate.ToString(),
                     DeliveryStatus = x.Key.DeliveryStatus,
-                    IsApprove = x.Key.IsApprove != null,
-                    IsPrepared = x.Key.IsPrepared,
-                    ApprovedDate = x.Key.ApproveDateTempo.ToString(),
-                    IsPrint = x.Key.IsPrint != null,
-                    IsTransact = x.Key.IsTransact
+                    TransactedBy = x.Key.PreparedBy,
                 });
 
             return await orders.ToListAsync();

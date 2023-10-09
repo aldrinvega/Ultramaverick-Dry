@@ -749,8 +749,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 .Where(x => x.ActualRemaining != 0
                             && x.ActualRemaining > 0
                             && x.IsActive == true
-                            && Convert.ToString(x.PO_Number).ToLower()
-                                .Contains(search.Trim().ToLower()));
+                            && (Convert.ToString(x.PO_Number).ToLower().Contains(search.Trim().ToLower())
+                                || Convert.ToString(x.ItemDescription).ToLower().Contains(search.Trim().ToLower())
+                                || Convert.ToString(x.ItemCode).ToLower().Contains(search.Trim().ToLower())));
 
             return await PagedList<PoSummaryChecklistDto>.CreateAsync(poSummary, userParams.PageNumber,
                 userParams.PageSize);

@@ -1715,22 +1715,19 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<bool> UpdatePrintStatus(int[] orderNo)
+        public async Task<bool> UpdatePrintStatus(MoveOrder orderNo)
         {
-            foreach (var orders in orderNo)
+            var existing = await _context.MoveOrders.Where(x => x.OrderNo == orderNo.OrderNo)
+                .ToListAsync();
+            if (existing == null)
+                return false;
+
+            foreach (var items in existing)
             {
-                var existing = await _context.MoveOrders.Where(x => x.OrderNo == orders)
-                    .ToListAsync();
-                if (existing == null)
-                    return false;
-
-                foreach (var items in existing)
-                {
-                    items.IsPrint = true;
-                }
-
-                await _context.SaveChangesAsync();
+                items.IsPrint = true;
             }
+
+            await _context.SaveChangesAsync();
 
             return true;
         }

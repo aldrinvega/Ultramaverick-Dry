@@ -476,7 +476,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
 
         [HttpPut]
         [Route("UpdatePrintStatus")]
-        public async Task<IActionResult> UpdatePrintStatus([FromBody] int[] moveorder)
+        public async Task<IActionResult> UpdatePrintStatus([FromBody] MoveOrder moveorder)
         {
             await _unitOfWork.Order.UpdatePrintStatus(moveorder);
             return Ok(moveorder);
