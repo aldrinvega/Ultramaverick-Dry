@@ -73,7 +73,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 
         Task<bool> ReturnMoveOrderForApproval(MoveOrder moveorder);
 
-        Task<bool> UpdatePrintStatus(MoveOrder orderNo);
+        Task<bool> UpdatePrintStatus(int[] orderNo);
 
         Task<MoveOrderDto> GetAllApprovedMoveOrder(int id);
 

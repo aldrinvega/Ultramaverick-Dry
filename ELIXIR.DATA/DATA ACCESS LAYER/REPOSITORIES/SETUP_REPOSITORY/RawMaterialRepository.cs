@@ -6,19 +6,17 @@ using ELIXIR.DATA.DTOs.SETUP_DTOs;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 {
-    public class RawMaterialRepository :  GenericRepository<RawMaterialDto>, IRawMaterialRepository
+    public class RawMaterialRepository : GenericRepository<RawMaterialDto>, IRawMaterialRepository
     {
         private new readonly StoreContext _context;
 
-       
-        public RawMaterialRepository(StoreContext context) : base (context)
+
+        public RawMaterialRepository(StoreContext context) : base(context)
         {
             _context = context;
         }
@@ -27,102 +25,103 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public override async Task<IReadOnlyList<RawMaterialDto>> GetAll()
         {
-                var rawmaterials = (from rawmaterial in _context.RawMaterials
-                                    join category in _context.ItemCategories on rawmaterial.ItemCategoryId equals category.Id
-                                    join uom in _context.UOMS on rawmaterial.UomId equals uom.Id
-                                    select new RawMaterialDto
-                                    {
-                                        Id = rawmaterial.Id,
-                                        ItemCode = rawmaterial.ItemCode,
-                                        ItemDescription = rawmaterial.ItemDescription,
-                                        ItemCategory = category.ItemCategoryName,
-                                        ItemCategoryId = category.Id,
-                                        Uom = uom.UOM_Code,
-                                        UomId = uom.Id,
-                                        BufferLevel = rawmaterial.BufferLevel,
-                                        DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
-                                        AddedBy = rawmaterial.AddedBy,
-                                        IsActive = rawmaterial.IsActive,
-                                        Reason = rawmaterial.Reason,
-                                        IsExpirable = rawmaterial.IsExpirable
-                                    }).OrderByDescending(X => X.Id);
-                return await rawmaterials.ToListAsync();
+            var rawmaterials = (from rawmaterial in _context.RawMaterials
+                join category in _context.ItemCategories on rawmaterial.ItemCategoryId equals category.Id
+                join uom in _context.UOMS on rawmaterial.UomId equals uom.Id
+                select new RawMaterialDto
+                {
+                    Id = rawmaterial.Id,
+                    ItemCode = rawmaterial.ItemCode,
+                    ItemDescription = rawmaterial.ItemDescription,
+                    ItemCategory = category.ItemCategoryName,
+                    ItemCategoryId = category.Id,
+                    Uom = uom.UOM_Code,
+                    UomId = uom.Id,
+                    BufferLevel = rawmaterial.BufferLevel,
+                    DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
+                    AddedBy = rawmaterial.AddedBy,
+                    IsActive = rawmaterial.IsActive,
+                    Reason = rawmaterial.Reason,
+                    IsExpirable = rawmaterial.IsExpirable
+                }).OrderByDescending(X => X.Id);
+            return await rawmaterials.ToListAsync();
         }
 
         public override async Task<RawMaterialDto> GetById(int id)
         {
             var rawmaterials = (from rawmaterial in _context.RawMaterials
-                                join category in _context.ItemCategories on rawmaterial.ItemCategoryId equals category.Id
-                                join uom in _context.UOMS on rawmaterial.UomId equals uom.Id
-                                select new RawMaterialDto
-                                {
-                                    Id = rawmaterial.Id,
-                                    ItemCode = rawmaterial.ItemCode,
-                                    ItemDescription = rawmaterial.ItemDescription,
-                                    ItemCategory = category.ItemCategoryName,
-                                    ItemCategoryId = category.Id,
-                                    Uom = uom.UOM_Code,
-                                    UomId = uom.Id,
-                                    BufferLevel = rawmaterial.BufferLevel,
-                                    DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
-                                    AddedBy = rawmaterial.AddedBy,
-                                    IsActive = rawmaterial.IsActive,
-                                    Reason = rawmaterial.Reason,
-                                    IsExpirable = rawmaterial.IsExpirable
-                                });
+                join category in _context.ItemCategories on rawmaterial.ItemCategoryId equals category.Id
+                join uom in _context.UOMS on rawmaterial.UomId equals uom.Id
+                select new RawMaterialDto
+                {
+                    Id = rawmaterial.Id,
+                    ItemCode = rawmaterial.ItemCode,
+                    ItemDescription = rawmaterial.ItemDescription,
+                    ItemCategory = category.ItemCategoryName,
+                    ItemCategoryId = category.Id,
+                    Uom = uom.UOM_Code,
+                    UomId = uom.Id,
+                    BufferLevel = rawmaterial.BufferLevel,
+                    DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
+                    AddedBy = rawmaterial.AddedBy,
+                    IsActive = rawmaterial.IsActive,
+                    Reason = rawmaterial.Reason,
+                    IsExpirable = rawmaterial.IsExpirable
+                });
             return await rawmaterials.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<IReadOnlyList<RawMaterialDto>> GetAllActiveRawMaterial()
         {
             var rawmaterials = (from rawmaterial in _context.RawMaterials
-                                join category in _context.ItemCategories on rawmaterial.ItemCategoryId equals category.Id
-                                join uom in _context.UOMS on rawmaterial.UomId equals uom.Id
-                                select new RawMaterialDto
-                                {
-                                    Id = rawmaterial.Id,
-                                    ItemCode = rawmaterial.ItemCode,
-                                    ItemDescription = rawmaterial.ItemDescription,
-                                    ItemCategory = category.ItemCategoryName,
-                                    Uom = uom.UOM_Code,
-                                    BufferLevel = rawmaterial.BufferLevel,
-                                    DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
-                                    AddedBy = rawmaterial.AddedBy,
-                                    IsActive = rawmaterial.IsActive,
-                                    Reason = rawmaterial.Reason,
-                                    IsExpirable = rawmaterial.IsExpirable
-                                });
+                join category in _context.ItemCategories on rawmaterial.ItemCategoryId equals category.Id
+                join uom in _context.UOMS on rawmaterial.UomId equals uom.Id
+                select new RawMaterialDto
+                {
+                    Id = rawmaterial.Id,
+                    ItemCode = rawmaterial.ItemCode,
+                    ItemDescription = rawmaterial.ItemDescription,
+                    ItemCategory = category.ItemCategoryName,
+                    Uom = uom.UOM_Code,
+                    BufferLevel = rawmaterial.BufferLevel,
+                    DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
+                    AddedBy = rawmaterial.AddedBy,
+                    IsActive = rawmaterial.IsActive,
+                    Reason = rawmaterial.Reason,
+                    IsExpirable = rawmaterial.IsExpirable
+                });
 
             return await rawmaterials.OrderBy(x => x.Id)
-                                     .Where(x => x.IsActive == true)
-                                     .ToListAsync();
+                .Where(x => x.IsActive == true)
+                .ToListAsync();
         }
 
         public async Task<IReadOnlyList<RawMaterialDto>> GetAllInActiveRawMaterial()
         {
             var rawmaterials = (from rawmaterial in _context.RawMaterials
-                                join category in _context.ItemCategories on rawmaterial.ItemCategoryId equals category.Id
-                                join uom in _context.UOMS on rawmaterial.UomId equals uom.Id
-                                select new RawMaterialDto
-                                {
-                                    Id = rawmaterial.Id,
-                                    ItemCode = rawmaterial.ItemCode,
-                                    ItemDescription = rawmaterial.ItemDescription,
-                                    ItemCategory = category.ItemCategoryName,
-                                    Uom = uom.UOM_Code,
-                                    BufferLevel = rawmaterial.BufferLevel,
-                                    DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
-                                    AddedBy = rawmaterial.AddedBy,
-                                    IsActive = rawmaterial.IsActive,
-                                    Reason = rawmaterial.Reason,
-                                    IsExpirable = rawmaterial.IsExpirable
-                                });
+                join category in _context.ItemCategories on rawmaterial.ItemCategoryId equals category.Id
+                join uom in _context.UOMS on rawmaterial.UomId equals uom.Id
+                select new RawMaterialDto
+                {
+                    Id = rawmaterial.Id,
+                    ItemCode = rawmaterial.ItemCode,
+                    ItemDescription = rawmaterial.ItemDescription,
+                    ItemCategory = category.ItemCategoryName,
+                    Uom = uom.UOM_Code,
+                    BufferLevel = rawmaterial.BufferLevel,
+                    DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
+                    AddedBy = rawmaterial.AddedBy,
+                    IsActive = rawmaterial.IsActive,
+                    Reason = rawmaterial.Reason,
+                    IsExpirable = rawmaterial.IsExpirable
+                });
 
             return await rawmaterials
-                                     .Where(x => x.IsActive == false)
-                                     .OrderByDescending(X => X.Id)
-                                     .ToListAsync();
+                .Where(x => x.IsActive == false)
+                .OrderByDescending(X => X.Id)
+                .ToListAsync();
         }
+
         public async Task<bool> AddNewRawMaterial(RawMaterial rawmaterial)
         {
             rawmaterial.DateAdded = DateTime.Now;
@@ -138,7 +137,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         public async Task<bool> UpdateRawMaterialInfo(RawMaterial rawmaterial)
         {
             var existingRawmaterial = await _context.RawMaterials.Where(x => x.Id == rawmaterial.Id)
-                                                    .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync();
 
             if (existingRawmaterial == null)
                 return await AddNewRawMaterial(rawmaterial);
@@ -152,10 +151,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
             return true;
         }
+
         public async Task<bool> InActiveRawMaterial(RawMaterial rawmaterial)
         {
             var existingRawMaterial = await _context.RawMaterials.Where(x => x.Id == rawmaterial.Id)
-                                                                 .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync();
 
             existingRawMaterial.ItemCode = existingRawMaterial.ItemCode;
             existingRawMaterial.ItemDescription = existingRawMaterial.ItemDescription;
@@ -175,7 +175,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         public async Task<bool> ActivateRawMaterial(RawMaterial rawmaterial)
         {
             var existingRawMaterial = await _context.RawMaterials.Where(x => x.Id == rawmaterial.Id)
-                                                                 .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync();
 
             existingRawMaterial.ItemCode = existingRawMaterial.ItemCode;
             existingRawMaterial.ItemDescription = existingRawMaterial.ItemDescription;
@@ -218,67 +218,66 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         }
 
 
-
         //-----ITEM CATEGORY-----
 
         public async Task<IReadOnlyList<ItemCategoryDto>> GetAllItemCategory()
         {
             return await _context.ItemCategories.OrderByDescending(x => x.Id)
-                                                .Select(item => new ItemCategoryDto
-                                                {
-                                                    Id = item.Id,
-                                                    ItemCategoryName = item.ItemCategoryName,
-                                                    DateAdded = item.DateAdded.ToString("MM/dd/yyyy"),
-                                                    AddedBy = item.AddedBy,
-                                                    IsActive = item.IsActive,
-                                                    Reason = item.Reason
-                                                }).ToListAsync();
+                .Select(item => new ItemCategoryDto
+                {
+                    Id = item.Id,
+                    ItemCategoryName = item.ItemCategoryName,
+                    DateAdded = item.DateAdded.ToString("MM/dd/yyyy"),
+                    AddedBy = item.AddedBy,
+                    IsActive = item.IsActive,
+                    Reason = item.Reason
+                }).ToListAsync();
         }
 
         public async Task<ItemCategoryDto> GetCategoryById(int id)
         {
             return await _context.ItemCategories
-                                                 .Select(item => new ItemCategoryDto
-                                                 {
-                                                     Id = item.Id,
-                                                     ItemCategoryName = item.ItemCategoryName,
-                                                     DateAdded = item.DateAdded.ToString("MM/dd/yyyy"),
-                                                     AddedBy = item.AddedBy,
-                                                     IsActive = item.IsActive,
-                                                     Reason = item.Reason
-                                                 }).FirstOrDefaultAsync(x => x.Id == id);
+                .Select(item => new ItemCategoryDto
+                {
+                    Id = item.Id,
+                    ItemCategoryName = item.ItemCategoryName,
+                    DateAdded = item.DateAdded.ToString("MM/dd/yyyy"),
+                    AddedBy = item.AddedBy,
+                    IsActive = item.IsActive,
+                    Reason = item.Reason
+                }).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<IReadOnlyList<ItemCategoryDto>> GetAllActiveItemCategory()
         {
             return await _context.ItemCategories.OrderByDescending(x => x.Id)
-                                            .Select(item => new ItemCategoryDto
-                                            {
-                                                Id = item.Id,
-                                                ItemCategoryName = item.ItemCategoryName,
-                                                DateAdded = item.DateAdded.ToString("MM/dd/yyyy"),
-                                                AddedBy = item.AddedBy,
-                                                IsActive = item.IsActive,
-                                                Reason = item.Reason
-                                            })
-                                                .Where(x => x.IsActive == true)
-                                                .ToListAsync();
+                .Select(item => new ItemCategoryDto
+                {
+                    Id = item.Id,
+                    ItemCategoryName = item.ItemCategoryName,
+                    DateAdded = item.DateAdded.ToString("MM/dd/yyyy"),
+                    AddedBy = item.AddedBy,
+                    IsActive = item.IsActive,
+                    Reason = item.Reason
+                })
+                .Where(x => x.IsActive == true)
+                .ToListAsync();
         }
 
         public async Task<IReadOnlyList<ItemCategoryDto>> GetAllInActiveItemCategory()
         {
-            return await _context.ItemCategories.OrderByDescending (x => x.Id)
-                                          .Select(item => new ItemCategoryDto
-                                          {
-                                              Id = item.Id,
-                                              ItemCategoryName = item.ItemCategoryName,
-                                              DateAdded = item.DateAdded.ToString("MM/dd/yyyy"),
-                                              AddedBy = item.AddedBy,
-                                              IsActive = item.IsActive,
-                                              Reason = item.Reason
-                                          })
-                                              .Where(x => x.IsActive == false)
-                                              .ToListAsync();
+            return await _context.ItemCategories.OrderByDescending(x => x.Id)
+                .Select(item => new ItemCategoryDto
+                {
+                    Id = item.Id,
+                    ItemCategoryName = item.ItemCategoryName,
+                    DateAdded = item.DateAdded.ToString("MM/dd/yyyy"),
+                    AddedBy = item.AddedBy,
+                    IsActive = item.IsActive,
+                    Reason = item.Reason
+                })
+                .Where(x => x.IsActive == false)
+                .ToListAsync();
         }
 
         public async Task<bool> AddNewItemCategory(ItemCategory category)
@@ -295,20 +294,20 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<bool> UpdateItemCategory(ItemCategory category)
         {
-            var existingCategory= await _context.ItemCategories.Where(x => x.Id == category.Id)
-                                                               .FirstOrDefaultAsync();        
+            var existingCategory = await _context.ItemCategories.Where(x => x.Id == category.Id)
+                .FirstOrDefaultAsync();
             if (existingCategory == null)
                 return await AddNewItemCategory(category);
 
             existingCategory.ItemCategoryName = category.ItemCategoryName;
-         
+
             return true;
         }
 
         public async Task<bool> InActiveItemCategory(ItemCategory category)
         {
             var existingCategory = await _context.ItemCategories.Where(x => x.Id == category.Id)
-                                                                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync();
 
             existingCategory.ItemCategoryName = existingCategory.ItemCategoryName;
             existingCategory.Reason = category.Reason;
@@ -323,8 +322,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         public async Task<bool> ActivateItemCategory(ItemCategory category)
         {
             var existingCategory = await _context.ItemCategories.Where(x => x.Id == category.Id)
-                                                                .FirstOrDefaultAsync();
-             
+                .FirstOrDefaultAsync();
+
             existingCategory.ItemCategoryName = existingCategory.ItemCategoryName;
             existingCategory.Reason = category.Reason;
             existingCategory.IsActive = true;
@@ -343,99 +342,131 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         public async Task<PagedList<RawMaterialDto>> GetAllRawMaterialWithPagination(bool status, UserParams userParams)
         {
             var rawmaterials = (from rawmaterial in _context.RawMaterials
-                                join category in _context.ItemCategories on rawmaterial.ItemCategoryId equals category.Id
-                                join uom in _context.UOMS on rawmaterial.UomId equals uom.Id
-                                orderby rawmaterial.DateAdded descending
-                                select new RawMaterialDto
-                                {
-                                    Id = rawmaterial.Id,
-                                    ItemCode = rawmaterial.ItemCode,
-                                    ItemDescription = rawmaterial.ItemDescription,
-                                    ItemCategory = category.ItemCategoryName,
-                                    ItemCategoryId = category.Id,
-                                    Uom = uom.UOM_Code,
-                                    UomId = uom.Id,
-                                    BufferLevel = rawmaterial.BufferLevel,
-                                    DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
-                                    AddedBy = rawmaterial.AddedBy,
-                                    IsActive = rawmaterial.IsActive,
-                                    Reason = rawmaterial.Reason,
-                                    IsExpirable = rawmaterial.IsExpirable
-                                }).OrderBy(x => x.Id)
-                                  .Where(x => x.IsActive == status);
+                    join category in _context.ItemCategories on rawmaterial.ItemCategoryId equals category.Id
+                    join uom in _context.UOMS on rawmaterial.UomId equals uom.Id
+                    orderby rawmaterial.DateAdded descending
+                    select new RawMaterialDto
+                    {
+                        Id = rawmaterial.Id,
+                        ItemCode = rawmaterial.ItemCode,
+                        ItemDescription = rawmaterial.ItemDescription,
+                        ItemCategory = category.ItemCategoryName,
+                        ItemCategoryId = category.Id,
+                        Uom = uom.UOM_Code,
+                        UomId = uom.Id,
+                        BufferLevel = rawmaterial.BufferLevel,
+                        DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
+                        AddedBy = rawmaterial.AddedBy,
+                        IsActive = rawmaterial.IsActive,
+                        Reason = rawmaterial.Reason,
+                        IsExpirable = rawmaterial.IsExpirable
+                    }).OrderBy(x => x.Id)
+                .Where(x => x.IsActive == status);
 
 
-            return await PagedList<RawMaterialDto>.CreateAsync(rawmaterials, userParams.PageNumber, userParams.PageSize);
+            return await PagedList<RawMaterialDto>.CreateAsync(rawmaterials, userParams.PageNumber,
+                userParams.PageSize);
         }
 
-        public async Task<PagedList<RawMaterialDto>> GetRawMaterialByStatusWithPaginationOrig(UserParams userParams, bool status, string search)
+        public async Task<PagedList<RawMaterialDto>> GetRawMaterialByStatusWithPaginationOrig(UserParams userParams,
+            bool status, string search)
         {
             var rawmaterials = (from rawmaterial in _context.RawMaterials
-                                join category in _context.ItemCategories on rawmaterial.ItemCategoryId equals category.Id
-                                join uom in _context.UOMS on rawmaterial.UomId equals uom.Id
-                                join rawmats in _context.RawMaterials on rawmaterial.ItemCode equals rawmats.ItemCode 
-                                orderby rawmaterial.DateAdded descending
-                                select new RawMaterialDto
-                                {
-                                    Id = rawmaterial.Id,
-                                    ItemCode = rawmaterial.ItemCode,
-                                    ItemDescription = rawmaterial.ItemDescription,
-                                    ItemCategory = category.ItemCategoryName,
-                                    ItemCategoryId = category.Id,
-                                    Uom = uom.UOM_Code,
-                                    UomId = uom.Id,
-                                    BufferLevel = rawmaterial.BufferLevel,
-                                    DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
-                                    AddedBy = rawmaterial.AddedBy,
-                                    IsActive = rawmaterial.IsActive,
-                                    Reason = rawmaterial.Reason,
-                                    IsExpirable = rawmats.IsExpirable
-                                }).OrderBy(x => x.Id)
-                                  .Where(x => x.IsActive == status)
-                                  .Where(x => x.ItemCode.ToLower()
-                                  .Contains(search.Trim().ToLower()));
-            
-            return await PagedList<RawMaterialDto>.CreateAsync(rawmaterials, userParams.PageNumber, userParams.PageSize);
+                    join category in _context.ItemCategories on rawmaterial.ItemCategoryId equals category.Id
+                    join uom in _context.UOMS on rawmaterial.UomId equals uom.Id
+                    join rawmats in _context.RawMaterials on rawmaterial.ItemCode equals rawmats.ItemCode
+                    orderby rawmaterial.DateAdded descending
+                    select new RawMaterialDto
+                    {
+                        Id = rawmaterial.Id,
+                        ItemCode = rawmaterial.ItemCode,
+                        ItemDescription = rawmaterial.ItemDescription,
+                        ItemCategory = category.ItemCategoryName,
+                        ItemCategoryId = category.Id,
+                        Uom = uom.UOM_Code,
+                        UomId = uom.Id,
+                        BufferLevel = rawmaterial.BufferLevel,
+                        DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
+                        AddedBy = rawmaterial.AddedBy,
+                        IsActive = rawmaterial.IsActive,
+                        Reason = rawmaterial.Reason,
+                        IsExpirable = rawmats.IsExpirable
+                    }).OrderBy(x => x.Id)
+                .Where(x => x.IsActive == status)
+                .Where(x => x.ItemCode.ToLower()
+                    .Contains(search.Trim().ToLower()));
 
+            return await PagedList<RawMaterialDto>.CreateAsync(rawmaterials, userParams.PageNumber,
+                userParams.PageSize);
         }
 
-        public async Task<PagedList<ItemCategoryDto>> GetAllItemCategoryWithPagination(bool status, UserParams userParams)
+        public async Task<PagedList<ItemCategoryDto>> GetAllItemCategoryWithPagination(bool status,
+            UserParams userParams)
         {
             var category = _context.ItemCategories.OrderByDescending(x => x.DateAdded)
-                                                .Select(item => new ItemCategoryDto
-                                                {
-                                                    Id = item.Id,
-                                                    ItemCategoryName = item.ItemCategoryName,
-                                                    DateAdded = item.DateAdded.ToString("MM/dd/yyyy"),
-                                                    AddedBy = item.AddedBy,
-                                                    IsActive = item.IsActive,
-                                                    Reason = item.Reason
-
-                                                }).OrderByDescending(x => x.Id)
-                                                  .Where(x => x.IsActive == status);
+                .Select(item => new ItemCategoryDto
+                {
+                    Id = item.Id,
+                    ItemCategoryName = item.ItemCategoryName,
+                    DateAdded = item.DateAdded.ToString("MM/dd/yyyy"),
+                    AddedBy = item.AddedBy,
+                    IsActive = item.IsActive,
+                    Reason = item.Reason
+                }).OrderByDescending(x => x.Id)
+                .Where(x => x.IsActive == status);
 
             return await PagedList<ItemCategoryDto>.CreateAsync(category, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<PagedList<ItemCategoryDto>> GetAllItemCategoryWithPaginationOrig(UserParams userParams, bool status, string search)
+        public async Task<PagedList<ItemCategoryDto>> GetAllItemCategoryWithPaginationOrig(UserParams userParams,
+            bool status, string search)
         {
             var category = _context.ItemCategories.OrderByDescending(x => x.DateAdded)
-                                               .Select(item => new ItemCategoryDto
-                                               {
-                                                   Id = item.Id,
-                                                   ItemCategoryName = item.ItemCategoryName,
-                                                   DateAdded = item.DateAdded.ToString("MM/dd/yyyy"),
-                                                   AddedBy = item.AddedBy,
-                                                   IsActive = item.IsActive,
-                                                   Reason = item.Reason
-
-                                               }).OrderByDescending(x => x.Id)
-                                                 .Where(x => x.IsActive == status)
-                                                 .Where(x => x.ItemCategoryName.ToLower()
-                                                 .Contains(search.Trim().ToLower()));
+                .Select(item => new ItemCategoryDto
+                {
+                    Id = item.Id,
+                    ItemCategoryName = item.ItemCategoryName,
+                    DateAdded = item.DateAdded.ToString("MM/dd/yyyy"),
+                    AddedBy = item.AddedBy,
+                    IsActive = item.IsActive,
+                    Reason = item.Reason
+                }).OrderByDescending(x => x.Id)
+                .Where(x => x.IsActive == status)
+                .Where(x => x.ItemCategoryName.ToLower()
+                    .Contains(search.Trim().ToLower()));
 
             return await PagedList<ItemCategoryDto>.CreateAsync(category, userParams.PageNumber, userParams.PageSize);
+        }
+
+        public async Task<IList<RawMaterialDto>> GetAllRawMaterialForExport()
+        {
+            var rawMaterials = await _context.RawMaterials
+                .Join(_context.ItemCategories,
+                    rawmaterial => rawmaterial.ItemCategoryId,
+                    category => category.Id,
+                    (rawmaterial, category) => new { rawmaterial, category })
+                .Join(_context.UOMS,
+                    rawAndCategory => rawAndCategory.rawmaterial.UomId,
+                    uom => uom.Id,
+                    (rawAndCategory, uom) => new { rawAndCategory, uom })
+                .OrderByDescending(rawAndCategoryAndUom => rawAndCategoryAndUom.rawAndCategory.rawmaterial.DateAdded)
+                .ThenBy(rawAndCategoryAndUom => rawAndCategoryAndUom.rawAndCategory.rawmaterial.Id)
+                .ToListAsync();
+
+            return rawMaterials
+                .Select(rawItem => new RawMaterialDto
+                {
+                    Id = rawItem.rawAndCategory.rawmaterial.Id,
+                    ItemCode = rawItem.rawAndCategory.rawmaterial.ItemCode,
+                    ItemDescription = rawItem.rawAndCategory.rawmaterial.ItemDescription,
+                    ItemCategory = rawItem.rawAndCategory.category.ItemCategoryName,
+                    Uom = rawItem.uom.UOM_Code,
+                    BufferLevel = rawItem.rawAndCategory.rawmaterial.BufferLevel,
+                    DateAdded = rawItem.rawAndCategory.rawmaterial.DateAdded.ToString("MM/dd/yyyy"),
+                    Expirable = rawItem.rawAndCategory.rawmaterial.IsExpirable ? "Yes" : "No",
+                    IsActive = rawItem.rawAndCategory.rawmaterial.IsActive
+                })
+                .Where(rawMaterialDto => rawMaterialDto.IsActive).ToList();
         }
     }
-
 }

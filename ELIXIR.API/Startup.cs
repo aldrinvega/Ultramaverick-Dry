@@ -16,7 +16,11 @@ using System.Linq;
 using ELIXIR.API.ERRORS;
 using ELIXIR.DATA.SERVICES;
 using System.Text.Json.Serialization;
+using ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE;
+using ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY;
 using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions.AddNewChecklistQuestions;
 using FluentValidation;
 
@@ -73,9 +77,11 @@ namespace ELIXIR.API
                     };
                 });
             services.AddScoped(typeof(IUserService), typeof(UserService));
+            services.AddScoped<IReportRepository, ReportRepository>();
+            services.AddScoped<IRawMaterialRepository, RawMaterialRepository>();
 
             services.AddDbContext<StoreContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("LiveConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("LiveConnectionDevelopment")));
 
             services.Configure<ApiBehaviorOptions>(options =>
             {

@@ -249,7 +249,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     MoveOrderBy = result.Key.PreparedBy,
                     MoveOrderDate = result.Key.PreparedDate.ToString(),
                     TransactedBy = result.Key.PreparedBy,
-                    TransactedDate = result.Key.PreparedDate,
+                    TransactedDate = result.Key.PreparedDate.HasValue
+                        ? result.Key.PreparedDate.Value.ToString("MM/dd/yyyy")
+                        : "N/A",
                     /*WeightedAverageUnitCost = Math.Round((decimal)result.Key.AvgUnitCost, 2)*/
                 });
 
@@ -428,7 +430,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 from moveorder in leftJ.DefaultIfEmpty()
                 where moveorder.IsActive == true
                 join customer in _context.Customers
-                    on moveorder.FarmCode equals customer.CustomerCode
+                    on new { Code = moveorder.FarmCode, Name = moveorder.FarmName }
+                    equals new { Code = customer.CustomerCode, Name = customer.CustomerName }
                     into leftJ2
                 from customer in leftJ2.DefaultIfEmpty()
                 group new
@@ -446,10 +449,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                         moveorder.ItemDescription,
                         moveorder.Uom,
                         moveorder.QuantityOrdered,
-                        MoveOrderDate = moveorder.ApprovedDate.ToString(),
                         transact.PreparedBy,
                         moveorder.DeliveryStatus,
-                        TransactedDate = transact.PreparedDate,
+                        MoveOrderDate = moveorder.ApprovedDate.ToString(),
+                        TransactedDate = transact.PreparedDate.ToString(),
                         DeliveryDate = transact.DeliveryDate.ToString()
                     }
                 into total

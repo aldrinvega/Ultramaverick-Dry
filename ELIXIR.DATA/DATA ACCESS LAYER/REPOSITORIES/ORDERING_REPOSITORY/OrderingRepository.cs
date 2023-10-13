@@ -439,13 +439,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
         public async Task<bool> ValidateCustomerCode(Ordering orders)
         {
-            var customercode = await _context.Customers.Where(x => x.CustomerCode == orders.FarmCode)
+            var customercode = await _context.Customers
+                .Where(x => x.CustomerCode == orders.FarmCode && x.CustomerName == orders.FarmName)
                 .Where(x => x.IsActive == true)
                 .FirstOrDefaultAsync();
 
             if (customercode == null)
                 return false;
-
 
             return true;
         }
@@ -1715,19 +1715,23 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<bool> UpdatePrintStatus(MoveOrder orderNo)
+        public async Task<bool> UpdatePrintStatus(int[] orderNo)
         {
-            var existing = await _context.MoveOrders.Where(x => x.OrderNo == orderNo.OrderNo)
-                .ToListAsync();
-            if (existing == null)
-                return false;
-
-            foreach (var items in existing)
+            foreach (var orderNos in orderNo)
             {
-                items.IsPrint = true;
+                var existing = await _context.MoveOrders.Where(x => x.OrderNo == orderNos)
+                    .ToListAsync();
+                if (existing == null)
+                    return false;
+
+                foreach (var items in existing)
+                {
+                    items.IsPrint = true;
+                }
+
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
 
             return true;
         }

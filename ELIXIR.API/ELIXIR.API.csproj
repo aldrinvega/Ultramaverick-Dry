@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="ClosedXML" Version="0.103.0-beta"/>
     <PackageReference Include="EPPlus" Version="5.8.4" />
     <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
     <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="5.1.0" />
