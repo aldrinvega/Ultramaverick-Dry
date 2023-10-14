@@ -81,7 +81,7 @@ namespace ELIXIR.API
             services.AddScoped<IRawMaterialRepository, RawMaterialRepository>();
 
             services.AddDbContext<StoreContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("LiveConnectionDevelopment")));
+                options.UseSqlServer(Configuration.GetConnectionString("LiveConnection")));
 
             services.Configure<ApiBehaviorOptions>(options =>
             {

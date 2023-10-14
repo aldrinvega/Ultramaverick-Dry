@@ -89,11 +89,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports
 
 [Microsoft.AspNetCore.Components.Route("api/ExportReports")]
 [ApiController]
-public class AddNewProspect : ControllerBase
+public class ExportReports : ControllerBase
 {
     private readonly IMediator _mediator;
 
-    public AddNewProspect(IMediator mediator)
+    public ExportReports(IMediator mediator)
     {
         _mediator = mediator;
     }

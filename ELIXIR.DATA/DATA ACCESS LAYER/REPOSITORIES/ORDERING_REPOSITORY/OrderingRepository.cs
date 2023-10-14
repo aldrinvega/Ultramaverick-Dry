@@ -1636,8 +1636,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     ApprovedDate = x.Key.ApproveDateTempo.ToString(),
                     IsPrint = x.Key.IsPrint != null,
                     IsTransact = x.Key.IsTransact
-                }).Where(x => Convert.ToString(x.OrderNo).ToLower()
-                    .Contains(search.Trim().ToLower()));
+                }).Where(x => Convert.ToString(x.OrderNo).ToLower().Contains(search.Trim().ToLower())
+                              || x.FarmName.ToLower().Contains(search.Trim().ToLower()));
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }

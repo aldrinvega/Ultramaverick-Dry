@@ -844,8 +844,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     id.ActualGood,
                     id.QuantityOrdered,
                     Difference = id.CostByWarehouse,
-                    TotalDifference = td.TotalDifference,
-                    AvgUnitCost = auc.AvgUnitCost
+                    td.TotalDifference,
+                    auc.AvgUnitCost
                 };
 
 
