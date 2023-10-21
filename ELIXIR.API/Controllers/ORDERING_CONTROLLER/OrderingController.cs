@@ -740,16 +740,14 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [Route("SetBeingPrepared")]
         public async Task<IActionResult> SetBeingPrepared([FromBody] Ordering[] moveOrders)
         {
-            foreach (Ordering item in moveOrders)
+            foreach (var item in moveOrders)
             {
                 var result = await _unitOfWork.Order.SetBeingPrepared(item);
 
-                if (result)
-                {
-                    // Call the SignalR hub method to broadcast the update
-                    await _hub.Clients.All.SetBeingPrepared(item);
-                    return Ok();
-                }
+                if (!result) continue;
+                // Call the SignalR hub method to broadcast the update
+                await _hub.Clients.All.SetBeingPrepared(item);
+                return Ok();
             }
 
             return new JsonResult("Someone is already preparing!");
@@ -763,7 +761,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
             {
                 var result = await _unitOfWork.Order.UnsetBeingPrepared(item);
 
-                if (result)
+                if (result != null)
                 {
                     await _hub.Clients.All.SetBeingPrepared(item);
                     return Ok();

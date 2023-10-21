@@ -430,8 +430,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 from moveorder in leftJ.DefaultIfEmpty()
                 where moveorder.IsActive == true
                 join customer in _context.Customers
-                    on new { Code = moveorder.FarmCode, Name = moveorder.FarmName }
-                    equals new { Code = customer.CustomerCode, Name = customer.CustomerName }
+                    on new { Code = moveorder.FarmCode.ToLower(), Name = moveorder.FarmName.ToLower() }
+                    equals new { Code = customer.CustomerCode.ToLower(), Name = customer.CustomerName.ToLower() }
                     into leftJ2
                 from customer in leftJ2.DefaultIfEmpty()
                 group new
@@ -959,6 +959,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                         moveorder.QuantityOrdered,
                         moveorder.WarehouseId,
                         transact.PreparedDate,
+                        transact.PreparedBy,
+                        moveorder.DeliveryStatus
                     }).ToListAsync();
 
             var receiptInReport = await _context.MiscellaneousReceipts
@@ -988,45 +990,56 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     rawMaterial => rawMaterial.ItemCode,
                     (receiving, rawMaterialsGroup) =>
                         new { Receiving = receiving, RawMaterialsGroup = rawMaterialsGroup })
+                .Join(
+                    _context.POSummary,
+                    receiving => receiving.Receiving.PO_Summary_Id,
+                    posummary => posummary.Id,
+                    (receiving, posummary) => new
+                        { Receiving = receiving, PoSummary = posummary }
+                )
                 .AsEnumerable()
                 .Select(
                     (joinResult, rawMaterial) => new ConsolidatedReport
                     {
-                        Id = joinResult.Receiving.Id,
-                        TransactionDate = joinResult.Receiving.QC_ReceiveDate,
-                        ItemCode = joinResult.Receiving.ItemCode,
-                        ItemDescription = joinResult.RawMaterialsGroup.ItemDescription,
-                        Category = joinResult.RawMaterialsGroup.ItemCategory.ItemCategoryName,
-                        UOM = joinResult.RawMaterialsGroup.UOM.UOM_Description,
-                        Quantity = joinResult.Receiving.Actual_Delivered,
-                        UnitPrice = warehouseReceived.Where(wr => wr.PO_Number == joinResult.Receiving.PO_Summary_Id)
+                        Id = joinResult.Receiving.Receiving.Id,
+                        TransactDate = joinResult.Receiving.Receiving.QC_ReceiveDate.ToString("MM/dd/yyyy"),
+                        ItemCode = joinResult.Receiving.Receiving.ItemCode,
+                        ItemDescription = joinResult.Receiving.RawMaterialsGroup.ItemDescription,
+                        Category = joinResult.Receiving.RawMaterialsGroup.ItemCategory.ItemCategoryName,
+                        UOM = joinResult.Receiving.RawMaterialsGroup.UOM.UOM_Description,
+                        Quantity = joinResult.Receiving.Receiving.Actual_Delivered,
+                        UnitPrice = warehouseReceived
+                            .Where(wr => wr.PO_Number == joinResult.Receiving.Receiving.PO_Summary_Id)
                             .Select(x => x.UnitCost)
                             .FirstOrDefault(),
                         WarehouseId = warehouseReceived
-                            .Where(wr => wr.MiscellaneousReceiptId == joinResult.Receiving.Id)
+                            .Where(wr => wr.MiscellaneousReceiptId == joinResult.Receiving.Receiving.Id)
                             .Select(wr => wr.Id)
                             .FirstOrDefault(),
                         TransactionType = "Receiving",
                         CompanyCode = moveOrderReports
-                            .Where(mor => mor.ItemCode == joinResult.Receiving.ItemCode)
+                            .Where(mor => mor.ItemCode == joinResult.Receiving.Receiving.ItemCode)
                             .Select(mor => mor.CompanyCode)
                             .FirstOrDefault(),
                         CompanyName = moveOrderReports
-                            .Where(mor => mor.ItemCode == joinResult.Receiving.ItemCode)
+                            .Where(mor => mor.ItemCode == joinResult.Receiving.Receiving.ItemCode)
                             .Select(mor => mor.CompanyName)
                             .FirstOrDefault(),
                         DepartmentName = moveOrderReports
-                            .Where(mor => mor.ItemCode == joinResult.Receiving.ItemCode)
+                            .Where(mor => mor.ItemCode == joinResult.Receiving.Receiving.ItemCode)
                             .Select(mor => mor.DepartmentName)
                             .FirstOrDefault(),
                         LocationName = receiptInReport
-                            .Where(ro => ro.Id == joinResult.Receiving.Id)
+                            .Where(ro => ro.Id == joinResult.Receiving.Receiving.Id)
                             .Select(ro => ro.LocationName)
                             .FirstOrDefault(),
                         AccountTitle = receiptInReport
-                            .Where(ro => ro.Id == joinResult.Receiving.Id)
+                            .Where(ro => ro.Id == joinResult.Receiving.Receiving.Id)
                             .Select(ro => ro.AccountTitles)
-                            .FirstOrDefault()
+                            .FirstOrDefault(),
+                        Source = joinResult.Receiving.Receiving.PO_Summary_Id,
+                        Reference = joinResult.PoSummary.VendorName,
+                        Encoded = joinResult.Receiving.Receiving.QcBy
                     }).ToList();
 
             foreach (var moveOrderReport in moveOrderReports)
@@ -1034,7 +1047,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 consolidatedReports.Add(new ConsolidatedReport
                 {
                     Id = moveOrderReport.Id,
-                    TransactionDate = moveOrderReport.PreparedDate,
+                    TransactDate = moveOrderReport.PreparedDate.HasValue
+                        ? moveOrderReport.PreparedDate.Value.ToString("MM/dd/yyyy")
+                        : null,
                     ItemCode = moveOrderReport.ItemCode,
                     ItemDescription = moveOrderReport.ItemDescription,
                     Category = moveOrderReport.Category,
@@ -1044,14 +1059,18 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     UnitPrice = warehouseReceived.Where(wr => wr.Id == moveOrderReport.WarehouseId)
                         .Select(x => x.UnitCost).FirstOrDefault(),
                     TransactionType = "MoveOrder",
-                    CompanyCode = moveOrderReport.FarmName,
-                    CompanyName = moveOrderReport.FarmCode,
+                    CompanyCode = moveOrderReport.FarmCode,
+                    CompanyName = moveOrderReport.FarmName,
                     DepartmentCode = "N/A",
                     DepartmentName = moveOrderReport.DepartmentName,
                     LocationCode = "N/A",
                     LocationName = moveOrderReport.LocationName,
                     AccountTitleCode = "N/A",
-                    AccountTitle = moveOrderReport.AccountTitles
+                    AccountTitle = moveOrderReport.AccountTitles,
+                    Source = moveOrderReport.OrderNo,
+                    Reference = moveOrderReport.FarmName,
+                    Encoded = moveOrderReport.PreparedBy,
+                    Reason = moveOrderReport.DeliveryStatus
                 });
             }
 
@@ -1066,7 +1085,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 select new ConsolidatedReport
                 {
                     Id = receiptInReports.Id,
-                    TransactionDate = receiptInReports.TransactionDate,
+                    TransactDate = receiptInReports.TransactionDate.ToString("MM/dd/yyyy"),
                     ItemCode = warehouseRec.ItemCode,
                     ItemDescription = warehouseRec.ItemDescription,
                     Category = "N/A",
@@ -1079,6 +1098,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     DepartmentName = receiptInReports.DepartmentName,
                     AccountTitle = receiptInReports.AccountTitles,
                     LocationName = receiptInReports.LocationName,
+                    Source = receiptInReports.Id,
+                    Reference = receiptInReports.CompanyName,
+                    Reason = receiptInReports.Reason
                 }).ToListAsync();
 
             var miscellaneousIssues = _context.MiscellaneousIssues
@@ -1092,7 +1114,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .Select(result => new ConsolidatedReport
                 {
                     Id = result.Issue.Id,
-                    TransactionDate = result.Issue.TransactionDate,
+                    TransactDate = result.Issue.TransactionDate.ToString("MM/dd/yyyy"),
                     ItemCode = result.Details.ItemCode,
                     ItemDescription = result.Details.ItemDescription,
                     Category = "N/A",
@@ -1104,7 +1126,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     CompanyName = result.Issue.CompanyName,
                     DepartmentName = result.Issue.DepartmentName,
                     LocationName = result.Issue.LocationName,
-                    AccountTitle = result.Issue.AccountTitles
+                    AccountTitle = result.Issue.AccountTitles,
+                    Source = result.Issue.Id,
+                    Reason = result.Details.Remarks,
+                    Reference = result.Details.Customer,
+                    Encoded = result.Issue.PreparedBy
                 })
                 .ToList();
             consolidatedReports.AddRange(miscellaneousReceipts);
@@ -1113,7 +1139,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             var result = consolidatedReports.Select(report => new ConsolidatedReport
             {
                 Id = report.Id,
-                TransactionDate = report.TransactionDate,
+                TransactDate = report.TransactDate,
                 ItemCode = report.ItemCode,
                 ItemDescription = report.ItemDescription,
                 Category = report.Category,
@@ -1129,7 +1155,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 Amount = (report.Quantity.HasValue && report.UnitPrice.HasValue)
                     ? Math.Round((report.Quantity.Value * report.UnitPrice.Value), 2)
                     : 0,
-                UnitPrice = report.UnitPrice.HasValue ? Math.Round((decimal)report.UnitPrice, 2) : 0
+                UnitPrice = report.UnitPrice.HasValue ? Math.Round((decimal)report.UnitPrice, 2) : 0,
+                Source = report.Source,
+                Reference = report.Reference,
+                Reason = report.Reason,
+                Encoded = report.Encoded
             });
 
             return result.ToList();

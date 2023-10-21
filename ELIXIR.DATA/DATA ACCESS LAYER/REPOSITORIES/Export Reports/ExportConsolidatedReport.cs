@@ -98,7 +98,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports
                 {
                     var row = worksheet.Row(index + 1);
 
-                    row.Cell(1).Value = orders[index - 1].TransactionDate;
+                    row.Cell(1).Value = orders[index - 1].TransactDate;
                     row.Cell(2).Value = orders[index - 1].Id;
                     row.Cell(3).Value = orders[index - 1].WarehouseId;
                     row.Cell(4).Value = orders[index - 1].ItemCode;

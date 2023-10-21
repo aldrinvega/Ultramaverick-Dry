@@ -8,6 +8,8 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
 
         public DateTime? TransactionDate { get; set; }
 
+        public string TransactDate { get; set; }
+
         public string ItemCode { get; set; }
 
         public string ItemDescription { get; set; }
@@ -17,10 +19,10 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public string UOM { get; set; }
         public decimal? UnitPrice { get; set; }
         public decimal? Amount { get; set; }
-        public string Source { get; set; }
+        public int Source { get; set; }
         public string Reason { get; set; }
         public string Reference { get; set; }
-        public int Encoded { get; set; }
+        public string Encoded { get; set; }
 
         public decimal? Quantity { get; set; }
 

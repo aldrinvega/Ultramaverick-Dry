@@ -771,6 +771,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                         PR_Date = posummary.PR_Date.ToString("MM/dd/yyyy"),
                         ItemCode = posummary.ItemCode,
                         ItemDescription = posummary.ItemDescription,
+                        UnitPrice = posummary.UnitPrice,
                         Supplier = posummary.VendorName,
                         QuantityOrdered = posummary.Ordered,
                         ActualGood = receive.Actual_Delivered - receive.TotalReject,

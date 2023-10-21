@@ -1877,6 +1877,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             existingOrder.SetBy = moveOrders.SetBy;
 
             await _context.SaveChangesAsync();
+
             return true;
         }
 
@@ -1894,6 +1895,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             existingOrder.SetBy = null;
 
             await _context.SaveChangesAsync();
+
             return true;
         }
 

@@ -943,7 +943,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                         TransformFrom = transformfrom.WeighingScale != null ? transformfrom.WeighingScale : 0,
                         TransformTo = transformto.Quantity != null ? transformto.Quantity : 0,
                         avgUnitCost.AvgUnitCost,
-                        avgUnitCost.Difference
+                        avgUnitCost.TotalDifference
                     }
                 into total
                 select new MRPDto
@@ -958,7 +958,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     ReceiptIn = total.Key.ReceiptIn,
                     IssueOut = total.Key.IssueOut,
                     WeightedAverageUnitCost = total.Key.AvgUnitCost,
-                    TotalCost = total.Key.Difference,
+                    TotalCost = total.Key.TotalDifference,
                     SOH = total.Key.SOH - total.Key.IssueOut,
                     Reserve = total.Key.Reserve - total.Key.IssueOut,
                     SuggestedPo = total.Key.SuggestedPo,
@@ -967,7 +967,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                         Convert.ToDecimal(total.Key.Reserve /
                                           (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)), 2),
                     ReserveUsage = total.Key.ReserveUsage
-                });
+                }).OrderBy(x => x.ItemCode);
             return await PagedList<MRPDto>.CreateAsync(inventory, userParams.PageNumber, userParams.PageSize);
         }
 
@@ -1339,127 +1339,128 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 };
 
             var inventory = (from rawmaterial in _context.RawMaterials
-                join posummary in getPoSummary
-                    on rawmaterial.ItemCode equals posummary.ItemCode
-                    into leftJ1
-                from posummary in leftJ1.DefaultIfEmpty()
-                join warehouse in getWarehouseIn
-                    on rawmaterial.ItemCode equals warehouse.ItemCode
-                    into leftJ2
-                from warehouse in leftJ2.DefaultIfEmpty()
-                join moveorders in getMoveOrderOut
-                    on rawmaterial.ItemCode equals moveorders.ItemCode
-                    into leftJ3
-                from moveorders in leftJ3.DefaultIfEmpty()
-                join qcreceive in getQCReceivingIn
-                    on rawmaterial.ItemCode equals qcreceive.ItemCode
-                    into leftJ4
-                from qcreceive in leftJ4.DefaultIfEmpty()
-                join receiptin in getReceiptIn
-                    on rawmaterial.ItemCode equals receiptin.ItemCode
-                    into leftJ5
-                from receiptin in leftJ5.DefaultIfEmpty()
-                join issueout in getIssueOut
-                    on rawmaterial.ItemCode equals issueout.ItemCode
-                    into leftJ6
-                from issueout in leftJ6.DefaultIfEmpty()
-                join SOH in getSOH
-                    on rawmaterial.ItemCode equals SOH.ItemCode
-                    into leftJ7
-                from SOH in leftJ7.DefaultIfEmpty()
-                join Reserve in getReserve
-                    on rawmaterial.ItemCode equals Reserve.ItemCode
-                    into leftJ8
-                from Reserve in leftJ8.DefaultIfEmpty()
-                join suggestedpo in getSuggestedPo
-                    on rawmaterial.ItemCode equals suggestedpo.ItemCode
-                    into leftJ9
-                from suggestedpo in leftJ9.DefaultIfEmpty()
-                join averageissuance in getAverageIssuance
-                    on rawmaterial.ItemCode equals averageissuance.ItemCode
-                    into leftJ10
-                from averageissuance in leftJ10.DefaultIfEmpty()
-                join reserveusage in getReserveUsage
-                    on rawmaterial.ItemCode equals reserveusage.ItemCode
-                    into leftJ11
-                from reserveusage in leftJ11.DefaultIfEmpty()
-                join transformto in getTransformTo
-                    on rawmaterial.ItemCode equals transformto.ItemCode
-                    into leftJ12
-                from transformto in leftJ12.DefaultIfEmpty()
-                join transformfrom in getTransformation
-                    on rawmaterial.ItemCode equals transformfrom.ItemCode
-                    into leftJ13
-                from transformfrom in leftJ13.DefaultIfEmpty()
-                join avgUnitCost in finalResult
-                    on rawmaterial.ItemCode equals avgUnitCost.ItemCode
-                    into avgCostJoin
-                from avgUnitCost in avgCostJoin.DefaultIfEmpty()
-                group new
+                    join posummary in getPoSummary
+                        on rawmaterial.ItemCode equals posummary.ItemCode
+                        into leftJ1
+                    from posummary in leftJ1.DefaultIfEmpty()
+                    join warehouse in getWarehouseIn
+                        on rawmaterial.ItemCode equals warehouse.ItemCode
+                        into leftJ2
+                    from warehouse in leftJ2.DefaultIfEmpty()
+                    join moveorders in getMoveOrderOut
+                        on rawmaterial.ItemCode equals moveorders.ItemCode
+                        into leftJ3
+                    from moveorders in leftJ3.DefaultIfEmpty()
+                    join qcreceive in getQCReceivingIn
+                        on rawmaterial.ItemCode equals qcreceive.ItemCode
+                        into leftJ4
+                    from qcreceive in leftJ4.DefaultIfEmpty()
+                    join receiptin in getReceiptIn
+                        on rawmaterial.ItemCode equals receiptin.ItemCode
+                        into leftJ5
+                    from receiptin in leftJ5.DefaultIfEmpty()
+                    join issueout in getIssueOut
+                        on rawmaterial.ItemCode equals issueout.ItemCode
+                        into leftJ6
+                    from issueout in leftJ6.DefaultIfEmpty()
+                    join SOH in getSOH
+                        on rawmaterial.ItemCode equals SOH.ItemCode
+                        into leftJ7
+                    from SOH in leftJ7.DefaultIfEmpty()
+                    join Reserve in getReserve
+                        on rawmaterial.ItemCode equals Reserve.ItemCode
+                        into leftJ8
+                    from Reserve in leftJ8.DefaultIfEmpty()
+                    join suggestedpo in getSuggestedPo
+                        on rawmaterial.ItemCode equals suggestedpo.ItemCode
+                        into leftJ9
+                    from suggestedpo in leftJ9.DefaultIfEmpty()
+                    join averageissuance in getAverageIssuance
+                        on rawmaterial.ItemCode equals averageissuance.ItemCode
+                        into leftJ10
+                    from averageissuance in leftJ10.DefaultIfEmpty()
+                    join reserveusage in getReserveUsage
+                        on rawmaterial.ItemCode equals reserveusage.ItemCode
+                        into leftJ11
+                    from reserveusage in leftJ11.DefaultIfEmpty()
+                    join transformto in getTransformTo
+                        on rawmaterial.ItemCode equals transformto.ItemCode
+                        into leftJ12
+                    from transformto in leftJ12.DefaultIfEmpty()
+                    join transformfrom in getTransformation
+                        on rawmaterial.ItemCode equals transformfrom.ItemCode
+                        into leftJ13
+                    from transformfrom in leftJ13.DefaultIfEmpty()
+                    join avgUnitCost in finalResult
+                        on rawmaterial.ItemCode equals avgUnitCost.ItemCode
+                        into avgCostJoin
+                    from avgUnitCost in avgCostJoin.DefaultIfEmpty()
+                    group new
+                        {
+                            posummary,
+                            warehouse,
+                            moveorders,
+                            qcreceive,
+                            receiptin,
+                            issueout,
+                            SOH,
+                            Reserve,
+                            suggestedpo,
+                            averageissuance,
+                            reserveusage,
+                            transformto,
+                            transformfrom,
+                            avgUnitCost
+                        }
+                        by new
+                        {
+                            rawmaterial.ItemCode,
+                            rawmaterial.ItemDescription,
+                            rawmaterial.UOM.UOM_Code,
+                            rawmaterial.ItemCategory.ItemCategoryName,
+                            rawmaterial.BufferLevel,
+                            SuggestedPo = suggestedpo.Ordered != null ? suggestedpo.Ordered : 0,
+                            WarehouseActualGood = warehouse.ActualGood != null ? warehouse.ActualGood : 0,
+                            ReceiptIn = receiptin.Quantity != null ? receiptin.Quantity : 0,
+                            MoveOrderOut = moveorders.QuantityOrdered != null ? moveorders.QuantityOrdered : 0,
+                            QcReceiving = qcreceive.QuantityOrdered != null ? qcreceive.QuantityOrdered : 0,
+                            IssueOut = issueout.Quantity != null ? issueout.Quantity : 0,
+                            SOH = SOH.SOH != null ? SOH.SOH : 0,
+                            Reserve = Reserve.Reserve != null ? Reserve.Reserve : 0,
+                            AverageIssuance = averageissuance.ActualGood != null ? averageissuance.ActualGood : 0,
+                            ReserveUsage = reserveusage.Reserve != null ? reserveusage.Reserve : 0,
+                            TransformFrom = transformfrom.WeighingScale != null ? transformfrom.WeighingScale : 0,
+                            TransformTo = transformto.Quantity != null ? transformto.Quantity : 0,
+                            avgUnitCost.AvgUnitCost,
+                            avgUnitCost.TotalDifference
+                            //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
+                        }
+                    into total
+                    select new MRPDto
                     {
-                        posummary,
-                        warehouse,
-                        moveorders,
-                        qcreceive,
-                        receiptin,
-                        issueout,
-                        SOH,
-                        Reserve,
-                        suggestedpo,
-                        averageissuance,
-                        reserveusage,
-                        transformto,
-                        transformfrom,
-                        avgUnitCost
-                    }
-                    by new
-                    {
-                        rawmaterial.ItemCode,
-                        rawmaterial.ItemDescription,
-                        rawmaterial.UOM.UOM_Code,
-                        rawmaterial.ItemCategory.ItemCategoryName,
-                        rawmaterial.BufferLevel,
-                        SuggestedPo = suggestedpo.Ordered != null ? suggestedpo.Ordered : 0,
-                        WarehouseActualGood = warehouse.ActualGood != null ? warehouse.ActualGood : 0,
-                        ReceiptIn = receiptin.Quantity != null ? receiptin.Quantity : 0,
-                        MoveOrderOut = moveorders.QuantityOrdered != null ? moveorders.QuantityOrdered : 0,
-                        QcReceiving = qcreceive.QuantityOrdered != null ? qcreceive.QuantityOrdered : 0,
-                        IssueOut = issueout.Quantity != null ? issueout.Quantity : 0,
-                        SOH = SOH.SOH != null ? SOH.SOH : 0,
-                        Reserve = Reserve.Reserve != null ? Reserve.Reserve : 0,
-                        AverageIssuance = averageissuance.ActualGood != null ? averageissuance.ActualGood : 0,
-                        ReserveUsage = reserveusage.Reserve != null ? reserveusage.Reserve : 0,
-                        TransformFrom = transformfrom.WeighingScale != null ? transformfrom.WeighingScale : 0,
-                        TransformTo = transformto.Quantity != null ? transformto.Quantity : 0,
-                        avgUnitCost.AvgUnitCost,
-                        avgUnitCost.Difference
-                        //  LastUsed = lastUsed.PreparedDate != null ? lastUsed.PreparedDate : null
-                    }
-                into total
-                select new MRPDto
-                {
-                    ItemCode = total.Key.ItemCode,
-                    ItemDescription = total.Key.ItemDescription,
-                    Uom = total.Key.UOM_Code,
-                    ItemCategory = total.Key.ItemCategoryName,
-                    BufferLevel = total.Key.BufferLevel,
-                    ReceiveIn = total.Key.QcReceiving,
-                    MoveOrderOut = total.Key.MoveOrderOut,
-                    /*QCReceiving = total.Key.QcReceiving,*/
-                    ReceiptIn = total.Key.ReceiptIn,
-                    IssueOut = total.Key.IssueOut,
-                    WeightedAverageUnitCost = total.Key.AvgUnitCost,
-                    SOH = total.Key.SOH - total.Key.IssueOut,
-                    Reserve = total.Key.Reserve - total.Key.IssueOut,
-                    SuggestedPo = total.Key.SuggestedPo,
-                    AverageIssuance = Math.Round(Convert.ToDecimal(total.Key.AverageIssuance), 2),
-                    DaysLevel = Math.Round(
-                        Convert.ToDecimal(total.Key.Reserve /
-                                          (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)), 2),
-                    ReserveUsage = total.Key.ReserveUsage,
-                    TotalCost = total.Key.Difference
-                }).Where(x => x.ItemDescription.ToLower()
-                .Contains(search.Trim().ToLower()));
+                        ItemCode = total.Key.ItemCode,
+                        ItemDescription = total.Key.ItemDescription,
+                        Uom = total.Key.UOM_Code,
+                        ItemCategory = total.Key.ItemCategoryName,
+                        BufferLevel = total.Key.BufferLevel,
+                        ReceiveIn = total.Key.QcReceiving,
+                        MoveOrderOut = total.Key.MoveOrderOut,
+                        /*QCReceiving = total.Key.QcReceiving,*/
+                        ReceiptIn = total.Key.ReceiptIn,
+                        IssueOut = total.Key.IssueOut,
+                        WeightedAverageUnitCost = total.Key.AvgUnitCost,
+                        SOH = total.Key.SOH - total.Key.IssueOut,
+                        Reserve = total.Key.Reserve - total.Key.IssueOut,
+                        SuggestedPo = total.Key.SuggestedPo,
+                        AverageIssuance = Math.Round(Convert.ToDecimal(total.Key.AverageIssuance), 2),
+                        DaysLevel = Math.Round(
+                            Convert.ToDecimal(total.Key.Reserve /
+                                              (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)), 2),
+                        ReserveUsage = total.Key.ReserveUsage,
+                        TotalCost = total.Key.TotalDifference
+                    }).OrderBy(x => x.ItemCode)
+                .Where(x => x.ItemDescription.ToLower()
+                    .Contains(search.Trim().ToLower()));
 
             return await PagedList<MRPDto>.CreateAsync(inventory, userParams.PageNumber, userParams.PageSize);
         }

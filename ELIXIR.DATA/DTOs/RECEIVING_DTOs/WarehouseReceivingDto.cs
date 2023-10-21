@@ -9,7 +9,6 @@ namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
 {
     public class WarehouseReceivingDto
     {
-
         public int Id { get; set; }
         public int PO_Number { get; set; }
         public string PO_Date { get; set; }
@@ -32,8 +31,6 @@ namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
         public bool IsExpirable { get; set; }
         public DateTime? ExpirationDate1 { get; set; }
 
-
-
-
+        public decimal UnitPrice { get; set; }
     }
 }
