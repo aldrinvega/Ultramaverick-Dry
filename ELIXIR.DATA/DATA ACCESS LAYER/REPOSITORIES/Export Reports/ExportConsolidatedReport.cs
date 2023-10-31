@@ -80,7 +80,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports
                     "Account Title", "Category"
                 };
 
-
                 var range = worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, headers.Count));
 
                 range.Style.Fill.BackgroundColor = XLColor.Azure;

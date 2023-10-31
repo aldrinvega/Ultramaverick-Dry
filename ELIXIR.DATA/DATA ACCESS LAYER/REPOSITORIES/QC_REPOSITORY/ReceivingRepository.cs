@@ -789,7 +789,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                         ManufacturingDate = receive.Manufacturing_Date.ToString()
                     }).OrderBy(x => x.PO_Number)
                 .Where(x => x.IsWareHouseReceive == false)
-                .Where(x => x.IsExpiryApprove == true || x.ExpirationDate1 == null)
+                .Where(x => x.IsExpiryApprove == true && (x.ExpirationDate1 == null || x.ExpirationDate1 != null))
                 .Where(x => x.IsActive == true);
 
             return await PagedList<WarehouseReceivingDto>.CreateAsync(warehouse, userParams.PageNumber,
@@ -827,7 +827,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                         IsExpirable = rawmats.IsExpirable
                     }).OrderBy(x => x.PO_Number)
                 .Where(x => x.IsWareHouseReceive == false)
-                .Where(x => x.IsExpiryApprove == true || x.ExpirationDate1 == null)
+                .Where(x => x.IsExpiryApprove == true && (x.ExpirationDate1 == null || x.ExpirationDate1 != null))
                 .Where(x => x.IsActive == true)
                 .Where(x => Convert.ToString(x.PO_Number).ToLower()
                     .Contains(search.Trim().ToLower()));

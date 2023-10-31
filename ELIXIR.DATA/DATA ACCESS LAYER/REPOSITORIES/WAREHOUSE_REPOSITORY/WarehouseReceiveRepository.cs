@@ -36,7 +36,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
             var summary = (from receive in _context.QC_Receiving
                 where receive.IsActive == true &&
                       (receive.IsWareHouseReceive == false || receive.IsWareHouseReceive == null) &&
-                      receive.ExpiryIsApprove == true
+                      receive.ExpiryIsApprove == true && (receive.Expiry_Date == null || receive.Expiry_Date != null)
                 join posummary in _context.POSummary
                     on receive.PO_Summary_Id equals posummary.Id into leftJ
                 from posummary in leftJ.DefaultIfEmpty()
@@ -72,6 +72,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                     Supplier = total.Key.VendorName,
                     ActualDelivered = total.Key.Actual_Delivered - total.Key.TotalReject,
                     TotalReject = total.Key.TotalReject,
+                    ExpirationDate1 = total.Key.Expiry_Date != null
+                        ? total.Key.Expiry_Date.Value
+                        : null,
                     UnitPrice = total.Key.UnitPrice,
                     Expiration = (total.Key.Expiry_Date).ToString() != null ? (total.Key.Expiry_Date).ToString() : null,
                     //ExpirationDays = total.Key.Expiry_Date == null ? 0 : total.Key.Expiry_Date.Value.Subtract(dateNow).Days,

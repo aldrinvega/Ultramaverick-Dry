@@ -105,7 +105,6 @@ namespace ELIXIR.API.Controllers.REPORT_CONTROLLER
             [FromQuery] string PlusOne)
         {
             var cancel = await _unitOfWork.Report.InventoryMovementReport(DateFrom, DateTo, PlusOne);
-
             return Ok(cancel);
         }
 

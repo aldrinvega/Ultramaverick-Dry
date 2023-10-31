@@ -564,9 +564,9 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [HttpGet]
         [Route("ApprovedMoveOrderPagination")]
         public async Task<ActionResult<IEnumerable<MoveOrderDto>>> ApprovedMoveOrderPagination(
-            [FromQuery] UserParams userParams)
+            [FromQuery] UserParams userParams, string dateFrom, string dateTo)
         {
-            var moveorder = await _unitOfWork.Order.ApprovedMoveOrderPagination(userParams);
+            var moveorder = await _unitOfWork.Order.ApprovedMoveOrderPagination(userParams, dateFrom, dateTo);
 
             Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount,
                 moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
@@ -588,14 +588,14 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         [HttpGet]
         [Route("ApprovedMoveOrderPaginationOrig")]
         public async Task<ActionResult<IEnumerable<MoveOrderDto>>> ApprovedMoveOrderPaginationOrig(
-            [FromQuery] UserParams userParams, [FromQuery] string search /*string dateFrom, string dateTo*/)
+            [FromQuery] UserParams userParams, [FromQuery] string search, string dateFrom, string dateTo)
         {
-            if (search == null /*&& dateFrom == null && dateTo == null*/)
+            if (search == null)
 
-                return await ApprovedMoveOrderPagination(userParams);
+                return await ApprovedMoveOrderPagination(userParams, dateFrom, dateTo);
 
             var moveorder =
-                await _unitOfWork.Order.ApprovedMoveOrderPaginationOrig(userParams, search /*, dateFrom, dateTo*/);
+                await _unitOfWork.Order.ApprovedMoveOrderPaginationOrig(userParams, search);
 
             Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount,
                 moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);

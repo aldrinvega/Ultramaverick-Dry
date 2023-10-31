@@ -24,9 +24,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
         public bool IsPrepared { get; set; }
         public string PreparedBy { get; set; }
         public DateTime? PreparedDate { get; set; }
-        
+
         public bool? IsCancel { get; set; }
-        
+
         public string CancelBy { get; set; }
         public DateTime? CancelledDate { get; set; }
         public int OrderNoPKey { get; set; }
@@ -42,7 +42,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
         public bool? IsPrint { get; set; }
         public bool? IsApproveReject { get; set; }
         public bool? IsRejectForPreparation { get; set; }
+        public string AccountTitleCode { get; set; }
         public string AccountTitles { get; set; }
+        public string LocationCode { get; set; }
         public string LocationName { get; set; }
         public string DepartmentName { get; set; }
         public string DepartmentCode { get; set; }

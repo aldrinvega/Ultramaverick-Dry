@@ -4,14 +4,16 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20231030202232_AddLocationCodeOnMoveORderEntity")]
+    partial class AddLocationCodeOnMoveORderEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,9 +118,6 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("AccountTitleCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("AccountTitles")
                         .HasColumnType("nvarchar(max)");
 
@@ -137,9 +136,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("CustomerCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DepartmentCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("DepartmentName")
                         .HasColumnType("nvarchar(max)");
 
@@ -151,9 +147,6 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<bool?>("IsTransact")
                         .HasColumnType("bit");
-
-                    b.Property<string>("LocationCode")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LocationName")
                         .HasColumnType("nvarchar(max)");
@@ -245,9 +238,6 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("AccountTitleCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("AccountTitles")
                         .HasColumnType("nvarchar(max)");
 
@@ -260,9 +250,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("CompanyName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DepartmentCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("DepartmentName")
                         .HasColumnType("nvarchar(max)");
 
@@ -271,9 +258,6 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
-
-                    b.Property<string>("LocationCode")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LocationName")
                         .HasColumnType("nvarchar(max)");
@@ -528,9 +512,6 @@ namespace ELIXIR.DATA.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
-
-                    b.Property<string>("AccountTitleCode")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AccountTitles")
                         .HasColumnType("nvarchar(max)");
