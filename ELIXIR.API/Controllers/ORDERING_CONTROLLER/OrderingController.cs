@@ -595,7 +595,7 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
                 return await ApprovedMoveOrderPagination(userParams, dateFrom, dateTo);
 
             var moveorder =
-                await _unitOfWork.Order.ApprovedMoveOrderPaginationOrig(userParams, search);
+                await _unitOfWork.Order.ApprovedMoveOrderPaginationOrig(userParams, search, dateFrom, dateTo);
 
             Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount,
                 moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);

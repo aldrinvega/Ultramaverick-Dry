@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ELIXIR.DATA.DTOs.ORDERING_DTOs;
+using ConsolidatedReport = ELIXIR.DATA.DTOs.REPORT_DTOs.ConsolidatedReport;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 {
@@ -132,68 +133,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     ActualGood = x.Sum(g => g.ActualGood)
                 });
 
-            /*var individualDifferences = from wr in _context.WarehouseReceived
-                join mo in _context.MoveOrders
-                    on wr.Id equals mo.WarehouseId
-                    into moveOrders
-                from mo in moveOrders.DefaultIfEmpty()
-                where wr.IsActive && wr.IsWarehouseReceive
-                select new
-                {
-                    wr.ItemCode,
-                    wr.ActualGood,
-                    QuantityOrdered = mo != null ? mo.QuantityOrdered : 0,
-                    CostByWarehouse = wr.UnitCost * (wr.ActualGood - (mo != null ? mo.QuantityOrdered : 0))
-                };
-
-            string queryString = individualDifferences.ToQueryString();
-
-
-
-            // Calculate the sum of differences per ItemCode
-            var totalDifferences = individualDifferences
-                .GroupBy(id => id.ItemCode)
-                .Select(g => new
-                {
-                    ItemCode = g.Key,
-                    TotalDifference = g.Sum(id => id.CostByWarehouse)
-                });
-
-            string queryString2 = totalDifferences.ToQueryString();
-
-            // Calculate the average UnitCost per ItemCode
-            var averageUnitCosts = individualDifferences
-                .GroupBy(id => id.ItemCode)
-                .Select(g => new
-                {
-                    ItemCode = g.Key,
-                    AvgUnitCost = g.Average(id =>
-                        (id.ActualGood - id.QuantityOrdered) == 0
-                            ? 0
-                            : id.CostByWarehouse / (id.ActualGood - id.QuantityOrdered))
-                });
-
-            string queryString3 = averageUnitCosts.ToQueryString();
-
-            // Combine the results
-            var finalResult = from id in individualDifferences
-                join td in totalDifferences
-                    on id.ItemCode equals td.ItemCode
-                join auc in averageUnitCosts
-                    on id.ItemCode equals auc.ItemCode
-                select new
-                {
-                    id.ItemCode,
-                    id.ActualGood,
-                    id.QuantityOrdered,
-                    Difference = id.CostByWarehouse,
-                    TotalDifference = td.TotalDifference,
-                    AvgUnitCost = auc.AvgUnitCost
-                };
-                */
-
-            /*string queryString4 = finalResult.ToQueryString();*/
-
             var orders = (
                 from moveorder in _context.MoveOrders
                 where moveorder.PreparedDate >= DateTime.Parse(DateFrom) &&
@@ -217,6 +156,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 } by new
                 {
                     moveorder.OrderNo,
+                    moveorder.OrderNoPKey,
                     moveorder.FarmCode,
                     moveorder.FarmName,
                     moveorder.ItemCode,
@@ -422,54 +362,37 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             DateTime fromDate = DateTime.Parse(dateFrom);
             DateTime toDate = DateTime.Parse(dateTo);
 
-            var orders = (from transact in _context.TransactMoveOrder
-                where transact.IsActive == true && transact.IsTransact == true &&
-                      transact.PreparedDate >= fromDate && transact.PreparedDate <= toDate
-                join moveorder in _context.MoveOrders
-                    on transact.OrderNo equals moveorder.OrderNo into leftJ
-                from moveorder in leftJ.DefaultIfEmpty()
-                where moveorder.IsActive == true
-                join customer in _context.Customers
-                    on moveorder.FarmCode equals customer.CustomerCode
-                    into leftJ2
-                from customer in leftJ2.DefaultIfEmpty()
-                where moveorder.FarmName.ToLower() == customer.CustomerName.ToLower()
-                group new
-                    {
-                        transact,
-                        moveorder,
-                        customer
-                    }
-                    by new
-                    {
-                        moveorder.OrderNo,
-                        customer.CustomerName,
-                        customer.CustomerCode,
-                        moveorder.ItemCode,
-                        moveorder.ItemDescription,
-                        moveorder.Uom,
-                        moveorder.QuantityOrdered,
-                        transact.PreparedBy,
-                        moveorder.DeliveryStatus,
-                        MoveOrderDate = moveorder.ApprovedDate.ToString(),
-                        TransactedDate = transact.PreparedDate.ToString(),
-                        DeliveryDate = transact.DeliveryDate.ToString()
-                    }
-                into total
-                select new MoveOrderReport
+            var orders = _context.MoveOrders
+                .Where(moveorder => moveorder.IsActive == true)
+                .Join(_context.TransactMoveOrder,
+                    moveorder => moveorder.OrderNo,
+                    transact => transact.OrderNo,
+                    (moveorder, transact) => new { moveorder, transact })
+                .Where(joinResult => joinResult.transact.IsActive == true
+                                     && joinResult.transact.IsTransact == true
+                                     && joinResult.transact.PreparedDate >= fromDate
+                                     && joinResult.transact.PreparedDate <= toDate)
+                .Join(_context.Customers,
+                    joinResult => joinResult.moveorder.FarmCode,
+                    customer => customer.CustomerCode,
+                    (joinResult, customer) => new { joinResult, customer })
+                .Where(joinCustomerResult => joinCustomerResult.joinResult.moveorder.FarmName.Equals(
+                    joinCustomerResult.customer.CustomerName,
+                    StringComparison.OrdinalIgnoreCase))
+                .Select(s => new MoveOrderReport
                 {
-                    OrderNo = total.Key.OrderNo,
-                    CustomerName = total.Key.CustomerName,
-                    CustomerCode = total.Key.CustomerCode,
-                    ItemCode = total.Key.ItemCode,
-                    ItemDescription = total.Key.ItemDescription,
-                    Uom = total.Key.Uom,
-                    Quantity = total.Key.QuantityOrdered,
-                    MoveOrderDate = total.Key.MoveOrderDate,
-                    TransactedBy = total.Key.PreparedBy,
-                    TransactionType = total.Key.DeliveryStatus,
-                    TransactedDate = total.Key.TransactedDate,
-                    DeliveryDate = total.Key.DeliveryDate
+                    OrderNo = s.joinResult.moveorder.OrderNo,
+                    CustomerName = s.customer.CustomerName,
+                    CustomerCode = s.customer.CustomerCode,
+                    ItemCode = s.joinResult.moveorder.ItemCode,
+                    ItemDescription = s.joinResult.moveorder.ItemDescription,
+                    Uom = s.joinResult.moveorder.Uom,
+                    Quantity = s.joinResult.moveorder.QuantityOrdered,
+                    MoveOrderDate = s.joinResult.moveorder.ApprovedDate.ToString(),
+                    TransactedBy = s.joinResult.transact.PreparedBy,
+                    TransactionType = s.joinResult.moveorder.DeliveryStatus,
+                    TransactedDate = s.joinResult.transact.PreparedDate.ToString(),
+                    DeliveryDate = s.joinResult.transact.DeliveryDate.ToString()
                 });
 
             return await orders.ToListAsync();
@@ -937,11 +860,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     join moveorder in _context.MoveOrders
                         on transact.OrderNo equals moveorder.OrderNo into leftJ
                     from moveorder in leftJ.DefaultIfEmpty()
-                    join customer in _context.Customers
-                        on new { Code1 = moveorder.FarmCode, name1 = moveorder.FarmName }
-                        equals new { Code1 = customer.CustomerCode, name1 = customer.CustomerName }
-                        into leftJ2
-                    from customer in leftJ2.DefaultIfEmpty()
                     select new
                     {
                         moveorder.Id,
@@ -949,8 +867,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                         moveorder.ItemDescription,
                         moveorder.Category,
                         moveorder.OrderNo,
-                        FarmName = customer.CustomerName,
-                        FarmCode = customer.CustomerCode,
+                        moveorder.FarmName,
+                        moveorder.FarmCode,
                         moveorder.Uom,
                         moveorder.CompanyCode,
                         moveorder.CompanyName,
@@ -1032,7 +950,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                         DepartmentName = "Meatshop Administration",
                         LocationCode = "0",
                         LocationName = "Common",
-                        AccountTitle = "Accrued expense Payable",
+                        AccountTitle = "Accrued Expense Payable",
                         AccountTitleCode = "211201",
                         Source = joinResult.Receiving.Receiving.PO_Summary_Id,
                         Reference = joinResult.PoSummary.VendorName,
@@ -1099,9 +1017,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     DepartmentCode = receiptInReports.DepartmentCode,
                     DepartmentName = receiptInReports.DepartmentName,
                     AccountTitleCode = receiptInReports.AccountTitleCode,
-                    AccountTitle = receiptInReports.AccountTitleCode,
+                    AccountTitle = receiptInReports.AccountTitles,
                     LocationCode = receiptInReports.LocationCode,
                     LocationName = receiptInReports.LocationName,
+                    Encoded = receiptInReports.PreparedBy,
                     Source = receiptInReports.Id,
                     Reference = receiptInReports.CompanyName,
                     Reason = receiptInReports.Remarks

@@ -1222,6 +1222,19 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             existing.DeliveryStatus = order.DeliveryStatus;
             existing.IsMove = true;
 
+            AdvancesToEmployees advancesToEmployees = null;
+
+            if (!string.IsNullOrWhiteSpace(order.EmployeeId) && !string.IsNullOrWhiteSpace(order.EmployeeName))
+            {
+                advancesToEmployees = new AdvancesToEmployees
+                {
+                    EmployeeId = order.EmployeeId,
+                    EmployeeName = order.EmployeeName
+                };
+                await _context.AdvancesToEmployees.AddAsync(advancesToEmployees);
+                await _context.SaveChangesAsync();
+            }
+
             foreach (var items in existingMoveorder)
             {
                 items.DeliveryStatus = order.DeliveryStatus;
@@ -1234,6 +1247,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 items.CompanyName = order.CompanyName;
                 items.CompanyCode = order.CompanyCode;
                 items.AddedBy = order.AddedBy;
+                items.AdvancesToEmployeesId = advancesToEmployees?.Id;
             }
 
             return true;
@@ -1589,7 +1603,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             if (!string.IsNullOrEmpty(dateFrom) && !string.IsNullOrEmpty(dateTo))
             {
-                var fromDate = DateTime.Parse(dateFrom);
+                var fromDate = DateTime.Parse(dateFrom).AddDays(1).AddTicks(-1);
                 var toDate = DateTime.Parse(dateTo);
                 orders = orders.Where(x =>
                     x.Key.PreparedDate >= fromDate.Date && x.Key.PreparedDate <= toDate.Date);
@@ -1614,10 +1628,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await PagedList<MoveOrderDto>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPaginationOrig(UserParams userParams, string search)
+        public async Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPaginationOrig(UserParams userParams, string search,
+            string DateFrom, string DateTo)
         {
             var orders = _context.MoveOrders
-                .Where(X => X.IsActive == true)
+                .Where(x => x.IsActive == true)
                 .GroupBy(x => new
                 {
                     x.OrderNo,
@@ -1631,29 +1646,38 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     x.IsReject,
                     x.ApproveDateTempo,
                     x.IsPrint,
-                    x.IsTransact
-                })
-                .Where(x => x.Key.IsApprove == true)
+                    x.IsTransact,
+                }).Where(x => x.Key.IsApprove == true)
                 .Where(x => x.Key.DeliveryStatus != null)
-                .Where(x => x.Key.IsReject != true)
-                .Select(x => new MoveOrderDto
+                .Where(x => x.Key.IsReject != true);
+
+            if (!string.IsNullOrEmpty(DateFrom) && !string.IsNullOrEmpty(DateTo))
+            {
+                var fromDate = DateTime.Parse(DateFrom).AddDays(1).AddTicks(-1);
+                var toDate = DateTime.Parse(DateTo);
+                orders = orders.Where(x =>
+                    x.Key.PreparedDate >= fromDate.Date && x.Key.PreparedDate <= toDate.Date);
+            }
+
+            var result = orders.Select(x => new MoveOrderDto
                 {
                     OrderNo = x.Key.OrderNo,
                     FarmName = x.Key.FarmName,
                     FarmCode = x.Key.FarmCode,
                     Category = x.Key.FarmType,
-                    Quantity = x.Sum(y => y.QuantityOrdered),
+                    Quantity = x.Sum(x => x.QuantityOrdered),
                     PreparedDate = x.Key.PreparedDate.ToString(),
                     DeliveryStatus = x.Key.DeliveryStatus,
                     IsApprove = x.Key.IsApprove != null,
                     IsPrepared = x.Key.IsPrepared,
                     ApprovedDate = x.Key.ApproveDateTempo.ToString(),
                     IsPrint = x.Key.IsPrint != null,
-                    IsTransact = x.Key.IsTransact
-                }).Where(x => Convert.ToString(x.OrderNo).ToLower().Contains(search.Trim().ToLower())
-                              || x.FarmName.ToLower().Contains(search.Trim().ToLower()));
+                    IsTransact = x.Key.IsTransact,
+                }).OrderBy(x => x.PreparedDate)
+                .Where(x => Convert.ToString(x.OrderNo).ToLower().Contains(search.Trim().ToLower())
+                            || x.FarmName.ToLower().Contains(search.Trim().ToLower()));
 
-            return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
+            return await PagedList<MoveOrderDto>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
         public async Task<PagedList<MoveOrderDto>> RejectedMoveOrderPagination(UserParams userParams)

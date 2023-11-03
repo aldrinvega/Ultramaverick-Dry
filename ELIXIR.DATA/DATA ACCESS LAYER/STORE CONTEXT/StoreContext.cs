@@ -20,7 +20,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
 {
     public class StoreContext : DbContext
     {
-        public StoreContext(DbContextOptions<StoreContext> options) : base(options) { }
+        public StoreContext(DbContextOptions<StoreContext> options) : base(options)
+        {
+        }
 
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserRole> Roles { get; set; }
@@ -81,22 +83,23 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public virtual DbSet<ChecklistOtherObservation> ChecklistOtherObservations { get; set; }
         public virtual DbSet<ChecklistCompliance> ChecklistCompliances { get; set; }
         public virtual DbSet<ChecklistReviewVerificationLog> ChecklistReviewVerificationLogs { get; set; }
+        public virtual DbSet<AdvancesToEmployees> AdvancesToEmployees { get; set; }
         public virtual DbSet<ChecklistAnswers> ChecklistAnswers { get; set; }
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ReceiveRequest>()
                 .HasOne(l => l.LabTestRequests)
                 .WithMany()
                 .HasForeignKey(l => l.LabTestRequestsId);
-            
+
             modelBuilder.Entity<LabTestRequests>()
                 .HasOne(l => l.WarehouseReceived)
                 .WithMany()
                 .HasForeignKey(l => l.WarehouseReceivingId);
-            
+
             //AcceptedLabRequest
-            
+
             modelBuilder.Entity<LabTestRequests>()
                 .Property(e => e.Analysis)
                 .HasConversion(
@@ -106,8 +109,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                         (c1, c2) => c1.SequenceEqual(c2),
                         c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                         c => c.ToList()
-                        ));
-            
+                    ));
+
             modelBuilder.Entity<LabTestRequests>()
                 .Property(e => e.Parameters)
                 .HasConversion(
@@ -118,7 +121,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                         c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                         c => c.ToList()
                     ));
-            
+
             modelBuilder.Entity<LabTestRequests>()
                 .Property(e => e.ProductCondition)
                 .HasConversion(
@@ -129,7 +132,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                         c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                         c => c.ToList()
                     ));
-            
+
             modelBuilder.Entity<LabTestRequests>()
                 .Property(e => e.SampleType)
                 .HasConversion(
@@ -140,7 +143,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                         c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                         c => c.ToList()
                     ));
-            
+
             modelBuilder.Entity<LabTestRequests>()
                 .Property(e => e.TypeOfSwab)
                 .HasConversion(
@@ -151,7 +154,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                         c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                         c => c.ToList()
                     ));
-            
+
             modelBuilder.Entity<CheckListString>()
                 .Property(e => e.Value)
                 .HasConversion(
@@ -167,19 +170,19 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                 .HasOne(x => x.AddedByUser)
                 .WithMany()
                 .HasForeignKey(x => x.AddedBy);
-            
+
             ///New Checklist Entities
 
             modelBuilder.Entity<QCChecklist>()
                 .HasOne(x => x.PoReceiving)
                 .WithMany()
                 .HasForeignKey(x => x.ReceivingId);
-            
+
             modelBuilder.Entity<ChecklistTypes>()
                 .HasOne(x => x.AddedByUser)
                 .WithMany()
                 .HasForeignKey(x => x.AddedBy);
-            
+
             modelBuilder.Entity<ChecklistTypes>()
                 .HasOne(x => x.ModifiedByUser)
                 .WithMany()
@@ -189,7 +192,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
                 .HasOne(x => x.ModifiedByUser)
                 .WithMany()
                 .HasForeignKey(x => x.ModifiedBy);
-
         }
     }
 }

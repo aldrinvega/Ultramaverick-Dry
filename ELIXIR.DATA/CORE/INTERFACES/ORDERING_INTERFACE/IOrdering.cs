@@ -66,7 +66,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         Task<PagedList<MoveOrderDto>>
             ApprovedMoveOrderPagination(UserParams userParams, string dateFrom, string dateTo);
 
-        Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPaginationOrig(UserParams userParams, string search);
+        Task<PagedList<MoveOrderDto>> ApprovedMoveOrderPaginationOrig(UserParams userParams, string search,
+            string DateFrom, string DateTo);
 
         Task<PagedList<MoveOrderDto>> RejectedMoveOrderPagination(UserParams userParams);
 
