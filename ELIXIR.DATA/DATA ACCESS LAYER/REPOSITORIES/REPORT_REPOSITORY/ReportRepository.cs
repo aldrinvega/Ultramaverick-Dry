@@ -1007,6 +1007,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     TransactDate = receiptInReports.TransactionDate.ToString("MM/dd/yyyy"),
                     ItemCode = warehouseRec.ItemCode,
                     ItemDescription = warehouseRec.ItemDescription,
+                    UOM = warehouseRec.Uom,
                     Category = itemCategory.ItemCategoryName,
                     Quantity = receiptInReports.TotalQuantity,
                     UnitPrice = warehouseRec.UnitCost,
