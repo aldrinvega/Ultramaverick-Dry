@@ -6,7 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 {
@@ -477,7 +479,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
             return await inventory.ToListAsync();
         }
 
-        public async Task<PagedList<MRPDto>> GetAllItemForInventoryPagination(UserParams userParams)
+        public async Task<PagedList<MRPDto>> GetAllItemForInventoryPagination(
+            UserParams userParams,
+            string SortColumn,
+            string SortOrder)
         {
             var EndDate = DateTime.Now;
             var StartDate = EndDate.AddDays(-30);
@@ -967,12 +972,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                         Convert.ToDecimal(total.Key.Reserve /
                                           (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)), 2),
                     ReserveUsage = total.Key.ReserveUsage
-                }).OrderBy(x => x.ItemCode);
+                });
+            inventory = SortOrder?.ToLower() == "desc"
+                ? inventory.OrderByDescending(GetSortProperty(SortColumn))
+                : inventory.OrderBy(GetSortProperty(SortColumn));
             return await PagedList<MRPDto>.CreateAsync(inventory, userParams.PageNumber, userParams.PageSize);
         }
 
         public async Task<PagedList<MRPDto>> GetAllItemForInventoryPaginationOrig(UserParams userParams,
-            string search)
+            string search,
+            string SortColumn,
+            string SortOrder)
         {
             var EndDate = DateTime.Now;
             var StartDate = EndDate.AddDays(-30);
@@ -1458,9 +1468,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                               (total.Key.AverageIssuance != 0 ? total.Key.AverageIssuance : 1)), 2),
                         ReserveUsage = total.Key.ReserveUsage,
                         TotalCost = total.Key.TotalDifference
-                    }).OrderBy(x => x.ItemCode)
+                    })
                 .Where(x => x.ItemDescription.ToLower()
                     .Contains(search.Trim().ToLower()));
+
+            inventory = SortOrder?.ToLower() == "desc"
+                ? inventory.OrderByDescending(GetSortProperty(SortColumn))
+                : inventory.OrderBy(GetSortProperty(SortColumn));
 
             return await PagedList<MRPDto>.CreateAsync(inventory, userParams.PageNumber, userParams.PageSize);
         }
@@ -1510,5 +1524,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
             return weightedAverage;
         }
+
+        ///Sort Items In Inventory
+        private static Expression<Func<MRPDto, object>> GetSortProperty(string SortColumn) =>
+            SortColumn?.ToLower() switch
+            {
+                "item_description" => warehouse => warehouse.ItemDescription,
+                "uom" => warehouse => warehouse.Uom,
+                _ => warehouse => warehouse.ItemCode
+            };
     }
 }
