@@ -362,7 +362,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             DateTime fromDate = DateTime.Parse(dateFrom);
             DateTime toDate = DateTime.Parse(dateTo);
 
-            var orders = _context.MoveOrders
+            var orders = await _context.MoveOrders
                 .Where(moveorder => moveorder.IsActive == true)
                 .Join(_context.TransactMoveOrder,
                     moveorder => moveorder.OrderNo,
@@ -376,6 +376,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     joinResult => joinResult.moveorder.FarmCode,
                     customer => customer.CustomerCode,
                     (joinResult, customer) => new { joinResult, customer })
+                .ToListAsync();
+
+            var filteredOrders = orders
                 .Where(joinCustomerResult => joinCustomerResult.joinResult.moveorder.FarmName.Equals(
                     joinCustomerResult.customer.CustomerName,
                     StringComparison.OrdinalIgnoreCase))
@@ -395,7 +398,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     DeliveryDate = s.joinResult.transact.DeliveryDate.ToString()
                 });
 
-            return await orders.ToListAsync();
+            return filteredOrders.ToList();
         }
 
         public async Task<IReadOnlyList<CancelledOrderReport>> CancelledOrderedReports(string DateFrom, string DateTo)
