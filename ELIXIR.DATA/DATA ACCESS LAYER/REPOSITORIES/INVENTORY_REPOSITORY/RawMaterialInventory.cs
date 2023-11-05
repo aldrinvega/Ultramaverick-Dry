@@ -1531,6 +1531,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
             {
                 "item_description" => warehouse => warehouse.ItemDescription,
                 "uom" => warehouse => warehouse.Uom,
+                "category" => warehouse => warehouse.ItemCategory,
                 _ => warehouse => warehouse.ItemCode
             };
     }
