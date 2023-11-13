@@ -688,7 +688,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
 
         public async Task<IReadOnlyList<WarehouseReceivingDto>> ListOfWarehouseReceivingId()
         {
-            var preparationOut = _context.Transformation_Preparation.Where(x => x.IsActive == true)
+            var preparationOut = _context.Transformation_Preparation.Where(x => 
+                    x.IsActive)
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -788,7 +789,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
 
         public async Task<IReadOnlyList<WarehouseReceivingDto>> ListOfWarehouseReceivingId(string search)
         {
-            var preparationOut = _context.Transformation_Preparation.Where(x => x.IsActive == true)
+            var preparationOut = _context.Transformation_Preparation.Where(x => 
+                    x.IsActive == true && 
+                    x.ItemCode == search)
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -801,7 +804,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                 });
 
             var moveorderOut = _context.MoveOrders.Where(x => x.IsActive == true)
-                .Where(x => x.IsPrepared == true)
+                .Where(x => x.IsPrepared == true && 
+                            x.ItemCode == search)
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -814,7 +818,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                 });
 
             var issueOut = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
-                .Where(x => x.IsTransact == true)
+                .Where(x => x.IsTransact == true &&
+                            x.ItemCode == search)
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -877,8 +882,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                     ItemCode = total.Key.ItemCode,
                     ItemDescription = total.Key.ItemDescription,
                     ManufacturingDate = total.Key.ManufacturingDate.ToString("MM/dd/yyyy"),
-                    ActualGood = total.Key.ActualGood - total.Key.PreparationOut - total.Key.MoveOrderOut -
-                                 total.Key.IssueOut,
+                    ActualGood = total.Key.ActualGood - (total.Key.PreparationOut + total.Key.MoveOrderOut +
+                                 total.Key.IssueOut),
                     ExpirationDate = total.Key.ExpirationDate != null ? total.Key.ExpirationDate.ToString() : null,
                     ExpirationDay = total.Key.ExpirationDays,
                 });
