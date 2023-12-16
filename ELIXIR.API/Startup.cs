@@ -24,7 +24,6 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questio
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY;
 using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions.AddNewChecklistQuestions;
-using FluentValidation;
 
 namespace ELIXIR.API
 {
@@ -84,7 +83,7 @@ namespace ELIXIR.API
             services.AddScoped<IOrdering, OrderingRepository>();
 
             services.AddDbContext<StoreContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("LiveConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("Smarter")));
 
             services.Configure<ApiBehaviorOptions>(options =>
             {

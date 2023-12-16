@@ -21,7 +21,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Ope
             public int ReceivingId { get; set; }
             public int PO_Summary_Id { get; set; }
             public DateTime? Manufacturing_Date { get; set; }
-            public int Expected_Delivery { get; set; }
+            public decimal Expected_Delivery { get; set; }
             public DateTime? Expiry_Date { get; set; }
             public decimal Actual_Delivered { get; set; }
             public string ItemCode { get; set; }

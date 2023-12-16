@@ -768,8 +768,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
         public async Task<IReadOnlyList<ConsolidatedReport>> ConsolidatedReport(string dateFrom, string dateTo)
         {
-            DateTime fromDate = DateTime.Parse(dateFrom);
-            DateTime toDate = DateTime.Parse(dateTo);
+            var fromDate = DateTime.Parse(dateFrom).Date;
+            var toDate = DateTime.Parse(dateTo).Date;
 
             var individualDifferences = from wr in _context.WarehouseReceived
                 join mo in _context.MoveOrders
@@ -859,7 +859,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
             var moveOrderReports = await
                 (from transact in _context.TransactMoveOrder
                     where transact.IsActive == true && transact.IsTransact == true &&
-                          transact.PreparedDate >= fromDate && transact.PreparedDate <= toDate
+                          transact.PreparedDate.Value.Date >= fromDate && transact.PreparedDate.Value.Date <= toDate
                     join moveorder in _context.MoveOrders
                         on transact.OrderNo equals moveorder.OrderNo into leftJ
                     from moveorder in leftJ.DefaultIfEmpty()
@@ -890,7 +890,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
             var receiptInReport = await _context.MiscellaneousReceipts
                 .Where(receipt => receipt.IsActive == true)
-                .Where(receipt => receipt.TransactionDate >= fromDate && receipt.TransactionDate <= toDate)
+                .Where(receipt => receipt.TransactionDate.Date >= fromDate && receipt.TransactionDate.Date <= toDate)
                 .Select(receiptIn => new
                 {
                     receiptIn.Id,
@@ -908,7 +908,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
             consolidatedReports = _context.QC_Receiving
                 .Where(wr => wr.IsWareHouseReceive == true)
-                .Where(wr => wr.QC_ReceiveDate >= fromDate && wr.QC_ReceiveDate <= toDate)
+                .Where(wr => wr.QC_ReceiveDate.Date >= fromDate && wr.QC_ReceiveDate.Date <= toDate)
                 .Join(
                     _context.RawMaterials
                         .Include(rm => rm.UOM)
@@ -932,7 +932,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     (joinResult, rawMaterial) => new ConsolidatedReport
                     {
                         Id = joinResult.Receiving.Receiving.Id,
-                        TransactDate = joinResult.Receiving.Receiving.QC_ReceiveDate.ToString("MM/dd/yyyy"),
+                        TransactDate = joinResult.Receiving.Receiving.QC_ReceiveDate.ToString("MM-dd-yyyy"),
                         ItemCode = joinResult.Receiving.Receiving.ItemCode,
                         ItemDescription = joinResult.Receiving.RawMaterialsGroup.ItemDescription,
                         Category = joinResult.Receiving.RawMaterialsGroup.ItemCategory.ItemCategoryName,
@@ -955,7 +955,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                         LocationName = "Common",
                         AccountTitle = "Accrued Expense Payable",
                         AccountTitleCode = "211201",
-                        Source = joinResult.Receiving.Receiving.PO_Summary_Id,
+                        Reason = joinResult.PoSummary.PO_Number.ToString(),
+                        Source = joinResult.PoSummary.PO_Number,
                         Reference = joinResult.PoSummary.VendorName,
                         Encoded = joinResult.Receiving.Receiving.QcBy
                     }).ToList();
@@ -966,7 +967,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 {
                     Id = moveOrderReport.Id,
                     TransactDate = moveOrderReport.PreparedDate.HasValue
-                        ? moveOrderReport.PreparedDate.Value.ToString("MM/dd/yyyy")
+                        ? moveOrderReport.PreparedDate.Value.ToString("MM-dd-yyyy")
                         : null,
                     ItemCode = moveOrderReport.ItemCode,
                     ItemDescription = moveOrderReport.ItemDescription,
@@ -1007,7 +1008,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 select new ConsolidatedReport
                 {
                     Id = receiptInReports.Id,
-                    TransactDate = receiptInReports.TransactionDate.ToString("MM/dd/yyyy"),
+                    TransactDate = receiptInReports.TransactionDate.ToString("MM-dd-yyyy"),
                     ItemCode = warehouseRec.ItemCode,
                     ItemDescription = warehouseRec.ItemDescription,
                     UOM = warehouseRec.Uom,
@@ -1032,7 +1033,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
 
             var miscellaneousIssues = _context.MiscellaneousIssues
                 .Where(wr => wr.IsTransact == true)
-                .Where(x => x.TransactionDate >= fromDate && x.TransactionDate <= toDate)
+                .Where(x => x.TransactionDate.Date >= fromDate && x.TransactionDate.Date <= toDate)
                 .Join(
                     _context.MiscellaneousIssueDetails,
                     issue => issue.Id,
@@ -1051,7 +1052,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 .Select(consolidated => new ConsolidatedReport
                 {
                     Id = consolidated.Combined.Result.Issue.Id,
-                    TransactDate = consolidated.Combined.Result.Issue.TransactionDate.ToString("MM/dd/yyyy"),
+                    TransactDate = consolidated.Combined.Result.Issue.TransactionDate.ToString("MM-dd-yyyy"),
                     ItemCode = consolidated.Combined.Result.Details.ItemCode,
                     ItemDescription = consolidated.Combined.Result.Details.ItemDescription,
                     Category = consolidated.ItemCategory.ItemCategoryName,

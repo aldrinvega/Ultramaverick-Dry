@@ -1469,8 +1469,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                         ReserveUsage = total.Key.ReserveUsage,
                         TotalCost = total.Key.TotalDifference
                     })
-                .Where(x => x.ItemDescription.ToLower()
-                    .Contains(search.Trim().ToLower()));
+                .Where(x => x.ItemDescription.ToLower().Contains(search.Trim().ToLower()) ||
+                            x.ItemCode.ToLower().Contains(search.Trim().ToLower()) ||
+                            x.ItemCategory.ToLower().Contains(search.Trim().ToLower()));
 
             inventory = SortOrder?.ToLower() == "desc"
                 ? inventory.OrderByDescending(GetSortProperty(SortColumn))

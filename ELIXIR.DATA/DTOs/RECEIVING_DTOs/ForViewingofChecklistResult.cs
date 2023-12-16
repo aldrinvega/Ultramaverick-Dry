@@ -17,7 +17,7 @@ namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
             set;
         }
         
-        public int Expected_Delivery {
+        public decimal Expected_Delivery {
             get; 
             set;
         }
