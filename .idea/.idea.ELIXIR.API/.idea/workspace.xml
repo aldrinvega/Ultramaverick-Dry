@@ -11,14 +11,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a52501b5-a0a4-45ca-a210-4d1e8b3c8605" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/ORDERING_DTOs/PreparationScheduleDTO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ELIXIR.API/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ELIXIR.API/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ELIXIR.API/Startup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Startup.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/QC_MODEL/PO_Receiving.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/QC_MODEL/PO_Receiving.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/QC_REPOSITORY/Checklist Operation/GetChecklistByReceivingId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/QC_REPOSITORY/Checklist Operation/GetChecklistByReceivingId.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/REPORT_REPOSITORY/ReportRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/REPORT_REPOSITORY/ReportRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/RECEIVING_DTOs/ForViewingofChecklistResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/RECEIVING_DTOs/ForViewingofChecklistResult.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/RECEIVING_DTOs/NearlyExpireDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/RECEIVING_DTOs/NearlyExpireDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/RECEIVING_DTOs/QC_ReceivingDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/RECEIVING_DTOs/QC_ReceivingDTO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.API/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/appsettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/ORDERING_INTERFACE/IOrdering.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/ORDERING_INTERFACE/IOrdering.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/SETUP_MODEL/CustomerListForPreparationSchedule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/SETUP_MODEL/CustomerListForPreparationSchedule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,6 +134,7 @@
       <workItem from="1701822024481" duration="871000" />
       <workItem from="1701934570520" duration="4210000" />
       <workItem from="1702339029264" duration="6108000" />
+      <workItem from="1702859434086" duration="7438000" />
     </task>
     <servers />
   </component>

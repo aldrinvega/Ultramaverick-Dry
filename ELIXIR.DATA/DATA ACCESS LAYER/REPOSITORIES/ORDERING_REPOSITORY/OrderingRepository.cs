@@ -28,7 +28,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             _clients = clients;
         }
 
-        public async Task<IReadOnlyList<OrderDto>> GetAllListOfOrders(string farms)
+        public async Task<IReadOnlyList<PreparationScheduleDto>> GetAllListOfOrders(string farms)
         {
             var datenow = DateTime.Now;
 
@@ -165,7 +165,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     }
                 into total
                 orderby total.Key.DateNeeded ascending
-                select new OrderDto
+                select new PreparationScheduleDto
                 {
                     Id = total.Key.Id,
                     OrderDate = total.Key.OrderDate.ToString("MM/dd/yyyy"),
@@ -180,7 +180,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                         ? total.Key.QuantityOrdered
                         : (decimal)total.Key.AllocatedQuantity,
                     IsActive = total.Key.IsActive,
-                    IsPrepared = total.Key.IsPrepared,
                     StockOnHand = total.Key.Reserve,
                     CompanyCode = total.Key.CustomerCode,
                     CompanyName = total.Key.CompanyName,
@@ -491,28 +490,88 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         public async Task<PagedList<CustomerListForPreparationSchedule>> GetAllListofOrdersPagination(
             UserParams userParams)
         {
-            //var orders = _context.Orders.OrderBy(x => x.OrderDate)
-            //                            .GroupBy(x => new
-            //                            {
-            //                                x.FarmName,
-            //                                x.IsActive,
-            //                                x.PreparedDate,
-            //                                x.ForAllocation,
-            //                                x.FarmCode,
-            //                                x.FarmType,
+            var getWarehouseStock = _context.WarehouseReceived.Where(x => x.IsActive == true)
+                .GroupBy(x => new
+                {
+                    x.ItemCode,
+                }).Select(x => new WarehouseInventory
+                {
+                    ItemCode = x.Key.ItemCode,
+                    ActualGood = x.Sum(x => x.ActualGood)
+                });
 
-            //                            }).Where(x => x.Key.IsActive == true)
-            //                              .Where(x => x.Key.PreparedDate == null)
-            //                              .Where(x => x.Key.ForAllocation == null)
-            //                            .Select(x => new OrderDto
-            //                              {
-            //                                  Farm = x.Key.FarmName,
-            //                                  FarmType = x.Key.FarmType,
-            //                                  FarmCode = x.Key.FarmCode,
-            //                                  IsActive = x.Key.IsActive,
-            //                                  NumberofOrders = x.Count(x => x.ItemCode)
 
-            //                              });
+            var getOrderingReserve = _context.Orders.Where(x => x.IsActive == true)
+                .Where(x => x.IsCancelledOrder == null)
+                .Where(x => x.PreparedDate != null)
+                .GroupBy(x => new
+                {
+                    x.ItemCode
+                }).Select(x => new OrderingInventory
+                {
+                    ItemCode = x.Key.ItemCode,
+                    QuantityOrdered = x.Sum(order => order.AllocatedQuantity ?? (int)order.QuantityOrdered)
+                });
+
+
+            var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)
+                .GroupBy(x => new
+                {
+                    x.ItemCode,
+                }).Select(x => new OrderingInventory
+                {
+                    ItemCode = x.Key.ItemCode,
+                    QuantityOrdered = x.Sum(x => x.Quantity)
+                });
+
+            var getIssueOut = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
+                .Where(x => x.IsTransact == true)
+                .GroupBy(x => new
+                {
+                    x.ItemCode,
+                }).Select(x => new IssueInventory
+                {
+                    ItemCode = x.Key.ItemCode,
+                    Quantity = x.Sum(x => x.Quantity)
+                });
+
+            var getReserve = (from warehouse in getWarehouseStock
+                join request in getTransformationReserve
+                    on warehouse.ItemCode equals request.ItemCode
+                    into leftJ1
+                from request in leftJ1.DefaultIfEmpty()
+                join ordering in getOrderingReserve
+                    on warehouse.ItemCode equals ordering.ItemCode
+                    into leftJ2
+                from ordering in leftJ2.DefaultIfEmpty()
+                join issue in getIssueOut
+                    on warehouse.ItemCode equals issue.ItemCode
+                    into leftJ3
+                from issue in leftJ3.DefaultIfEmpty()
+                group new
+                    {
+                        warehouse,
+                        request,
+                        ordering,
+                        issue
+                    }
+                    by new
+                    {
+                        warehouse.ItemCode,
+                        ordering.QuantityOrdered,
+                        warehouse.ActualGood,
+                        issue.Quantity
+                    }
+                into total
+                select new ReserveInventory
+                {
+                    ItemCode = total.Key.ItemCode,
+                    Reserve = total.Key.ActualGood -
+                              ((total.Key.QuantityOrdered != null ? total.Key.QuantityOrdered : 0) +
+                               (total.Key.Quantity != null ? total.Key.Quantity : 0))
+                });
+
+            var reserveList = getReserve.ToList();
 
             var customers = _context.Customers
                 .Include(x => x.Orders)
@@ -528,8 +587,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     DepartmentName = x.DepartmentName,
                     CompanyName = x.CompanyName,
                     LocationName = x.LocationName,
-                    FarmName = x.FarmType.FarmName,
-                    Orders = x.Orders
+                    FarmName = x.FarmType.FarmName
                 });
 
             return await PagedList<CustomerListForPreparationSchedule>.CreateAsync(customers, userParams.PageNumber,

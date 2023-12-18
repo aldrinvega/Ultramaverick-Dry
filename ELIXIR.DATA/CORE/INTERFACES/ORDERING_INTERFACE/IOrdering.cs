@@ -14,7 +14,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 {
     public interface IOrdering
     {
-        Task<IReadOnlyList<OrderDto>> GetAllListOfOrders(string farms);
+        Task<IReadOnlyList<PreparationScheduleDto>> GetAllListOfOrders(string farms);
         Task<bool> EditQuantityOrder(Ordering orders);
         Task<bool> SchedulePreparedDate(Ordering orders);
         Task<IReadOnlyList<OrderDto>> GetAllListOfPreparedDate();

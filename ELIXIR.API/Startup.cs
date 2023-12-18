@@ -83,7 +83,7 @@ namespace ELIXIR.API
             services.AddScoped<IOrdering, OrderingRepository>();
 
             services.AddDbContext<StoreContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("Smarter")));
+                options.UseSqlServer(Configuration.GetConnectionString("ETDConnection")));
 
             services.Configure<ApiBehaviorOptions>(options =>
             {

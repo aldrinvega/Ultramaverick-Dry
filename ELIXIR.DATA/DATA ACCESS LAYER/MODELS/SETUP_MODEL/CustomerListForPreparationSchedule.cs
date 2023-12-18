@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
+using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
 {
@@ -41,9 +42,5 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL
             get;
             set;
         }
-        public List<Ordering> Orders
-        {
-            get; set;
-        } = new List<Ordering>();
     }
 }
