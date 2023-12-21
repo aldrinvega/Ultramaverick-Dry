@@ -83,7 +83,7 @@ namespace ELIXIR.API
             services.AddScoped<IOrdering, OrderingRepository>();
 
             services.AddDbContext<StoreContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("ETDConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("LiveConnection")));
 
             services.Configure<ApiBehaviorOptions>(options =>
             {
@@ -107,6 +107,7 @@ namespace ELIXIR.API
             //{
             //    options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
             //    options.HttpsPort = 82;
+            /// sample
             //});
 
             services.AddApplicationServices();

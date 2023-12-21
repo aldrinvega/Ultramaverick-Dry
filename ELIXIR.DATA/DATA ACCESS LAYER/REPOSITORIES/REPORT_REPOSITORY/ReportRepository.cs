@@ -133,10 +133,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     ActualGood = x.Sum(g => g.ActualGood)
                 });
 
-            var orders = (
-                from moveorder in _context.MoveOrders
-                where moveorder.PreparedDate >= DateTime.Parse(DateFrom) &&
-                      moveorder.PreparedDate <= DateTime.Parse(DateTo) &&
+            var orders = from moveorder in _context.MoveOrders
+                where moveorder.PreparedDate >= DateTime.Parse(DateFrom).Date &&
+                      moveorder.PreparedDate <= DateTime.Parse(DateTo).Date &&
                       moveorder.IsActive == true
                 join transactmoveorder in _context.TransactMoveOrder
                     on moveorder.OrderNo equals transactmoveorder.OrderNo into leftJ
@@ -147,13 +146,38 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 /*join UC in finalResult
                     on moveorder.ItemCode equals UC.ItemCode into leftj2
                 from UC in leftj2.DefaultIfEmpty()*/
-                group new
+                select new
                 {
                     moveorder,
                     stockOnHand,
                     /*UC,*/
                     transactmoveorder
-                } by new
+                };
+            
+            var moveOrderReports = orders.AsEnumerable().SelectMany(order => new[]
+            {
+                new MoveOrderReport
+                {
+                    MoveOrderId = order.moveorder.OrderNo,
+                    CustomerCode = order.moveorder.FarmCode,
+                    CustomerName = order.moveorder.FarmName,
+                    ItemCode = order.moveorder.ItemCode,
+                    ItemDescription = order.moveorder.ItemDescription,
+                    Uom = order.moveorder.Uom,
+                    Category = order.moveorder.Category,
+                    Quantity = order.moveorder.QuantityOrdered,
+                    ExpirationDate = order.moveorder.ExpirationDate?.ToString(),
+                    TransactionType = order.moveorder.DeliveryStatus,
+                    MoveOrderBy = order.moveorder.PreparedBy,
+                    MoveOrderDate = order.moveorder.PreparedDate?.ToString(),
+                    TransactedBy = order.transactmoveorder?.PreparedBy ?? "N/A",
+                    TransactedDate = order.transactmoveorder?.PreparedDate?.ToString("MM/dd/yyyy") ?? "N/A",
+                }
+            });
+
+            return moveOrderReports.ToList();
+
+            /*by new
                 {
                     moveorder.OrderNo,
                     moveorder.OrderNoPKey,
@@ -171,7 +195,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     transactmoveorder.PreparedBy,
                     transactmoveorder.PreparedDate,
                     stockOnHand.ActualGood,
-                    /*UC.AvgUnitCost,*/
+                    /*UC.AvgUnitCost,#1#
                 }
                 into result
                 select new MoveOrderReport
@@ -192,10 +216,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     TransactedDate = result.Key.PreparedDate.HasValue
                         ? result.Key.PreparedDate.Value.ToString("MM/dd/yyyy")
                         : "N/A",
-                    /*WeightedAverageUnitCost = Math.Round((decimal)result.Key.AvgUnitCost, 2)*/
+                    /*WeightedAverageUnitCost = Math.Round((decimal)result.Key.AvgUnitCost, 2)#1#
                 });
 
-            return await orders.ToListAsync();
+            return await orders.ToListAsync();*/
         }
 
         public async Task<IReadOnlyList<MiscellaneousReceiptReport>> MReceiptReport(string DateFrom, string DateTo)

@@ -20,5 +20,6 @@
         public string DepartmentName { get; set; }
         public string CompanyName { get; set; }
         public string CompanyCode { get; set; }
+        public bool IsPrepared { get; set; }
     }
 }

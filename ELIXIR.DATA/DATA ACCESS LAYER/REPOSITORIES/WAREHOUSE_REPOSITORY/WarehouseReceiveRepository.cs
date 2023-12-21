@@ -137,7 +137,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
             warehouse.IsActive = true;
             warehouse.QcReceivingId = scanbarcode.Id;
             warehouse.TransactionType = "Receiving";
-            warehouse.UnitCost = scanbarcode.UnitCost;
 
             var qcreceived = _context.QC_Receiving.FirstOrDefault(x => x.Id == scanbarcode.Id);
             qcreceived.IsWareHouseReceive = true;
