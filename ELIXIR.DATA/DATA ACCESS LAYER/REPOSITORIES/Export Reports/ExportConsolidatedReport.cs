@@ -103,7 +103,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports
                     row.Cell(4).Value = orders[index - 1].ItemCode;
                     row.Cell(5).Value = orders[index - 1].ItemDescription;
                     row.Cell(6).Value = orders[index - 1].UOM;
-                    row.Cell(7).Value = orders[index - 1].Quantity;
+                    if (orders[index - 1].TransactionType == "Move Order" || orders[index - 1].TransactionType == "Miscellaneous Issue")
+                    {
+                        row.Cell(7).Value = "-" + orders[index - 1].Quantity;
+                    }
+                    else
+                    {
+                        row.Cell(7).Value = orders[index - 1].Quantity;
+                    }
                     row.Cell(8).Value = orders[index - 1].UnitPrice;
                     row.Cell(9).Value = orders[index - 1].Amount;
                     row.Cell(10).Value = orders[index - 1].TransactionType;

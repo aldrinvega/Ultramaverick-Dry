@@ -10,14 +10,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a52501b5-a0a4-45ca-a210-4d1e8b3c8605" name="Changes" comment="Adjust preparation schedule and appsettings.json">
+    <list default="true" id="a52501b5-a0a4-45ca-a210-4d1e8b3c8605" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ELIXIR.API/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ELIXIR.API/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ELIXIR.API/Startup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Startup.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/SETUP_MODEL/CustomerListForPreparationSchedule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/SETUP_MODEL/CustomerListForPreparationSchedule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/REPORT_REPOSITORY/ReportRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/REPORT_REPOSITORY/ReportRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/WAREHOUSE_REPOSITORY/WarehouseReceiveRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/WAREHOUSE_REPOSITORY/WarehouseReceiveRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/ORDERING_DTOs/PreparationScheduleDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/ORDERING_DTOs/PreparationScheduleDTO.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,12 +22,15 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock://C:/Users/avega/RiderProjects/ELIXIR-DEPOT/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/avega/RiderProjects/ELIXIR-DEPOT/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/avega/RiderProjects/ELIXIR-DEPOT/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/avega/RiderProjects/ELIXIR-DEPOT/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/SETUP_MODEL/CustomerListForPreparationSchedule.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -65,7 +65,7 @@
     ]
   }
 }</component>
-  <component name="RunManager" selected="Publish to IIS.ELIXIR.API: FolderProfile">
+  <component name="RunManager" selected=".NET Launch Settings Profile.ELIXIR.API: IIS Express">
     <configuration name="ELIXIR.API: FolderProfile" type="DotNetMsBuildPublish" factoryName="Publish to IIS">
       <riderPublish configuration="Release" platform="Any CPU" publish_profile="FolderProfile.pubxml" pubxml_path="$PROJECT_DIR$/ELIXIR.API/Properties/PublishProfiles/FolderProfile.pubxml" uuid_high="-8403624971411110585" uuid_low="-5197296087255001206" />
       <method v="2" />
@@ -140,7 +140,12 @@
       <workItem from="1701934570520" duration="4210000" />
       <workItem from="1702339029264" duration="6108000" />
       <workItem from="1702859434086" duration="11455000" />
-      <workItem from="1703049669409" duration="4465000" />
+      <workItem from="1703049669409" duration="7502000" />
+      <workItem from="1703126317251" duration="3749000" />
+      <workItem from="1703207922857" duration="1494000" />
+      <workItem from="1705635668179" duration="2475000" />
+      <workItem from="1705907282493" duration="3157000" />
+      <workItem from="1705969048821" duration="494000" />
     </task>
     <task id="LOCAL-00001" summary="Adjust preparation schedule and appsettings.json">
       <option name="closed" value="true" />
@@ -150,7 +155,15 @@
       <option name="project" value="LOCAL" />
       <updated>1702868956026</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Changes">
+      <option name="closed" value="true" />
+      <created>1703118718008</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1703118718008</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -171,7 +184,8 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Adjust preparation schedule and appsettings.json" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adjust preparation schedule and appsettings.json" />
+    <MESSAGE value="Changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -412,39 +426,39 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>1075</line>
+          <line>1076</line>
           <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" initialLine="1075" containingFunctionPresentation="Method 'GetAllItemForInventoryPaginationOrig'">
             <startOffsets>
-              <option value="46315" />
+              <option value="46332" />
             </startOffsets>
             <endOffsets>
-              <option value="46756" />
+              <option value="46773" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="22" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>1064</line>
+          <line>1065</line>
           <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" initialLine="1064" containingFunctionPresentation="Method 'GetAllItemForInventoryPaginationOrig'">
             <startOffsets>
-              <option value="45906" />
+              <option value="45923" />
             </startOffsets>
             <endOffsets>
-              <option value="46301" />
+              <option value="46318" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="23" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>1044</line>
+          <line>1045</line>
           <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" initialLine="1044" containingFunctionPresentation="Method 'GetAllItemForInventoryPaginationOrig'">
             <startOffsets>
-              <option value="45140" />
+              <option value="45157" />
             </startOffsets>
             <endOffsets>
-              <option value="45496" />
+              <option value="45513" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="25" />
@@ -457,36 +471,62 @@
               <option value="43837" />
             </startOffsets>
             <endOffsets>
-              <option value="44250" />
+              <option value="44267" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="26" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>1136</line>
+          <line>1137</line>
           <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" initialLine="1136" containingFunctionPresentation="Method 'GetAllItemForInventoryPaginationOrig'">
             <startOffsets>
-              <option value="49075" />
+              <option value="49092" />
             </startOffsets>
             <endOffsets>
-              <option value="49962" />
+              <option value="49979" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="27" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>1096</line>
+          <line>1097</line>
           <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" initialLine="1096" containingFunctionPresentation="Method 'GetAllItemForInventoryPaginationOrig'">
             <startOffsets>
-              <option value="47160" />
+              <option value="47177" />
             </startOffsets>
             <endOffsets>
-              <option value="48963" />
+              <option value="48980" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/ELIXIR.API/Controllers/ORDERING_CONTROLLER/OrderingController.cs</url>
+          <line>208</line>
+          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.API\Controllers\ORDERING_CONTROLLER\OrderingController.cs" initialLine="208" containingFunctionPresentation="Method 'GetAllListOfOrdersPagination'">
+            <startOffsets>
+              <option value="7328" />
+            </startOffsets>
+            <endOffsets>
+              <option value="7406" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs</url>
+          <line>536</line>
+          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\ORDERING_REPOSITORY\OrderingRepository.cs" initialLine="536" containingFunctionPresentation="Method 'GetAllListofOrdersPagination'">
+            <startOffsets>
+              <option value="21206" />
+            </startOffsets>
+            <endOffsets>
+              <option value="21348" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="31" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

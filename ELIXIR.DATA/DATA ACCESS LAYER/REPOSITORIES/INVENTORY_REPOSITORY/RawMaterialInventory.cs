@@ -1009,7 +1009,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     ActualGood = x.Sum(x => x.ActualGood)
                 });
 
-            var getMoveOrderOut = _context.MoveOrders.Where(x => x.IsActive == true)
+            var getMoveOrderOut = _context.MoveOrders
+                .Where(x => x.IsActive == true)
                 .Where(x => x.IsPrepared == true)
                 .GroupBy(x => new
                 {

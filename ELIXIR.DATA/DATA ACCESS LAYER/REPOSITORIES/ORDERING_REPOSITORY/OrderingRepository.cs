@@ -524,13 +524,15 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 {
                     Id = x.Id,
                     CustomerCode = x.CustomerCode,
-                    CustomerName = x.CustomerName,
+                    CustomerName = x.CustomerName, 
                     DepartmentName = x.DepartmentName,
                     CompanyName = x.CompanyName,
                     LocationName = x.LocationName,
                     FarmName = x.FarmType.FarmName,
-                    Orders = x.Orders
+                    /*Orders = x.Orders*/
                 });
+
+          
 
             return await PagedList<CustomerListForPreparationSchedule>.CreateAsync(customers, userParams.PageNumber,
                 userParams.PageSize);

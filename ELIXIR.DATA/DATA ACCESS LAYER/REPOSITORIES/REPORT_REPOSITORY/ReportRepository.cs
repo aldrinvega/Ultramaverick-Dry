@@ -6,11 +6,8 @@ using ELIXIR.DATA.DTOs.TRANSFORMATION_DTOs;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Formats.Asn1;
-using System.Linq;
-using System.Text;
+using System.Linq; 
 using System.Threading.Tasks;
-using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 using ConsolidatedReport = ELIXIR.DATA.DTOs.REPORT_DTOs.ConsolidatedReport;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
@@ -134,6 +131,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                 });
 
             var orders = from moveorder in _context.MoveOrders
+                         .Include(x => x.AdvancesToEmployees)
                 where moveorder.PreparedDate >= DateTime.Parse(DateFrom).Date &&
                       moveorder.PreparedDate <= DateTime.Parse(DateTo).Date &&
                       moveorder.IsActive == true
@@ -172,6 +170,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     MoveOrderDate = order.moveorder.PreparedDate?.ToString(),
                     TransactedBy = order.transactmoveorder?.PreparedBy ?? "N/A",
                     TransactedDate = order.transactmoveorder?.PreparedDate?.ToString("MM/dd/yyyy") ?? "N/A",
+                    EmployeeId = order.moveorder?.AdvancesToEmployees?.EmployeeId,
+                    EmployeeName = order.moveorder?.AdvancesToEmployees?.EmployeeName
                 }
             });
 
@@ -236,7 +236,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     ReceiptId = receiptHeader.Id,
                     SupplierCode = receiptHeader.SupplierCode,
                     SupplierName = receiptHeader.Supplier,
-                    Details = receiptHeader.Remarks,
+                    Details = receiptHeader.Details,
                     ItemCode = receipt.ItemCode,
                     ItemDescription = receipt.ItemDescription,
                     Uom = receipt.Uom,
@@ -244,7 +244,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     Quantity = receipt.ActualGood,
                     ExpirationDate = receipt.Expiration.ToString(),
                     TransactBy = receiptHeader.PreparedBy,
-                    TransactDate = receipt.ReceivingDate.ToString()
+                    TransactDate = receipt.ReceivingDate.ToString(),
+                    Reason = receiptHeader.Reason
                 });
 
             return await receipts.ToListAsync();
@@ -1079,8 +1080,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     TransactDate = consolidated.Combined.Result.Issue.TransactionDate.ToString("MM-dd-yyyy"),
                     ItemCode = consolidated.Combined.Result.Details.ItemCode,
                     ItemDescription = consolidated.Combined.Result.Details.ItemDescription,
+                    UOM = consolidated.Combined.Result.Details.Uom,
                     Category = consolidated.ItemCategory.ItemCategoryName,
-                    Quantity = consolidated.Combined.Result.Issue.TotalQuantity,
+                    Quantity = consolidated.Combined.Result.Details.Quantity,
                     WarehouseId = consolidated.Combined.Result.Details.WarehouseId,
                     UnitPrice = consolidated.Combined.Result.Details.UnitCost,
                     TransactionType = "Miscellaneous Issue",
