@@ -1,34 +1,29 @@
 ﻿using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Office2016.Excel;
 using ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports
 {
+
     [Route("api/ExportReports"), ApiController]
-    public class ExportMiscIssueHistoryReport : ControllerBase
+    public class ExportMiscReceiptHistoryReport : ControllerBase
     {
         private readonly IMediator _mediator;
 
-        public ExportMiscIssueHistoryReport(IMediator mediator)
+        public ExportMiscReceiptHistoryReport(IMediator mediator)
         {
             _mediator = mediator;
         }
 
-        [HttpGet("ExportMiscIssueHistoryReports")]
-        public async Task<IActionResult> Add([FromQuery] ExportMiscIssueHistoryReportCommand command)
+        [HttpGet("ExportMiscReceiptHistoryReports")]
+        public async Task<IActionResult> Add([FromQuery] ExportMiscReceiptHistoryReportQuery command)
         {
-            var filePath = $"MiscellaneousIssueHistoryReport {command.DateFrom} - {command.DateTo}.xlsx";
+            var filePath = $"MiscellaneousReceiptHistoryReport {command.DateFrom} - {command.DateTo}.xlsx";
             try
             {
                 await _mediator.Send(command);
@@ -51,13 +46,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports
             }
         }
 
-        public class ExportMiscIssueHistoryReportCommand : IRequest<Unit>
+        public class ExportMiscReceiptHistoryReportQuery : IRequest<Unit>
         {
             public string DateFrom { get; set; }
             public string DateTo { get; set; }
         }
 
-        public class Handler : IRequestHandler<ExportMiscIssueHistoryReportCommand, Unit>
+        public class Handler : IRequestHandler<ExportMiscReceiptHistoryReportQuery, Unit>
         {
             private readonly IReportRepository _reportRepository;
 
@@ -66,27 +61,27 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports
                 _reportRepository = reportRepository;
             }
 
-            public async Task<Unit> Handle(ExportMiscIssueHistoryReportCommand request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(ExportMiscReceiptHistoryReportQuery request, CancellationToken cancellationToken)
             {
-                var miscReceipt = await _reportRepository.MIssueReport(request.DateFrom, request.DateTo);
+                var miscReceipt = await _reportRepository.MReceiptReport(request.DateFrom, request.DateTo);
 
                 using (var workbook = new XLWorkbook())
                 {
-                    var worksheet = workbook.Worksheets.Add($"Misc Issue History Report");
+                    var worksheet = workbook.Worksheets.Add($"Misc Receipt History Report");
 
                     var headers = new List<string>
                 {
-                    "Issue Id", 
-                    "Customer Code", 
-                    "Customer Name",
-                    "Details",
+                    "Receipt Id",
+                    "Supplier Code",
+                    "Supplier Name",
                     "Item Code",
-                    "Item Description", 
+                    "Item Description",
                     "Uom",
                     "Quantity",
-                    "Expiration Date",
                     "Transacted By",
-                    "Transacted Date"
+                    "Transacted Date",
+                    "Details",
+                    "Reason"
                 };
 
                     var range = worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, headers.Count));
@@ -106,21 +101,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports
                     {
                         var row = worksheet.Row(index + 1);
 
-                        row.Cell(1).Value = miscReceipt[index - 1].IssueId;
-                        row.Cell(2).Value = miscReceipt[index - 1].CustomerCode;
-                        row.Cell(3).Value = miscReceipt[index - 1].CustomerName;
-                        row.Cell(4).Value = miscReceipt[index - 1].Details;
-                        row.Cell(5).Value = miscReceipt[index - 1].ItemCode;
-                        row.Cell(6).Value = miscReceipt[index - 1].ItemDescription;
-                        row.Cell(7).Value = miscReceipt[index - 1].Uom;
-                        row.Cell(8).Value = miscReceipt[index - 1].Quantity;
-                        row.Cell(9).Value = miscReceipt[index - 1].ExpirationDate;
-                        row.Cell(10).Value = miscReceipt[index - 1].TransactBy;
-                        row.Cell(11).Value = miscReceipt[index - 1].TransactDate;
+                        row.Cell(1).Value = miscReceipt[index - 1].ReceiptId;
+                        row.Cell(2).Value = miscReceipt[index - 1].SupplierCode;
+                        row.Cell(3).Value = miscReceipt[index - 1].SupplierName;
+                        row.Cell(4).Value = miscReceipt[index - 1].ItemCode;
+                        row.Cell(5).Value = miscReceipt[index - 1].ItemDescription;
+                        row.Cell(6).Value = miscReceipt[index - 1].Uom;
+                        row.Cell(7).Value = miscReceipt[index - 1].Quantity;
+                        row.Cell(8).Value = miscReceipt[index - 1].TransactBy;
+                        row.Cell(9).Value = miscReceipt[index - 1].TransactDate;
+                        row.Cell(10).Value = miscReceipt[index - 1].Details;
+                        row.Cell(11).Value = miscReceipt[index - 1].Reason;
                     }
 
                     worksheet.Columns().AdjustToContents();
-                    workbook.SaveAs($"MiscellaneousIssueHistoryReport {request.DateFrom} - {request.DateTo}.xlsx");
+                    workbook.SaveAs($"MiscellaneousReceiptHistoryReport {request.DateFrom} - {request.DateTo}.xlsx");
                 }
 
                 return Unit.Value;

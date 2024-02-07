@@ -159,7 +159,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     ActualGood = x.Sum(x => x.ActualGood)
                 });
 
-            var getOrderingReserve = _context.Orders.Where(x => x.IsActive == true)
+            var getOrderingReserve = _context.Orders.Where(x => x.IsActive == true && x.IsCancelledOrder == null)
                 .Where(x => x.PreparedDate != null)
                 .GroupBy(x => new
                 {
@@ -574,7 +574,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     ActualGood = x.Sum(x => x.ActualGood)
                 });
 
-            var getOrderingReserve = _context.Orders.Where(x => x.IsActive == true)
+            var getOrderingReserve = _context.Orders.Where(x => x.IsActive == true & x.IsCancelledOrder == null)
                 .Where(x => x.PreparedDate != null)
                 .GroupBy(x => new
                 {
@@ -1074,7 +1074,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     ActualGood = x.Sum(x => x.ActualGood)
                 });
 
-            var getOrderingReserve = _context.Orders.Where(x => x.IsActive == true)
+            var getOrderingReserve = _context.Orders.Where(x => x.IsActive == true && x.IsCancelledOrder == null)
                 .Where(x => x.PreparedDate != null)
                 .GroupBy(x => new
                 {

@@ -1002,7 +1002,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY
                     WarehouseId = moveOrderReport.WarehouseId,
                     UnitPrice = warehouseReceived.Where(wr => wr.Id == moveOrderReport.WarehouseId)
                         .Select(x => x.UnitCost).FirstOrDefault(),
-                    TransactionType = "MoveOrder",
+                    TransactionType = "Move Order",
                     CompanyCode = moveOrderReport.CompanyCode,
                     CompanyName = moveOrderReport.CompanyName,
                     DepartmentCode = moveOrderReport.DepartmentCode,

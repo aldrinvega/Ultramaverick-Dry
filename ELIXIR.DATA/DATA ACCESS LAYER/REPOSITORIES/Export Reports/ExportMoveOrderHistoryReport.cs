@@ -78,7 +78,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports
                     {
                         var row = worksheet.Row(index + 1);
 
-                        row.Cell(1).Value = orders[index - 1].OrderNo;
+                        row.Cell(1).Value = orders[index - 1].MoveOrderId;
                         row.Cell(2).Value = orders[index - 1].CustomerCode;
                         row.Cell(3).Value = orders[index - 1].CustomerName;
                         row.Cell(4).Value = orders[index - 1].ItemCode;
@@ -89,7 +89,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports
                         row.Cell(9).Value = orders[index - 1].TransactionType;
                         row.Cell(10).Value = orders[index - 1].MoveOrderDate;
                         row.Cell(11).Value = orders[index - 1].MoveOrderBy;
-                        row.Cell(12).Value = orders[index - 1].DeliveryStatus;
+                        row.Cell(12).Value = orders[index - 1].TransactionType;
                         row.Cell(13).Value = orders[index - 1].TransactedBy;
                         row.Cell(14).Value = orders[index - 1].TransactedDate;
                         row.Cell(15).Value = orders[index - 1].EmployeeId;
