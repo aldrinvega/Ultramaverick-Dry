@@ -845,7 +845,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             var customer = _context.Customers.GroupBy(x => new
                 {
-                    x.CustomerCode,
+                    x.CustomerName,
                     x.LocationName,
                     x.CompanyName,
                     x.CompanyCode,
@@ -853,7 +853,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 })
                 .Select(x => new
                 {
-                    x.Key.CustomerCode,
+                    x.Key.CustomerName,
                     x.Key.LocationName,
                     x.Key.CompanyName,
                     x.Key.CompanyCode,
@@ -861,7 +861,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 });
 
             var oderResult = await (from order in orders
-                join cust in customer on order.FarmCode equals cust.CustomerCode
+                join cust in customer on order.Farm equals cust.CustomerName
                 select new TotalListOfPreparedDateDTO
                 {
                     Id = order.Id,
@@ -1443,7 +1443,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         public async Task<IReadOnlyList<MultiplePrintingDTO>> MultiplePrintingForMOS(List<int> orderIds)
         {
             var moveOrdersList = await _context.MoveOrders
-                .Where(x => x.IsActive && orderIds.Contains(x.OrderNo))
+                .Where(x => x.IsActive && orderIds.Contains(x.OrderNo) && x.PreparedDate != null)    
                 .ToListAsync();
 
             var groups = moveOrdersList

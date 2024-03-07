@@ -53,11 +53,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports
                         "Transaction Type",
                         "Move Order Date",
                         "Move Order By",
+                        "Employee ID",
+                        "Employee Name",
                         "Status",
                         "Transacted Date",
-                        "Transacted By",
-                        "Employee ID",
-                        "Employee Name"
+                        "Transacted By"
                     };
 
 
@@ -89,11 +89,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports
                         row.Cell(9).Value = orders[index - 1].TransactionType;
                         row.Cell(10).Value = orders[index - 1].MoveOrderDate;
                         row.Cell(11).Value = orders[index - 1].MoveOrderBy;
-                        row.Cell(12).Value = orders[index - 1].TransactionType;
-                        row.Cell(13).Value = orders[index - 1].TransactedBy;
-                        row.Cell(14).Value = orders[index - 1].TransactedDate;
-                        row.Cell(15).Value = orders[index - 1].EmployeeId;
-                        row.Cell(16).Value = orders[index - 1].EmployeeName;
+                        row.Cell(12).Value = orders[index - 1].EmployeeId;
+                        row.Cell(13).Value = orders[index - 1].EmployeeName;
+                        row.Cell(14).Value = orders[index - 1].Status;
+                        row.Cell(15).Value = orders[index - 1].TransactedDate;
+                        row.Cell(16).Value = orders[index - 1].TransactedBy;
+                        
                     }
 
                     worksheet.Columns().AdjustToContents();

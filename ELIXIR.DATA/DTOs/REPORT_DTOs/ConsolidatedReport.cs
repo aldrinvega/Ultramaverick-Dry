@@ -45,5 +45,7 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public string AccountTitleCode { get; set; }
 
         public string AccountTitle { get; set; }
+        public string Details { get; set; }
+        public string Status { get; set; }
     }
 }
