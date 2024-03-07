@@ -15,13 +15,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
         }
 
         [Column(TypeName = "Date")]
-        public DateTime Manufacturing_Date {
+        public DateTime? Manufacturing_Date {
             get;
             set;
         }
 
         [Column(TypeName = "decimal(18,2)")]
-        public int Expected_Delivery {
+        public decimal Expected_Delivery {
             get; 
             set;
         }
@@ -71,7 +71,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
             set; 
         }
         
-
         public bool? ExpiryIsApprove {
             get; 
             set;
@@ -113,6 +112,14 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL
         }
         public string QcBy {
             get; 
+            set;
+        }
+        
+        public string MonitoredBy { get; set; }
+
+        public string ProductType
+        {
+            get;
             set;
         }
     }

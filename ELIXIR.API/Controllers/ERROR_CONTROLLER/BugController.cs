@@ -2,7 +2,7 @@
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ELIXIR.API.Controllers
+namespace ELIXIR.API.Controllers.ERROR_CONTROLLER
 {
     public class BugController : BaseApiController
     {

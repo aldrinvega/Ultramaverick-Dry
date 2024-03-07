@@ -14,6 +14,10 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs
 
         public string ExpirationDate { get; set; }
         public int ExpirationDays { get; set; }
-
+        public decimal? UnitCost
+        {
+            get;
+            set;
+        }
     }
 }

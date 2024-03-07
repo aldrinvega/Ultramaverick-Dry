@@ -1,5 +1,4 @@
 ﻿using ELIXIR.DATA.CORE.ICONFIGURATION;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using ELIXIR.DATA.JWT.AUTHENTICATION;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
 
 namespace ELIXIR.DATA.JWT.SERVICES
 {
@@ -31,10 +31,14 @@ namespace ELIXIR.DATA.JWT.SERVICES
                                                        && x.Password == request.Password
                                                        && x.IsActive != false);
            if(user == null)
-              return null;
+           {
+               return null;
+           }
 
            var token = generateJwtToken(user);
+           
               return new AuthenticateResponse(user, token);
+            
         }
 
         private string generateJwtToken(User user)
@@ -48,7 +52,8 @@ namespace ELIXIR.DATA.JWT.SERVICES
             {
 
                 Subject = new ClaimsIdentity(new Claim[] {
-                    new Claim("id", user.Id.ToString())
+                    new Claim("id", user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.FullName)
 
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.USER_REPOSITORY.Exceptions;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES
 {
@@ -273,13 +274,18 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES
             var existingrolemodule = await _context.RoleModules.Where(x => x.ModuleId == rolemodule.ModuleId)
                                                                .Where(x => x.RoleId == rolemodule.RoleId)
                                                                .FirstOrDefaultAsync();
+            var taggedModules = await _context.RoleModules.Where(x => x.RoleId == rolemodule.RoleId && x.IsActive == true).ToListAsync();
 
-            if(existingrolemodule == null)
-                return false;
+            if (taggedModules.Count > 1)
+            {
+                existingrolemodule.IsActive = false;
+                return true;
+            }
 
-            existingrolemodule.IsActive = false;
+            if (existingrolemodule == null)
+                throw new NoRolesFooundException(rolemodule.RoleId);
 
-            return true;
+            throw new RoleCountShouldBeMorethan1Exception();
         }
         public async Task<IReadOnlyList<UntagModuleDto>> GetUntagModuleByRoleId(int id, int menuid)
         {

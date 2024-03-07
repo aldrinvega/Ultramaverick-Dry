@@ -10,20 +10,20 @@ namespace ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE
 {
     public interface IRawMaterialInventory
     {
-
         Task<IReadOnlyList<RawmaterialInventory>> GetAllAvailbleInRawmaterialInventory();
         Task<IReadOnlyList<MRPDto>> GetAllItemForInventory();
 
 
-        Task<PagedList<MRPDto>> GetAllItemForInventoryPagination(UserParams userParams);
-        Task<PagedList<MRPDto>> GetAllItemForInventoryPaginationOrig(UserParams userParams, string search);
+        Task<PagedList<MRPDto>> GetAllItemForInventoryPagination(UserParams userParams, string SortColumn,
+            string SortOrder);
+
+        Task<PagedList<MRPDto>> GetAllItemForInventoryPaginationOrig(UserParams userParams, string search,
+            string SortColumn, string SortOrder);
 
 
         //MRP
         Task<PoSummaryInventory> GetPOSummary();
 
-
-
-
+        Task<IReadOnlyList<MRPDto>> GetSample(string itemCode);
     }
 }

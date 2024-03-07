@@ -8,9 +8,9 @@ namespace ELIXIR.DATA.SERVICES
 {
     public class OrderHub : Hub<IOrderHub>
     {
-        public async Task SetBeingPrepared(List<Ordering> moveList)
+        public async Task SetBeingIsPrepared(Ordering orders)
         {
-            await Clients.Others.SetBeingPrepared(moveList);
+            await Clients.All.SetBeingPrepared(orders);
         }
     }
-} 
+}

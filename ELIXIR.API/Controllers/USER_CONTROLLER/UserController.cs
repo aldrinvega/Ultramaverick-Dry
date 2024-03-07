@@ -8,10 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
 
 namespace ELIXIR.API.Controllers
 {
-    [ApiExplorerSettings(IgnoreApi = true)]
+    //[ApiExplorerSettings(IgnoreApi = true)]
 
     //[Authorize]
     public class UserController : BaseApiController
@@ -133,7 +134,7 @@ namespace ELIXIR.API.Controllers
         }
 
         [HttpPost]
-        [Route("AddeNwUser")]
+        [Route("AddNewUser")]
         public async Task<IActionResult> CreateUser(User user)
         {
             if (ModelState.IsValid)
@@ -143,7 +144,6 @@ namespace ELIXIR.API.Controllers
 
                 if (await _unitOfWork.Users.UserAlreadyExists(user.UserName))
                     return BadRequest("UserName Already Exist!, Please try something else!");
-
 
                 if (getRoleId == false)
                     return BadRequest("Role doesn't exist, Please input data first!");
@@ -332,8 +332,5 @@ namespace ELIXIR.API.Controllers
 
             return new JsonResult("Successfully Activate Department!");
         }
-
-
-
     }
 }

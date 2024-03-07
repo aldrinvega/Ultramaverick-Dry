@@ -15,6 +15,7 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
     public class ImportController : BaseApiController
     {
         private IUnitOfWork _unitOfWork;
+
         public ImportController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
@@ -23,10 +24,9 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
         [HttpPost]
         [Route("UploadPOSummaryReport")]
         public async Task<ActionResult<List<ImportPOSummary>>> ImportPoExcelFile
-                    (IFormFile formfile,
-                     CancellationToken cancellationToken)
+        (IFormFile formfile,
+            CancellationToken cancellationToken)
         {
-
             var validateFile = await _unitOfWork.Imports.ValidateFileIfNull(formfile);
 
             if (validateFile == false)
@@ -47,7 +47,6 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
 
             using (var stream = new MemoryStream())
             {
-
                 await formfile.CopyToAsync(stream, cancellationToken);
 
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -60,7 +59,6 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
 
                     for (int row = 2; row <= rowCount; row++)
                     {
-
                         var validateRow = await _unitOfWork.Imports.ValidateExcelPerRow(formfile, row);
                         if (validateRow == false)
                             return BadRequest("Some of the columns are null, Please check your data!");
@@ -85,11 +83,11 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                         if (validatePoandItem == true)
                             return BadRequest("PO Number with Item code already exist!");
 
-                        var validateItemcode = await _unitOfWork.Imports.CheckItemCode(itemcode);
+                        var itemdescription = worksheet.Cells[row, 6].Value.ToString().Trim();
+
+                        var validateItemcode = await _unitOfWork.Imports.CheckItemCode(itemcode, itemdescription);
                         if (validateItemcode == false)
                             return BadRequest("Some of the ItemCode not exist, Please input data first!");
-
-                        var itemdescription = worksheet.Cells[row, 6].Value.ToString().Trim();
 
                         var quantityordered = worksheet.Cells[row, 7].Value.ToString().Trim();
                         var validatequantity = await _unitOfWork.Imports.ValidateExcelColumnNumber(quantityordered);
@@ -142,7 +140,6 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                     _unitOfWork.Imports.InsertListOfPOSummary(posummary);
                     await _unitOfWork.CompleteAsync();
                 }
-
             }
 
             return posummary;
@@ -151,10 +148,9 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
         [HttpPost]
         [Route("UploadRawMaterialsReport")]
         public async Task<ActionResult<List<RawMaterial>>> ImportRawMaterialExcelFile
-                         (IFormFile formfile,
-                          CancellationToken cancellationToken)
+        (IFormFile formfile,
+            CancellationToken cancellationToken)
         {
-
             var validateFile = await _unitOfWork.Imports.ValidateFileIfNull(formfile);
 
             if (validateFile == false)
@@ -175,7 +171,6 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
 
             using (var stream = new MemoryStream())
             {
-
                 await formfile.CopyToAsync(stream);
 
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -232,7 +227,6 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
 
                     _unitOfWork.Imports.InsertListOfRawMaterial(rawmaterialSummary);
                     await _unitOfWork.CompleteAsync();
-
                 }
             }
 
@@ -242,8 +236,8 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
         [HttpPost]
         [Route("UploadFormulaReport")]
         public async Task<ActionResult<List<TransformationRequirement>>> ImportFormulaExcelFile
-                         (IFormFile formfile,
-                          CancellationToken cancellationToken)
+        (IFormFile formfile,
+            CancellationToken cancellationToken)
         {
             var validateFile = await _unitOfWork.Imports.ValidateFileIfNull(formfile);
 
@@ -263,7 +257,6 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
 
             using (var stream = new MemoryStream())
             {
-
                 await formfile.CopyToAsync(stream);
 
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -277,7 +270,6 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
 
                     for (int row = 2; row <= rowCount; row++)
                     {
-
                         var validateRow = await _unitOfWork.Imports.ValidateExcelPerRowFormula(formfile, row);
                         if (validateRow == false)
                             return BadRequest("Some of the columns are null, Please check your data!");
@@ -286,7 +278,8 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                         var formulaname = worksheet.Cells[row, 2].Value.ToString().Trim();
                         var version = worksheet.Cells[row, 3].Value.ToString().Trim();
 
-                        var validateFormula = await _unitOfWork.Imports.ValidateFormulaCode(formulacode, formulaname, version);
+                        var validateFormula =
+                            await _unitOfWork.Imports.ValidateFormulaCode(formulacode, formulaname, version);
 
                         if (validateFormula == false)
                             return BadRequest("Formula Code and Version not exist, Please check your data!");
@@ -297,7 +290,8 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                         var itemcode = worksheet.Cells[row, 4].Value.ToString().Trim();
                         var itemdescription = worksheet.Cells[row, 5].Value.ToString().Trim();
 
-                        var validateRawmaterial = await _unitOfWork.Imports.ValidateRawMaterialAndDescription(itemcode, itemdescription);
+                        var validateRawmaterial =
+                            await _unitOfWork.Imports.ValidateRawMaterialAndDescription(itemcode, itemdescription);
 
                         if (validateRawmaterial == false)
                             return BadRequest("Raw Material with Description not exist, Please check your data!");
@@ -305,7 +299,8 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                         var rawMaterial = await _unitOfWork.Imports.CheckRawMaterialId(itemcode, itemdescription);
                         var rawMaterialid = rawMaterial;
 
-                        var formulaAndrawmaterial = await _unitOfWork.Imports.ValidateFormulaAndRawMaterial(formulaid, rawMaterialid);
+                        var formulaAndrawmaterial =
+                            await _unitOfWork.Imports.ValidateFormulaAndRawMaterial(formulaid, rawMaterialid);
 
                         if (formulaAndrawmaterial == true)
                             return BadRequest("Formula with requirements already exist!");
@@ -322,28 +317,24 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                             ItemDescription = itemdescription,
                             Quantity = Decimal.Parse(quantity),
                             AddedBy = "Admin"
-
                         });
-
                     }
 
                     _unitOfWork.Imports.InsertListOfFormulaCode(formulaSummary);
 
                     await _unitOfWork.CompleteAsync();
                 }
+
                 return formulaSummary;
             }
-
         }
 
         [HttpPost]
         [Route("AddNewPOManual")]
         public async Task<ActionResult> CreateNewPo([FromBody] ImportPOSummary[] posummary)
         {
-
             if (ModelState.IsValid)
             {
-
                 List<ImportPOSummary> duplicateList = new List<ImportPOSummary>();
                 List<ImportPOSummary> availableImport = new List<ImportPOSummary>();
                 List<ImportPOSummary> supplierNotExist = new List<ImportPOSummary>();
@@ -352,10 +343,11 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
 
                 foreach (ImportPOSummary items in posummary)
                 {
-
                     var validateSupplier = await _unitOfWork.Imports.CheckSupplier(items.VendorName);
-                    var validateItemCode = await _unitOfWork.Imports.CheckItemCode(items.ItemCode);
-                    var validatePoandItem = await _unitOfWork.Imports.ValidatePOAndItemcodeManual(items.PO_Number, items.ItemCode);
+                    var validateItemCode =
+                        await _unitOfWork.Imports.CheckItemCode(items.ItemCode, items.ItemDescription);
+                    var validatePoandItem =
+                        await _unitOfWork.Imports.ValidatePOAndItemcodeManual(items.PO_Number, items.ItemCode);
                     var validateUom = await _unitOfWork.Imports.CheckUomCode(items.UOM);
 
                     if (validatePoandItem == true)
@@ -382,7 +374,6 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                         availableImport.Add(items);
 
                     await _unitOfWork.Imports.AddNewPORequest(items);
-
                 }
 
                 var resultList = new
@@ -399,6 +390,7 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                 await _unitOfWork.CompleteAsync();
                 return Ok("Successfully Add!");
             }
+
             return new JsonResult("Something went Wrong!") { StatusCode = 500 };
         }
 
@@ -426,7 +418,6 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
         {
             if (ModelState.IsValid)
             {
-
                 foreach (RawMaterial items in material)
                 {
                     var itemCategoryId = await _unitOfWork.RawMaterials.ValidateItemCategoryId(items.ItemCategoryId);
@@ -442,19 +433,45 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
                         return BadRequest("Item Code already Exist!, Please try something else!");
 
                     await _unitOfWork.Imports.AddNewRawMaterialSummary(items);
-
                 }
-                await _unitOfWork.CompleteAsync();
 
+                await _unitOfWork.CompleteAsync();
             }
+
             return Ok("Successfully import raw materials!");
         }
+
+        [HttpPost("AddNewCustomerManual")]
+        public async Task<IActionResult> AddNewCustomerManual([FromBody] Customer[] customers)
+        {
+            if (ModelState.IsValid)
+            {
+                foreach (Customer customer in customers)
+                {
+                    //var farmId = await _unitOfWork.Customers.ValidateFarmId(customer.FarmTypeId);
+
+                    //if (farmId == false)
+                    //    //farmtype in database
+                    //    return BadRequest("Customer Type doesn't exist, Please add data first!");
+
+                    //if (await _unitOfWork.Customers.CustomerCodeExist(customer.CustomerCode))
+                    //    return BadRequest("Customer already Exist!, Please try something else!");
+
+                    await _unitOfWork.Imports.AddNewCustomers(customer);
+                }
+
+                await _unitOfWork.CompleteAsync();
+                return Ok("Successfully import customers!");
+            }
+
+            return new JsonResult("Something went Wrong!") { StatusCode = 500 };
+        }
+
 
         [HttpPost]
         [Route("AddNewFormulaManual")]
         public async Task<IActionResult> AddNewFormulaManual([FromBody] TransformationRequirement[] requirement)
         {
-
             if (ModelState.IsValid)
             {
                 decimal totalamount = 0;
@@ -464,13 +481,12 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
 
                 foreach (TransformationRequirement items in requirement)
                 {
-
                     totalamount = totalamount + items.Quantity;
                     transformId = items.TransformationFormulaId;
 
                     if (formulacode == items.TransformationFormulaId && rawmats == items.RawMaterialId)
                         return BadRequest("Import failed! There is duplicate data in your excel.");
-                    
+
                     if (formulacode != items.TransformationFormulaId && formulacode != 0)
                         return BadRequest("Import failed! Cannot import different formula code at the same time.");
 
@@ -478,7 +494,8 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
 
                     var verifytagrequirement = await _unitOfWork.Transforms.ValidateTagRequirements(items);
 
-                    var validateformula = await _unitOfWork.Transforms.ValidateFormulaIfActive(items.TransformationFormulaId);
+                    var validateformula =
+                        await _unitOfWork.Transforms.ValidateFormulaIfActive(items.TransformationFormulaId);
 
 
                     if (validateRawMaterial == false)
@@ -504,37 +521,29 @@ namespace ELIXIR.API.Controllers.IMPORT_CONTROLLER
 
 
                 await _unitOfWork.CompleteAsync();
-
             }
 
             return Ok("Successfully import formula requirements!");
-
         }
 
         [HttpPost]
         [Route("AddNewSupplierSummary")]
         public async Task<IActionResult> AddNewSupplierSummary([FromBody] Supplier[] supply)
         {
-
             if (ModelState.IsValid)
             {
                 foreach (Supplier items in supply)
                 {
-
                     if (await _unitOfWork.Suppliers.SupplierCodeExist(items.SupplierCode))
                         return BadRequest("Supplier name already exist, please try something else!");
 
                     await _unitOfWork.Imports.AddNewSupplierSummary(items);
-
                 }
 
                 await _unitOfWork.CompleteAsync();
             }
 
             return Ok("Successfully import supplier!");
-
         }
-
-
     }
 }

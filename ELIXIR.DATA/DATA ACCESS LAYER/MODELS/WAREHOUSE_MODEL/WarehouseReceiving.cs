@@ -1,10 +1,5 @@
-﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL
 {
@@ -48,6 +43,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL
             get; 
             set;
         }
+        
+        // [Column(TypeName = "Date")]
+        // public DateTime? ExtendedExpiration
+        // {
+        //     get;
+        //     set;
+        // }
 
         public int ExpirationDays  { 
             get; 
@@ -130,5 +132,22 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL
             set;
         }
 
+        public decimal? UnitCost
+        {
+            get;
+            set;
+        }
+        // [ForeignKey("LabTestRequests")]
+        // public int? LabTestRequestId
+        // {
+        //     get;
+        //     set;
+        // }
+        //
+        // public LabTestRequests LabTestRequests
+        // {
+        //     get;
+        //     set;
+        // }
     }
 }

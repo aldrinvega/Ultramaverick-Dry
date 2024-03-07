@@ -10,7 +10,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL
 {
     public class ImportPOSummary : BaseEntity
     {
-        
         public int PR_Number {
             get; 
             set;
@@ -21,7 +20,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL
             get; 
             set;
         }
-
+        
         public int PO_Number {
             get; 
             set; 
@@ -37,6 +36,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL
             get;
             set; 
         }
+        
         public string ItemDescription { 
             get; 
             set; 
@@ -60,18 +60,21 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL
             set;
         }
 
-        public string UOM { 
-            get; 
-            set; 
+        public string UOM
+        {
+            get;
+            set;
         }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal UnitPrice {
+            
             get;
             set;
         }
 
         public string VendorName { 
+            
             get; 
             set;
         }

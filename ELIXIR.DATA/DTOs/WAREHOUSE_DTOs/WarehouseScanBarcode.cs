@@ -17,7 +17,7 @@ namespace ELIXIR.DATA.DTOs.WAREHOUSE_DTOs
         public string ManufacturingDate { get; set; }
         public decimal ActualDelivered { get; set; }
         public decimal TotalStock { get; set; }
-
+        public DateTime? ExpirationDate1 { get; set; }
         public string Expiration { get; set; }
         public int ExpirationDays { get; set; }
         public bool IsActive { get; set; }
@@ -27,6 +27,8 @@ namespace ELIXIR.DATA.DTOs.WAREHOUSE_DTOs
         public decimal TotalReject { get; set; }
         public DateTime ManufacturingDateTime { get; set; }
 
+        public decimal UnitCost { get; set; }
 
+        public decimal UnitPrice { get; set; }
     }
 }

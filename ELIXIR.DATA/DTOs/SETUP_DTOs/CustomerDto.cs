@@ -21,6 +21,10 @@ namespace ELIXIR.DATA.DTOs.SETUP_DTOs
         public string DateAdded { get; set; }
         public string AddedBy { get; set; }
         public bool IsActive { get; set; }
+        public string LocationName { get; set; }
+        public string  DepartmentName { get; set; }
+        public string AccountTitles { get; set; }
+        public string CompanyCode { get; set; }
 
     }
 }

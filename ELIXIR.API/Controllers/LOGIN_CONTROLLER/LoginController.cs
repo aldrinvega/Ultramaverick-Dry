@@ -1,7 +1,9 @@
-﻿ using ELIXIR.DATA.CORE.ICONFIGURATION;
+﻿ using System.Runtime.CompilerServices;
+ using ELIXIR.DATA.CORE.ICONFIGURATION;
 using ELIXIR.DATA.JWT.AUTHENTICATION;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+ using Microsoft.AspNetCore.Http;
+ using Microsoft.AspNetCore.Mvc;
 
 namespace ELIXIR.API.Controllers
 {
@@ -10,6 +12,7 @@ namespace ELIXIR.API.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IUserService _userService;
+
         public LoginController(IUserService userService)
         {
             _userService = userService;
@@ -23,12 +26,8 @@ namespace ELIXIR.API.Controllers
 
             if (response == null)
                 return BadRequest(new { message = " Username or Password is incorrect!" });
-
             return Ok(response);
 
-
         }
-
-
     }
 }

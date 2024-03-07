@@ -1,0 +1,38 @@
+version: '3.4'
+
+networks:
+  rdf.umdry.api:
+
+services:
+  rdf.umdry.api:
+    image: rdf.umdry.api
+    build:
+      context: .
+      dockerfile: ELIXIR.API/Dockerfile
+    ports:
+    - "5007:5007"
+    - "5008:5008"
+    depends_on: 
+      - umdry.database
+    networks: 
+      - rdf.umdry.api
+
+  umdry.database: 
+     image: mcr.microsoft.com/mssql/server:2022-latest
+     container_name: umdry.database
+     environment:
+         - ACCEPT_EULA=Y
+         - MSSQL_SA_PASSWORD=Aldrin004!
+         - DB_NAME=ElixirDepotDry
+         - DB_SA_PASSWORD=Aldrin004! 
+     networks:
+       - rdf.umdry.api
+     volumes:
+      - ./data:/var/opt/mssql/data
+      - ./log:/var/opt/mssql/log
+      - ./secrets:/var/opt/mssql/secrets
+      - umdry-volume:/var/lib/mysql
+     ports:
+        - "5009:1433"
+volumes:
+  umdry-volume:

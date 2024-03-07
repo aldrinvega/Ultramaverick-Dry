@@ -29,5 +29,8 @@ namespace ELIXIR.DATA.DTOs.RECEIVING_DTOs
         public int ReceivingId { get; set; }
         public string DateOfChecking { get; set; }
         public decimal TotalReject { get; set; }
+        public decimal ExpectedDelivery { get; set; }
+        public string MonitoredBy { get; set; }
+        public string QcBy { get; set; }
     }
 }

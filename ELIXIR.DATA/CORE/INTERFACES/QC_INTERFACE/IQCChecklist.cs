@@ -8,8 +8,10 @@ namespace ELIXIR.DATA.CORE.INTERFACES.QC_INTERFACE
 {
     public interface IQCChecklist
     {
-        Task<bool> AddChecklists(Checklists input);
-        //Task<List<ChecklistParent>> GetAllChecklist();
-        //Task<List<ChecklistParent>> GetAllChecklistbyPOSummaryId(int po_SummaryId);
+        /*ask<bool> AddChecklists(Checklists input);*/
+        Task<IReadOnlyList<ChecklistStringDTO>> GetAllChecklist();
+        Task<IReadOnlyList<ChecklistStringDTO>> GetChecklistByPoSummaryId(int poSummaryId);
+        Task<ForViewingofChecklistResult> GetPoReceivingInformation(int poSummaryId);
+        Task<bool> UpdateReceivingId(int receivingId);
     }
 }

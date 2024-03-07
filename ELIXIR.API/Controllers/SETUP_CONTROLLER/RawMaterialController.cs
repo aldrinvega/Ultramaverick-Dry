@@ -334,5 +334,12 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok(categoryResult);
         }
 
+        [HttpGet("GetSample")]
+        public async Task<IActionResult> GetSample(string itemCode)
+        {
+            var result = await _unitOfWork.Inventory.GetSample(itemCode);
+            return Ok(result);
+        }
+
     }
 }

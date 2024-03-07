@@ -5,6 +5,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
 using ELIXIR.DATA.DTOs;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -255,13 +256,21 @@ namespace ELIXIR.API.Controllers
         public async Task<IActionResult> UntagModule([FromBody] UserRole_Modules[] rolemodule)
         {
 
-            foreach (UserRole_Modules module in rolemodule)
+            try
             {
-                await _unitOfWork.Roles.UntagModuleinRole(module);
-                await _unitOfWork.CompleteAsync();
+                foreach (UserRole_Modules module in rolemodule)
+                {
+                    await _unitOfWork.Roles.UntagModuleinRole(module);
+                    await _unitOfWork.CompleteAsync();
+                }
+                return new JsonResult("Successfully Untag Module!");
+            }catch (Exception ex)
+            {
+                return Conflict(new
+                {
+                    ex.Message,
+                });
             }
-
-            return new JsonResult("Successfully Untag Module!");
         }
 
         [HttpPut]

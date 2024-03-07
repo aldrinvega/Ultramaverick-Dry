@@ -18,7 +18,7 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         public string Category { get; set; }
         public string ItemCode { get; set; }
         public string ItemDescription { get; set; }
-        public string Uom{ get; set; }
+        public string Uom { get; set; }
         public decimal QuantityOrder { get; set; }
         public string PreparedDate { get; set; }
         public bool IsApproved { get; set; }
@@ -43,13 +43,21 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         public int Days { get; set; }
         public bool? ForAllocation { get; set; }
         public string? SetBy { get; set; }
-        
+
         public int casting { get; set; }
         public DateTime OrderDateTime { get; set; }
         public DateTime? PreparedDateTime { get; set; }
         public DateTime DateNeededDateTime { get; set; }
-        
-
-
+        public string AccountTitleCode { get; set; }
+        public string AccountTitles { get; set; }
+        public string LocationCode { get; set; }
+        public string LocationName { get; set; }
+        public string DepartmentName { get; set; }
+        public string DepartmentCode { get; set; }
+        public string CompanyName { get; set; }
+        public string CompanyCode { get; set; }
+        public string AddedBy { get; set; }
+        public string EmployeeId { get; set; }
+        public string EmployeeName { get; set; }
     }
 }

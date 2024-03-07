@@ -1,6 +1,5 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
 {
@@ -48,7 +47,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
             get;
             set;
         }
-        
+
         public DateTime OrderDate
         {
             get;
@@ -212,11 +211,27 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
             set;
         }
 
+        public bool? IsCancelledOrder
+        {
+            get;
+            set;
+        }
+
         // public bool? ForPendingAllocation
         // {
         //     get;
         //     set;
         // }
-        
+
+        public Customer Customer
+        {
+            get; set;
+        }
+        public int? CustomerId
+        {
+            get; set;
+        }
+
     }
 }
+

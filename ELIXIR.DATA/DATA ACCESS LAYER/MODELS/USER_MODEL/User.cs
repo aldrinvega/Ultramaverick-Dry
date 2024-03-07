@@ -1,9 +1,7 @@
-﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
-namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
+namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL
 {
     public class User : BaseEntity
     {

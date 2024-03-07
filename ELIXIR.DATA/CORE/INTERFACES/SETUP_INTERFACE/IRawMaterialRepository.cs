@@ -36,12 +36,15 @@ namespace ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE
 
 
         Task<PagedList<RawMaterialDto>> GetAllRawMaterialWithPagination(bool status, UserParams userParams);
-        Task<PagedList<RawMaterialDto>> GetRawMaterialByStatusWithPaginationOrig(UserParams userParams, bool status, string search);
+
+        Task<PagedList<RawMaterialDto>> GetRawMaterialByStatusWithPaginationOrig(UserParams userParams, bool status,
+            string search);
 
         Task<PagedList<ItemCategoryDto>> GetAllItemCategoryWithPagination(bool status, UserParams userParams);
-        Task<PagedList<ItemCategoryDto>> GetAllItemCategoryWithPaginationOrig(UserParams userParams, bool status, string search);
 
+        Task<PagedList<ItemCategoryDto>> GetAllItemCategoryWithPaginationOrig(UserParams userParams, bool status,
+            string search);
 
-
+        Task<IList<RawMaterialDto>> GetAllRawMaterialForExport();
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
 {
     public class MoveOrderDto
     {
@@ -29,5 +31,17 @@
         public bool IsPrint { get; set; }
         public bool IsTransact { get; set; }
         public string DeliveryStatus { get; set; }
+        public string PreparedBy{ get; set; }
+        public string CheckedBy
+        {
+            get;
+            set;
+        }
+
+        public decimal UnitPrice
+        {
+            get;
+            set;
+        }
     }
 }

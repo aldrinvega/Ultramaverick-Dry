@@ -207,7 +207,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     PreparedDate = x.PreparedDate.ToString("MM/dd/yyyy"),
                     Remarks = x.Remarks,
                     PreparedBy = x.PreparedBy,
-                    IsActive = x.IsActive
+                    IsActive = x.IsActive,
+                    TransactionDate = x.TransactionDate.ToString("MM/dd/yyyy")
                 });
 
             return await PagedList<MIssueDto>.CreateAsync(issue, userParams.PageNumber, userParams.PageSize);
@@ -226,8 +227,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                  PreparedDate = x.PreparedDate.ToString("MM/dd/yyyy"),
                  Remarks = x.Remarks,
                  PreparedBy = x.PreparedBy,
-                 IsActive = x.IsActive
-
+                 IsActive = x.IsActive,
+                 TransactionDate = x.TransactionDate.ToString("MM/dd/yyyy")
              }).Where(x => (Convert.ToString(x.IssuePKey)).ToLower()
                .Contains(search.Trim().ToLower()));
 
@@ -306,14 +307,16 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
              x.Id,
              x.ItemCode,
              x.ActualGood,
-             x.Expiration
+             x.Expiration,
+             x.UnitCost
 
          }).Select(x => new WarehouseInventory
          {
              WarehouseId = x.Key.Id,
              ItemCode = x.Key.ItemCode,
              ActualGood = x.Key.ActualGood,
-             ExpirationDate = x.Key.Expiration.ToString()
+             ExpirationDate = x.Key.Expiration.ToString(),
+             UnitCost = x.Key.UnitCost
 
          });
 
@@ -389,6 +392,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                     warehouse.WarehouseId,
                                     warehouse.ItemCode,
                                     warehouse.ExpirationDate,
+                                    warehouse.UnitCost,
                                     WarehouseActualGood = warehouse.ActualGood != null ? warehouse.ActualGood : 0,
                                     TransformOut = transform.WeighingScale != null ? transform.WeighingScale : 0,
                                     MoveOrderOut = moveorder.QuantityOrdered != null ? moveorder.QuantityOrdered : 0,
@@ -401,7 +405,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                     WarehouseId = total.Key.WarehouseId,
                                     ItemCode = total.Key.ItemCode,
                                     RemainingStocks = total.Key.WarehouseActualGood - total.Key.TransformOut - total.Key.MoveOrderOut - total.Key.IssueOut,
-                                    ExpirationDate = total.Key.ExpirationDate
+                                    ExpirationDate = total.Key.ExpirationDate,
+                                    UnitCost = total.Key.UnitCost
 
                                 }).Where(x => x.RemainingStocks != 0)
                                   .Where(x => x.ItemCode == itemcode);

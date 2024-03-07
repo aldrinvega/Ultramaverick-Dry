@@ -20,8 +20,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES
         protected readonly ILogger _logger;
 
         public GenericRepository(
-            StoreContext context,
-            ILogger logger
+            StoreContext context, ILogger logger
         )
 
         {
@@ -75,7 +74,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES
         //{
         //    return SpecificationEvaluator<T>.GetQuery(_context.Set<T>().AsQueryable(), spec);
         //}
-
- 
+        
     }
 }

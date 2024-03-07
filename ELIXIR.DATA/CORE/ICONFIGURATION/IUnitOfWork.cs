@@ -1,4 +1,5 @@
 ﻿using ELIXIR.DATA.CORE.INTERFACES;
+using ELIXIR.DATA.CORE.INTERFACES.CANCELLED_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.IMPORT_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.INVENTORY_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE;
@@ -8,7 +9,7 @@ using ELIXIR.DATA.CORE.INTERFACES.SETUP_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.TRANSFORMATION_INTERFACE;
 using ELIXIR.DATA.CORE.INTERFACES.WAREHOUSE_INTERFACE;
 using System.Threading.Tasks;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY;
+using ELIXIR.DATA.CORE.INTERFACES.LABTEST_INTERFACE;
 
 namespace ELIXIR.DATA.CORE.ICONFIGURATION
 {
@@ -58,6 +59,26 @@ namespace ELIXIR.DATA.CORE.ICONFIGURATION
         
         //Checklist
         IQCChecklist QcChecklist { get; set; }
+        
+        ILabtestMasterlist LabtestMasterlist { get; set; }
+
+        IProductTypeRepository ProductType { get; set; }
+        
+        //Cancelled Orders
+        ICancelledOrders CancelledOrders { get; set; }
+        
+        //LabTest 
+        ILabTestRepository LaboratoryTest
+        {
+            get;
+            set;
+        }
+
+        IAccountTitleRepository AccountTitle
+        {
+            get;
+            set;
+        }
 
         Task CompleteAsync();
 

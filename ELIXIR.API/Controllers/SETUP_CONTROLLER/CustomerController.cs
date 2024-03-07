@@ -19,8 +19,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             _unitOfWork = unitofwork;
         }
 
-        //----CUSTOMER---------
-
+        //----CUSTOMER--------//
         [HttpGet]
         [Route("GetAllCustomers")]
         public async Task<IActionResult> GetAllCustomer()
@@ -30,14 +29,15 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             return Ok(customer);
         }
 
-
         [HttpGet]
         [Route("GetAllCustomerWithPagination/{status}")]
-        public async Task<ActionResult<IEnumerable<CustomerDto>>> GetAllCustomerWithPagination([FromRoute] bool status, [FromQuery] UserParams userParams)
+        public async Task<ActionResult<IEnumerable<CustomerDto>>> GetAllCustomerWithPagination([FromRoute] bool status,
+            [FromQuery] UserParams userParams)
         {
             var customer = await _unitOfWork.Customers.GetAllCustomerWithPagination(status, userParams);
 
-            Response.AddPaginationHeader(customer.CurrentPage, customer.PageSize, customer.TotalCount, customer.TotalPages, customer.HasNextPage, customer.HasPreviousPage);
+            Response.AddPaginationHeader(customer.CurrentPage, customer.PageSize, customer.TotalCount,
+                customer.TotalPages, customer.HasNextPage, customer.HasPreviousPage);
 
             var customerResult = new
             {
@@ -55,17 +55,19 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
         [HttpGet]
         [Route("GetAllCustomerWithPaginationOrig/{status}")]
-        public async Task<ActionResult<IEnumerable<CustomerDto>>> GetAllCustomerWithPaginationOrig([FromRoute] bool status, [FromQuery] UserParams userParams, [FromQuery] string search)
+        public async Task<ActionResult<IEnumerable<CustomerDto>>> GetAllCustomerWithPaginationOrig(
+            [FromRoute] bool status, [FromQuery] UserParams userParams, [FromQuery] string search)
         {
-
             if (search == null)
 
                 return await GetAllCustomerWithPagination(status, userParams);
 
-            var customer = await _unitOfWork.Customers.GetCustomerByStatusWithPaginationOrig(userParams, status, search);
+            var customer =
+                await _unitOfWork.Customers.GetCustomerByStatusWithPaginationOrig(userParams, status, search);
 
 
-            Response.AddPaginationHeader(customer.CurrentPage, customer.PageSize, customer.TotalCount, customer.TotalPages, customer.HasNextPage, customer.HasPreviousPage);
+            Response.AddPaginationHeader(customer.CurrentPage, customer.PageSize, customer.TotalCount,
+                customer.TotalPages, customer.HasNextPage, customer.HasPreviousPage);
 
             var customerResult = new
             {
@@ -113,13 +115,12 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
         {
             if (ModelState.IsValid)
             {
-
                 var farmId = await _unitOfWork.Customers.ValidateFarmId(customer.FarmTypeId);
 
                 if (farmId == false)
                     return BadRequest("Farm Type doesn't exist, Please add data first!");
 
-                if (await _unitOfWork.Customers.CustomerCodeExist(customer.CustomerCode))
+                if (await _unitOfWork.Customers.CustomerCodeExist(customer.CustomerCode, customer.CustomerName))
                     return BadRequest("Customer already Exist!, Please try something else!");
 
                 await _unitOfWork.Customers.AddNewCustomer(customer);
@@ -127,6 +128,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
                 return CreatedAtAction("GetAllCustomer", new { customer.Id }, customer);
             }
+
             return new JsonResult("Something went Wrong!") { StatusCode = 500 };
         }
 
@@ -225,6 +227,7 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
                 return CreatedAtAction("GetAllFarms", new { farm.Id }, farm);
             }
+
             return new JsonResult("Something went Wrong!") { StatusCode = 500 };
         }
 
@@ -269,11 +272,13 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
         [HttpGet]
         [Route("GetAllFarmWithPagination/{status}")]
-        public async Task<ActionResult<IEnumerable<CustomerDto>>> GetAllFarmWithPagination([FromRoute] bool status, [FromQuery] UserParams userParams)
+        public async Task<ActionResult<IEnumerable<CustomerDto>>> GetAllFarmWithPagination([FromRoute] bool status,
+            [FromQuery] UserParams userParams)
         {
             var farms = await _unitOfWork.Customers.GetAllFarmWithPagination(status, userParams);
 
-            Response.AddPaginationHeader(farms.CurrentPage, farms.PageSize, farms.TotalCount, farms.TotalPages, farms.HasNextPage, farms.HasPreviousPage);
+            Response.AddPaginationHeader(farms.CurrentPage, farms.PageSize, farms.TotalCount, farms.TotalPages,
+                farms.HasNextPage, farms.HasPreviousPage);
 
             var farmResult = new
             {
@@ -291,9 +296,9 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
 
         [HttpGet]
         [Route("GetAllFarmWithPaginationOrig/{status}")]
-        public async Task<ActionResult<IEnumerable<CustomerDto>>> GetAllFarmWithPaginationOrig([FromRoute] bool status, [FromQuery] UserParams userParams, [FromQuery] string search)
+        public async Task<ActionResult<IEnumerable<CustomerDto>>> GetAllFarmWithPaginationOrig([FromRoute] bool status,
+            [FromQuery] UserParams userParams, [FromQuery] string search)
         {
-
             if (search == null)
 
                 return await GetAllFarmWithPagination(status, userParams);
@@ -301,7 +306,8 @@ namespace ELIXIR.API.Controllers.SETUP_CONTROLLER
             var farms = await _unitOfWork.Customers.GetAllFarmWithPaginationOrig(userParams, status, search);
 
 
-            Response.AddPaginationHeader(farms.CurrentPage, farms.PageSize, farms.TotalCount, farms.TotalPages, farms.HasNextPage, farms.HasPreviousPage);
+            Response.AddPaginationHeader(farms.CurrentPage, farms.PageSize, farms.TotalCount, farms.TotalPages,
+                farms.HasNextPage, farms.HasPreviousPage);
 
             var farmResult = new
             {

@@ -8,7 +8,7 @@ namespace ELIXIR.DATA.DTOs.SETUP_DTOs
 {
     public class RawMaterialDto
     {
-        public int  Id { get; set; }
+        public int Id { get; set; }
         public string ItemCode { get; set; }
         public string ItemDescription { get; set; }
         public string ItemCategory { get; set; }
@@ -20,8 +20,8 @@ namespace ELIXIR.DATA.DTOs.SETUP_DTOs
         public string AddedBy { get; set; }
         public bool IsActive { get; set; }
         public string Reason { get; set; }
-        
-        public bool IsExpirable { get; set; }
 
+        public bool IsExpirable { get; set; }
+        public string Expirable { get; set; }
     }
 }
