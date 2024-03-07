@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
+#nullable disable
+
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
@@ -15,16 +17,18 @@ namespace ELIXIR.DATA.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseIdentityColumns()
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.0");
+                .HasAnnotation("ProductVersion", "7.0.16")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.Department", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -50,8 +54,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -113,8 +118,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AccountTitleCode")
                         .HasColumnType("nvarchar(max)");
@@ -185,8 +191,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Customer")
                         .HasColumnType("nvarchar(max)");
@@ -242,8 +249,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AccountTitleCode")
                         .HasColumnType("nvarchar(max)");
@@ -311,8 +319,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Analysis")
                         .HasColumnType("nvarchar(max)");
@@ -367,8 +376,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DateAnalyze")
                         .HasColumnType("Date");
@@ -399,8 +409,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Disposition")
                         .HasColumnType("nvarchar(max)");
@@ -425,8 +436,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("AllowableDate")
                         .HasColumnType("datetime2");
@@ -454,8 +466,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("AllowableDate")
                         .HasColumnType("datetime2");
@@ -479,12 +492,35 @@ namespace ELIXIR.DATA.Migrations
                     b.ToTable("ReturnedItems");
                 });
 
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.AdvancesToEmployees", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EmployeeId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmployeeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AdvancesToEmployees");
+                });
+
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.CancelledOrders", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CancellationDate")
                         .HasColumnType("datetime2");
@@ -511,8 +547,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -526,8 +563,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AccountTitleCode")
                         .HasColumnType("nvarchar(max)");
@@ -537,6 +575,9 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("AdvancesToEmployeesId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("ApproveDateTempo")
                         .HasColumnType("Date");
@@ -669,6 +710,8 @@ namespace ELIXIR.DATA.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AdvancesToEmployeesId");
+
                     b.ToTable("MoveOrders");
                 });
 
@@ -676,8 +719,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("AllocatedQuantity")
                         .HasColumnType("int");
@@ -813,8 +857,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("DeliveryDate")
                         .HasColumnType("datetime2");
@@ -858,8 +903,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("ChecklistInputId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChecklistInputId"));
 
                     b.Property<string>("Checlist_Type")
                         .HasColumnType("nvarchar(max)");
@@ -882,8 +928,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("ChecklistStringId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChecklistStringId"));
 
                     b.Property<string>("Checlist_Type")
                         .HasColumnType("nvarchar(max)");
@@ -909,8 +956,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ChecklistQuestionsId")
                         .HasColumnType("int");
@@ -934,8 +982,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Compliance")
                         .HasColumnType("nvarchar(max)");
@@ -960,8 +1009,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("ChecklistCompliantId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChecklistCompliantId"));
 
                     b.Property<string>("Checklist_Type")
                         .HasColumnType("nvarchar(max)");
@@ -984,8 +1034,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ChecklistQuestionId")
                         .HasColumnType("int");
@@ -1009,8 +1060,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Observation")
                         .HasColumnType("nvarchar(max)");
@@ -1029,8 +1081,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Actual")
                         .HasColumnType("nvarchar(max)");
@@ -1057,8 +1110,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AddedBy")
                         .HasColumnType("int");
@@ -1107,8 +1161,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("DispositionId")
                         .HasColumnType("int");
@@ -1145,8 +1200,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AddedBy")
                         .HasColumnType("int");
@@ -1187,8 +1243,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -1212,8 +1269,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Actual_Delivered")
                         .HasColumnType("decimal(18,2)");
@@ -1293,8 +1351,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("PO_ReceivingId")
                         .HasColumnType("int");
@@ -1314,8 +1373,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AccountTitleCode")
                         .HasColumnType("nvarchar(max)");
@@ -1344,8 +1404,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AnalysisName")
                         .HasColumnType("nvarchar(max)");
@@ -1371,8 +1432,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AccountTitle")
                         .HasColumnType("nvarchar(max)");
@@ -1430,8 +1492,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime2");
@@ -1457,8 +1520,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1487,8 +1551,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1514,8 +1579,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1544,8 +1610,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1579,8 +1646,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime2");
@@ -1606,8 +1674,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime2");
@@ -1633,8 +1702,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1660,8 +1730,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1706,8 +1777,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1733,8 +1805,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime2");
@@ -1760,8 +1833,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1793,8 +1867,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1817,8 +1892,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1856,8 +1932,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1890,8 +1967,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime2");
@@ -1917,8 +1995,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1947,8 +2026,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -2016,8 +2096,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Batch")
                         .HasColumnType("int");
@@ -2067,8 +2148,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Batch")
                         .HasColumnType("int");
@@ -2121,8 +2203,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Batch")
                         .HasColumnType("int");
@@ -2169,8 +2252,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -2202,8 +2286,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -2243,8 +2328,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -2292,8 +2378,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
@@ -2325,8 +2412,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -2346,8 +2434,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("ActualDelivered")
                         .HasColumnType("decimal(18,2)");
@@ -2436,8 +2525,9 @@ namespace ELIXIR.DATA.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -2530,6 +2620,15 @@ namespace ELIXIR.DATA.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.MoveOrder", b =>
+                {
+                    b.HasOne("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.AdvancesToEmployees", "AdvancesToEmployees")
+                        .WithMany()
+                        .HasForeignKey("AdvancesToEmployeesId");
+
+                    b.Navigation("AdvancesToEmployees");
                 });
 
             modelBuilder.Entity("ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL.Ordering", b =>
