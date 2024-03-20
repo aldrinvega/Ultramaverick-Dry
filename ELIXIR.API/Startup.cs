@@ -43,9 +43,10 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         //     services.AddControllers()
-        //.AddJsonOptions(options =>
+     s   //.AddJsonOptions(options =>
         //{
         //    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        
         //    options.JsonSerializerOptions.MaxDepth = 32;
         //});
 
