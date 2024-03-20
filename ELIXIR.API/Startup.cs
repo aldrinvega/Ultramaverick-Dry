@@ -43,7 +43,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         //     services.AddControllers()
-     s   //.AddJsonOptions(options =>
+        //.AddJsonOptions(options =>
         //{
         //    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
         
