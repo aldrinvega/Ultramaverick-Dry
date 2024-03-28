@@ -18,6 +18,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
         <entry key="$PROJECT_DIR$" value="main" />
@@ -25,23 +26,27 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "aldrinvega"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;aldrinvega&quot;
   }
-}]]></component>
-  <component name="GitHubPullRequestState"><![CDATA[{
-  "prStates": []
-}]]></component>
-  <component name="GitLabMergeRequestsSettings"><![CDATA[{}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/aldrinvega/Ultramaverick-Dry",
-    "accountId": "7e4485fb-5771-4ad6-884f-95cb4480b057"
+}</component>
+  <component name="GitHubPullRequestState">{
+  &quot;prStates&quot;: []
+}</component>
+  <component name="GitLabMergeRequestsSettings">{}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/aldrinvega/Ultramaverick-Dry&quot;,
+    &quot;accountId&quot;: &quot;7e4485fb-5771-4ad6-884f-95cb4480b057&quot;
   }
-}]]></component>
-  <component name="KubernetesApiProvider"><![CDATA[{}]]></component>
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="mock://C:/Users/avega/source/repos/aldrinvega/Ultramaverick-Dry/ELIXIR.API/Startup.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/avega/source/repos/aldrinvega/Ultramaverick-Dry/ELIXIR.API/Startup.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="KubernetesApiProvider">{}</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -184,6 +189,7 @@
       <workItem from="1705969048821" duration="494000" />
       <workItem from="1709278818214" duration="1590000" />
       <workItem from="1710937612480" duration="112000" />
+      <workItem from="1710939211111" duration="679000" />
     </task>
     <task id="LOCAL-00001" summary="Adjust preparation schedule and appsettings.json">
       <option name="closed" value="true" />
@@ -209,7 +215,23 @@
       <option name="project" value="LOCAL" />
       <updated>1710937714713</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="-">
+      <option name="closed" value="true" />
+      <created>1710939240197</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1710939240197</updated>
+    </task>
+    <task id="LOCAL-00005" summary="-">
+      <option name="closed" value="true" />
+      <created>1710939259776</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1710939259776</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -233,7 +255,8 @@
     <MESSAGE value="Adjust preparation schedule and appsettings.json" />
     <MESSAGE value="Changes" />
     <MESSAGE value="fix: consolidated reports export bug fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: consolidated reports export bug fixes" />
+    <MESSAGE value="-" />
+    <option name="LAST_COMMIT_MESSAGE" value="-" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

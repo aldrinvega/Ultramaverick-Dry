@@ -33,6 +33,7 @@ public class ReportRepository : IReportRepository
                 ItemCategory = category.ItemCategoryName
             });
 
+
         var report = (from receiving in _context.QC_Receiving
             where receiving.QC_ReceiveDate >= DateTime.Parse(DateFrom) &&
                   receiving.QC_ReceiveDate <= DateTime.Parse(DateTo) && receiving.IsActive == true
