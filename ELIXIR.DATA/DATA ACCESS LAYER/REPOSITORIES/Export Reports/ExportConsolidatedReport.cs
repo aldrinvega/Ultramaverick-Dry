@@ -67,6 +67,8 @@ public class Handler : IRequestHandler<ExportConsolidatedReportQuery, Unit>
         var orders =
             await _reportRepository.ConsolidatedReport(request.DateFrom, request.DateTo);
 
+      
+
         using (var workbook = new XLWorkbook())
         {
             var worksheet = workbook.Worksheets.Add($"Consolidated Report");

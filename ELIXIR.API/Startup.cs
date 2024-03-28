@@ -46,6 +46,7 @@ public class Startup
         //.AddJsonOptions(options =>
         //{
         //    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        
         //    options.JsonSerializerOptions.MaxDepth = 32;
         //});
 
@@ -84,7 +85,7 @@ public class Startup
         services.AddScoped<IOrdering, OrderingRepository>();
 
         services.AddDbContext<StoreContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("LiveConnection")));
+            options.UseSqlServer(Configuration.GetConnectionString("Docker")));
 
         services.Configure<ApiBehaviorOptions>(options =>
         {
