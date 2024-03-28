@@ -36,3 +36,8 @@ services:
         - "5009:1433"
 volumes:
   umdry-volume:
+
+              
+- name: Publish Docker       
+  uses: elgohr/Publish-Docker-Github-Action@v5
+
