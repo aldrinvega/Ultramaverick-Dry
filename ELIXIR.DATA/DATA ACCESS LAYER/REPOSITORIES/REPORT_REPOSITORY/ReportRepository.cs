@@ -91,6 +91,7 @@ public class ReportRepository : IReportRepository
         return await warehouse.ToListAsync();
     }
 
+    //Transformation Report
     public async Task<IReadOnlyList<TransformationReport>> TransformationReport(string DateFrom, string DateTo)
     {
         var transform = (from planning in _context.Transformation_Planning
@@ -131,10 +132,11 @@ public class ReportRepository : IReportRepository
             });
 
         var orders = from moveorder in _context.MoveOrders
-                     .Include(x => x.AdvancesToEmployees)
+                .Include(x => x.AdvancesToEmployees)
             where moveorder.ApprovedDate.Value.Date >= DateTime.Parse(DateFrom).Date &&
                   moveorder.ApprovedDate.Value.Date <= DateTime.Parse(DateTo).Date &&
-                  moveorder.IsActive == true
+                  moveorder.IsActive == true &&
+                  moveorder.IsRejectForPreparation == null
             join transactmoveorder in _context.TransactMoveOrder
                 on moveorder.OrderNo equals transactmoveorder.OrderNo into leftJ
             from transactmoveorder in leftJ.DefaultIfEmpty()
@@ -143,7 +145,7 @@ public class ReportRepository : IReportRepository
                 moveorder,
                 transactmoveorder
             };
-        
+
         var moveOrderReports = orders.Select(order => new MoveOrderReport
         {
             MoveOrderId = order.moveorder.OrderNo,
@@ -378,7 +380,8 @@ public class ReportRepository : IReportRepository
         DateTime toDate = DateTime.Parse(dateTo);
 
         var orders = await _context.MoveOrders
-            .Where(moveorder => moveorder.IsActive == true)
+            .Where(moveorder => moveorder.IsActive == true &&
+                                moveorder.IsRejectForPreparation != true)
             .Join(_context.TransactMoveOrder,
                 moveorder => moveorder.OrderNo,
                 transact => transact.OrderNo,
@@ -872,7 +875,7 @@ public class ReportRepository : IReportRepository
             .ToListAsync();
 
         var moveOrderReports = await
-            
+
             //(from transact in _context.TransactMoveOrder
             //    where transact.IsActive == true && transact.IsTransact == true &&
             //          transact.PreparedDate.Value.Date >= fromDate && transact.PreparedDate.Value.Date <= toDate
@@ -880,14 +883,14 @@ public class ReportRepository : IReportRepository
             //        on transact.OrderNo equals moveorder.OrderNo into leftJ
             // from moveorder in leftJ.DefaultIfEmpty()
 
-             (from moveorder in _context.MoveOrders
-                     .Include(x => x.AdvancesToEmployees)
-             where moveorder.ApprovedDate.Value.Date >= fromDate &&
-                   moveorder.ApprovedDate.Value.Date <= toDate &&
-                   moveorder.IsActive == true
-             join transactmoveorder in _context.TransactMoveOrder
-                 on moveorder.OrderNo equals transactmoveorder.OrderNo into leftJ
-             from transactmoveorder in leftJ.DefaultIfEmpty()
+            (from moveorder in _context.MoveOrders
+                    .Include(x => x.AdvancesToEmployees)
+                where moveorder.ApprovedDate.Value.Date >= fromDate &&
+                      moveorder.ApprovedDate.Value.Date <= toDate &&
+                      moveorder.IsActive == true
+                join transactmoveorder in _context.TransactMoveOrder
+                    on moveorder.OrderNo equals transactmoveorder.OrderNo into leftJ
+                from transactmoveorder in leftJ.DefaultIfEmpty()
                 select new
                 {
                     moveorder.Id,
@@ -1191,5 +1194,63 @@ public class ReportRepository : IReportRepository
             });
 
         return await orders.ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<OrderVsServeReportsDTO>> OrderVsServeReports(string dateFrom, string dateTo)
+    {
+        var fromDate = DateTime.Parse(dateFrom);
+        var toDate = DateTime.Parse(dateTo);
+
+        var orders = await _context.Orders
+            .Where(order => order.IsActive &&
+                            !order.IsReject != true &&
+                            order.PreparedDate != null &&
+                            order.PreparedDate >= fromDate &&
+                            order.PreparedDate <= toDate)
+            .Select(order => new
+            {
+                order.Id,
+                order.FarmCode,
+                order.FarmName,
+                order.ItemCode,
+                order.ItemDescription,
+                order.Uom,
+                order.Category,
+                order.QuantityOrdered,
+                order.PreparedDate
+            }).ToListAsync();
+
+        var serveOrders = await _context.MoveOrders
+            .Where(moveOrder => moveOrder.IsTransact &&
+                                moveOrder.IsActive &&
+                                moveOrder.IsPrepared &&
+                                moveOrder.IsRejectForPreparation != true &&
+                                moveOrder.ApprovedDate >= fromDate &&
+                                moveOrder.ApprovedDate <= toDate)
+            .GroupBy(x => x.OrderNoPKey)
+            .Select(group => new
+            {
+                OrderNoPKey = group.Key,
+                TotalQuantityOrdered = group.Sum(x => x.QuantityOrdered)
+            })
+            .ToListAsync();
+
+        var reportList = serveOrders.Join(orders,
+            serveOrder => serveOrder.OrderNoPKey,
+            order => order.Id,
+            (serveOrder, order) => new OrderVsServeReportsDTO
+            {
+                OrderNo = order.Id,
+                CustomerCode = order.FarmCode,
+                CustomerName = order.FarmName,
+                ItemCode = order.ItemCode,
+                ItemDescription = order.ItemDescription,
+                Uom = order.Uom,
+                Category = order.Category,
+                QuantityOrdered = order.QuantityOrdered,
+                QuantityServed = serveOrder.TotalQuantityOrdered
+            }).ToList();
+
+        return reportList;
     }
 }

@@ -1443,7 +1443,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         public async Task<IReadOnlyList<MultiplePrintingDTO>> MultiplePrintingForMOS(List<int> orderIds)
         {
             var moveOrdersList = await _context.MoveOrders
-                .Where(x => x.IsActive && orderIds.Contains(x.OrderNo) && x.PreparedDate != null)    
+                .Where(x => x.IsActive && 
+                orderIds.Contains(x.OrderNo) && x.PreparedDate != null &&
+                x.IsRejectForPreparation != true)
                 .ToListAsync();
 
             var groups = moveOrdersList

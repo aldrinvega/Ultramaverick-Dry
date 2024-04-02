@@ -123,5 +123,15 @@ namespace ELIXIR.API.Controllers.REPORT_CONTROLLER
             var approvedMoveOrderReports = await _unitOfWork.Report.ApprovedMoveOrderReport(dateFrom, dateTo);
             return Ok(approvedMoveOrderReports);
         }
+        
+        [HttpGet]
+        [Route("OrderVsServeReports")]
+        public async Task<IActionResult> OrderVsServeReports([FromQuery] string dateFrom,
+            [FromQuery] string dateTo)
+        {
+            var orderVsServeReports = await _unitOfWork.Report.OrderVsServeReports(dateFrom, dateTo);
+
+            return Ok(orderVsServeReports);
+        }
     }
 }
