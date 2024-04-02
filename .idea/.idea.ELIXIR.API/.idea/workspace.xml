@@ -11,11 +11,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a52501b5-a0a4-45ca-a210-4d1e8b3c8605" name="Changes" comment="add: ordered vs served export file">
+    <list default="true" id="a52501b5-a0a4-45ca-a210-4d1e8b3c8605" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportServedVsOrderReports.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/REPORT_DTOs/OrderVsServeReportsDTO.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ELIXIR.API/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ELIXIR.API/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ELIXIR.API/Controllers/REPORT_CONTROLLER/ReportController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Controllers/REPORT_CONTROLLER/ReportController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Startup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Startup.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/ORDERING_INTERFACE/IOrdering.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/ORDERING_INTERFACE/IOrdering.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/REPORT_INTERFACE/IReportRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/REPORT_INTERFACE/IReportRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportApprovedMoveorder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportApprovedMoveorder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/REPORT_REPOSITORY/ReportRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/REPORT_REPOSITORY/ReportRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,22 +48,12 @@
   &quot;prStates&quot;: []
 }</component>
   <component name="GitLabMergeRequestsSettings">{}</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/aldrinvega/Ultramaverick-Dry",
-    "accountId": "7e4485fb-5771-4ad6-884f-95cb4480b057"
-  },
-  "recentNewPullRequestHead": {
-    "server": {
-      "useHttp": false,
-      "host": "github.com",
-      "port": null,
-      "suffix": null
-    },
-    "owner": "aldrinvega",
-    "repository": "Ultramaverick-Dry"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/aldrinvega/Ultramaverick-Dry&quot;,
+    &quot;accountId&quot;: &quot;7e4485fb-5771-4ad6-884f-95cb4480b057&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="mock://C:/Users/avega/source/repos/aldrinvega/Ultramaverick-Dry/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
@@ -84,7 +81,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "#1 on developmentenv",
+    "git-widget-placeholder": "developmentenv",
     "last_opened_file_path": "C:/Users/avega/source/repos/aldrinvega/Ultramaverick-Dry/ELIXIR.API.sln",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.stylelint": "true",
@@ -209,7 +206,7 @@
       <workItem from="1709278818214" duration="1590000" />
       <workItem from="1710937612480" duration="112000" />
       <workItem from="1710939211111" duration="679000" />
-      <workItem from="1712017091248" duration="8500000" />
+      <workItem from="1712017091248" duration="6031000" />
     </task>
     <task id="LOCAL-00001" summary="Adjust preparation schedule and appsettings.json">
       <option name="closed" value="true" />
@@ -251,15 +248,7 @@
       <option name="project" value="LOCAL" />
       <updated>1710939259776</updated>
     </task>
-    <task id="LOCAL-00006" summary="add: ordered vs served export file">
-      <option name="closed" value="true" />
-      <created>1712024586916</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1712024586916</updated>
-    </task>
-    <option name="localTasksCounter" value="7" />
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -285,8 +274,7 @@
     <MESSAGE value="Changes" />
     <MESSAGE value="fix: consolidated reports export bug fixes" />
     <MESSAGE value="-" />
-    <MESSAGE value="add: ordered vs served export file" />
-    <option name="LAST_COMMIT_MESSAGE" value="add: ordered vs served export file" />
+    <option name="LAST_COMMIT_MESSAGE" value="-" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY;
 
@@ -1253,63 +1252,5 @@ public class ReportRepository : IReportRepository
             }).ToList();
 
         return reportList;
-    }
-
-    public async Task<PagedList<OrderVsServeReportsDTO>> OrderVsServeReportsPagination(string dateFrom, string dateTo,
-        UserParams userParams)
-    {
-        var fromDate = DateTime.Parse(dateFrom);
-        var toDate = DateTime.Parse(dateTo);
-
-        var orders = _context.Orders
-            .Where(order => order.IsActive &&
-                            !order.IsReject != true &&
-                            order.PreparedDate != null &&
-                            order.PreparedDate >= fromDate &&
-                            order.PreparedDate <= toDate)
-            .Select(order => new OrderVsServeReportsDTO
-            {
-                OrderNo = order.Id,
-                CustomerCode = order.FarmCode,
-                CustomerName = order.FarmName,
-                ItemCode = order.ItemCode,
-                ItemDescription = order.ItemDescription,
-                Uom = order.Uom,
-                Category = order.Category,
-                QuantityOrdered = order.QuantityOrdered,
-                QuantityServed = 0 // Initialize with 0, since we'll update this later
-            });
-
-        var serveOrders = _context.MoveOrders
-            .Where(moveOrder => moveOrder.IsTransact &&
-                                moveOrder.IsActive &&
-                                moveOrder.IsPrepared &&
-                                moveOrder.IsRejectForPreparation != true &&
-                                moveOrder.ApprovedDate >= fromDate &&
-                                moveOrder.ApprovedDate <= toDate)
-            .GroupBy(x => x.OrderNoPKey)
-            .Select(group => new
-            {
-                OrderNoPKey = group.Key,
-                TotalQuantityOrdered = group.Sum(x => x.QuantityOrdered)
-            });
-
-        var reportList = from serveOrder in serveOrders
-            join order in orders on serveOrder.OrderNoPKey equals order.OrderNo
-            select new OrderVsServeReportsDTO
-            {
-                OrderNo = order.OrderNo,
-                CustomerCode = order.CustomerCode,
-                CustomerName = order.CustomerName,
-                ItemCode = order.ItemCode,
-                ItemDescription = order.ItemDescription,
-                Uom = order.Uom,
-                Category = order.Category,
-                QuantityOrdered = order.QuantityOrdered,
-                QuantityServed = serveOrder.TotalQuantityOrdered
-            };
-
-        return await PagedList<OrderVsServeReportsDTO>.CreateAsync(reportList, userParams.PageNumber,
-            userParams.PageSize);
     }
 }

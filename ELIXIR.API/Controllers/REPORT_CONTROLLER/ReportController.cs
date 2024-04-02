@@ -1,8 +1,6 @@
 ﻿using ELIXIR.DATA.CORE.ICONFIGURATION;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 
 namespace ELIXIR.API.Controllers.REPORT_CONTROLLER
 {
@@ -134,37 +132,6 @@ namespace ELIXIR.API.Controllers.REPORT_CONTROLLER
             var orderVsServeReports = await _unitOfWork.Report.OrderVsServeReports(dateFrom, dateTo);
 
             return Ok(orderVsServeReports);
-        }
-        
-        [HttpGet]
-        [Route("OrderVsServeReportsPagination")]
-        public async Task<IActionResult> OrderVsServeReportPagination([FromQuery] string dateFrom,
-            [FromQuery] string dateTo, [FromQuery] UserParams userParams)
-        {
-            var orderVsServeReports = await _unitOfWork.Report
-                .OrderVsServeReportsPagination(dateFrom, dateTo, userParams);
-            
-            Response.AddPaginationHeader(
-                orderVsServeReports.CurrentPage,
-                orderVsServeReports.PageSize,
-                orderVsServeReports.TotalCount,
-                orderVsServeReports.TotalPages,
-                orderVsServeReports.HasPreviousPage,
-                orderVsServeReports.HasNextPage
-                );
-
-            var result = new
-            {
-                orderVsServeReports,
-                orderVsServeReports.CurrentPage,
-                orderVsServeReports.PageSize,
-                orderVsServeReports.TotalCount,
-                orderVsServeReports.TotalPages,
-                orderVsServeReports.HasPreviousPage,
-                orderVsServeReports.HasNextPage
-            };
-
-            return Ok(result);
         }
     }
 }

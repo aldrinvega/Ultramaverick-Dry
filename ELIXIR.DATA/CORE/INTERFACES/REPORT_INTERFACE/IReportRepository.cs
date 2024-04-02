@@ -1,7 +1,6 @@
 ﻿using ELIXIR.DATA.DTOs.REPORT_DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 
 namespace ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE
 {
@@ -26,7 +25,5 @@ namespace ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE
         Task<IReadOnlyList<ConsolidatedReport>> ConsolidatedReport(string dateFrom, string dateTo);
         Task<IReadOnlyList<MoveOrderReport>> ApprovedMoveOrderReport(string dateFrom, string dateTo);
         Task<IReadOnlyList<OrderVsServeReportsDTO>> OrderVsServeReports(string dateFrom, string dateTo);
-        Task<PagedList<OrderVsServeReportsDTO>> OrderVsServeReportsPagination(string dateFrom, string dateTo,
-            UserParams userParams);
     }
 }
