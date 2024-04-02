@@ -77,6 +77,8 @@ public class ExportServedVsOrderReports : ControllerBase
                     "Category ",
                     "QuantityOrdered",
                     "QuantityServed",
+                    "Variance",
+                    "Percentage"
                 };
 
                 var range = worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, headers.Count));
@@ -105,6 +107,8 @@ public class ExportServedVsOrderReports : ControllerBase
                     row.Cell(7).Value = miscReceipt[index - 1].Category;
                     row.Cell(8).Value = miscReceipt[index - 1].QuantityOrdered;
                     row.Cell(9).Value = miscReceipt[index - 1].QuantityServed;
+                    row.Cell(10).Value = miscReceipt[index - 1].Variance;
+                    row.Cell(11).Value = miscReceipt[index - 1].Percentage;
                 }
 
                 worksheet.Columns().AdjustToContents();
