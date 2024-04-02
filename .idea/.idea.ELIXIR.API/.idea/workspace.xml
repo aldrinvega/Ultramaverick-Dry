@@ -13,6 +13,7 @@
   <component name="ChangeListManager">
     <list default="true" id="a52501b5-a0a4-45ca-a210-4d1e8b3c8605" name="Changes" comment="add: export ordered vs served pagination">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ELIXIR.API/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ELIXIR.API/.idea/workspace.xml" afterDir="false" />
+
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,8 +46,6 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock://C:/Users/avega/source/repos/aldrinvega/Ultramaverick-Dry/ELIXIR.DATA/CORE/INTERFACES/REPORT_INTERFACE/IReportRepository.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/avega/source/repos/aldrinvega/Ultramaverick-Dry/ELIXIR.DATA/CORE/INTERFACES/REPORT_INTERFACE/IReportRepository.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Users/avega/source/repos/aldrinvega/Ultramaverick-Dry/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="KubernetesApiProvider">{}</component>
@@ -74,6 +73,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "#1 on developmentenv",
+
     "last_opened_file_path": "C:/Users/avega/source/repos/aldrinvega/Ultramaverick-Dry/ELIXIR.API.sln",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.stylelint": "true",
