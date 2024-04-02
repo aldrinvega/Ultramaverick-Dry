@@ -1249,7 +1249,9 @@ public class ReportRepository : IReportRepository
                 Uom = order.Uom,
                 Category = order.Category,
                 QuantityOrdered = order.QuantityOrdered,
-                QuantityServed = serveOrder.TotalQuantityOrdered
+                QuantityServed = serveOrder.TotalQuantityOrdered,
+                Variance = order.QuantityOrdered - serveOrder.TotalQuantityOrdered,
+                Percentage = Math.Round(serveOrder.TotalQuantityOrdered / order.QuantityOrdered * 100, 2)
             }).ToList();
 
         return reportList;
@@ -1277,7 +1279,7 @@ public class ReportRepository : IReportRepository
                 Uom = order.Uom,
                 Category = order.Category,
                 QuantityOrdered = order.QuantityOrdered,
-                QuantityServed = 0 // Initialize with 0, since we'll update this later
+                QuantityServed = 0, // Initialize with 0, since we'll update this later,
             });
 
         var serveOrders = _context.MoveOrders
@@ -1306,7 +1308,9 @@ public class ReportRepository : IReportRepository
                 Uom = order.Uom,
                 Category = order.Category,
                 QuantityOrdered = order.QuantityOrdered,
-                QuantityServed = serveOrder.TotalQuantityOrdered
+                QuantityServed = serveOrder.TotalQuantityOrdered,
+                Variance = order.QuantityServed - serveOrder.TotalQuantityOrdered,
+                Percentage = Math.Round((order.QuantityServed / (decimal)order.QuantityOrdered) * 100, 2)
             };
 
         return await PagedList<OrderVsServeReportsDTO>.CreateAsync(reportList, userParams.PageNumber,

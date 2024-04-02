@@ -16,4 +16,6 @@ public class OrderVsServeReportsDTO
     public string Category { get; set; }
     public decimal? QuantityOrdered { get; set; }
     public decimal QuantityServed { get; set; }
+    public decimal Variance { get; set; }
+    public decimal Percentage { get; set; }
 }
