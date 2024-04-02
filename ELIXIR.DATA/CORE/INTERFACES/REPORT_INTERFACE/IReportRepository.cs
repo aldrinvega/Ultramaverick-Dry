@@ -28,5 +28,6 @@ namespace ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE
         Task<IReadOnlyList<OrderVsServeReportsDTO>> OrderVsServeReports(string dateFrom, string dateTo);
         Task<PagedList<OrderVsServeReportsDTO>> OrderVsServeReportsPagination(string dateFrom, string dateTo,
             UserParams userParams);
+        
     }
 }
