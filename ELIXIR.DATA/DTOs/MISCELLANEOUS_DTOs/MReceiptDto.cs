@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Office2013.Excel;
 
 namespace ELIXIR.DATA.DTOs.MISCELLANEOUS_DTOs
 {
@@ -15,6 +16,8 @@ namespace ELIXIR.DATA.DTOs.MISCELLANEOUS_DTOs
         public string ItemDescription { get; set; }
         public string SupplierCode { get; set; }
         public string SupplierName { get; set; }
+        public string CustomerCode { get; set; }
+        public string Customer { get; set; }
         public decimal TotalQuantity { get; set; }
         public string PreparedDate { get; set; }
         public string AddedBy { get; set; }
