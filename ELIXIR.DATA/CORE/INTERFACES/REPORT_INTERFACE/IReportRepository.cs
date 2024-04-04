@@ -29,5 +29,21 @@ namespace ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE
         Task<PagedList<OrderVsServeReportsDTO>> OrderVsServeReportsPagination(string dateFrom, string dateTo,
             UserParams userParams);
         Task<IReadOnlyList<ItemswithBBDDTO>> ItemswithBBDReport();
+        //Task<PagedList<ConsolidatedReport>> ConsolidatedReportPagination(string dateFrom, string dateTo, UserParams userParams);
+        Task<PagedList<ItemswithBBDDTO>> ItemswithBBDDTOsPagination(UserParams userParams);
+
+        Task<PagedList<QCReport>> QcRecevingReportPagination(string DateFrom, string DateTo, UserParams userParams);
+        Task<PagedList<WarehouseReport>> WarehouseReceivingReportPagination(string DateFrom, string DateTo, UserParams userParams);
+        Task<PagedList<TransformationReport>> TransformationReportPagination(string DateFrom, string DateTo, UserParams userParams);
+        Task<PagedList<MoveOrderReport>> MoveOrderReportPagination(string DateFrom, string DateTo, UserParams userParams);
+        Task<PagedList<MiscellaneousReceiptReport>> MReceiptReportPagination(string DateFrom, string DateTo, UserParams userParams);
+        Task<PagedList<MiscellaneousIssueReport>> MIssueReportPagination(string DateFrom, string DateTo, UserParams userParams);
+        Task<PagedList<WarehouseReport>> NearlyExpireItemsReportPagination(int expirydays, UserParams userParams);
+        Task<PagedList<MoveOrderReport>> TransactedMoveOrderReportPagination(string dateFrom, string dateTo, UserParams userParams);
+        Task<PagedList<CancelledOrderReport>> CancelledOrderedReportsPagination(string DateFrom, string DateTo, UserParams userParams);
+        Task<PagedList<InventoryMovementReport>> InventoryMovementReportPagination(string DateFrom,
+        string DateTo, string PlusOne, UserParams userParams);
+        Task<PagedList<MoveOrderReport>> ApprovedMoveOrderReportPagination(string dateFrom, string dateTo, UserParams userParams);
+ 
     }
 }
