@@ -389,10 +389,10 @@ namespace ELIXIR.API.Controllers.REPORT_CONTROLLER
 
         [HttpGet]
         [Route("InventoryMovementReportPagination")]
-        public async Task<IActionResult> InventoryMovementReportPagination([FromQuery] string DateFrom, [FromQuery] string DateTo, [FromQuery] UserParams userParams)
+        public async Task<IActionResult> InventoryMovementReportPagination([FromQuery] string DateFrom, [FromQuery] string DateTo, [FromQuery] string PlusOne, [FromQuery] UserParams userParams)
         {
             var inventoryMovementReports = await _unitOfWork.Report
-                .ApprovedMoveOrderReportPagination(DateFrom, DateTo, userParams);
+                .InventoryMovementReportPagination(DateFrom, DateTo, PlusOne, userParams);
 
             Response.AddPaginationHeader(
                 inventoryMovementReports.CurrentPage,
