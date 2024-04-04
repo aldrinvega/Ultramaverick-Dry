@@ -9,10 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
-using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
-using Microsoft.AspNetCore.Mvc;
-using ELIXIR.DATA.CORE.INTERFACES.WAREHOUSE_INTERFACE;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY;
 
@@ -2304,21 +2300,108 @@ public class ReportRepository : IReportRepository
 
     public async Task<IReadOnlyList<ItemswithBBDDTO>> ItemswithBBDReport()
     {
+        var EndDate = DateTime.Now;
+        var StartDate = EndDate.AddDays(-30);
 
-        var items = await _context.WarehouseReceived
-            .Select(i => new ItemswithBBDDTO
+        var getWarehouseIn = await _context.WarehouseReceived
+            .Where(x => x.IsActive == true)
+            .GroupBy(x => new { 
+                x.ItemCode, 
+                x.Id, 
+                x.ActualGood, 
+                x.ItemDescription, 
+                x.Uom, 
+                x.Expiration })
+            .Select(x => new WarehouseInventoryWIthBbd
             {
-                WarehouseId = i.Id,
-                ItemCode = i.ItemCode,
-                ItemDescription = i.ItemDescription,
-                UOM = i.Uom,
-                BBD = i.Expiration.Value.ToString("MM-dd-yyyy")
+                WarehouseId = x.Key.Id,
+                ItemCode = x.Key.ItemCode,
+                Uom = x.Key.Uom,
+                ActualGood = x.Key.ActualGood,
+                ItemDescription = x.Key.ItemDescription,
+                ExpirationDate = x.Key.Expiration
             })
-            .OrderBy(item => item.ItemCode)
             .ToListAsync();
+
+        var getMoveOrderOut = await _context.MoveOrders
+            .Where(x => x.IsActive == true && x.IsPrepared == true)
+            .GroupBy(x => new { x.ItemCode, x.WarehouseId})
+            .Select(x => new MoveOrderInventory
+            {
+                WarehouseId = x.Key.WarehouseId,
+                ItemCode = x.Key.ItemCode,
+                QuantityOrdered = x.Sum(x => x.QuantityOrdered)
+            })
+            .ToListAsync();
+
+        var getReceiptIn = await _context.WarehouseReceived
+            .Where(x => x.IsActive == true && x.TransactionType == "MiscellaneousReceipt")
+            .GroupBy(x => new { x.ItemCode, x.Id })
+            .Select(x => new ReceiptInventoryWithBBDDTO
+            {
+                WarehouseId = x.Key.Id,
+                ItemCode = x.Key.ItemCode,
+                Quantity = x.Sum(x => x.ActualGood)
+            })
+            .ToListAsync();
+
+        var getIssueOut = await _context.MiscellaneousIssueDetails
+            .Where(x => x.IsActive == true)
+            .GroupBy(x => new { x.ItemCode, x.WarehouseId })
+            .Select(x => new IssueInventoryWithBBDDTO
+            {
+                WarehouseId = x.Key.WarehouseId,
+                ItemCode = x.Key.ItemCode,
+                Quantity = x.Sum(x => x.Quantity)
+            })
+            .ToListAsync();
+
+        var items = (from warehouse in getWarehouseIn
+                     join moveOrder in getMoveOrderOut on new { warehouse.ItemCode, warehouse.WarehouseId } equals new { moveOrder.ItemCode, moveOrder.WarehouseId } into moveOrders
+                     from moveOrder in moveOrders.DefaultIfEmpty()
+                     join receipt in getReceiptIn on new { warehouse.ItemCode, warehouse.WarehouseId } equals new { receipt.ItemCode, receipt.WarehouseId } into receipts
+                     from receipt in receipts.DefaultIfEmpty()
+                     join issue in getIssueOut on new { warehouse.ItemCode, warehouse.WarehouseId } equals new { issue.ItemCode, issue.WarehouseId } into issues
+                     from issue in issues.DefaultIfEmpty()
+                     group new
+                     {
+                         warehouse,
+                         moveOrder,
+                         receipt,
+                         issue
+                     } by new
+                     {
+                         warehouse.WarehouseId,
+                         warehouse.ItemCode,
+                         warehouse.ItemDescription,
+                         warehouse.Uom,
+                         warehouse.ExpirationDate,
+                         warehouse.ActualGood,
+                         ReceiptQuantity = receipt?.Quantity,
+                         IssueQuantity = issue?.Quantity,
+                         MoveOrderQuantity = moveOrder?.QuantityOrdered
+                     } into total
+                     select new ItemswithBBDDTO
+                     {
+                         WarehouseId = total.Key.WarehouseId,
+                         ItemCode = total.Key.ItemCode,
+                         ItemDescription = total.Key.ItemDescription,
+                         UOM = total.Key.Uom,
+                         Receipt = total.Key.ReceiptQuantity,
+                         Issue = total.Key.IssueQuantity,
+                         MoveOrder = total.Key.MoveOrderQuantity,
+                         Warehouse = total.Key.ActualGood,
+                         SOH = (total.Sum(x => x.warehouse?.ActualGood ?? 0)) -
+                               ((total.Sum(x => x.moveOrder?.QuantityOrdered ?? 0)) +
+                               (total.Sum(x => x.issue?.Quantity ?? 0))),
+                         BBD = total.Key.ExpirationDate?.ToString("MM-dd-yyyy") ?? "-"
+                     })
+                     .Where(items => items.SOH != 0)
+                     .ToList();
 
         return items;
     }
+
 
     public async Task<PagedList<ItemswithBBDDTO>> ItemswithBBDDTOsPagination(UserParams userParams)
     {

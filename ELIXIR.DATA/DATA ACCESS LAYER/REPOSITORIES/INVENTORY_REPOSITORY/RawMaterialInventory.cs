@@ -772,33 +772,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     Quantity = x.Sum(x => x.ActualGood)
                 });
 
-            //var getLastUsed = (from transform in _context.Transformation_Preparation
-            //                   where transform.IsActive == true && transform.IsMixed == true
-            //                   select new
-            //                   {
-            //                       ItemCode = transform.ItemCode,
-            //                       PreparedDate = (DateTime?)transform.PreparedDate
-            //                   }).Distinct()
-            //                   .Union
-            //                    (from moveorder in _context.MoveOrders
-            //                     where moveorder.IsActive == true && moveorder.IsPrepared == true
-            //                     select new
-            //                     {
-            //                         ItemCode = moveorder.ItemCode,
-            //                         PreparedDate = moveorder.PreparedDate
-
-            //                     });
-            //.OrderByDescending(x => x.PreparedDate);
-
-
-            //var x = getLastUsed.ToLookup(x => new
-            //{ 
-            //    x.PreparedDate,
-            //    x.ItemCode
-            //}).Distinct();
-
-            // var xx = getLastUsed;
-
             var individualDifferences = from wr in _context.WarehouseReceived
                 join mo in _context.MoveOrders
                     on wr.Id equals mo.WarehouseId
@@ -812,8 +785,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     QuantityOrdered = mo != null ? mo.QuantityOrdered : 0,
                     CostByWarehouse = wr.UnitCost * (wr.ActualGood - (mo != null ? mo.QuantityOrdered : 0))
                 };
-
-            string queryString = individualDifferences.ToQueryString();
 
 
             // Calculate the sum of differences per ItemCode

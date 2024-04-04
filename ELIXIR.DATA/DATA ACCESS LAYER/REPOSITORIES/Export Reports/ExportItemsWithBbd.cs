@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,9 +22,10 @@ public class ExportItemsWithBbd : ControllerBase
     [HttpGet("ExportItemsWithBbd")]
     public async Task<IActionResult> Add()
     {
-        var filePath = $"Items.xlsx";
+        var filePath = $"Items.xlsx"; ;
         try
         {
+
             var command = new ExportItemsWithBbsCommand();
             await _mediator.Send(command);
 
@@ -45,7 +47,7 @@ public class ExportItemsWithBbd : ControllerBase
         }
     }
 
-    public class ExportItemsWithBbsCommand : IRequest<Unit>{}
+public class ExportItemsWithBbsCommand : IRequest<Unit>{}
 
     public class Handler : IRequestHandler<ExportItemsWithBbsCommand, Unit>
     {
@@ -69,6 +71,11 @@ public class ExportItemsWithBbd : ControllerBase
                         "Item Code",
                         "Item Description",
                         "UOM",
+                        "Receipt",
+                        "Issue",
+                        "Move Order",
+                        "Warehouse",
+                        "SOH",
                         "BBD"
                     };
 
@@ -86,19 +93,25 @@ public class ExportItemsWithBbd : ControllerBase
                     worksheet.Cell(1, index).Value = headers[index - 1];
                 }
 
-                for (var index = 1; index <= rawMaterials.Count; index++)
+                for (var index = 0; index < rawMaterials.Count; index++)
                 {
-                    var row = worksheet.Row(index + 1);
+                    var row = worksheet.Row(index + 2);
 
-                    row.Cell(1).Value = rawMaterials[index - 1].WarehouseId;
-                    row.Cell(2).Value = rawMaterials[index - 1].ItemCode;
-                    row.Cell(3).Value = rawMaterials[index - 1].ItemDescription;
-                    row.Cell(4).Value = rawMaterials[index - 1].UOM;
-                    row.Cell(5).Value = rawMaterials[index - 1].BBD ?? "-";
+                    row.Cell(1).Value = rawMaterials[index].WarehouseId;
+                    row.Cell(2).Value = rawMaterials[index].ItemCode;
+                    row.Cell(3).Value = rawMaterials[index].ItemDescription;
+                    row.Cell(4).Value = rawMaterials[index].UOM;
+                    row.Cell(5).Value = rawMaterials[index].Receipt;
+                    row.Cell(6).Value = rawMaterials[index].Issue;
+                    row.Cell(7).Value = rawMaterials[index].MoveOrder;
+                    row.Cell(8).Value = rawMaterials[index].Warehouse;
+                    row.Cell(9).Value = rawMaterials[index].SOH;
+                    row.Cell(10).Value = rawMaterials[index].BBD ?? "-";
                 }
 
                 worksheet.Columns().AdjustToContents();
-                workbook.SaveAs("Items.xlsx");
+                workbook.SaveAs($"Items.xlsx");
+
             }
 
             return Unit.Value;

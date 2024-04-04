@@ -2204,7 +2204,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 items.IsApproved = null;
                 items.ApprovedDate = null;
                 items.DeliveryStatus = null;
-                items.Reason = reason.Reason;
+                items.Reason = reason.Remarks;
             }
 
             if (existMoveorders != null)
