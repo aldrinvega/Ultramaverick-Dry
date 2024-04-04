@@ -1316,4 +1316,20 @@ public class ReportRepository : IReportRepository
         return await PagedList<OrderVsServeReportsDTO>.CreateAsync(reportList, userParams.PageNumber,
             userParams.PageSize);
     }
+
+    public async Task<IReadOnlyList<ItemswithBBDDTO>> ItemswithBBDReport()
+    {
+
+        var items = await _context.WarehouseReceived
+            .Select(i => new ItemswithBBDDTO
+            {
+                WarehouseId = i.Id,
+                ItemCode = i.ItemCode,
+                ItemDescription = i.ItemDescription,
+                UOM = i.Uom,
+                BBD = i.Expiration.Value.ToString("MM-dd-yyyy")
+            }).ToListAsync();
+
+        return items;
+    }
 }
