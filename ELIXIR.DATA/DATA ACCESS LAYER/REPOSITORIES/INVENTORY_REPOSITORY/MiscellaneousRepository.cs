@@ -51,7 +51,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 {
                 Id = x.Id,
                 SupplierCode = x.SupplierCode,
-                SupplierName = x.Supplier,
+                Supplier = x.Supplier,
                 TotalQuantity = x.TotalQuantity,
                 PreparedDate = x.PreparedDate.ToString("MM/dd/yyyy"),
                 Remarks = x.Remarks
@@ -112,7 +112,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 {
                     Id = x.Id,
                     SupplierCode = x.SupplierCode,
-                    SupplierName = x.Supplier,
+                    Supplier = x.Supplier,
                     TotalQuantity = x.TotalQuantity,
                     PreparedDate = x.PreparedDate.ToString("MM/dd/yyyy"),
                     Remarks = x.Remarks,
@@ -134,7 +134,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
             {
                 Id = x.Id,
                 SupplierCode = x.SupplierCode,
-                SupplierName = x.Supplier,
+                Supplier = x.Supplier,
                 TotalQuantity = x.TotalQuantity,
                 PreparedDate = x.PreparedDate.ToString("MM/dd/yyyy"),
                 Remarks = x.Remarks,
@@ -169,7 +169,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                CustomerCode = receiptParent.CustomerCode,
                                TotalQuantity = warehouse.ActualGood,
                                SupplierCode = receiptParent.SupplierCode,
-                               SupplierName = receiptParent.Supplier,
+                               Supplier = receiptParent.Supplier,
                                PreparedDate = receiptParent.PreparedDate.ToString(),
                                PreparedBy = receiptParent.PreparedBy,
                                Remarks = receiptParent.Remarks
