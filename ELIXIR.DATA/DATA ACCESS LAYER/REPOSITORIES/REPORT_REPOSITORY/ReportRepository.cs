@@ -2313,7 +2313,9 @@ public class ReportRepository : IReportRepository
                 ItemDescription = i.ItemDescription,
                 UOM = i.Uom,
                 BBD = i.Expiration.Value.ToString("MM-dd-yyyy")
-            }).ToListAsync();
+            })
+            .OrderBy(item => item.ItemCode)
+            .ToListAsync();
 
         return items;
     }
@@ -2329,7 +2331,7 @@ public class ReportRepository : IReportRepository
                 ItemDescription = i.ItemDescription,
                 UOM = i.Uom,
                 BBD = i.Expiration.Value.ToString("MM-dd-yyyy")
-            });
+            }).OrderBy(items => items.ItemCode);
 
         return await PagedList<ItemswithBBDDTO>.CreateAsync(items, userParams.PageNumber, userParams.PageSize);
     }
