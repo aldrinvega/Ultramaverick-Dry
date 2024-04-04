@@ -135,14 +135,8 @@ public class Ordering : BaseEntity
 
     public bool? IsCancelledOrder { get; set; }
 
-    // public bool? ForPendingAllocation
-    // {
-    //     get;
-    //     set;
-    // }
-
     public Customer Customer { get; set; }
-
     public int? CustomerId { get; set; }
+    public string Reason { get; set; }
 
 }
