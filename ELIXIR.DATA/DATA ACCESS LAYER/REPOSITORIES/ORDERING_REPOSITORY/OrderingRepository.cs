@@ -2191,12 +2191,12 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await orders.ToListAsync();
         }
 
-        public async Task<bool> CancelControlInMoveOrder(Ordering order)
+        public async Task<bool> CancelControlInMoveOrder(int orderNoPkey, ReasontDTO reason)
         {
-            var existorders = await _context.Orders.Where(x => x.OrderNoPKey == order.OrderNoPKey)
+            var existorders = await _context.Orders.Where(x => x.OrderNoPKey == orderNoPkey)
                 .ToListAsync();
 
-            var existMoveorders = await _context.MoveOrders.Where(x => x.OrderNo == order.OrderNoPKey)
+            var existMoveorders = await _context.MoveOrders.Where(x => x.OrderNo == orderNoPkey)
                 .ToListAsync();
 
             foreach (var items in existorders)
@@ -2204,6 +2204,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 items.IsApproved = null;
                 items.ApprovedDate = null;
                 items.DeliveryStatus = null;
+                items.Reason = reason.Reason;
             }
 
             if (existMoveorders != null)
