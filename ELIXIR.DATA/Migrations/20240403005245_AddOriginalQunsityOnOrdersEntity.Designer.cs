@@ -4,6 +4,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20240403005245_AddOriginalQunsityOnOrdersEntity")]
+    partial class AddOriginalQunsityOnOrdersEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,12 +234,6 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Supplier")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SupplierCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal?>("UnitCost")
                         .HasColumnType("decimal(18,2)");
 
@@ -272,12 +269,6 @@ namespace ELIXIR.DATA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CompanyName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Customer")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CustomerCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DepartmentCode")
@@ -833,9 +824,6 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<decimal>("QuantityOrdered")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ReceivedDate")
                         .HasColumnType("datetime2");

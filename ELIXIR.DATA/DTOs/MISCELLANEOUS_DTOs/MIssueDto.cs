@@ -15,6 +15,8 @@ namespace ELIXIR.DATA.DTOs.MISCELLANEOUS_DTOs
         public string Uom { get; set; }
         public string CustomerCode { get; set; }
         public string Customer { get; set; }
+        public string SupplierCode { get; set; }
+        public string Supplier { get; set; }
         public string PreparedDate { get; set; }
         public string PreparedBy { get; set; }
         public int IssuePKey { get; set; }

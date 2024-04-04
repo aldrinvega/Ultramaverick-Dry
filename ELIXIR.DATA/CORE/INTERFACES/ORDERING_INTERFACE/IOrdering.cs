@@ -82,7 +82,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 
         Task<ItemStocks> GetFirstExpiry(string itemcode);
 
-        Task<bool> CancelControlInMoveOrder(Ordering order);
+        Task<bool> CancelControlInMoveOrder(int orderNoPkey, ReasontDTO reason);
 
         Task<IReadOnlyList<OrderDto>> GetAllApprovedOrdersForCalendar();
 
@@ -118,5 +118,6 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 
         //Orders
         Task<bool> AddNewOrders(Ordering[] orders);
+        
     }
 }

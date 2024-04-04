@@ -24,7 +24,6 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questio
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY;
 using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions.AddNewChecklistQuestions;
-using RDF.Arcana.API.Common;
 
 namespace ELIXIR.API;
 
@@ -85,7 +84,7 @@ public class Startup
         services.AddScoped<IOrdering, OrderingRepository>();
 
         services.AddDbContext<StoreContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("Docker")));
+            options.UseSqlServer(Configuration.GetConnectionString("LiveConnectionDevelopment")));
 
         services.Configure<ApiBehaviorOptions>(options =>
         {

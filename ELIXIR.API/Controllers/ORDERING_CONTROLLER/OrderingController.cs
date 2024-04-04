@@ -677,10 +677,10 @@ namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER
         }
 
         [HttpPut]
-        [Route("CancelOrdersInMoveOrder")]
-        public async Task<IActionResult> CancelOrdersInMoveOrder([FromBody] Ordering order)
+        [Route("CancelOrdersInMoveOrder/{id}")]
+        public async Task<IActionResult> CancelOrdersInMoveOrder([FromBody] ReasontDTO reason, [FromRoute]int id)
         {
-            await _unitOfWork.Order.CancelControlInMoveOrder(order);
+            await _unitOfWork.Order.CancelControlInMoveOrder(id, reason);
 
             await _unitOfWork.CompleteAsync();
 
