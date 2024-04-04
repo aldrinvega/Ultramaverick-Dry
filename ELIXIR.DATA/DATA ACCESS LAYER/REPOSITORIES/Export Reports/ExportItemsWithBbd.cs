@@ -94,7 +94,7 @@ public class ExportItemsWithBbd : ControllerBase
                     row.Cell(2).Value = rawMaterials[index - 1].ItemCode;
                     row.Cell(3).Value = rawMaterials[index - 1].ItemDescription;
                     row.Cell(4).Value = rawMaterials[index - 1].UOM;
-                    row.Cell(5).Value = rawMaterials[index - 1].BBD == null ? "-" : rawMaterials[index - 1].BBD;
+                    row.Cell(5).Value = rawMaterials[index - 1].BBD ?? "-";
                 }
 
                 worksheet.Columns().AdjustToContents();
