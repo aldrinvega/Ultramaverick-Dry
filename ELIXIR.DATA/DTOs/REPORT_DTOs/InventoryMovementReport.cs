@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ELIXIR.DATA.DTOs.REPORT_DTOs
+﻿namespace ELIXIR.DATA.DTOs.REPORT_DTOs
 {
     public class InventoryMovementReport
     {
