@@ -156,12 +156,13 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                         ordering.AllocatedQuantity,
                         ordering.IsActive,
                         ordering.IsPrepared,
+                        ordering.PreparingCancellationRemarks,
                         customers.CustomerCode,
                         customers.CompanyName,
                         customers.CompanyCode,
                         customers.LocationName,
                         customers.DepartmentName,
-                        Reserve = warehouse.Reserve == null ? 0 : warehouse.Reserve,
+                        Reserve = warehouse.Reserve == null ? 0 : warehouse.Reserve
                     }
                 into total
                 orderby total.Key.DateNeeded ascending
@@ -185,7 +186,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     CompanyCode = total.Key.CustomerCode,
                     CompanyName = total.Key.CompanyName,
                     DepartmentName = total.Key.DepartmentName,
-                    LocationName = total.Key.LocationName
+                    LocationName = total.Key.LocationName,
+                    PreparingCancellationRemarks = total.Key.PreparingCancellationRemarks
                 });
 
             return await orders.ToListAsync();
@@ -275,9 +277,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             foreach (var item in activeOrders)
             {
+                var ordering = orders.FirstOrDefault(o => o.OrderNoPKey == item.OrderNoPKey);
                 item.IsReject = true;
                 item.RejectBy = item.RejectBy;
-                item.PreparingCancellationRemarks = item.PreparingCancellationRemarks;
+                item.PreparingCancellationRemarks = ordering.PreparingCancellationRemarks;
                 item.RejectedDate = DateTime.Now;
                 item.PreparedDate = null;
                 item.OrderNoPKey = 0;
@@ -531,6 +534,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     CompanyName = x.CompanyName,
                     LocationName = x.LocationName,
                     FarmName = x.FarmType.FarmName,
+
                     /*Orders = x.Orders*/
                 });
 
@@ -696,7 +700,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     x.IsApproved,
                     x.IsActive,
                     x.AllocatedQuantity,
-                    x.IsCancelledOrder
+                    x.IsCancelledOrder,
+                    x.MoveOrderCancellationRemarks
                 }).Where(x => x.Key.IsApproved == null)
                 .Where(x => x.Key.PreparedDate != null)
                 .Where(x => x.Key.IsActive == true)
@@ -710,7 +715,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     TotalAllocatedOrder = x.Key.AllocatedQuantity == null
                         ? (int)x.Sum(x => x.QuantityOrdered)
                         : (int)x.Sum(x => x.AllocatedQuantity),
-                    PreparedDate = x.Key.PreparedDate.ToString()
+                    PreparedDate = x.Key.PreparedDate.ToString(),
+                    MoveOrderCancellationRemarks = x.Key.MoveOrderCancellationRemarks
                 });
 
             return await orders.ToListAsync();
@@ -797,19 +803,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     DepartmentName = x.Key.DepartmentName,
                     LocationName = x.Key.LocationName,
                     FarmType = x.Key.FarmType
-                });
-
-            var query = orders.ToQueryString();
-
-            // var customers = _context.Customers
-            //     .Include(x => x.Orders)
-            //     .Where(x => x.IsActive == true &&
-            //                 x.Orders.Any(o => o.IsActive == true &&
-            //                                   o.PreparedDate == null &&
-            //                                   o.ForAllocation == null))
-            //     .ToListAsync();
-            //
-            // var result = _mapper.<a
+                }).Distinct();
 
             return await PagedList<CustomersForMoveOrderDTO>.CreateAsync(orders, userParams.PageNumber,
                 userParams.PageSize);

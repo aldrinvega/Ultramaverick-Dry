@@ -21,5 +21,6 @@
         public string CompanyName { get; set; }
         public string CompanyCode { get; set; }
         public bool IsPrepared { get; set; }
+        public string PreparingCancellationRemarks { get; set; }
     }
 }

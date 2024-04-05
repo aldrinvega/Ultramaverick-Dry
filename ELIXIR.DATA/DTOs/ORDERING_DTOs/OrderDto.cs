@@ -59,5 +59,6 @@ namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
         public string AddedBy { get; set; }
         public string EmployeeId { get; set; }
         public string EmployeeName { get; set; }
+        public string MoveOrderCancellationRemarks { get; set; }
     }
 }
