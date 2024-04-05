@@ -184,7 +184,7 @@ public class ReportRepository : IReportRepository
                              Formula_Quantity = planning.Quantity,
                              ItemCode_Recipe = preparation.ItemCode != null ? preparation.ItemCode : null,
                              ItemDescription_Recipe = preparation.ItemDescription != null ? preparation.ItemDescription : null,
-                             Recipe_Quantity = preparation.WeighingScale != null ? preparation.WeighingScale : 0,
+                             Recipe_Quantity = preparation.WeighingScale != 0 ? preparation.WeighingScale : 0,
                              DateTransformed = warehouse.ManufacturingDate.ToString()
                          });
 
@@ -212,7 +212,7 @@ public class ReportRepository : IReportRepository
                              Formula_Quantity = planning.Quantity,
                              ItemCode_Recipe = preparation.ItemCode != null ? preparation.ItemCode : null,
                              ItemDescription_Recipe = preparation.ItemDescription != null ? preparation.ItemDescription : null,
-                             Recipe_Quantity = preparation.WeighingScale != null ? preparation.WeighingScale : 0,
+                             Recipe_Quantity = preparation.WeighingScale != 0 ? preparation.WeighingScale : 0,
                              DateTransformed = warehouse.ManufacturingDate.ToString()
                          });
 
@@ -221,13 +221,13 @@ public class ReportRepository : IReportRepository
 
     public async Task<IReadOnlyList<MoveOrderReport>> MoveOrderReport(string DateFrom, string DateTo)
     {
-        var soh = _context.WarehouseReceived
+        var soh = await _context.WarehouseReceived
             .GroupBy(x => new { x.ItemCode })
             .Select(x => new SOHDTO
             {
                 ItemCode = x.Key.ItemCode,
                 ActualGood = x.Sum(g => g.ActualGood)
-            });
+            }).ToListAsync();
 
         var orders = from moveorder in _context.MoveOrders
                 .Include(x => x.AdvancesToEmployees)
@@ -266,50 +266,6 @@ public class ReportRepository : IReportRepository
         });
 
         return moveOrderReports.ToList();
-
-        /*by new
-            {
-                moveorder.OrderNo,
-                moveorder.OrderNoPKey,
-                moveorder.FarmCode,
-                moveorder.FarmName,
-                moveorder.ItemCode,
-                moveorder.ItemDescription,
-                moveorder.Uom,
-                moveorder.Category,
-                MoveOrderPreparedBy = moveorder.PreparedBy,
-                moveorder.QuantityOrdered,
-                moveorder.ExpirationDate,
-                moveorder.DeliveryStatus,
-                TransactMoveorderPreparedDate = moveorder.PreparedDate,
-                transactmoveorder.PreparedBy,
-                transactmoveorder.PreparedDate,
-                stockOnHand.ActualGood,
-                /*UC.AvgUnitCost,#1#
-            }
-            into result
-            select new MoveOrderReport
-            {
-                MoveOrderId = result.Key.OrderNo,
-                CustomerCode = result.Key.FarmCode,
-                CustomerName = result.Key.FarmName,
-                ItemCode = result.Key.ItemCode,
-                ItemDescription = result.Key.ItemDescription,
-                Uom = result.Key.Uom,
-                Category = result.Key.Category,
-                Quantity = result.Key.QuantityOrdered,
-                ExpirationDate = result.Key.ExpirationDate.ToString(),
-                TransactionType = result.Key.DeliveryStatus,
-                MoveOrderBy = result.Key.PreparedBy,
-                MoveOrderDate = result.Key.PreparedDate.ToString(),
-                TransactedBy = result.Key.PreparedBy,
-                TransactedDate = result.Key.PreparedDate.HasValue
-                    ? result.Key.PreparedDate.Value.ToString("MM/dd/yyyy")
-                    : "N/A",
-                /*WeightedAverageUnitCost = Math.Round((decimal)result.Key.AvgUnitCost, 2)#1#
-            });
-
-        return await orders.ToListAsync();*/
     }
 
     public async Task<PagedList<MoveOrderReport>> MoveOrderReportPagination(string DateFrom, string DateTo, UserParams userParams)
@@ -548,11 +504,11 @@ public class ReportRepository : IReportRepository
                                           warehouse.ExpirationDays,
                                           warehouse.Supplier,
                                           warehouse.ReceivedBy,
-                                          PreparationOut = preparation.Out != null ? preparation.Out : 0,
-                                          MoveOrderOut = moveorder.Out != null ? moveorder.Out : 0,
-                                          IssueOut = issue.Out != null ? issue.Out : 0
+                                          PreparationOut = preparation.Out != 0 ? preparation.Out : 0,
+                                          MoveOrderOut = moveorder.Out != 0 ? moveorder.Out : 0,
+                                          IssueOut = issue.Out != 0 ? issue.Out : 0
                                       }
-            into total
+                                 into total
                                   orderby total.Key.ItemCode, total.Key.ExpirationDays ascending
                                   select new WarehouseReport
                                   {
@@ -652,9 +608,9 @@ public class ReportRepository : IReportRepository
                                           warehouse.ExpirationDays,
                                           warehouse.Supplier,
                                           warehouse.ReceivedBy,
-                                          PreparationOut = preparation.Out != null ? preparation.Out : 0,
-                                          MoveOrderOut = moveorder.Out != null ? moveorder.Out : 0,
-                                          IssueOut = issue.Out != null ? issue.Out : 0
+                                          PreparationOut = preparation.Out != 0 ? preparation.Out : 0,
+                                          MoveOrderOut = moveorder.Out != 0 ? moveorder.Out : 0,
+                                          IssueOut = issue.Out != 0 ? issue.Out : 0
                                       }
             into total
                                   orderby total.Key.ItemCode, total.Key.ExpirationDays ascending
@@ -783,7 +739,7 @@ public class ReportRepository : IReportRepository
                           QuantityOrdered = ordering.QuantityOrdered,
                           CancelledDate = ordering.CancelDate.ToString(),
                           CancelledBy = ordering.IsCancelBy,
-                          Reason = ordering.Remarks
+                          Reason = ordering.OrderCancellationRemarks
                       });
 
         return await orders.ToListAsync();
@@ -806,7 +762,7 @@ public class ReportRepository : IReportRepository
                           QuantityOrdered = ordering.QuantityOrdered,
                           CancelledDate = ordering.CancelDate.ToString(),
                           CancelledBy = ordering.IsCancelBy,
-                          Reason = ordering.Remarks
+                          Reason = ordering.OrderCancellationRemarks
                       });
 
         return await PagedList<CancelledOrderReport>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
@@ -1040,9 +996,9 @@ public class ReportRepository : IReportRepository
                       select new SOHInventory
                       {
                           ItemCode = total.Key.ItemCode,
-                          SOH = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
-                                total.Sum(x => x.preparation.WeighingScale == null ? 0 : x.preparation.WeighingScale) -
-                                total.Sum(x => x.moveorder.QuantityOrdered == null ? 0 : x.moveorder.QuantityOrdered)
+                          SOH = total.Sum(x => x.warehouse.ActualGood == 0 ? 0 : x.warehouse.ActualGood) -
+                                total.Sum(x => x.preparation.WeighingScale == 0 ? 0 : x.preparation.WeighingScale) -
+                                total.Sum(x => x.moveorder.QuantityOrdered == 0 ? 0 : x.moveorder.QuantityOrdered)
                       });
 
         var movementInventory = (from rawmaterial in _context.RawMaterials
@@ -1120,19 +1076,19 @@ public class ReportRepository : IReportRepository
                                          rawmaterial.ItemCode,
                                          rawmaterial.ItemDescription,
                                          rawmaterial.ItemCategory.ItemCategoryName,
-                                         MoveOrder = moveorder.QuantityOrdered != null ? moveorder.QuantityOrdered : 0,
-                                         Transformation = transformation.WeighingScale != null ? transformation.WeighingScale : 0,
-                                         Issue = issue.Quantity != null ? issue.Quantity : 0,
-                                         ReceiptIn = receipt.Quantity != null ? receipt.Quantity : 0,
-                                         ReceiveIn = receive.Quantity != null ? receive.Quantity : 0,
-                                         TransformIn = transformIn.Quantity != null ? transformIn.Quantity : 0,
-                                         SOH = SOH.SOH != null ? SOH.SOH : 0,
-                                         ReceivePlus = receivePlus.Quantity != null ? receivePlus.Quantity : 0,
-                                         TransformPlus = transformPlus.Quantity != null ? transformPlus.Quantity : 0,
-                                         ReceiptPlus = receiptPlus.Quantity != null ? receiptPlus.Quantity : 0,
-                                         MoveOrderPlus = moveorderPlus.QuantityOrdered != null ? moveorderPlus.QuantityOrdered : 0,
-                                         TransformOutPlus = transformoutPlus.WeighingScale != null ? transformoutPlus.WeighingScale : 0,
-                                         IssuePlus = issuePlus.Quantity != null ? issuePlus.Quantity : 0,
+                                         MoveOrder = moveorder.QuantityOrdered != 0 ? moveorder.QuantityOrdered : 0,
+                                         Transformation = transformation.WeighingScale != 0 ? transformation.WeighingScale : 0,
+                                         Issue = issue.Quantity != 0 ? issue.Quantity : 0,
+                                         ReceiptIn = receipt.Quantity != 0 ? receipt.Quantity : 0,
+                                         ReceiveIn = receive.Quantity != 0 ? receive.Quantity : 0,
+                                         TransformIn = transformIn.Quantity != 0 ? transformIn.Quantity : 0,
+                                         SOH = SOH.SOH != 0 ? SOH.SOH : 0,
+                                         ReceivePlus = receivePlus.Quantity != 0 ? receivePlus.Quantity : 0,
+                                         TransformPlus = transformPlus.Quantity != 0 ? transformPlus.Quantity : 0,
+                                         ReceiptPlus = receiptPlus.Quantity != 0 ? receiptPlus.Quantity : 0,
+                                         MoveOrderPlus = moveorderPlus.QuantityOrdered != 0 ? moveorderPlus.QuantityOrdered : 0,
+                                         TransformOutPlus = transformoutPlus.WeighingScale != 0 ? transformoutPlus.WeighingScale : 0,
+                                         IssuePlus = issuePlus.Quantity != 0 ? issuePlus.Quantity : 0,
                                      }
             into total
                                  select new InventoryMovementReport
@@ -1381,9 +1337,9 @@ public class ReportRepository : IReportRepository
                       select new SOHInventory
                       {
                           ItemCode = total.Key.ItemCode,
-                          SOH = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
-                                total.Sum(x => x.preparation.WeighingScale == null ? 0 : x.preparation.WeighingScale) -
-                                total.Sum(x => x.moveorder.QuantityOrdered == null ? 0 : x.moveorder.QuantityOrdered)
+                          SOH = total.Sum(x => x.warehouse.ActualGood == 0 ? 0 : x.warehouse.ActualGood) -
+                                total.Sum(x => x.preparation.WeighingScale == 0 ? 0 : x.preparation.WeighingScale) -
+                                total.Sum(x => x.moveorder.QuantityOrdered == 0 ? 0 : x.moveorder.QuantityOrdered)
                       });
 
         var movementInventory = (from rawmaterial in _context.RawMaterials
@@ -1461,19 +1417,19 @@ public class ReportRepository : IReportRepository
                                          rawmaterial.ItemCode,
                                          rawmaterial.ItemDescription,
                                          rawmaterial.ItemCategory.ItemCategoryName,
-                                         MoveOrder = moveorder.QuantityOrdered != null ? moveorder.QuantityOrdered : 0,
-                                         Transformation = transformation.WeighingScale != null ? transformation.WeighingScale : 0,
-                                         Issue = issue.Quantity != null ? issue.Quantity : 0,
-                                         ReceiptIn = receipt.Quantity != null ? receipt.Quantity : 0,
-                                         ReceiveIn = receive.Quantity != null ? receive.Quantity : 0,
-                                         TransformIn = transformIn.Quantity != null ? transformIn.Quantity : 0,
-                                         SOH = SOH.SOH != null ? SOH.SOH : 0,
-                                         ReceivePlus = receivePlus.Quantity != null ? receivePlus.Quantity : 0,
-                                         TransformPlus = transformPlus.Quantity != null ? transformPlus.Quantity : 0,
-                                         ReceiptPlus = receiptPlus.Quantity != null ? receiptPlus.Quantity : 0,
-                                         MoveOrderPlus = moveorderPlus.QuantityOrdered != null ? moveorderPlus.QuantityOrdered : 0,
-                                         TransformOutPlus = transformoutPlus.WeighingScale != null ? transformoutPlus.WeighingScale : 0,
-                                         IssuePlus = issuePlus.Quantity != null ? issuePlus.Quantity : 0,
+                                         MoveOrder = moveorder.QuantityOrdered != 0 ? moveorder.QuantityOrdered : 0,
+                                         Transformation = transformation.WeighingScale != 0 ? transformation.WeighingScale : 0,
+                                         Issue = issue.Quantity != 0 ? issue.Quantity : 0,
+                                         ReceiptIn = receipt.Quantity != 0 ? receipt.Quantity : 0,
+                                         ReceiveIn = receive.Quantity != 0 ? receive.Quantity : 0,
+                                         TransformIn = transformIn.Quantity != 0 ? transformIn.Quantity : 0,
+                                         SOH = SOH.SOH != 0 ? SOH.SOH : 0,
+                                         ReceivePlus = receivePlus.Quantity != 0 ? receivePlus.Quantity : 0,
+                                         TransformPlus = transformPlus.Quantity != 0 ? transformPlus.Quantity : 0,
+                                         ReceiptPlus = receiptPlus.Quantity != 0 ? receiptPlus.Quantity : 0,
+                                         MoveOrderPlus = moveorderPlus.QuantityOrdered != 0 ? moveorderPlus.QuantityOrdered : 0,
+                                         TransformOutPlus = transformoutPlus.WeighingScale != 0 ? transformoutPlus.WeighingScale : 0,
+                                         IssuePlus = issuePlus.Quantity != 0 ? issuePlus.Quantity : 0,
                                      }
             into total
                                  select new InventoryMovementReport
@@ -2406,15 +2362,100 @@ public class ReportRepository : IReportRepository
     public async Task<PagedList<ItemswithBBDDTO>> ItemswithBBDDTOsPagination(UserParams userParams)
     {
 
-        var items = _context.WarehouseReceived
-            .Select(i => new ItemswithBBDDTO
+        var EndDate = DateTime.Now;
+        var StartDate = EndDate.AddDays(-30);
+
+        var getWarehouseIn = _context.WarehouseReceived
+            .Where(x => x.IsActive == true)
+            .GroupBy(x => new {
+                x.ItemCode,
+                x.Id,
+                x.ActualGood,
+                x.ItemDescription,
+                x.Uom,
+                x.Expiration
+            })
+            .Select(x => new WarehouseInventoryWIthBbd
             {
-                WarehouseId = i.Id,
-                ItemCode = i.ItemCode,
-                ItemDescription = i.ItemDescription,
-                UOM = i.Uom,
-                BBD = i.Expiration.Value.ToString("MM-dd-yyyy")
-            }).OrderBy(items => items.ItemCode);
+                WarehouseId = x.Key.Id,
+                ItemCode = x.Key.ItemCode,
+                Uom = x.Key.Uom,
+                ActualGood = x.Key.ActualGood,
+                ItemDescription = x.Key.ItemDescription,
+                ExpirationDate = x.Key.Expiration
+            });
+
+        var getMoveOrderOut = _context.MoveOrders
+            .Where(x => x.IsActive == true && x.IsPrepared == true)
+            .GroupBy(x => new { x.ItemCode, x.WarehouseId })
+            .Select(x => new MoveOrderInventory
+            {
+                WarehouseId = x.Key.WarehouseId,
+                ItemCode = x.Key.ItemCode,
+                QuantityOrdered = x.Sum(x => x.QuantityOrdered)
+            });
+
+        var getReceiptIn = _context.WarehouseReceived
+            .Where(x => x.IsActive == true && x.TransactionType == "MiscellaneousReceipt")
+            .GroupBy(x => new { x.ItemCode, x.Id })
+            .Select(x => new ReceiptInventoryWithBBDDTO
+            {
+                WarehouseId = x.Key.Id,
+                ItemCode = x.Key.ItemCode,
+                Quantity = x.Sum(x => x.ActualGood)
+            });
+
+        var getIssueOut = _context.MiscellaneousIssueDetails
+            .Where(x => x.IsActive == true)
+            .GroupBy(x => new { x.ItemCode, x.WarehouseId })
+            .Select(x => new IssueInventoryWithBBDDTO
+            {
+                WarehouseId = x.Key.WarehouseId,
+                ItemCode = x.Key.ItemCode,
+                Quantity = x.Sum(x => x.Quantity)
+            });
+
+        var items = (from warehouse in getWarehouseIn
+                     join moveOrder in getMoveOrderOut on new { warehouse.ItemCode, warehouse.WarehouseId } equals new { moveOrder.ItemCode, moveOrder.WarehouseId } into moveOrders
+                     from moveOrder in moveOrders.DefaultIfEmpty()
+                     join receipt in getReceiptIn on new { warehouse.ItemCode, warehouse.WarehouseId } equals new { receipt.ItemCode, receipt.WarehouseId } into receipts
+                     from receipt in receipts.DefaultIfEmpty()
+                     join issue in getIssueOut on new { warehouse.ItemCode, warehouse.WarehouseId } equals new { issue.ItemCode, issue.WarehouseId } into issues
+                     from issue in issues.DefaultIfEmpty()
+                     group new
+                     {
+                         warehouse,
+                         moveOrder,
+                         receipt,
+                         issue
+                     } by new
+                     {
+                         warehouse.WarehouseId,
+                         warehouse.ItemCode,
+                         warehouse.ItemDescription,
+                         warehouse.Uom,
+                         warehouse.ExpirationDate,
+                         warehouse.ActualGood,
+                         ReceiptQuantity = receipt.Quantity,
+                         IssueQuantity = issue.Quantity,
+                         MoveOrderQuantity = moveOrder.QuantityOrdered
+                     } into total
+                     select new ItemswithBBDDTO
+                     {
+                         WarehouseId = total.Key.WarehouseId,
+                         ItemCode = total.Key.ItemCode,
+                         ItemDescription = total.Key.ItemDescription,
+                         UOM = total.Key.Uom,
+                         Receipt = total.Key.ReceiptQuantity,
+                         Issue = total.Key.IssueQuantity,
+                         MoveOrder = total.Key.MoveOrderQuantity,
+                         Warehouse = total.Key.ActualGood,
+                         SOH = (total.Sum(x => x.warehouse.ActualGood != 0 ? x.warehouse.ActualGood : 0)) -
+                               ((total.Sum(x => x.moveOrder.QuantityOrdered != 0 ? x.moveOrder.QuantityOrdered : 0)) +
+                               (total.Sum(x => x.issue.Quantity != 0 ? x.issue.Quantity : 0))),
+                         BBD = total.Key.ExpirationDate.Value.ToString("MM-dd-yyyy") ?? "-"
+                     })
+                     .Where(items => items.SOH != 0);
 
         return await PagedList<ItemswithBBDDTO>.CreateAsync(items, userParams.PageNumber, userParams.PageSize);
     }

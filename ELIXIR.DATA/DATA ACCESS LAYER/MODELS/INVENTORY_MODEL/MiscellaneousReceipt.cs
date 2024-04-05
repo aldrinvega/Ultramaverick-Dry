@@ -29,7 +29,5 @@ public class MiscellaneousReceipt : BaseEntity
     public string CompanyCode { get; set; }
     public string AddedBy { get; set; }
     public DateTime TransactionDate { get; set; }
-    public string Customer { get; set; }
-    public string CustomerCode { get; set; }
     public string Reason { get; set; }
 }

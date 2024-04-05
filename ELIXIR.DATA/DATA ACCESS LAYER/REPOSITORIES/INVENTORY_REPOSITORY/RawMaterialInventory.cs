@@ -213,9 +213,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 select new SOHInventory
                 {
                     ItemCode = total.Key.ItemCode,
-                    SOH = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
-                          total.Sum(x => x.preparation.WeighingScale == null ? 0 : x.preparation.WeighingScale) -
-                          total.Sum(x => x.moveorder.QuantityOrdered == null ? 0 : x.moveorder.QuantityOrdered)
+                    SOH = total.Sum(x => x.warehouse.ActualGood == 0 ? 0 : x.warehouse.ActualGood) -
+                          total.Sum(x => x.preparation.WeighingScale == 0 ? 0 : x.preparation.WeighingScale) -
+                          total.Sum(x => x.moveorder.QuantityOrdered == 0 ? 0 : x.moveorder.QuantityOrdered)
                 });
 
             var getReserve = (from warehouse in getWarehouseStock

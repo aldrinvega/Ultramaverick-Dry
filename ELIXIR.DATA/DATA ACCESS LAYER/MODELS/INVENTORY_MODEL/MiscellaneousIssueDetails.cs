@@ -76,6 +76,4 @@ public class MiscellaneousIssueDetails : BaseEntity
         get;
         set;
     }
-    public string SupplierCode { get; set; }
-    public string Supplier { get; set; }
 }

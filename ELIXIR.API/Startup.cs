@@ -84,7 +84,7 @@ public class Startup
         services.AddScoped<IOrdering, OrderingRepository>();
 
         services.AddDbContext<StoreContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("Docker")));
+            options.UseSqlServer(Configuration.GetConnectionString("LiveConnectionDevelopment")));
 
         services.Configure<ApiBehaviorOptions>(options =>
         {

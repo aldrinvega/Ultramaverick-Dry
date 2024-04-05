@@ -110,8 +110,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 {
                     ItemCode = total.Key.ItemCode,
                     Reserve = total.Key.ActualGood -
-                              ((total.Key.QuantityOrdered != null ? total.Key.QuantityOrdered : 0) +
-                               (total.Key.Quantity != null ? total.Key.Quantity : 0))
+                              ((total.Key.QuantityOrdered != 0 ? total.Key.QuantityOrdered : 0) +
+                               (total.Key.Quantity != 0 ? total.Key.Quantity : 0))
                 });
 
             var customer = _context.Customers.Select(x => new
@@ -258,7 +258,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 order.ApprovedDate = DateTime.Now;
                 order.RejectBy = null;
                 order.RejectedDate = null;
-                order.Remarks = null;
+                order.OrderCancellationRemarks = null;
+                order.MoveOrderCancellationRemarks = null;
+                order.PreparingCancellationRemarks = null;
             }
 
             return true;
@@ -275,7 +277,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             {
                 item.IsReject = true;
                 item.RejectBy = item.RejectBy;
-                item.Remarks = item.Remarks;
+                item.PreparingCancellationRemarks = item.PreparingCancellationRemarks;
                 item.RejectedDate = DateTime.Now;
                 item.PreparedDate = null;
                 item.OrderNoPKey = 0;
@@ -620,7 +622,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 existing.IsCancelBy = order.IsCancelBy;
                 existing.IsCancel = true;
                 existing.CancelDate = DateTime.Now;
-                existing.Remarks = order.Remarks;
+                existing.OrderCancellationRemarks = order.OrderCancellationRemarks;
             }
 
             return true;
@@ -658,7 +660,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             existing.IsActive = true;
             existing.IsCancelBy = null;
             existing.IsCancel = null;
-            existing.Remarks = null;
+            existing.OrderCancellationRemarks = null;
             existing.CancelDate = null;
 
             return true;
@@ -826,7 +828,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     x.PreparedDate,
                     x.IsApproved,
                     x.IsMove,
-                    x.Remarks
+                    x.PreparingCancellationRemarks
                 }).Where(x => x.Key.FarmName == farm)
                 .Where(x => x.Key.IsApproved == true)
                 .Where(x => x.Key.PreparedDate != null)
@@ -840,7 +842,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     TotalOrders = x.Sum(order => order.AllocatedQuantity ?? (int)order.QuantityOrdered),
                     PreparedDate = x.Key.PreparedDate.ToString(),
                     IsMove = x.Key.IsMove,
-                    Remarks = x.Key.Remarks
+                    Remarks = x.Key.PreparingCancellationRemarks
                 });
 
             var customer = _context.Customers.GroupBy(x => new
@@ -1310,7 +1312,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 items.IsMove = false;
                 items.IsReject = true;
                 items.RejectBy = moveorder.RejectBy;
-                items.Remarks = moveorder.Remarks;
+                items.MoveOrderCancellationRemarks = moveorder.Remarks;
             }
 
             return true;
@@ -1365,7 +1367,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 items.IsMove = true;
                 items.IsReject = null;
                 items.RejectBy = null;
-                items.Remarks = moveorder.Remarks;
+                items.MoveOrderCancellationRemarks = moveorder.Remarks;
             }
 
             return true;
@@ -2204,7 +2206,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 items.IsApproved = null;
                 items.ApprovedDate = null;
                 items.DeliveryStatus = null;
-                items.Reason = reason.Remarks;
+                items.MoveOrderCancellationRemarks = reason.MoveOrderCancellationRemarks;
             }
 
             if (existMoveorders != null)
@@ -2230,7 +2232,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     x.IsApproved,
                     x.IsMove,
                     x.IsReject,
-                    x.Remarks,
+                    x.OrderCancellationRemarks,
                     x.AllocatedQuantity,
                     x.IsCancelledOrder
                 })
@@ -2250,7 +2252,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     PreparedDate = x.Key.PreparedDate.ToString(),
                     IsMove = x.Key.IsMove,
                     IsReject = x.Key.IsReject != null,
-                    Remarks = x.Key.Remarks
+                    Remarks = x.Key.OrderCancellationRemarks
                 });
             return await orders.ToListAsync();
         }

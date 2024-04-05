@@ -185,10 +185,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.TRANSFORMATION_REPOSITORY
 
             var dateNow = DateTime.Now;
 
-            if (Convert.ToDateTime(date.Trim()).Date < Convert.ToDateTime(Convert.ToString(dateNow).Trim()).Date)
-                return false;
-
-            return true;
+            return Convert.ToDateTime(date.Trim()).Date >= Convert.ToDateTime(Convert.ToString(dateNow).Trim()).Date;
         }
 
         public async Task<IReadOnlyList<MaterialRequirements>> GetAllListOfRequirementsByTransformId(int id)

@@ -710,7 +710,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                         IsActive = posummary.IsActive,
                         IsQcReceiveIsActive = receive != null && receive.IsActive != false ? receive.IsActive : true,
                         ActualRemaining = 0,
-                        IsExpirable = rawmats != null && rawmats.IsExpirable != null ? rawmats.IsExpirable : false
+                        IsExpirable = rawmats != null && rawmats.IsExpirable != false ? rawmats.IsExpirable : false
                     }).GroupBy(x => new
                 {
                     x.Id,
