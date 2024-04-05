@@ -25,7 +25,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports
             _mediator = mediator;
         }
 
-        [HttpGet("ExportMiscIssueHistoryReports")]
+        [HttpGet("ExportMiscIssueHistoryReport")]
         public async Task<IActionResult> Add([FromQuery] ExportMiscIssueHistoryReportCommand command)
         {
             var filePath = $"MiscellaneousIssueHistoryReport {command.DateFrom} - {command.DateTo}.xlsx";

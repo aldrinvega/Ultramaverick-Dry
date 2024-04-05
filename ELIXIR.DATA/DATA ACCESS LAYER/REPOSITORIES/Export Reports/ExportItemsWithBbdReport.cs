@@ -10,19 +10,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports;
 [Route("api/ExportReports"), ApiController]
-public class ExportItemsWithBbd : ControllerBase
+public class ExportItemsWithBbdReport : ControllerBase
 {
     private readonly IMediator _mediator;
 
-    public ExportItemsWithBbd(IMediator mediator)
+    public ExportItemsWithBbdReport(IMediator mediator)
     {
         _mediator = mediator;
     }
 
-    [HttpGet("ExportItemsWithBbd")]
+    [HttpGet("ExportItemsWithBbdReport")]
     public async Task<IActionResult> Add()
     {
-        var filePath = $"Items.xlsx"; ;
+        var filePath = $"Items.xlsx";
         try
         {
 

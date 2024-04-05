@@ -184,7 +184,7 @@ public class ReportRepository : IReportRepository
                              Formula_Quantity = planning.Quantity,
                              ItemCode_Recipe = preparation.ItemCode != null ? preparation.ItemCode : null,
                              ItemDescription_Recipe = preparation.ItemDescription != null ? preparation.ItemDescription : null,
-                             Recipe_Quantity = preparation.WeighingScale != 0 ? preparation.WeighingScale : 0,
+                             Recipe_Quantity = preparation.WeighingScale != null ? preparation.WeighingScale : 0,
                              DateTransformed = warehouse.ManufacturingDate.ToString()
                          });
 
@@ -212,7 +212,7 @@ public class ReportRepository : IReportRepository
                              Formula_Quantity = planning.Quantity,
                              ItemCode_Recipe = preparation.ItemCode != null ? preparation.ItemCode : null,
                              ItemDescription_Recipe = preparation.ItemDescription != null ? preparation.ItemDescription : null,
-                             Recipe_Quantity = preparation.WeighingScale != 0 ? preparation.WeighingScale : 0,
+                             Recipe_Quantity = preparation.WeighingScale != null ? preparation.WeighingScale : 0,
                              DateTransformed = warehouse.ManufacturingDate.ToString()
                          });
 
@@ -504,9 +504,9 @@ public class ReportRepository : IReportRepository
                                           warehouse.ExpirationDays,
                                           warehouse.Supplier,
                                           warehouse.ReceivedBy,
-                                          PreparationOut = preparation.Out != 0 ? preparation.Out : 0,
-                                          MoveOrderOut = moveorder.Out != 0 ? moveorder.Out : 0,
-                                          IssueOut = issue.Out != 0 ? issue.Out : 0
+                                          PreparationOut = preparation.Out != null ? preparation.Out : 0,
+                                          MoveOrderOut = moveorder.Out != null ? moveorder.Out : 0,
+                                          IssueOut = issue.Out != null ? issue.Out : 0
                                       }
                                  into total
                                   orderby total.Key.ItemCode, total.Key.ExpirationDays ascending
@@ -608,9 +608,9 @@ public class ReportRepository : IReportRepository
                                           warehouse.ExpirationDays,
                                           warehouse.Supplier,
                                           warehouse.ReceivedBy,
-                                          PreparationOut = preparation.Out != 0 ? preparation.Out : 0,
-                                          MoveOrderOut = moveorder.Out != 0 ? moveorder.Out : 0,
-                                          IssueOut = issue.Out != 0 ? issue.Out : 0
+                                          PreparationOut = preparation.Out != null ? preparation.Out : 0,
+                                          MoveOrderOut = moveorder.Out != null ? moveorder.Out : 0,
+                                          IssueOut = issue.Out != null ? issue.Out : 0
                                       }
             into total
                                   orderby total.Key.ItemCode, total.Key.ExpirationDays ascending
@@ -1076,19 +1076,19 @@ public class ReportRepository : IReportRepository
                                          rawmaterial.ItemCode,
                                          rawmaterial.ItemDescription,
                                          rawmaterial.ItemCategory.ItemCategoryName,
-                                         MoveOrder = moveorder.QuantityOrdered != 0 ? moveorder.QuantityOrdered : 0,
-                                         Transformation = transformation.WeighingScale != 0 ? transformation.WeighingScale : 0,
-                                         Issue = issue.Quantity != 0 ? issue.Quantity : 0,
-                                         ReceiptIn = receipt.Quantity != 0 ? receipt.Quantity : 0,
-                                         ReceiveIn = receive.Quantity != 0 ? receive.Quantity : 0,
-                                         TransformIn = transformIn.Quantity != 0 ? transformIn.Quantity : 0,
-                                         SOH = SOH.SOH != 0 ? SOH.SOH : 0,
-                                         ReceivePlus = receivePlus.Quantity != 0 ? receivePlus.Quantity : 0,
-                                         TransformPlus = transformPlus.Quantity != 0 ? transformPlus.Quantity : 0,
-                                         ReceiptPlus = receiptPlus.Quantity != 0 ? receiptPlus.Quantity : 0,
-                                         MoveOrderPlus = moveorderPlus.QuantityOrdered != 0 ? moveorderPlus.QuantityOrdered : 0,
-                                         TransformOutPlus = transformoutPlus.WeighingScale != 0 ? transformoutPlus.WeighingScale : 0,
-                                         IssuePlus = issuePlus.Quantity != 0 ? issuePlus.Quantity : 0,
+                                         MoveOrder = moveorder.QuantityOrdered != null ? moveorder.QuantityOrdered : 0,
+                                         Transformation = transformation.WeighingScale != null ? transformation.WeighingScale : 0,
+                                         Issue = issue.Quantity != null ? issue.Quantity : 0,
+                                         ReceiptIn = receipt.Quantity != null ? receipt.Quantity : 0,
+                                         ReceiveIn = receive.Quantity != null ? receive.Quantity : 0,
+                                         TransformIn = transformIn.Quantity != null ? transformIn.Quantity : 0,
+                                         SOH = SOH.SOH != null ? SOH.SOH : 0,
+                                         ReceivePlus = receivePlus.Quantity != null ? receivePlus.Quantity : 0,
+                                         TransformPlus = transformPlus.Quantity != null ? transformPlus.Quantity : 0,
+                                         ReceiptPlus = receiptPlus.Quantity != null ? receiptPlus.Quantity : 0,
+                                         MoveOrderPlus = moveorderPlus.QuantityOrdered != null ? moveorderPlus.QuantityOrdered : 0,
+                                         TransformOutPlus = transformoutPlus.WeighingScale != null ? transformoutPlus.WeighingScale : 0,
+                                         IssuePlus = issuePlus.Quantity != null ? issuePlus.Quantity : 0,
                                      }
             into total
                                  select new InventoryMovementReport
@@ -1417,19 +1417,19 @@ public class ReportRepository : IReportRepository
                                          rawmaterial.ItemCode,
                                          rawmaterial.ItemDescription,
                                          rawmaterial.ItemCategory.ItemCategoryName,
-                                         MoveOrder = moveorder.QuantityOrdered != 0 ? moveorder.QuantityOrdered : 0,
-                                         Transformation = transformation.WeighingScale != 0 ? transformation.WeighingScale : 0,
-                                         Issue = issue.Quantity != 0 ? issue.Quantity : 0,
-                                         ReceiptIn = receipt.Quantity != 0 ? receipt.Quantity : 0,
-                                         ReceiveIn = receive.Quantity != 0 ? receive.Quantity : 0,
-                                         TransformIn = transformIn.Quantity != 0 ? transformIn.Quantity : 0,
-                                         SOH = SOH.SOH != 0 ? SOH.SOH : 0,
-                                         ReceivePlus = receivePlus.Quantity != 0 ? receivePlus.Quantity : 0,
-                                         TransformPlus = transformPlus.Quantity != 0 ? transformPlus.Quantity : 0,
-                                         ReceiptPlus = receiptPlus.Quantity != 0 ? receiptPlus.Quantity : 0,
-                                         MoveOrderPlus = moveorderPlus.QuantityOrdered != 0 ? moveorderPlus.QuantityOrdered : 0,
-                                         TransformOutPlus = transformoutPlus.WeighingScale != 0 ? transformoutPlus.WeighingScale : 0,
-                                         IssuePlus = issuePlus.Quantity != 0 ? issuePlus.Quantity : 0,
+                                         MoveOrder = moveorder.QuantityOrdered != null ? moveorder.QuantityOrdered : 0,
+                                         Transformation = transformation.WeighingScale != null ? transformation.WeighingScale : 0,
+                                         Issue = issue.Quantity != null ? issue.Quantity : 0,
+                                         ReceiptIn = receipt.Quantity != null ? receipt.Quantity : 0,
+                                         ReceiveIn = receive.Quantity != null ? receive.Quantity : 0,
+                                         TransformIn = transformIn.Quantity != null ? transformIn.Quantity : 0,
+                                         SOH = SOH.SOH != null ? SOH.SOH : 0,
+                                         ReceivePlus = receivePlus.Quantity != null ? receivePlus.Quantity : 0,
+                                         TransformPlus = transformPlus.Quantity != null ? transformPlus.Quantity : 0,
+                                         ReceiptPlus = receiptPlus.Quantity != null ? receiptPlus.Quantity : 0,
+                                         MoveOrderPlus = moveorderPlus.QuantityOrdered != null ? moveorderPlus.QuantityOrdered : 0,
+                                         TransformOutPlus = transformoutPlus.WeighingScale != null ? transformoutPlus.WeighingScale : 0,
+                                         IssuePlus = issuePlus.Quantity != null ? issuePlus.Quantity : 0,
                                      }
             into total
                                  select new InventoryMovementReport

@@ -8,17 +8,17 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports;
-[Route("api/ExportsReports")]
-public class ExportServedVsOrderReports : ControllerBase
+[Route("api/ExportReports")]
+public class ExportServedVsOrderReport : ControllerBase
 {
     private readonly IMediator _mediator;
 
-    public ExportServedVsOrderReports(IMediator mediator)
+    public ExportServedVsOrderReport(IMediator mediator)
     {
         _mediator = mediator;
     }
 
-    [HttpGet("ExportServedVsOrdered")]
+    [HttpGet("ExportServedVsOrderedReport")]
     public async Task<IActionResult> Add([FromQuery] ExportServeVsReportsCommand command)
     {
         var filePath = $"Order vs Served Report {command.DateFrom} - {command.DateTo}.xlsx";

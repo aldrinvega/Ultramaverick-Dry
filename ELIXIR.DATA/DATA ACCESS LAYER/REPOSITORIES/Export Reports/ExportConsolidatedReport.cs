@@ -20,7 +20,7 @@ public class Export : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet("ExportConsolidatedReports")]
+    [HttpGet("ExportConsolidatedReport")]
     public async Task<IActionResult> Add([FromQuery] ExportConsolidatedReportQuery command)
     {
         var filePath = $"ConsolidatedReports {command.DateFrom} - {command.DateTo}.xlsx";

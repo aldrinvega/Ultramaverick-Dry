@@ -393,10 +393,10 @@ public class MiscellaneousRepository : IMiscellaneous
                                 warehouse.ItemCode,
                                 warehouse.ExpirationDate,
                                 warehouse.UnitCost,
-                                WarehouseActualGood = warehouse.ActualGood != 0 ? warehouse.ActualGood : 0,
-                                TransformOut = transform.WeighingScale != 0 ? transform.WeighingScale : 0,
-                                MoveOrderOut = moveorder.QuantityOrdered != 0 ? moveorder.QuantityOrdered : 0,
-                                IssueOut = issue.Out != 0 ? issue.Out : 0
+                                WarehouseActualGood = warehouse.ActualGood != null ? warehouse.ActualGood : 0,
+                                TransformOut = transform.WeighingScale != null ? transform.WeighingScale : 0,
+                                MoveOrderOut = moveorder.QuantityOrdered != null ? moveorder.QuantityOrdered : 0,
+                                IssueOut = issue.Out != null ? issue.Out : 0
 
                             } into total
 
