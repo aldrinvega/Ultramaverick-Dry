@@ -225,6 +225,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
             existingOrder.PreparedDate = orders.PreparedDate;
             existingOrder.OrderNoPKey = orders.OrderNoPKey;
+            existingOrder.PreparingCancellationRemarks = null;
+            existingOrder.OrderCancellationRemarks = null;
+            existingOrder.MoveOrderCancellationRemarks = null;
 
             return true;
         }
