@@ -1,6 +1,7 @@
 ﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
+using ELIXIR.DATA.DTOs.INVENTORY_DTOs;
 using ELIXIR.DATA.DTOs.RECEIVING_DTOs;
 using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
 using System;
@@ -47,6 +48,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.WAREHOUSE_INTERFACE
         Task<PagedList<WarehouseReceivingDto>> GetAllWarehouseIdWithPagination(UserParams userParams);
         Task<PagedList<WarehouseReceivingDto>> GetAllWarehouseIdWithPaginationOrig(UserParams userParams, string search);
         // Task<bool> CheckOrderInAllocationModule(WarehouseReceiving warehouseReceiving);
+        Task<ItemByWarehouseId> GetItemCodeByWarehouseId(int warehouseId);
 
     }
 }

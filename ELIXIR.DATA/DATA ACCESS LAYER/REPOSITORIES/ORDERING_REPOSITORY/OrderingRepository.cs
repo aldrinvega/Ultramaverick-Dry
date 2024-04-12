@@ -2629,16 +2629,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<ItemByWarehouseId> GetItemCodeByWarehouseId (int warehouseId)
-        {
-            var item = await _context.WarehouseReceived.FirstOrDefaultAsync(x => x.Id == warehouseId);
-
-            var result = new ItemByWarehouseId
-            {
-                ItemCode = item.ItemCode
-            };
-
-            return result;
-        }
+        
     }
 }

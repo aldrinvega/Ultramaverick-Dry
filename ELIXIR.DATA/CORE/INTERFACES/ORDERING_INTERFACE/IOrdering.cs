@@ -119,7 +119,6 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 
         //Orders
         Task<bool> AddNewOrders(Ordering[] orders);
-        Task<ItemByWarehouseId> GetItemCodeByWarehouseId(int warehouseId);
 
     }
 }

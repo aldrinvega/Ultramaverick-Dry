@@ -3,6 +3,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.QC_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
+using ELIXIR.DATA.DTOs.INVENTORY_DTOs;
 using ELIXIR.DATA.DTOs.RECEIVING_DTOs;
 using ELIXIR.DATA.DTOs.TRANSFORMATION_DTOs;
 using ELIXIR.DATA.DTOs.WAREHOUSE_DTOs;
@@ -933,6 +934,37 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
 
             return await PagedList<WarehouseReceivingDto>.CreateAsync(warehouse, userParams.PageNumber,
                 userParams.PageSize);
+        }
+
+        public async Task<ItemByWarehouseId> GetItemCodeByWarehouseId(int warehouseId)
+        {
+            var warehouseReceived = await _context.WarehouseReceived.FirstOrDefaultAsync(x => x.Id == warehouseId);
+
+            if (warehouseReceived == null)
+            {
+                // Handle the case where warehouseReceived is not found
+                return null;
+            }
+
+            var actualGoods = await ListOfWarehouseReceivingId(warehouseReceived.ItemCode);
+
+            // Find the matching item based on ID
+            var matchingActualGood = actualGoods.FirstOrDefault(item => item.Id == warehouseId);
+
+            if (matchingActualGood == null)
+            {
+                
+                return null;
+            }
+
+            // Create and return the result
+            var result = new ItemByWarehouseId
+            {
+                ItemCode = warehouseReceived.ItemCode,
+                ActualGood = matchingActualGood.ActualGood
+            };
+
+            return result;
         }
     }
 }

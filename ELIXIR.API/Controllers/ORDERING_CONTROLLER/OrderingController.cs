@@ -850,11 +850,5 @@ public class OrderingController : BaseApiController
         return new JsonResult("Something Wrong");
     }
 
-    [HttpGet("GetItemCodeByWarehouseId")]
-    public async Task<IActionResult> GetItemCodeByWarehouseId(int warehouseId)
-    {
-        var item = await _unitOfWork.Order.GetItemCodeByWarehouseId(warehouseId);
-
-        return Ok(item);
-    }
+    
 }
