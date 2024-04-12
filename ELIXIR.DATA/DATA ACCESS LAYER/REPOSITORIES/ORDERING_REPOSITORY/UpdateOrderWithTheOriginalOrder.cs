@@ -61,7 +61,7 @@ public class UpdateOrderWithTheOriginalOrder : ControllerBase
             CancellationToken cancellationToken)
         {
             const int batchSize = 1000; // Number of rows to update per session
-
+            
             foreach (var transaction in request.Transaction)
             {
                 // Get the last updated order ID for this transaction

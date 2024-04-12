@@ -160,7 +160,9 @@ public class OrderingController : BaseApiController
             // }
 
             else
+            {
                 filteredOrders.Add(items);
+            }
 
             orderList.Add(items);
 
@@ -179,12 +181,12 @@ public class OrderingController : BaseApiController
             notExistUom,
             previousdateNeeded
         };
+        await _unitOfWork.Order.ValidateIfForAllocation(orderList);
 
         if (notExistFarmName.Count == 0 && notExistFarmCode.Count == 0 && notExistRawMats.Count == 0
             && notExistUom.Count == 0 && duplicateList.Count == 0 && previousdateNeeded.Count == 0)
         {
-            await _unitOfWork.Order.ValidateIfForAllocation(orderList);
-            await _unitOfWork.CompleteAsync();
+            
             await _unitOfWork.CompleteAsync();
 
             return Ok("Successfully add new orders!");
@@ -848,10 +850,11 @@ public class OrderingController : BaseApiController
         return new JsonResult("Something Wrong");
     }
 
-    /*[HttpPost("AddChecklist")]
-    public async Task<IActionResult> AddChecklist(Checklists input)
+    [HttpGet("GetItemCodeByWarehouseId")]
+    public async Task<IActionResult> GetItemCodeByWarehouseId(int warehouseId)
     {
-        await _unitOfWork.QcChecklist.AddChecklists(input);
-        return Ok("Goods");
-    }*/
+        var item = await _unitOfWork.Order.GetItemCodeByWarehouseId(warehouseId);
+
+        return Ok(item);
+    }
 }

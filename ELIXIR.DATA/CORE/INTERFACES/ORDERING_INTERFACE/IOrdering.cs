@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using ELIXIR.DATA.DTOs;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.DTOs.REPORT_DTOs;
+using ELIXIR.DATA.DTOs.INVENTORY_DTOs;
 
 namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 {
@@ -118,6 +119,7 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 
         //Orders
         Task<bool> AddNewOrders(Ordering[] orders);
-        
+        Task<ItemByWarehouseId> GetItemCodeByWarehouseId(int warehouseId);
+
     }
 }

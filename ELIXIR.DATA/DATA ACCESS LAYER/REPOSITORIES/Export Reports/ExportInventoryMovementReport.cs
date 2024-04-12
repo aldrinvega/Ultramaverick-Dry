@@ -89,6 +89,7 @@ public class ExportInventoryMovementReport : ControllerBase
                 range.Style.Font.FontColor = XLColor.Black;
                 range.Style.Border.TopBorder = XLBorderStyleValues.Thick;
                 range.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                range.SetAutoFilter(true);
 
                 for (var index = 1; index <= headers.Count; index++)
                 {

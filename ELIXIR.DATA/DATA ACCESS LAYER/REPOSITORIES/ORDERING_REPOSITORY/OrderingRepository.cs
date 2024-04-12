@@ -14,6 +14,7 @@ using ELIXIR.DATA.SERVICES;
 using Microsoft.AspNetCore.SignalR;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.CORE.INTERFACES.ORDER_HUB;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 {
@@ -608,8 +609,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 {
                     order.ForAllocation = true;
                 }
-            }
 
+            }
             return true;
         }
 
@@ -2626,6 +2627,18 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 }).OrderBy(x => x.PreparedDate);
 
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
+        }
+
+        public async Task<ItemByWarehouseId> GetItemCodeByWarehouseId (int warehouseId)
+        {
+            var item = await _context.WarehouseReceived.FirstOrDefaultAsync(x => x.Id == warehouseId);
+
+            var result = new ItemByWarehouseId
+            {
+                ItemCode = item.ItemCode
+            };
+
+            return result;
         }
     }
 }
