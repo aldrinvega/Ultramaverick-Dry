@@ -966,5 +966,42 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
 
             return result;
         }
+
+        public async Task<ItemInformationByWarehouseId> GetItemCodeInformationByWarehouseId(int warehouseId)
+        {
+            var warehouseReceived = await _context.WarehouseReceived.FirstOrDefaultAsync(x => x.Id == warehouseId);
+
+            if (warehouseReceived == null)
+            {
+                return null;
+            }
+
+            var actualGoods = await ListOfWarehouseReceivingId(warehouseReceived.ItemCode);
+
+            // Find the matching item based on ID
+            var matchingActualGood = actualGoods.FirstOrDefault(item => item.Id == warehouseId);
+
+            if (matchingActualGood == null)
+            {
+
+                return null;
+            }
+
+            // Create and return the result
+            var result = new ItemInformationByWarehouseId
+            {
+                ReceivingId = warehouseReceived.QcReceivingId,
+                ItemCode = warehouseReceived.ItemCode,
+                ItemDescription = warehouseReceived.ItemDescription,
+                UOM = warehouseReceived.Uom,
+                Supplier = warehouseReceived.Supplier,
+                QuantityGood = warehouseReceived.QuantityGood,
+                ReceivedDate = warehouseReceived.ReceivingDate.ToString("MM-dd-yyyy"),
+                ExpirationDate = warehouseReceived.Expiration?.ToString("MM-dd-yyyy"),
+                LotCategory = warehouseReceived.LotCategory
+            };
+
+            return result;
+        }
     }
 }

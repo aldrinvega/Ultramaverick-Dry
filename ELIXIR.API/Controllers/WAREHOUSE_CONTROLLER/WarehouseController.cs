@@ -386,5 +386,13 @@ namespace ELIXIR.API.Controllers.WAREHOUSE_CONTROLLER
             return Ok(item);
         }
 
+        [HttpGet("GetItemCodeInformationByWarehouseId")]
+        public async Task<IActionResult> GetItemCodeInformationByWarehouseId(int warehouseId)
+        {
+            var item = await _unitOfWork.Warehouse.GetItemCodeInformationByWarehouseId(warehouseId);
+
+            return Ok(item);
+        }
+
     }
 }
