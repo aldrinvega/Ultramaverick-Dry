@@ -8,7 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports;
-[Route("apip/ExportReports"), ApiController]
+[Route("api/ExportReports"), ApiController]
 public class ExportTransactedMoveOrdersReport : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -68,7 +68,8 @@ public class ExportTransactedMoveOrdersReport : ControllerBase
 
                 var headers = new List<string>
                 {
-                        "Order No",
+                        "MIR Id",
+                        "Move Order Id",
                         "Customer Name",
                         "Customer Code",
                         "Item Code",
@@ -101,18 +102,19 @@ public class ExportTransactedMoveOrdersReport : ControllerBase
                 {
                     var row = worksheet.Row(index + 2);
 
-                    row.Cell(1).Value = transactedMoveOrderReports[index].OrderNo;
-                    row.Cell(2).Value = transactedMoveOrderReports[index].CustomerName;
-                    row.Cell(3).Value = transactedMoveOrderReports[index].CustomerCode;
-                    row.Cell(4).Value = transactedMoveOrderReports[index].ItemCode;
-                    row.Cell(5).Value = transactedMoveOrderReports[index].ItemDescription;
-                    row.Cell(6).Value = transactedMoveOrderReports[index].Uom;
-                    row.Cell(7).Value = transactedMoveOrderReports[index].Quantity;
-                    row.Cell(8).Value = transactedMoveOrderReports[index].MoveOrderDate;
-                    row.Cell(9).Value = transactedMoveOrderReports[index].TransactedBy;
+                    row.Cell(1).Value = transactedMoveOrderReports[index].MIRId;
+                    row.Cell(2).Value = transactedMoveOrderReports[index].MoveOrderId;
+                    row.Cell(3).Value = transactedMoveOrderReports[index].CustomerName;
+                    row.Cell(4).Value = transactedMoveOrderReports[index].CustomerCode;
+                    row.Cell(5).Value = transactedMoveOrderReports[index].ItemCode;
+                    row.Cell(6).Value = transactedMoveOrderReports[index].ItemDescription;
+                    row.Cell(7).Value = transactedMoveOrderReports[index].Uom;
+                    row.Cell(8).Value = transactedMoveOrderReports[index].Quantity;
+                    row.Cell(9).Value = transactedMoveOrderReports[index].MoveOrderDate;
                     row.Cell(10).Value = transactedMoveOrderReports[index].TransactedBy;
-                    row.Cell(11).Value = transactedMoveOrderReports[index].TransactedDate;
-                    row.Cell(12).Value = transactedMoveOrderReports[index].DeliveryDate;
+                    row.Cell(11).Value = transactedMoveOrderReports[index].TransactionType;
+                    row.Cell(12).Value = transactedMoveOrderReports[index].TransactedDate;
+                    row.Cell(13).Value = transactedMoveOrderReports[index].DeliveryDate;
                 }
 
                 worksheet.Columns().AdjustToContents();

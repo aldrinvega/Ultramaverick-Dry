@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Office2013.Excel;
 
 namespace ELIXIR.DATA.DTOs.REPORT_DTOs
 {
@@ -21,6 +22,7 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public string ExpirationDate { get; set; }
         public string TransactBy { get; set; }
         public string TransactDate { get; set; }
+        public string CreatedAt { get; set; }
 
 
     }

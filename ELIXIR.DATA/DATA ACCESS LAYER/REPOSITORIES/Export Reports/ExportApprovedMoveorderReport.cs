@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Core;
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Office2016.Excel;
 using ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -76,7 +73,6 @@ public class ExportApprovedMoveorderReport : ControllerBase
                 var headers = new List<string>
                 {
                     "MoveOrder Id",
-                    "Order No",
                     "Customer Name",
                     "Customer Code",
                     "Item Code",
@@ -109,17 +105,16 @@ public class ExportApprovedMoveorderReport : ControllerBase
                     var row = worksheet.Row(index + 1);
 
                     row.Cell(1).Value = approvedMoveOrders[index - 1].MoveOrderId;
-                    row.Cell(2).Value = approvedMoveOrders[index - 1].OrderNo;
-                    row.Cell(3).Value = approvedMoveOrders[index - 1].CustomerName;
-                    row.Cell(4).Value = approvedMoveOrders[index - 1].CustomerCode;
-                    row.Cell(5).Value = approvedMoveOrders[index - 1].ItemCode;
-                    row.Cell(6).Value = approvedMoveOrders[index - 1].ItemDescription;
-                    row.Cell(7).Value = approvedMoveOrders[index - 1].TransactionType;
-                    row.Cell(8).Value = approvedMoveOrders[index - 1].Category;
-                    row.Cell(9).Value = approvedMoveOrders[index - 1].Quantity;
-                    row.Cell(10).Value = approvedMoveOrders[index - 1].PreparedDate;
-                    row.Cell(11).Value = approvedMoveOrders[index - 1].DeliveryStatus;
-                    row.Cell(12).Value = approvedMoveOrders[index - 1].TransactedBy;
+                    row.Cell(2).Value = approvedMoveOrders[index - 1].CustomerName;
+                    row.Cell(3).Value = approvedMoveOrders[index - 1].CustomerCode;
+                    row.Cell(4).Value = approvedMoveOrders[index - 1].ItemCode;
+                    row.Cell(5).Value = approvedMoveOrders[index - 1].ItemDescription;
+                    row.Cell(6).Value = approvedMoveOrders[index - 1].TransactionType;
+                    row.Cell(7).Value = approvedMoveOrders[index - 1].Category;
+                    row.Cell(8).Value = approvedMoveOrders[index - 1].Quantity;
+                    row.Cell(9).Value = approvedMoveOrders[index - 1].PreparedDate;
+                    row.Cell(10).Value = approvedMoveOrders[index - 1].DeliveryStatus;
+                    row.Cell(11).Value = approvedMoveOrders[index - 1].TransactedBy;
                 }
 
                 worksheet.Columns().AdjustToContents();

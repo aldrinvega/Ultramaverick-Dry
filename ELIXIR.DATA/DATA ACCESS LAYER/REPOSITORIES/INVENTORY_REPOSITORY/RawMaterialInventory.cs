@@ -596,10 +596,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 });
 
             var getSOH = (from warehouse in getWarehouseIn
-                join preparation in getTransformation
-                    on warehouse.ItemCode equals preparation.ItemCode
-                    into leftJ1
-                from preparation in leftJ1.DefaultIfEmpty()
                 join issue in getIssueOut
                     on warehouse.ItemCode equals issue.ItemCode
                     into leftJ2
@@ -608,16 +604,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     on warehouse.ItemCode equals moveorder.ItemCode
                     into leftJ3
                 from moveorder in leftJ3.DefaultIfEmpty()
-                join receipt in getReceiptIn
-                    on warehouse.ItemCode equals receipt.ItemCode
-                    into leftJ4
-                from receipt in leftJ4.DefaultIfEmpty()
                 group new
                     {
                         warehouse,
-                        preparation,
                         moveorder,
-                        receipt,
                         issue
                     }
                     by new
@@ -629,9 +619,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 {
                     ItemCode = total.Key.ItemCode,
                     SOH = (total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood)) -
-                          ((total.Sum(x => x.preparation.WeighingScale == null ? 0 : x.preparation.WeighingScale) +
-                            total.Sum(x => x.moveorder.QuantityOrdered == null ? 0 : x.moveorder.QuantityOrdered) +
-                            total.Sum(x => x.issue.Quantity == null ? 0 : x.issue.Quantity)))
+                          (total.Sum(x => x.moveorder.QuantityOrdered == null ? 0 : x.moveorder.QuantityOrdered) +
+                            total.Sum(x => x.issue.Quantity == null ? 0 : x.issue.Quantity))
                 });
 
             ///try mong alisin and sum sa getorderingReservesataass kasi by Item code naman sila
@@ -935,7 +924,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     IssueOut = total.Key.IssueOut,
                     WeightedAverageUnitCost = total.Key.AvgUnitCost,
                     TotalCost = total.Key.TotalDifference,
-                    SOH = total.Key.SOH - total.Key.IssueOut,
+                    SOH = total.Key.SOH,
                     Reserve = total.Key.Reserve - total.Key.IssueOut,
                     SuggestedPo = total.Key.SuggestedPo,
                     AverageIssuance = Math.Round(Convert.ToDecimal(total.Key.AverageIssuance), 2),

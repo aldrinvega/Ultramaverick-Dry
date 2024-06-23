@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY;
 
@@ -62,7 +63,6 @@ public class ReportRepository : IReportRepository
                           Price = posummary != null ? posummary.UnitPrice : 0,
                           QcBy = receiving.QcBy,
                       });
-
         return await report.ToListAsync();
     }
     public async Task<PagedList<QCReport>> QcRecevingReportPagination(string DateFrom, string DateTo, UserParams userParams)
@@ -109,11 +109,10 @@ public class ReportRepository : IReportRepository
 
         return await PagedList<QCReport>.CreateAsync(report, userParams.PageNumber, userParams.PageSize);
     }
-
     public async Task<IReadOnlyList<WarehouseReport>> WarehouseReceivingReport(string DateFrom, string DateTo)
     {
         var warehouse = _context.WarehouseReceived.Where(x =>
-                x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo))
+                x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo) && x.MiscellaneousReceiptId == null)
             .Where(x => x.IsActive == true)
             .Select(x => new WarehouseReport
             {
@@ -138,7 +137,7 @@ public class ReportRepository : IReportRepository
     public async Task<PagedList<WarehouseReport>> WarehouseReceivingReportPagination(string DateFrom, string DateTo, UserParams userParams)
     {
         var warehouse = _context.WarehouseReceived.Where(x =>
-                x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo))
+                x.ReceivingDate.Date >= DateTime.Parse(DateFrom) && x.ReceivingDate.Date <= DateTime.Parse(DateTo) && x.MiscellaneousReceiptId == null)
             .Where(x => x.IsActive == true)
             .Select(x => new WarehouseReport
             {
@@ -218,7 +217,6 @@ public class ReportRepository : IReportRepository
 
         return await PagedList<TransformationReport>.CreateAsync(transform, userParams.PageNumber, userParams.PageSize);
     }
-
     public async Task<IReadOnlyList<MoveOrderReport>> MoveOrderReport(string DateFrom, string DateTo)
     {
         var soh = await _context.WarehouseReceived
@@ -238,10 +236,14 @@ public class ReportRepository : IReportRepository
                      join transactmoveorder in _context.TransactMoveOrder
                          on moveorder.OrderNo equals transactmoveorder.OrderNo into leftJ
                      from transactmoveorder in leftJ.DefaultIfEmpty()
+                     join material in _context.RawMaterials.Include(x => x.ItemCategory).Include(x => x.UOM)
+                        on moveorder.ItemCode equals material.ItemCode into left2
+                     from material in left2.DefaultIfEmpty()
                      select new
                      {
                          moveorder,
-                         transactmoveorder
+                         transactmoveorder,
+                         material
                      };
 
         var moveOrderReports = orders.Select(order => new MoveOrderReport
@@ -249,10 +251,10 @@ public class ReportRepository : IReportRepository
             MoveOrderId = order.moveorder.OrderNo,
             CustomerCode = order.moveorder.FarmCode,
             CustomerName = order.moveorder.FarmName,
-            ItemCode = order.moveorder.ItemCode,
-            ItemDescription = order.moveorder.ItemDescription,
-            Uom = order.moveorder.Uom,
-            Category = order.moveorder.Category,
+            ItemCode = order.material.ItemCode,
+            ItemDescription = order.material.ItemDescription,
+            Uom = order.material.UOM.UOM_Description,
+            Category = order.material.ItemCategory.ItemCategoryName,
             Quantity = order.moveorder.QuantityOrdered,
             ExpirationDate = order.moveorder.ExpirationDate.ToString(),
             TransactionType = order.moveorder.DeliveryStatus,
@@ -267,7 +269,6 @@ public class ReportRepository : IReportRepository
 
         return moveOrderReports.ToList();
     }
-
     public async Task<PagedList<MoveOrderReport>> MoveOrderReportPagination(string DateFrom, string DateTo, UserParams userParams)
     {
         var soh = _context.WarehouseReceived
@@ -316,15 +317,14 @@ public class ReportRepository : IReportRepository
 
         return await PagedList<MoveOrderReport>.CreateAsync(moveOrderReports, userParams.PageNumber, userParams.PageSize);
     }
-
     public async Task<IReadOnlyList<MiscellaneousReceiptReport>> MReceiptReport(string DateFrom, string DateTo)
     {
         var receipts = (from receiptHeader in _context.MiscellaneousReceipts
                         join receipt in _context.WarehouseReceived
                             on receiptHeader.Id equals receipt.MiscellaneousReceiptId into leftJ
                         from receipt in leftJ.DefaultIfEmpty()
-                        where receipt.ReceivingDate >= DateTime.Parse(DateFrom) &&
-                              receipt.ReceivingDate <= DateTime.Parse(DateTo) && receipt.IsActive == true &&
+                        where receiptHeader.TransactionDate >= DateTime.Parse(DateFrom) &&
+                              receiptHeader.TransactionDate <= DateTime.Parse(DateTo) && receipt.IsActive == true &&
                               receipt.TransactionType == "MiscellaneousReceipt"
                         select new MiscellaneousReceiptReport
                         {
@@ -345,7 +345,6 @@ public class ReportRepository : IReportRepository
 
         return await receipts.ToListAsync();
     }
-
     public async Task<PagedList<MiscellaneousReceiptReport>> MReceiptReportPagination(string DateFrom, string DateTo, UserParams userParams)
     {
         var receipts = (from receiptHeader in _context.MiscellaneousReceipts
@@ -374,16 +373,15 @@ public class ReportRepository : IReportRepository
 
         return await PagedList<MiscellaneousReceiptReport>.CreateAsync(receipts, userParams.PageNumber, userParams.PageSize);
     }
-
     public async Task<IReadOnlyList<MiscellaneousIssueReport>> MIssueReport(string DateFrom, string DateTo)
     {
         var issues = (from issue in _context.MiscellaneousIssues
+                      where issue.TransactionDate >= DateTime.Parse(DateFrom) &&
+                         issue.TransactionDate <= DateTime.Parse(DateTo) && issue.IsActive == true
                       join issuedetails in _context.MiscellaneousIssueDetails
                           on issue.Id equals issuedetails.IssuePKey into leftJ
                       from issuedetails in leftJ.DefaultIfEmpty()
-                      where issuedetails.PreparedDate >= DateTime.Parse(DateFrom) &&
-                            issuedetails.PreparedDate <= DateTime.Parse(DateTo) && issuedetails.IsActive == true &&
-                            issuedetails.IsTransact == true
+                      where issuedetails.IsActive == true && issuedetails.IsTransact == true
                       select new MiscellaneousIssueReport
                       {
                           IssueId = issue.Id,
@@ -396,7 +394,8 @@ public class ReportRepository : IReportRepository
                           Quantity = issuedetails != null ? issuedetails.Quantity : 0,
                           ExpirationDate = issuedetails != null ? issuedetails.ExpirationDate.ToString() : null,
                           TransactBy = issue.PreparedBy,
-                          TransactDate = issuedetails != null ? issuedetails.PreparedDate.ToString() : null
+                          TransactDate = issue != null ? issue.TransactionDate.ToString("MM-dd-yyyy") : null,
+                          CreatedAt = issuedetails != null ? issuedetails.PreparedDate.ToString("MM-dd-yyyy"): null
                       });
 
         return await issues.ToListAsync();
@@ -427,7 +426,6 @@ public class ReportRepository : IReportRepository
 
         return await PagedList<MiscellaneousIssueReport>.CreateAsync(issues, userParams.PageNumber, userParams.PageSize);
     }
-
     public async Task<IReadOnlyList<WarehouseReport>> NearlyExpireItemsReport(int expirydays)
     {
         var preparationOut = _context.Transformation_Preparation.Where(x => x.IsActive == true)
@@ -531,7 +529,6 @@ public class ReportRepository : IReportRepository
         return await warehouseInventory.Where(x => x.Quantity != 0)
             .ToListAsync();
     }
-
     public async Task<PagedList<WarehouseReport>> NearlyExpireItemsReportPagination(int expirydays, UserParams userParams)
     {
         var preparationOut = _context.Transformation_Preparation.Where(x => x.IsActive == true)
@@ -636,7 +633,6 @@ public class ReportRepository : IReportRepository
 
         return await PagedList<WarehouseReport>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
     }
-
     public async Task<IReadOnlyList<MoveOrderReport>> TransactedMoveOrderReport(string dateFrom, string dateTo)
     {
         DateTime fromDate = DateTime.Parse(dateFrom);
@@ -651,37 +647,28 @@ public class ReportRepository : IReportRepository
                 (moveorder, transact) => new { moveorder, transact })
             .Where(joinResult => joinResult.transact.IsActive == true
                                  && joinResult.transact.IsTransact == true
-                                 && joinResult.transact.PreparedDate >= fromDate
-                                 && joinResult.transact.PreparedDate <= toDate)
-            .Join(_context.Customers,
-                joinResult => joinResult.moveorder.FarmCode,
-                customer => customer.CustomerCode,
-                (joinResult, customer) => new { joinResult, customer })
-            .ToListAsync();
-
-        var filteredOrders = orders
-            .Where(joinCustomerResult => joinCustomerResult.joinResult.moveorder.FarmName.Equals(
-                joinCustomerResult.customer.CustomerName,
-                StringComparison.OrdinalIgnoreCase))
+                                 && joinResult.transact.DeliveryDate >= fromDate
+                                 && joinResult.transact.DeliveryDate <= toDate)
             .Select(s => new MoveOrderReport
             {
-                OrderNo = s.joinResult.moveorder.OrderNo,
-                CustomerName = s.customer.CustomerName,
-                CustomerCode = s.customer.CustomerCode,
-                ItemCode = s.joinResult.moveorder.ItemCode,
-                ItemDescription = s.joinResult.moveorder.ItemDescription,
-                Uom = s.joinResult.moveorder.Uom,
-                Quantity = s.joinResult.moveorder.QuantityOrdered,
-                MoveOrderDate = s.joinResult.moveorder.ApprovedDate.ToString(),
-                TransactedBy = s.joinResult.transact.PreparedBy,
-                TransactionType = s.joinResult.moveorder.DeliveryStatus,
-                TransactedDate = s.joinResult.transact.PreparedDate.ToString(),
-                DeliveryDate = s.joinResult.transact.DeliveryDate.ToString()
-            });
+                MIRId = s.moveorder.TransactionId,
+                MoveOrderId = s.moveorder.OrderNo,
+                CustomerName = s.moveorder.FarmName,
+                CustomerCode = s.moveorder.FarmCode,
+                ItemCode = s.moveorder.ItemCode,
+                ItemDescription = s.moveorder.ItemDescription,
+                Uom = s.moveorder.Uom,
+                Quantity = s.moveorder.QuantityOrdered,
+                MoveOrderDate = s.moveorder.ApprovedDate.ToString(),
+                TransactedBy = s.transact.PreparedBy,
+                TransactionType = s.moveorder.DeliveryStatus,
+                TransactedDate = s.transact.PreparedDate.ToString(),
+                DeliveryDate = s.transact.DeliveryDate.ToString()
+            })
+            .ToListAsync();
 
-        return filteredOrders.ToList();
+        return orders;
     }
-
     public async Task<PagedList<MoveOrderReport>> TransactedMoveOrderReportPagination(string dateFrom, string dateTo, UserParams userParams)
     {
         DateTime fromDate = DateTime.Parse(dateFrom);
@@ -695,15 +682,15 @@ public class ReportRepository : IReportRepository
                 (moveorder, transact) => new { moveorder, transact })
             .Where(joinResult => joinResult.transact.IsActive
                                  && joinResult.transact.IsTransact
-                                 && joinResult.transact.PreparedDate >= fromDate
-                                 && joinResult.transact.PreparedDate <= toDate)
+                                 && joinResult.transact.DeliveryDate >= fromDate
+                                 && joinResult.transact.DeliveryDate <= toDate)
             .Join(_context.Customers,
                 joinResult => joinResult.moveorder.FarmCode,
                 customer => customer.CustomerCode,
                 (joinResult, customer) => new { joinResult, customer })
             .Select(s => new MoveOrderReport
             {
-                OrderNo = s.joinResult.moveorder.OrderNo,
+                MoveOrderId = s.joinResult.moveorder.OrderNo,
                 CustomerName = s.customer.CustomerName,
                 CustomerCode = s.customer.CustomerCode,
                 ItemCode = s.joinResult.moveorder.ItemCode,
@@ -720,36 +707,88 @@ public class ReportRepository : IReportRepository
 
         return await PagedList<MoveOrderReport>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
     }
-
-
-    public async Task<IReadOnlyList<CancelledOrderReport>> CancelledOrderedReports(string DateFrom, string DateTo)
+    public async Task<IReadOnlyList<CancelledOrderReport>> OrderSummaryReports(string DateFrom, string DateTo)
     {
         var orders = (from ordering in _context.Orders
-                      where ordering.OrderDate >= DateTime.Parse(DateFrom) && ordering.OrderDate <= DateTime.Parse(DateTo) &&
-                            ordering.IsCancel == true && ordering.IsActive == false
+                      where ordering.OrderDate >= DateTime.Parse(DateFrom) && ordering.OrderDate <= DateTime.Parse(DateTo)
                       select new CancelledOrderReport
                       {
+                          MirId = ordering.TransactId.ToString(),
                           OrderId = ordering.Id,
-                          DateNeeded = ordering.DateNeeded.ToString(),
-                          DateOrdered = ordering.OrderDate.ToString(),
+                          DateNeeded = ordering.DateNeeded.ToString("MM-dd-yyyy"),
+                          DateOrdered = ordering.OrderDate.ToString("MM-dd-yyyy"),
                           CustomerCode = ordering.FarmCode,
                           CustomerName = ordering.FarmName,
                           ItemCode = ordering.ItemCode,
                           ItemDescription = ordering.ItemDescription,
                           QuantityOrdered = ordering.QuantityOrdered,
-                          CancelledDate = ordering.CancelDate.ToString(),
+                          CancelledDate = ordering.CancelDate.Value.ToString("MM-dd-yyyy"),
+                          Status = ordering.IsActive == false ? "Cancelled" : "Active",
                           CancelledBy = ordering.IsCancelBy,
-                          Reason = ordering.OrderCancellationRemarks
+                          Reason = ordering.OrderCancellationRemarks,
+                          Uom = ordering.Uom,
+                          Category = ordering.Category
+                      }) ;
+
+        return await orders.ToListAsync();
+    }
+    public async Task<PagedList<CancelledOrderReport>> OrderSummaryReportsPagination(string DateFrom, string DateTo, UserParams userParams)
+    {
+        var orders = (from ordering in _context.Orders
+                      where ordering.OrderDate >= DateTime.Parse(DateFrom) && ordering.OrderDate <= DateTime.Parse(DateTo)
+                      select new CancelledOrderReport
+                      {
+                          MirId = ordering.TransactId.ToString(),
+                          OrderId = ordering.Id,
+                          DateNeeded = ordering.DateNeeded.ToString("MM-dd-yyyy"),
+                          DateOrdered = ordering.OrderDate.ToString("MM-dd-yyyy"),
+                          CustomerCode = ordering.FarmCode,
+                          CustomerName = ordering.FarmName,
+                          ItemCode = ordering.ItemCode,
+                          ItemDescription = ordering.ItemDescription,
+                          QuantityOrdered = ordering.QuantityOrdered,
+                          CancelledDate = ordering.CancelDate.Value.ToString("MM-dd-yyyy"),
+                          Status = ordering.IsActive == false ? "Cancelled" : "Active",
+                          CancelledBy = ordering.IsCancelBy,
+                          Reason = ordering.OrderCancellationRemarks,
+                          Uom = ordering.Uom,
+                          Category = ordering.Category
+                      });
+
+        return await PagedList<CancelledOrderReport>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
+    }
+
+    public async Task<IReadOnlyList<CancelledOrderReport>> CancelledOrderedReports(string DateFrom, string DateTo)
+    {
+        var orders = (from ordering in _context.Orders
+                      where ordering.OrderDate >= DateTime.Parse(DateFrom) && ordering.OrderDate <= DateTime.Parse(DateTo) &&
+                           ordering.IsCancel == true && ordering.IsActive == false
+                      select new CancelledOrderReport
+                      {
+                          MirId = ordering.TransactId.ToString(),
+                          OrderId = ordering.Id,
+                          DateNeeded = ordering.DateNeeded.ToString("MM-dd-yyyy"),
+                          DateOrdered = ordering.OrderDate.ToString("MM-dd-yyyy"),
+                          CustomerCode = ordering.FarmCode,
+                          CustomerName = ordering.FarmName,
+                          ItemCode = ordering.ItemCode,
+                          ItemDescription = ordering.ItemDescription,
+                          QuantityOrdered = ordering.QuantityOrdered,
+                          CancelledDate = ordering.CancelDate.Value.ToString("MM-dd-yyyy"),
+                          Status = ordering.IsActive == false ? "Cancelled" : "Active",
+                          CancelledBy = ordering.IsCancelBy,
+                          Reason = ordering.OrderCancellationRemarks,
+                          Uom = ordering.Uom,
+                          Category = ordering.Category
                       });
 
         return await orders.ToListAsync();
     }
-
     public async Task<PagedList<CancelledOrderReport>> CancelledOrderedReportsPagination(string DateFrom, string DateTo, UserParams userParams)
     {
         var orders = (from ordering in _context.Orders
                       where ordering.OrderDate >= DateTime.Parse(DateFrom) && ordering.OrderDate <= DateTime.Parse(DateTo) &&
-                            ordering.IsCancel == true && ordering.IsActive == false
+                           ordering.IsCancel == true && ordering.IsActive == false
                       select new CancelledOrderReport
                       {
                           OrderId = ordering.Id,
@@ -768,7 +807,7 @@ public class ReportRepository : IReportRepository
         return await PagedList<CancelledOrderReport>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
     }
     public async Task<IReadOnlyList<InventoryMovementReport>> InventoryMovementReport(string DateFrom,
-        string DateTo, string PlusOne)
+       string DateTo, string PlusOne)
     {
         var dateToday = DateTime.Now.ToString("MM/dd/yyyy");
 
@@ -798,7 +837,7 @@ public class ReportRepository : IReportRepository
 
         var getMoveOrderOutByDatePlus = _context.MoveOrders.Where(x => x.IsActive == true)
             .Where(x => x.IsPrepared == true)
-            .Where(x => x.PreparedDate >= DateTime.Parse(PlusOne) && x.PreparedDate <= DateTime.Parse(dateToday) &&
+            .Where(x => x.TimeStamp.Value.Date >= DateTime.Parse(PlusOne) && x.TimeStamp.Value.Date <= DateTime.Parse(dateToday) &&
                         x.ApprovedDate != null)
             .GroupBy(x => new
             {
@@ -858,7 +897,7 @@ public class ReportRepository : IReportRepository
 
         var getReceivetIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
             .Where(x => x.TransactionType == "Receiving")
-            .Where(x => x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo))
+            .Where(x => x.ReceivingDate.Date >= DateTime.Parse(DateFrom) && x.ReceivingDate.Date <= DateTime.Parse(DateTo))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -870,7 +909,7 @@ public class ReportRepository : IReportRepository
 
         var getReceivetInPlus = _context.WarehouseReceived.Where(x => x.IsActive == true)
             .Where(x => x.TransactionType == "Receiving")
-            .Where(x => x.ReceivingDate >= DateTime.Parse(PlusOne) && x.ReceivingDate <= DateTime.Parse(dateToday))
+            .Where(x => x.ReceivingDate.Date >= DateTime.Parse(PlusOne) && x.ReceivingDate.Date <= DateTime.Parse(dateToday))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -1096,18 +1135,19 @@ public class ReportRepository : IReportRepository
                                      ItemCode = total.Key.ItemCode,
                                      ItemDescription = total.Key.ItemDescription,
                                      ItemCategory = total.Key.ItemCategoryName,
-                                     TotalOut = total.Key.MoveOrder + total.Key.Transformation + total.Key.Issue,
-                                     TotalIn = total.Key.ReceiveIn + total.Key.ReceiptIn + total.Key.TransformIn,
+                                     TotalMoveOrderedOut = total.Key.MoveOrder + total.Key.Transformation + total.Key.Issue,
+                                     TotalMiscIssue = total.Key.Issue,
+                                     TotalMicReceipt = total.Key.ReceiptIn,
+                                     TotalReceived = total.Key.ReceiveIn,
                                      Ending = (total.Key.ReceiveIn + total.Key.ReceiptIn + total.Key.TransformIn) -
                                               (total.Key.MoveOrder + total.Key.Transformation + total.Key.Issue),
-                                     CurrentStock = total.Key.SOH,
+                                     CurrentStock = total.Key.SOH - total.Key.Issue,
                                      PurchasedOrder = total.Key.ReceivePlus + total.Key.TransformPlus + total.Key.ReceiptPlus,
                                      OthersPlus = total.Key.MoveOrderPlus + total.Key.TransformOutPlus + total.Key.IssuePlus
                                  });
 
         return await movementInventory.ToListAsync();
     }
-
     public async Task<PagedList<InventoryMovementReport>> InventoryMovementReportPagination(string DateFrom,
         string DateTo, string PlusOne, UserParams userParams)
     {
@@ -1126,7 +1166,7 @@ public class ReportRepository : IReportRepository
 
         var getMoveOrderOutByDate = _context.MoveOrders.Where(x => x.IsActive == true)
             .Where(x => x.IsPrepared == true)
-            .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(DateTo) &&
+            .Where(x => x.TimeStamp.Value.Date >= DateTime.Parse(DateFrom) && x.TimeStamp.Value.Date <= DateTime.Parse(DateTo) &&
                         x.ApprovedDate != null)
             .GroupBy(x => new
             {
@@ -1139,7 +1179,7 @@ public class ReportRepository : IReportRepository
 
         var getMoveOrderOutByDatePlus = _context.MoveOrders.Where(x => x.IsActive == true)
             .Where(x => x.IsPrepared == true)
-            .Where(x => x.PreparedDate >= DateTime.Parse(PlusOne) && x.PreparedDate <= DateTime.Parse(dateToday) &&
+            .Where(x => x.TimeStamp.Value.Date >= DateTime.Parse(PlusOne) && x.TimeStamp.Value.Date <= DateTime.Parse(dateToday) &&
                         x.ApprovedDate != null)
             .GroupBy(x => new
             {
@@ -1161,7 +1201,7 @@ public class ReportRepository : IReportRepository
             });
 
         var getTransformationByDatePlus = _context.Transformation_Preparation.Where(x => x.IsActive == true)
-            .Where(x => x.PreparedDate >= DateTime.Parse(PlusOne) && x.PreparedDate <= DateTime.Parse(dateToday))
+            .Where(x => x.PreparedDate.Date >= DateTime.Parse(PlusOne) && x.PreparedDate.Date <= DateTime.Parse(dateToday))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -1173,7 +1213,7 @@ public class ReportRepository : IReportRepository
 
         var getIssueOutByDate = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
             .Where(x => x.IsTransact == true)
-            .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(DateTo))
+            .Where(x => x.PreparedDate.Date >= DateTime.Parse(DateFrom) && x.PreparedDate.Date <= DateTime.Parse(DateTo))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -1186,7 +1226,7 @@ public class ReportRepository : IReportRepository
 
         var getIssueOutByDatePlus = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
             .Where(x => x.IsTransact == true)
-            .Where(x => x.PreparedDate >= DateTime.Parse(PlusOne) && x.PreparedDate <= DateTime.Parse(dateToday))
+            .Where(x => x.PreparedDate.Date >= DateTime.Parse(PlusOne) && x.PreparedDate.Date <= DateTime.Parse(dateToday))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -1199,7 +1239,7 @@ public class ReportRepository : IReportRepository
 
         var getReceivetIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
             .Where(x => x.TransactionType == "Receiving")
-            .Where(x => x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo))
+            .Where(x => x.ReceivingDate.Date >= DateTime.Parse(DateFrom) && x.ReceivingDate.Date <= DateTime.Parse(DateTo))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -1211,7 +1251,7 @@ public class ReportRepository : IReportRepository
 
         var getReceivetInPlus = _context.WarehouseReceived.Where(x => x.IsActive == true)
             .Where(x => x.TransactionType == "Receiving")
-            .Where(x => x.ReceivingDate >= DateTime.Parse(PlusOne) && x.ReceivingDate <= DateTime.Parse(dateToday))
+            .Where(x => x.ReceivingDate.Date >= DateTime.Parse(PlusOne) && x.ReceivingDate.Date <= DateTime.Parse(dateToday))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -1305,29 +1345,14 @@ public class ReportRepository : IReportRepository
             });
 
         var getSOH = (from warehouse in getWarehouseStock
-                      join preparation in getTransformation
-                          on warehouse.ItemCode equals preparation.ItemCode
-                          into leftJ1
-                      from preparation in leftJ1.DefaultIfEmpty()
-                      join issue in getIssueOut
-                          on warehouse.ItemCode equals issue.ItemCode
-                          into leftJ2
-                      from issue in leftJ2.DefaultIfEmpty()
                       join moveorder in getMoveOrderOut
                           on warehouse.ItemCode equals moveorder.ItemCode
                           into leftJ3
                       from moveorder in leftJ3.DefaultIfEmpty()
-                      join receipt in getReceiptIn
-                          on warehouse.ItemCode equals receipt.ItemCode
-                          into leftJ4
-                      from receipt in leftJ4.DefaultIfEmpty()
                       group new
                       {
                           warehouse,
-                          preparation,
-                          moveorder,
-                          receipt,
-                          issue
+                          moveorder
                       }
                           by new
                           {
@@ -1338,7 +1363,6 @@ public class ReportRepository : IReportRepository
                       {
                           ItemCode = total.Key.ItemCode,
                           SOH = total.Sum(x => x.warehouse.ActualGood == 0 ? 0 : x.warehouse.ActualGood) -
-                                total.Sum(x => x.preparation.WeighingScale == 0 ? 0 : x.preparation.WeighingScale) -
                                 total.Sum(x => x.moveorder.QuantityOrdered == 0 ? 0 : x.moveorder.QuantityOrdered)
                       });
 
@@ -1437,36 +1461,44 @@ public class ReportRepository : IReportRepository
                                      ItemCode = total.Key.ItemCode,
                                      ItemDescription = total.Key.ItemDescription,
                                      ItemCategory = total.Key.ItemCategoryName,
-                                     TotalOut = total.Key.MoveOrder + total.Key.Transformation + total.Key.Issue,
-                                     TotalIn = total.Key.ReceiveIn + total.Key.ReceiptIn + total.Key.TransformIn,
+                                     TotalMoveOrderedOut = total.Key.MoveOrder,
+                                     TotalMiscIssue = total.Key.Issue,
+                                     TotalReceived = total.Key.ReceiveIn,
+                                     TotalMicReceipt = total.Key.ReceiptIn,
                                      Ending = (total.Key.ReceiveIn + total.Key.ReceiptIn + total.Key.TransformIn) -
                                               (total.Key.MoveOrder + total.Key.Transformation + total.Key.Issue),
-                                     CurrentStock = total.Key.SOH,
-                                     PurchasedOrder = total.Key.ReceivePlus + total.Key.TransformPlus + total.Key.ReceiptPlus,
+                                     CurrentStock = total.Key.SOH - total.Key.Issue,
+                                     PurchasedOrder = total.Key.ReceivePlus + total.Key.ReceiptPlus,
                                      OthersPlus = total.Key.MoveOrderPlus + total.Key.TransformOutPlus + total.Key.IssuePlus
                                  });
 
         return await PagedList<InventoryMovementReport>.CreateAsync(movementInventory, userParams.PageNumber, userParams.PageSize);
     }
-
-    public async Task<IReadOnlyList<ConsolidatedReport>> ConsolidatedReport(string dateFrom, string dateTo)
+        /// <summary>
+        /// Retrieves a consolidated report based on the specified date range and department.
+        /// </summary>
+        /// <param name="dateFrom">The start date of the report in "MM/dd/yyyy" format.</param>
+        /// <param name="dateTo">The end date of the report in "MM/dd/yyyy" format.</param>
+        /// <param name="Department">The department for which the report is generated.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a read-only list of ConsolidatedReport objects.</returns>
+    public async Task<IReadOnlyList<ConsolidatedReport>> ConsolidatedReport(string dateFrom, string dateTo, string Department)
     {
         var fromDate = DateTime.Parse(dateFrom).Date;
         var toDate = DateTime.Parse(dateTo).Date;
 
         var individualDifferences = from wr in _context.WarehouseReceived
-            join mo in _context.MoveOrders
-                on wr.Id equals mo.WarehouseId
-                into moveOrders
-            from mo in moveOrders.DefaultIfEmpty()
-            where wr.IsActive && wr.IsWarehouseReceive
-            select new
-            {
-                wr.ItemCode,
-                wr.ActualGood,
-                QuantityOrdered = mo != null ? mo.QuantityOrdered : 0,
-                CostByWarehouse = wr.UnitCost * (wr.ActualGood - (mo != null ? mo.QuantityOrdered : 0))
-            };
+                                    join mo in _context.MoveOrders
+                                        on wr.Id equals mo.WarehouseId
+                                        into moveOrders
+                                    from mo in moveOrders.DefaultIfEmpty()
+                                    where wr.IsActive && wr.IsWarehouseReceive
+                                    select new
+                                    {
+                                        wr.ItemCode,
+                                        wr.ActualGood,
+                                        QuantityOrdered = mo != null ? mo.QuantityOrdered : 0,
+                                        CostByWarehouse = wr.UnitCost * (wr.ActualGood - (mo != null ? mo.QuantityOrdered : 0))
+                                    };
 
         // Calculate the sum of differences per ItemCode
         var totalDifferences = individualDifferences
@@ -1491,27 +1523,32 @@ public class ReportRepository : IReportRepository
 
         // Combine the results
         var finalResult = from id in individualDifferences
-            join td in totalDifferences
-                on id.ItemCode equals td.ItemCode
-            join auc in averageUnitCosts
-                on id.ItemCode equals auc.ItemCode
-            select new
-            {
-                id.ItemCode,
-                id.ActualGood,
-                id.QuantityOrdered,
-                Difference = id.CostByWarehouse,
-                td.TotalDifference,
-                auc.AvgUnitCost
-            };
+                          join td in totalDifferences
+                              on id.ItemCode equals td.ItemCode
+                          join auc in averageUnitCosts
+                              on id.ItemCode equals auc.ItemCode
+                          select new
+                          {
+                              id.ItemCode,
+                              id.ActualGood,
+                              id.QuantityOrdered,
+                              Difference = id.CostByWarehouse,
+                              td.TotalDifference,
+                              auc.AvgUnitCost
+                          };
+
 
         var consolidatedReports = new List<ConsolidatedReport>();
         var rawMaterials = await _context.RawMaterials
+            .Include(x => x.ItemCategory)
+            .Include(uom => uom.UOM )
             .Select(rawMaterial => new
             {
                 rawMaterial.ItemCode,
                 rawMaterial.ItemDescription,
-                rawMaterial.UOM
+                rawMaterial.UOM,
+                rawMaterial.ItemCategory.ItemCategoryName,
+                rawMaterial.UOM.UOM_Description
             })
             .ToListAsync();
 
@@ -1519,11 +1556,13 @@ public class ReportRepository : IReportRepository
             .Select(warehouseReceived => new
             {
                 warehouseReceived.PO_Number,
+                warehouseReceived.QcReceivingId,
                 warehouseReceived.Id,
                 warehouseReceived.ItemCode,
                 warehouseReceived.Uom,
                 warehouseReceived.MiscellaneousReceiptId,
-                warehouseReceived.UnitCost
+                warehouseReceived.UnitCost,
+                warehouseReceived.ActualGood
             })
             .ToListAsync();
 
@@ -1539,244 +1578,336 @@ public class ReportRepository : IReportRepository
             })
             .ToListAsync();
 
+        var cancelledOrders = await (from ordering in _context.Orders
+                      where ordering.OrderDate.Date >= fromDate && ordering.OrderDate.Date <= toDate &&
+                            ordering.IsCancel == true && ordering.IsActive == false
+                      select new CancelledOrderReport
+                      {
+                          MirId = ordering.TransactId.ToString(),
+                          OrderId = ordering.Id,
+                          DateNeeded = ordering.DateNeeded.ToString(),
+                          DateOrdered = ordering.OrderDate.ToString(),
+                          CustomerCode = ordering.FarmCode,
+                          CustomerName = ordering.FarmName,
+                          ItemCode = ordering.ItemCode,
+                          ItemDescription = ordering.ItemDescription,
+                          QuantityOrdered = ordering.QuantityOrdered,
+                          CancelledDate = ordering.CancelDate.ToString(),
+                          CancelledBy = ordering.IsCancelBy,
+                          Reason = ordering.OrderCancellationRemarks
+                      }).ToListAsync();
+
         var moveOrderReports = await
 
-            //(from transact in _context.TransactMoveOrder
-            //    where transact.IsActive == true && transact.IsTransact == true &&
-            //          transact.PreparedDate.Value.Date >= fromDate && transact.PreparedDate.Value.Date <= toDate
-            //    join moveorder in _context.MoveOrders.Where(x => x.IsActive)
-            //        on transact.OrderNo equals moveorder.OrderNo into leftJ
-            // from moveorder in leftJ.DefaultIfEmpty()
+        //(from transact in _context.TransactMoveOrder
+        //    where transact.IsActive == true && transact.IsTransact == true &&
+        //          transact.PreparedDate.Value.Date >= fromDate && transact.PreparedDate.Value.Date <= toDate
+        //    join moveorder in _context.MoveOrders.Where(x => x.IsActive)
+        //        on transact.OrderNo equals moveorder.OrderNo into leftJ
+        // from moveorder in leftJ.DefaultIfEmpty()
 
-            (from moveorder in _context.MoveOrders
-                    .Include(x => x.AdvancesToEmployees)
-                where moveorder.ApprovedDate.Value.Date >= fromDate &&
-                      moveorder.ApprovedDate.Value.Date <= toDate &&
-                      moveorder.IsActive == true
-                join transactmoveorder in _context.TransactMoveOrder
-                    on moveorder.OrderNo equals transactmoveorder.OrderNo into leftJ
-                from transactmoveorder in leftJ.DefaultIfEmpty()
-                select new
-                {
-                    moveorder.Id,
-                    moveorder.ItemCode,
-                    moveorder.ItemDescription,
-                    moveorder.Category,
-                    moveorder.OrderNo,
-                    moveorder.FarmName,
-                    moveorder.FarmCode,
-                    moveorder.Uom,
-                    moveorder.CompanyCode,
-                    moveorder.CompanyName,
-                    moveorder.DepartmentCode,
-                    moveorder.DepartmentName,
-                    moveorder.AccountTitleCode,
-                    moveorder.AccountTitles,
-                    moveorder.LocationCode,
-                    moveorder.LocationName,
-                    moveorder.QuantityOrdered,
-                    moveorder.WarehouseId,
-                    transactmoveorder.PreparedDate,
-                    transactmoveorder.PreparedBy,
-                    moveorder.DeliveryStatus
-                }).ToListAsync();
+            (from transactmoveorder in _context.TransactMoveOrder
+             where transactmoveorder.DeliveryDate.Value.Date >= fromDate && transactmoveorder.DeliveryDate.Value.Date <= toDate
+             join moveorder in _context.MoveOrders.Where(x => x.IsActive == true && x.IsRejectForPreparation == null)
+                 on transactmoveorder.OrderNo equals moveorder.OrderNo into leftJ
+            from moveorder in leftJ.DefaultIfEmpty()
+          //_context.MoveOrders
+          //   .Include(x => x.AdvancesToEmployees)
+          //   where moveorder.IsActive == true
+          //   join transactmoveorder in _context.TransactMoveOrder.Where(x => x.DeliveryDate.Value >= fromDate && x.DeliveryDate.Value <= toDate)
+          //       on moveorder.OrderNo equals transactmoveorder.OrderNo into leftJ
+          //   from transactmoveorder in leftJ.DefaultIfEmpty()
+             select new
+             {
+                 moveorder.TransactionId,
+                 moveorder.Id,
+                 moveorder.ItemCode,
+                 moveorder.ItemDescription,
+                 moveorder.Category,
+                 moveorder.OrderNo,
+                 moveorder.FarmName,
+                 moveorder.FarmCode,
+                 moveorder.Uom,
+                 moveorder.CompanyCode,
+                 moveorder.CompanyName,
+                 moveorder.DepartmentCode,
+                 moveorder.DepartmentName,
+                 moveorder.AccountTitleCode,
+                 moveorder.AccountTitles,
+                 moveorder.LocationCode,
+                 moveorder.LocationName,
+                 moveorder.QuantityOrdered,
+                 moveorder.WarehouseId,
+                 transactmoveorder.PreparedDate,
+                 transactmoveorder.PreparedBy,
+                 moveorder.DeliveryStatus,
+                 moveorder.AdvancesToEmployees.EmployeeName,
+                 moveorder.AdvancesToEmployees.EmployeeId
+             }).ToListAsync();
 
-        var receiptInReport = await _context.MiscellaneousReceipts
-            .Where(receipt => receipt.IsActive == true)
-            .Where(receipt => receipt.TransactionDate.Date >= fromDate && receipt.TransactionDate.Date <= toDate)
-            .Select(receiptIn => new
+        //var receiptInReport = await _context.MiscellaneousReceipts
+        //    .Where(receipt => receipt.IsActive == true)
+        //    .Where(receipt => receipt.TransactionDate.Date >= fromDate && receipt.TransactionDate.Date <= toDate)
+        //    .Select(receiptIn => new
+        //    {
+        //        receiptIn.Id,
+        //        receiptIn.CompanyName,
+        //        receiptIn.CompanyCode,
+        //        receiptIn.DepartmentCode,
+        //        receiptIn.DepartmentName,
+        //        receiptIn.AccountTitles,
+        //        receiptIn.LocationCode,
+        //        receiptIn.LocationName,
+        //        receiptIn.TotalQuantity,
+        //        receiptIn.PreparedDate
+        //    })
+        //    .ToListAsync();
+
+        
+            consolidatedReports = _context.WarehouseReceived
+                    .Where(wr => wr.IsActive == true && wr.MiscellaneousReceiptId == null)
+                    .Where(wr => wr.ReceivingDate.Date >= fromDate && wr.ReceivingDate.Date <= toDate)
+                    .Join(
+                        _context.RawMaterials
+                            .Include(rm => rm.UOM)
+                            .Include(rm => rm.ItemCategory),
+                        receiving => receiving.ItemCode,
+                        rawMaterial => rawMaterial.ItemCode,
+                        (receiving, rawMaterialsGroup) =>
+                            new { Receiving = receiving, RawMaterialsGroup = rawMaterialsGroup })
+                     .Join(
+                        _context.QC_Receiving,
+                        joinResult => joinResult.Receiving.QcReceivingId,
+                        qc => qc.Id,
+                        (joinResult, qc) => new { Receiving = joinResult.Receiving, RawMaterialsGroup = joinResult.RawMaterialsGroup, QC = qc })
+                    .AsEnumerable()
+                    .Select(
+                        (joinResult, rawMaterial) => new ConsolidatedReport
+                        {
+                            Id = joinResult.Receiving.Id,
+                            TransactDate = joinResult.Receiving.ReceivingDate.ToString("MM-dd-yyyy"),
+                            ItemCode = rawMaterials.Where(item => item.ItemCode == joinResult.RawMaterialsGroup.ItemCode)
+                            .Select(item => item.ItemCode)
+                            .FirstOrDefault(),
+                            ItemDescription = rawMaterials.Where(item => item.ItemCode == joinResult.RawMaterialsGroup.ItemCode)
+                            .Select(item => item.ItemDescription)
+                            .FirstOrDefault(),
+                            Category = rawMaterials
+                            .Where(item => item.ItemCode == joinResult.RawMaterialsGroup.ItemCode)
+                            .Select(item => item.ItemCategoryName)
+                            .FirstOrDefault(),
+                            UOM = rawMaterials
+                            .Where(item => item.ItemCode == joinResult.RawMaterialsGroup.ItemCode)
+                            .Select(item => item.UOM_Description)
+                            .FirstOrDefault(),
+                            Quantity = joinResult.Receiving.ActualGood,
+                            UnitPrice = Math.Round(warehouseReceived
+                            .Where(wr => wr.PO_Number == joinResult.Receiving.PO_Number && wr.ItemCode == joinResult.Receiving.ItemCode && wr.QcReceivingId == joinResult.QC.Id)
+                            .Select(wr => wr.UnitCost)
+                            .FirstOrDefault() ?? 0, 2),
+                            WarehouseId = warehouseReceived
+                                .Where(wr => wr.PO_Number == joinResult.Receiving.PO_Number && wr.ItemCode == joinResult.Receiving.ItemCode && wr.QcReceivingId == joinResult.QC.Id)
+                                .Select(wr => wr.Id)
+                                .FirstOrDefault(),
+                            TransactionType = "Receiving",
+                            CompanyCode = "31",
+                            CompanyName = "Fresh Options",
+                            DepartmentCode = "5001",
+                            DepartmentName = "Meatshop Administration",
+                            LocationCode = "0",
+                            LocationName = "Common",
+                            AccountTitle = "Accrued Expense Payable",
+                            AccountTitleCode = "211201",
+                            Reason = joinResult.Receiving.PO_Number.ToString(),
+                            MIRId = "-",
+                            Source = joinResult.Receiving.PO_Number,
+                            Reference = joinResult.Receiving.Supplier,
+                            Encoded = joinResult.Receiving.ReceivedBy,
+                            Details = null
+                        }).ToList();
+
+
+            foreach (var moveOrderReport in moveOrderReports)
             {
-                receiptIn.Id,
-                receiptIn.CompanyName,
-                receiptIn.CompanyCode,
-                receiptIn.DepartmentCode,
-                receiptIn.DepartmentName,
-                receiptIn.AccountTitles,
-                receiptIn.LocationCode,
-                receiptIn.LocationName,
-                receiptIn.TotalQuantity,
-                receiptIn.PreparedDate
-            })
-            .ToListAsync();
-
-        consolidatedReports = _context.QC_Receiving
-            .Where(wr => wr.IsWareHouseReceive == true)
-            .Where(wr => wr.QC_ReceiveDate.Date >= fromDate && wr.QC_ReceiveDate.Date <= toDate)
-            .Join(
-                _context.RawMaterials
-                    .Include(rm => rm.UOM)
-                    .Include(rm => rm.ItemCategory),
-                receiving => receiving.ItemCode,
-                rawMaterial => rawMaterial.ItemCode,
-                (receiving, rawMaterialsGroup) =>
-                    new { Receiving = receiving, RawMaterialsGroup = rawMaterialsGroup })
-            .Join(
-                _context.POSummary,
-                receiving => receiving.Receiving.PO_Summary_Id,
-                posummary => posummary.Id,
-                (receiving, posummary) => new
+                consolidatedReports.Add(new ConsolidatedReport
                 {
-                    Receiving = receiving,
-                    PoSummary = posummary
-                }
-            )
-            .AsEnumerable()
-            .Select(
-                (joinResult, rawMaterial) => new ConsolidatedReport
-                {
-                    Id = joinResult.Receiving.Receiving.Id,
-                    TransactDate = joinResult.Receiving.Receiving.QC_ReceiveDate.ToString("MM-dd-yyyy"),
-                    ItemCode = joinResult.Receiving.Receiving.ItemCode,
-                    ItemDescription = joinResult.Receiving.RawMaterialsGroup.ItemDescription,
-                    Category = joinResult.Receiving.RawMaterialsGroup.ItemCategory.ItemCategoryName,
-                    UOM = joinResult.Receiving.RawMaterialsGroup.UOM.UOM_Description,
-                    Quantity = joinResult.Receiving.Receiving.Actual_Delivered,
-                    UnitPrice = warehouseReceived
-                        .Where(wr => wr.PO_Number == joinResult.PoSummary.PO_Number)
-                        .Select(wr => wr.UnitCost)
-                        .FirstOrDefault(),
-                    WarehouseId = warehouseReceived
-                        .Where(wr => wr.PO_Number == joinResult.PoSummary.PO_Number)
-                        .Select(wr => wr.Id)
-                        .FirstOrDefault(),
-                    TransactionType = "Receiving",
-                    CompanyCode = "31",
-                    CompanyName = "Fresh Options",
-                    DepartmentCode = "5001",
-                    DepartmentName = "Meatshop Administration",
-                    LocationCode = "0",
-                    LocationName = "Common",
-                    AccountTitle = "Accrued Expense Payable",
-                    AccountTitleCode = "211201",
-                    Reason = joinResult.PoSummary.PO_Number.ToString(),
-                    Source = joinResult.PoSummary.PO_Number,
-                    Reference = joinResult.PoSummary.VendorName,
-                    Encoded = joinResult.Receiving.Receiving.QcBy,
-                    Details = null
-                }).ToList();
+                    Id = moveOrderReport.Id,
+                    TransactDate = moveOrderReport.PreparedDate.HasValue
+                        ? moveOrderReport.PreparedDate.Value.ToString("MM-dd-yyyy")
+                        : null,
+                    ItemCode = rawMaterials.Where(item => item.ItemCode == moveOrderReport.ItemCode)
+                            .Select(item => item.ItemCode)
+                            .FirstOrDefault(),
+                    ItemDescription = rawMaterials.Where(item => item.ItemCode == moveOrderReport.ItemCode)
+                            .Select(item => item.ItemDescription)
+                            .FirstOrDefault(),
+                    Category = rawMaterials.Where(item => item.ItemCode == moveOrderReport.ItemCode)
+                            .Select(item => item.ItemCategoryName)
+                            .FirstOrDefault(),
+                    UOM = rawMaterials.Where(item => item.ItemCode == moveOrderReport.ItemCode)
+                            .Select(item => item.UOM_Description)
+                            .FirstOrDefault(),
+                    Quantity = moveOrderReport.QuantityOrdered,
+                    WarehouseId = moveOrderReport.WarehouseId,
+                    UnitPrice = warehouseReceived.Where(wr => wr.Id == moveOrderReport.WarehouseId)
+                        .Select(x => x.UnitCost).FirstOrDefault(),
+                    TransactionType = "Move Order",
+                    CompanyCode = moveOrderReport.CompanyCode,
+                    CompanyName = moveOrderReport.CompanyName,
+                    DepartmentCode = moveOrderReport.DepartmentCode,
+                    DepartmentName = moveOrderReport.DepartmentName,
+                    LocationCode = moveOrderReport.LocationCode,
+                    LocationName = moveOrderReport.LocationName,
+                    AccountTitleCode = moveOrderReport.AccountTitleCode,
+                    AccountTitle = moveOrderReport.AccountTitles,
+                    MIRId = moveOrderReport.TransactionId,
+                    Source = moveOrderReport.OrderNo,
+                    Reference = moveOrderReport.FarmName,
+                    Encoded = moveOrderReport.PreparedBy,
+                    Reason = moveOrderReport.DeliveryStatus,
+                    Details = null,
+                    Status = moveOrderReport.PreparedDate != null ? "Transacted" : "Pending",
+                    EmployeeName = moveOrderReport.EmployeeName
+                });
+            }
 
-        foreach (var moveOrderReport in moveOrderReports)
+        if (!string.IsNullOrEmpty(Department) && Department == "Audit")
         {
-            consolidatedReports.Add(new ConsolidatedReport
+            foreach (var cancelledOrder in cancelledOrders)
             {
-                Id = moveOrderReport.Id,
-                TransactDate = moveOrderReport.PreparedDate.HasValue
-                    ? moveOrderReport.PreparedDate.Value.ToString("MM-dd-yyyy")
-                    : null,
-                ItemCode = moveOrderReport.ItemCode,
-                ItemDescription = moveOrderReport.ItemDescription,
-                Category = moveOrderReport.Category,
-                UOM = moveOrderReport.Uom,
-                Quantity = moveOrderReport.QuantityOrdered,
-                WarehouseId = moveOrderReport.WarehouseId,
-                UnitPrice = warehouseReceived.Where(wr => wr.Id == moveOrderReport.WarehouseId)
-                    .Select(x => x.UnitCost).FirstOrDefault(),
-                TransactionType = "Move Order",
-                CompanyCode = moveOrderReport.CompanyCode,
-                CompanyName = moveOrderReport.CompanyName,
-                DepartmentCode = moveOrderReport.DepartmentCode,
-                DepartmentName = moveOrderReport.DepartmentName,
-                LocationCode = moveOrderReport.LocationCode,
-                LocationName = moveOrderReport.LocationName,
-                AccountTitleCode = moveOrderReport.AccountTitleCode,
-                AccountTitle = moveOrderReport.AccountTitles,
-                Source = moveOrderReport.OrderNo,
-                Reference = moveOrderReport.FarmName,
-                Encoded = moveOrderReport.PreparedBy,
-                Reason = moveOrderReport.DeliveryStatus,
-                Details = null,
-                Status = moveOrderReport.PreparedDate != null ? "Transacted" : "Pending"
-            });
+                consolidatedReports.Add(new ConsolidatedReport
+                {
+                    Id = cancelledOrder.OrderId,
+                    TransactDate = cancelledOrder.CancelledDate,
+                    ItemCode = rawMaterials.Where(item => item.ItemCode == cancelledOrder.ItemCode)
+                            .Select(item => item.ItemCode)
+                            .FirstOrDefault(),
+                    ItemDescription = rawMaterials.Where(item => item.ItemCode == cancelledOrder.ItemCode)
+                            .Select(item => item.ItemDescription)
+                            .FirstOrDefault(),
+                    Category = rawMaterials.Where(item => item.ItemCode == cancelledOrder.ItemCode)
+                            .Select(item => item.ItemCategoryName)
+                            .FirstOrDefault(),
+                    UOM = rawMaterials.Where(item => item.ItemCode == cancelledOrder.ItemCode)
+                            .Select(item => item.UOM_Description)
+                            .FirstOrDefault(),
+                    Quantity = cancelledOrder.QuantityOrdered,
+                    WarehouseId = 0,
+                    UnitPrice = 0,
+                    TransactionType = "Cancelled Orders",
+                    CompanyCode = "-",
+                    CompanyName = "-",
+                    DepartmentCode = "-",
+                    DepartmentName = "-",
+                    LocationCode = "-",
+                    LocationName = "-",
+                    AccountTitleCode = "-",
+                    AccountTitle = "-",
+                    MIRId = cancelledOrder.MirId,
+                    Source = Convert.ToInt32(cancelledOrder.MirId),
+                    Reference = cancelledOrder.CustomerName,
+                    Encoded = cancelledOrder.CancelledBy,
+                    Reason = cancelledOrder.Reason,
+                    Details = null,
+                    Status = "-"
+                });
+            };
         }
 
-        var miscellaneousReceipts = await (from receiptInReports in _context.MiscellaneousReceipts
-            join warehouseRec in _context.WarehouseReceived
-                on receiptInReports.Id equals warehouseRec.MiscellaneousReceiptId
-            join rm in _context.RawMaterials
-                on warehouseRec.ItemCode equals rm.ItemCode
-            join itemCategory in _context.ItemCategories
-                on rm.ItemCategoryId equals itemCategory.Id
-            where receiptInReports.IsActive
-                  && receiptInReports.TransactionDate >= fromDate
-                  && receiptInReports.TransactionDate <= toDate
-                  && warehouseRec.ReceivingDate >= fromDate
-                  && warehouseRec.ReceivingDate <= toDate
-            select new ConsolidatedReport
-            {
-                Id = receiptInReports.Id,
-                TransactDate = receiptInReports.TransactionDate.ToString("MM-dd-yyyy"),
-                ItemCode = warehouseRec.ItemCode,
-                ItemDescription = warehouseRec.ItemDescription,
-                UOM = warehouseRec.Uom,
-                Category = itemCategory.ItemCategoryName,
-                Quantity = warehouseRec.ActualGood,
-                UnitPrice = warehouseRec.UnitCost,
-                WarehouseId = warehouseRec.Id,
-                TransactionType = "Miscellaneous Receipt",
-                CompanyName = receiptInReports.CompanyName,
-                CompanyCode = receiptInReports.CompanyCode,
-                DepartmentCode = receiptInReports.DepartmentCode,
-                DepartmentName = receiptInReports.DepartmentName,
-                AccountTitleCode = receiptInReports.AccountTitleCode,
-                AccountTitle = receiptInReports.AccountTitles,
-                LocationCode = receiptInReports.LocationCode,
-                LocationName = receiptInReports.LocationName,
-                Encoded = receiptInReports.PreparedBy,
-                Source = receiptInReports.Id,
-                Reference = receiptInReports.CompanyName,
-                Reason = receiptInReports.Remarks,
-                Details = receiptInReports.Details,
-                Status = "-"
-            }).ToListAsync();
+            var miscellaneousReceipts = await (from receiptInReports in _context.MiscellaneousReceipts
+                                               join warehouseRec in _context.WarehouseReceived
+                                                   on receiptInReports.Id equals warehouseRec.MiscellaneousReceiptId
+                                               join rm in _context.RawMaterials
+                                                .Include(category => category.ItemCategory)
+                                                .Include(uom => uom.UOM)
+                                                   on warehouseRec.ItemCode equals rm.ItemCode
+                                               join itemCategory in _context.ItemCategories
+                                                   on rm.ItemCategoryId equals itemCategory.Id
+                                               where receiptInReports.IsActive
+                                                     && receiptInReports.TransactionDate.Date >= fromDate
+                                                     && receiptInReports.TransactionDate.Date <= toDate
+                                               select new ConsolidatedReport
+                                               {
+                                                   Id = receiptInReports.Id,
+                                                   TransactDate = receiptInReports.TransactionDate.ToString("MM-dd-yyyy"),
+                                                   ItemCode = rm.ItemCode,
+                                                   ItemDescription = rm.ItemDescription,
+                                                   UOM = rm.UOM.UOM_Description,
+                                                   Category = rm.ItemCategory.ItemCategoryName,
+                                                   Quantity = warehouseRec.ActualGood,
+                                                   UnitPrice = warehouseRec.UnitCost,
+                                                   WarehouseId = warehouseRec.Id,
+                                                   TransactionType = "Miscellaneous Receipt",
+                                                   CompanyName = receiptInReports.CompanyName,
+                                                   CompanyCode = receiptInReports.CompanyCode,
+                                                   DepartmentCode = receiptInReports.DepartmentCode,
+                                                   DepartmentName = receiptInReports.DepartmentName,
+                                                   AccountTitleCode = receiptInReports.AccountTitleCode,
+                                                   AccountTitle = receiptInReports.AccountTitles,
+                                                   LocationCode = receiptInReports.LocationCode,
+                                                   LocationName = receiptInReports.LocationName,
+                                                   Encoded = receiptInReports.PreparedBy,
+                                                   Source = receiptInReports.Id,
+                                                   Reference = receiptInReports.CompanyName,
+                                                   Reason = receiptInReports.Remarks,
+                                                   Details = receiptInReports.Details,
+                                                   Status = "-",
+                                                   MIRId = "-"
+                                               }).ToListAsync();
 
-        var miscellaneousIssues = _context.MiscellaneousIssues
-            .Where(wr => wr.IsTransact == true)
-            .Where(x => x.TransactionDate.Date >= fromDate && x.TransactionDate.Date <= toDate)
-            .Join(
-                _context.MiscellaneousIssueDetails,
-                issue => issue.Id,
-                details => details.IssuePKey,
-                (issue, details) => new { Issue = issue, Details = details })
-            .Join(
-                _context.RawMaterials,
-                result => result.Details.ItemCode,
-                rawMaterial => rawMaterial.ItemCode,
-                (result, rawMaterial) => new { Result = result, RawMaterial = rawMaterial })
-            .Join(
-                _context.ItemCategories,
-                combined => combined.RawMaterial.ItemCategoryId,
-                itemCategory => itemCategory.Id,
-                (combined, itemCategory) => new { Combined = combined, ItemCategory = itemCategory })
-            .Select(consolidated => new ConsolidatedReport
-            {
-                Id = consolidated.Combined.Result.Issue.Id,
-                TransactDate = consolidated.Combined.Result.Issue.TransactionDate.ToString("MM-dd-yyyy"),
-                ItemCode = consolidated.Combined.Result.Details.ItemCode,
-                ItemDescription = consolidated.Combined.Result.Details.ItemDescription,
-                UOM = consolidated.Combined.Result.Details.Uom,
-                Category = consolidated.ItemCategory.ItemCategoryName,
-                Quantity = consolidated.Combined.Result.Details.Quantity,
-                WarehouseId = consolidated.Combined.Result.Details.WarehouseId,
-                UnitPrice = consolidated.Combined.Result.Details.UnitCost,
-                TransactionType = "Miscellaneous Issue",
-                CompanyCode = consolidated.Combined.Result.Issue.CompanyCode,
-                CompanyName = consolidated.Combined.Result.Issue.CompanyName,
-                DepartmentCode = consolidated.Combined.Result.Issue.DepartmentCode,
-                DepartmentName = consolidated.Combined.Result.Issue.DepartmentName,
-                LocationCode = consolidated.Combined.Result.Issue.LocationCode,
-                LocationName = consolidated.Combined.Result.Issue.LocationName,
-                AccountTitleCode = consolidated.Combined.Result.Issue.AccountTitleCode,
-                AccountTitle = consolidated.Combined.Result.Issue.AccountTitles,
-                Source = consolidated.Combined.Result.Issue.Id,
-                Reason = consolidated.Combined.Result.Details.Remarks,
-                Reference = consolidated.Combined.Result.Details.Customer,
-                Encoded = consolidated.Combined.Result.Issue.PreparedBy,
-                Details = consolidated.Combined.Result.Issue.Details,
-                Status = "-"
-            })
-            .ToList();
-        consolidatedReports.AddRange(miscellaneousReceipts);
-        consolidatedReports.AddRange(miscellaneousIssues);
+            consolidatedReports.AddRange(miscellaneousReceipts);
+
+            var miscellaneousIssues = _context.MiscellaneousIssues
+                .Where(wr => wr.IsTransact == true && wr.IsActive == true)
+                .Where(x => x.TransactionDate.Date >= fromDate && x.TransactionDate.Date <= toDate)
+                .Join(
+                    _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true),
+                    issue => issue.Id,
+                    details => details.IssuePKey,
+                    (issue, details) => new { Issue = issue, Details = details })
+                .Join(
+                    _context.RawMaterials
+                    .Include(uom => uom.UOM),
+                    result => result.Details.ItemCode,
+                    rawMaterial => rawMaterial.ItemCode,
+                    (result, rawMaterial) => new { Result = result, RawMaterial = rawMaterial })
+                .Join(
+                    _context.ItemCategories,
+                    combined => combined.RawMaterial.ItemCategoryId,
+                    itemCategory => itemCategory.Id,
+                    (combined, itemCategory) => new { Combined = combined, ItemCategory = itemCategory })
+                .Select(consolidated => new ConsolidatedReport
+                {
+                    Id = consolidated.Combined.Result.Issue.Id,
+                    TransactDate = consolidated.Combined.Result.Issue.TransactionDate.ToString("MM-dd-yyyy"),
+                    ItemCode = consolidated.Combined.RawMaterial.ItemCode,
+                    ItemDescription = consolidated.Combined.RawMaterial.ItemDescription,
+                    UOM = consolidated.Combined.RawMaterial.UOM.UOM_Description,
+                    Category = consolidated.ItemCategory.ItemCategoryName,
+                    Quantity = consolidated.Combined.Result.Details.Quantity,
+                    WarehouseId = consolidated.Combined.Result.Details.WarehouseId,
+                    UnitPrice = consolidated.Combined.Result.Details.UnitCost,
+                    TransactionType = "Miscellaneous Issue",
+                    CompanyCode = consolidated.Combined.Result.Issue.CompanyCode,
+                    CompanyName = consolidated.Combined.Result.Issue.CompanyName,
+                    DepartmentCode = consolidated.Combined.Result.Issue.DepartmentCode,
+                    DepartmentName = consolidated.Combined.Result.Issue.DepartmentName,
+                    LocationCode = consolidated.Combined.Result.Issue.LocationCode,
+                    LocationName = consolidated.Combined.Result.Issue.LocationName,
+                    AccountTitleCode = consolidated.Combined.Result.Issue.AccountTitleCode,
+                    AccountTitle = consolidated.Combined.Result.Issue.AccountTitles,
+                    Source = consolidated.Combined.Result.Issue.Id,
+                    Reason = consolidated.Combined.Result.Details.Remarks,
+                    Reference = consolidated.Combined.Result.Details.Customer,
+                    Encoded = consolidated.Combined.Result.Issue.PreparedBy,
+                    Details = consolidated.Combined.Result.Issue.Details,
+                    Status = "-",
+                    MIRId = "-"
+                   
+                })
+                .ToList();
+            consolidatedReports.AddRange(miscellaneousIssues);
+       
 
         var result = consolidatedReports.Select(report => new ConsolidatedReport
         {
@@ -1806,12 +1937,14 @@ public class ReportRepository : IReportRepository
             Reason = report.Reason,
             Encoded = report.Encoded,
             Details = report.Details,
-            Status = report.Status
+            Status = report.Status,
+            MIRId = report.MIRId
         });
 
         return result.ToList();
-    }
 
+    }
+    #region Conso Pagination
     //public async Task<PagedList<ConsolidatedReport>> ConsolidatedReportPagination(string dateFrom, string dateTo, UserParams userParams)
     //{
     //    var fromDate = DateTime.Parse(dateFrom).Date;
@@ -2034,7 +2167,7 @@ public class ReportRepository : IReportRepository
     //    // Convert the list to a paged list and return
     //    return await PagedList<ConsolidatedReport>.CreateAsync(combinedQuery, userParams.PageNumber, userParams.PageSize);
     //}
-
+    #endregion
 
     public async Task<IReadOnlyList<MoveOrderReport>> ApprovedMoveOrderReport(string dateFrom, string dateTo)
     {
@@ -2068,8 +2201,7 @@ public class ReportRepository : IReportRepository
             .Where(x => x.Key.IsReject != true)
             .Select(x => new MoveOrderReport
             {
-                MoveOrderId = x.Key.Id,
-                OrderNo = x.Key.OrderNo,
+                MoveOrderId = x.Key.OrderNo,
                 CustomerName = x.Key.FarmName,
                 CustomerCode = x.Key.FarmCode,
                 ItemCode = x.Key.ItemCode,
@@ -2117,8 +2249,7 @@ public class ReportRepository : IReportRepository
             .Where(x => x.Key.IsReject != true)
             .Select(x => new MoveOrderReport
             {
-                MoveOrderId = x.Key.Id,
-                OrderNo = x.Key.OrderNo,
+                MoveOrderId = x.Key.OrderNo,
                 CustomerName = x.Key.FarmName,
                 CustomerCode = x.Key.FarmCode,
                 ItemCode = x.Key.ItemCode,

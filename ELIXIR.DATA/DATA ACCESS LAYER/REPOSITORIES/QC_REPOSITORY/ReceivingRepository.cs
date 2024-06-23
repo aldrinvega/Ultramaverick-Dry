@@ -166,6 +166,48 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
                 .ToListAsync();
         }
 
+        public async Task<int> GetAllPONotification()
+        {
+            var poSummaryCount = await (from posummary in _context.POSummary
+                                  where posummary.IsActive == true
+                                  join receive in _context.QC_Receiving
+                                      on posummary.Id equals receive.PO_Summary_Id into lejt1
+                                  from receive in lejt1.DefaultIfEmpty()
+                                  join rawmats in _context.RawMaterials on posummary.ItemCode equals rawmats.ItemCode
+                                      into leftJ
+                                  from rawmats in leftJ.DefaultIfEmpty()
+                                  group new
+                                  {
+                                      posummary,
+                                      rawmats,
+                                      receive
+                                  }
+                                  by new
+                                  {
+                                      posummary.Id,
+                                      posummary.PO_Number,
+                                      posummary.PO_Date,
+                                      posummary.PR_Number,
+                                      posummary.PR_Date,
+                                      posummary.ItemCode,
+                                      posummary.ItemDescription,
+                                      Supplier = posummary.VendorName,
+                                      posummary.UOM,
+                                      QuantityOrdered = posummary.Ordered,
+                                      posummary.IsActive,
+                                      IsQcReceiveIsActive = receive == null || receive.IsActive == false || receive.IsActive,
+                                      ActualRemaining = 0,
+                                      Expirable = rawmats != null && rawmats.IsExpirable
+                                  }
+                          into result
+                                  select new
+                                  {
+                                      result.Key.Id
+                                  }).CountAsync();
+
+            return poSummaryCount;
+        }
+
         public async Task<bool> CancelPo(ImportPOSummary summary)
         {
             var existingPo = await _context.POSummary.Where(x => x.Id == summary.Id)
@@ -617,7 +659,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY
 
             return forcancel.ActualGood == 0;
         }
-
+        
         public async Task<PagedList<PoSummaryChecklistDto>> GetAllPoSummaryWithPagination(UserParams userParams)
         {
             var poSummary = (from posummary in _context.POSummary

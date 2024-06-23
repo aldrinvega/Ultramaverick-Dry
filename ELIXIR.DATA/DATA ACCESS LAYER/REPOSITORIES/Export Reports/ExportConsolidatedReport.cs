@@ -51,6 +51,7 @@ public class ExportConsolidatedReportQuery : IRequest<Unit>
 {
     public string DateFrom { get; set; }
     public string DateTo { get; set; }
+    public string Department { get; set; }
 }
 
 public class Handler : IRequestHandler<ExportConsolidatedReportQuery, Unit>
@@ -61,13 +62,12 @@ public class Handler : IRequestHandler<ExportConsolidatedReportQuery, Unit>
     {
         _reportRepository = reportRepository;
     }
-
+    // Handles the export of a consolidated report based on the provided query parameters.
     public async Task<Unit> Handle(ExportConsolidatedReportQuery request, CancellationToken cancellationToken)
     {
-        var orders =
-            await _reportRepository.ConsolidatedReport(request.DateFrom, request.DateTo);
 
-      
+        var orders =
+            await _reportRepository.ConsolidatedReport(request.DateFrom, request.DateTo, request.Department);
 
         using (var workbook = new XLWorkbook())
         {
@@ -75,11 +75,33 @@ public class Handler : IRequestHandler<ExportConsolidatedReportQuery, Unit>
 
             var headers = new List<string>
             {
-                "Transaction Date", "Transaction Id", "Warehouse Id", "Item Code",
-                "Item Description", "Uom", "Quantity", "Unit Price", "Amount", "Transaction Type", "Status",
-                "Source/Move Order", "Reason", "Reference", "Encoded", "Company Code",
-                "Company", "Department Code", "Department", "Location Code", "Location", "Account Title Code",
-                "Account Title", "Category", "Details"
+                "Transaction Date", 
+                "Transaction Id", 
+                "MIR Id",
+                "Warehouse Id", 
+                "Item Code",
+                "Item Description", 
+                "Uom", 
+                "Quantity", 
+                "Unit Price", 
+                "Amount", 
+                "Transaction Type", 
+                "Status",
+                "Source/Move Order", 
+                "Reason", 
+                "Reference", 
+                "Encoded", 
+                "Company Code",
+                "Company", 
+                "Department Code", 
+                "Department", 
+                "Location Code", 
+                "Location", 
+                "Account Title Code",
+                "Account Title", 
+                "Category", 
+                "Details", 
+                "Advance To Employee"
             };
 
             var range = worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, headers.Count));
@@ -89,7 +111,6 @@ public class Handler : IRequestHandler<ExportConsolidatedReportQuery, Unit>
             range.Style.Font.FontColor = XLColor.Black;
             range.Style.Border.TopBorder = XLBorderStyleValues.Thick;
             range.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-            range.SetAutoFilter(true);
 
             for (var index = 1; index <= headers.Count; index++)
             {
@@ -102,36 +123,38 @@ public class Handler : IRequestHandler<ExportConsolidatedReportQuery, Unit>
 
                 row.Cell(1).Value = orders[index - 1].TransactDate;
                 row.Cell(2).Value = orders[index - 1].Id;
-                row.Cell(3).Value = orders[index - 1].WarehouseId;
-                row.Cell(4).Value = orders[index - 1].ItemCode;
-                row.Cell(5).Value = orders[index - 1].ItemDescription;
-                row.Cell(6).Value = orders[index - 1].UOM;
+                row.Cell(3).Value = orders[index - 1].MIRId;
+                row.Cell(4).Value = orders[index - 1].WarehouseId;
+                row.Cell(5).Value = orders[index - 1].ItemCode;
+                row.Cell(6).Value = orders[index - 1].ItemDescription;
+                row.Cell(7).Value = orders[index - 1].UOM;
                 if (orders[index - 1].TransactionType == "Move Order" || orders[index - 1].TransactionType == "Miscellaneous Issue")
                 {
-                    row.Cell(7).Value = "-" + orders[index - 1].Quantity;
+                    row.Cell(8).Value = "-" + orders[index - 1].Quantity;
                 }
                 else
                 {
-                    row.Cell(7).Value = orders[index - 1].Quantity;
+                    row.Cell(8).Value = orders[index - 1].Quantity;
                 }
-                row.Cell(8).Value = orders[index - 1].UnitPrice;
-                row.Cell(9).Value = orders[index - 1].Amount;
-                row.Cell(10).Value = orders[index - 1].TransactionType;
-                row.Cell(11).Value = orders[index - 1].Status;
-                row.Cell(12).Value = orders[index - 1].Source;
-                row.Cell(13).Value = orders[index - 1].Reason;
-                row.Cell(14).Value = orders[index - 1].Reference;
-                row.Cell(15).Value = orders[index - 1].Encoded;
-                row.Cell(16).Value = orders[index - 1].CompanyCode;
-                row.Cell(17).Value = orders[index - 1].CompanyName;
-                row.Cell(18).Value = orders[index - 1].DepartmentCode;
-                row.Cell(19).Value = orders[index - 1].DepartmentName;
-                row.Cell(20).Value = orders[index - 1].LocationCode;
-                row.Cell(21).Value = orders[index - 1].LocationName;
-                row.Cell(22).Value = orders[index - 1].AccountTitleCode;
-                row.Cell(23).Value = orders[index - 1].AccountTitle;
-                row.Cell(24).Value = orders[index - 1].Category;
-                row.Cell(25).Value = orders[index - 1].Details;
+                row.Cell(9).Value = orders[index - 1].UnitPrice;
+                row.Cell(10).Value = orders[index - 1].Amount;
+                row.Cell(11).Value = orders[index - 1].TransactionType;
+                row.Cell(12).Value = orders[index - 1].Status;
+                row.Cell(13).Value = orders[index - 1].Source;
+                row.Cell(14).Value = orders[index - 1].Reason;
+                row.Cell(15).Value = orders[index - 1].Reference;
+                row.Cell(16).Value = orders[index - 1].Encoded;
+                row.Cell(17).Value = orders[index - 1].CompanyCode;
+                row.Cell(18).Value = orders[index - 1].CompanyName;
+                row.Cell(19).Value = orders[index - 1].DepartmentCode;
+                row.Cell(20).Value = orders[index - 1].DepartmentName;
+                row.Cell(21).Value = orders[index - 1].LocationCode;
+                row.Cell(22).Value = orders[index - 1].LocationName;
+                row.Cell(23).Value = orders[index - 1].AccountTitleCode;
+                row.Cell(24).Value = orders[index - 1].AccountTitle;
+                row.Cell(25).Value = orders[index - 1].Category;
+                row.Cell(26).Value = orders[index - 1].Details;
+                row.Cell(27).Value = orders[index - 1].EmployeeName;
             }
 
             worksheet.Columns().AdjustToContents();

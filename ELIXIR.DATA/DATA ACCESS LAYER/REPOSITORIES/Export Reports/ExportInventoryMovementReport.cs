@@ -73,14 +73,13 @@ public class ExportInventoryMovementReport : ControllerBase
                     "Item Code",
                     "Item Description",
                     "Item Category",
-                    "Total Out",
-                    "Total In",
+                    "Move Ordere",
+                    "Misc. Issued",
+                    "Receive",
+                    "Misc. Receipt",
                     "Ending",
-                    "Current Stock",
-                    "Purchased Order",
-                    "Others Plus"
+                    "Current Stock"
                 };
-
 
                 var range = worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, headers.Count));
 
@@ -103,12 +102,12 @@ public class ExportInventoryMovementReport : ControllerBase
                     row.Cell(1).Value = inventoryMovementReport[index - 1].ItemCode;
                     row.Cell(2).Value = inventoryMovementReport[index - 1].ItemDescription;
                     row.Cell(3).Value = inventoryMovementReport[index - 1].ItemCategory;
-                    row.Cell(4).Value = inventoryMovementReport[index - 1].TotalOut;
-                    row.Cell(5).Value = inventoryMovementReport[index - 1].TotalIn;
-                    row.Cell(6).Value = inventoryMovementReport[index - 1].Ending;
-                    row.Cell(7).Value = inventoryMovementReport[index - 1].CurrentStock;
-                    row.Cell(8).Value = inventoryMovementReport[index - 1].PurchasedOrder;
-                    row.Cell(9).Value = inventoryMovementReport[index - 1].OthersPlus;
+                    row.Cell(4).Value = inventoryMovementReport[index - 1].TotalMoveOrderedOut;
+                    row.Cell(5).Value = inventoryMovementReport[index - 1].TotalMiscIssue;
+                    row.Cell(6).Value = inventoryMovementReport[index - 1].TotalReceived;
+                    row.Cell(7).Value = inventoryMovementReport[index - 1].TotalMicReceipt;
+                    row.Cell(8).Value = inventoryMovementReport[index - 1].Ending;
+                    row.Cell(9).Value = inventoryMovementReport[index - 1].CurrentStock;
                 }
 
                 worksheet.Columns().AdjustToContents();

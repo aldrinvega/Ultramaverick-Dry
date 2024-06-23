@@ -91,12 +91,12 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
         //--------------------Transact Move Order--------------------
         Task<IReadOnlyList<OrderDto>> TotalListForTransactMoveOrder(bool status);
         Task<IReadOnlyList<MoveOrderDto>> ListOfMoveOrdersForTransact(int orderid);
-        Task<bool> TransanctListOfMoveOrders(TransactMoveOrder transact);
+        Task<bool> TransanctListOfMoveOrders(TransactMoveOrder[] transact);
 
 
         //-----------------Notifaction---------------------
-        Task<IReadOnlyList<OrderDto>> GetOrdersForNotification();
-        Task<IReadOnlyList<OrderDto>> GetMoveOrdersForNotification();
+        Task<int> GetOrdersForNotification();
+        Task<int> GetMoveOrdersForNotification();
         Task<IReadOnlyList<OrderDto>> GetAllForTransactMoveOrderNotification();
         Task<IReadOnlyList<MoveOrderDto>> GetForApprovalMoveOrderNotification();
         Task<IReadOnlyList<MoveOrderDto>> GetRejectMoveOrderNotification();
@@ -119,6 +119,8 @@ namespace ELIXIR.DATA.CORE.INTERFACES.ORDERING_INTERFACE
 
         //Orders
         Task<bool> AddNewOrders(Ordering[] orders);
+        Task<Ordering[]> ValidateInformation(Ordering[] orders);
+        Task<bool> ValidateCustomer(Ordering orders);
 
     }
 }

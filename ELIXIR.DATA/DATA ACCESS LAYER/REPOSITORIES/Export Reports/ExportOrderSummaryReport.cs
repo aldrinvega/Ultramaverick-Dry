@@ -1,28 +1,33 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
 using ELIXIR.DATA.CORE.INTERFACES.REPORT_INTERFACE;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports.ExportCancelledOrdersReport;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.Export_Reports;
 
 [Route("api/ExportReports"), ApiController]
-public class ExportCancelledOrdersReport : ControllerBase
+public class ExportOrderSummaryReport : ControllerBase
 {
     private readonly IMediator _mediator;
 
-    public ExportCancelledOrdersReport(IMediator mediator)
+    public ExportOrderSummaryReport(IMediator mediator)
     {
         _mediator = mediator;
     }
 
-    [HttpGet("ExportCancelledOrdersReport")]
-    public async Task<IActionResult> Export([FromQuery]ExportCancelledOrderedReportsCommand command)
+    [HttpGet("ExportOrderSummaryReport")]
+    public async Task<IActionResult> Export([FromQuery] ExportOrderSummaryReportQuery command)
     {
-        var filePath = $"Cancelled Orders Report {command.DateFrom}-{command.DateTo}.xlsx";
+        var filePath = $"Order Summary Report {command.DateFrom}-{command.DateTo}.xlsx";
         try
         {
             await _mediator.Send(command);
@@ -44,13 +49,14 @@ public class ExportCancelledOrdersReport : ControllerBase
             return Conflict(e.Message);
         }
     }
-    public class ExportCancelledOrderedReportsCommand : IRequest<Unit>
+
+    public class ExportOrderSummaryReportQuery : IRequest<Unit>
     {
         public string DateFrom { get; set; }
         public string DateTo { get; set; }
     }
 
-    public class Handler : IRequestHandler<ExportCancelledOrderedReportsCommand, Unit>
+    public class Handler : IRequestHandler<ExportOrderSummaryReportQuery, Unit>
     {
         private readonly IReportRepository _reportRepository;
 
@@ -59,9 +65,9 @@ public class ExportCancelledOrdersReport : ControllerBase
             _reportRepository = reportRepository;
         }
 
-        public async Task<Unit> Handle(ExportCancelledOrderedReportsCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(ExportOrderSummaryReportQuery request, CancellationToken cancellationToken)
         {
-            var cancelledOrders = await _reportRepository.CancelledOrderedReports(request.DateFrom, request.DateTo);
+            var orders = await _reportRepository.OrderSummaryReports(request.DateFrom, request.DateTo);
 
             using (var workbook = new XLWorkbook())
             {
@@ -97,30 +103,31 @@ public class ExportCancelledOrdersReport : ControllerBase
                     worksheet.Cell(1, index).Value = headers[index - 1];
                 }
 
-                for (var index = 0; index < cancelledOrders.Count; index++)
+                for (var index = 0; index < orders.Count; index++)
                 {
                     var row = worksheet.Row(index + 2);
 
-                    row.Cell(1).Value = cancelledOrders[index].MirId;
-                    row.Cell(2).Value = cancelledOrders[index].DateNeeded;
-                    row.Cell(3).Value = cancelledOrders[index].DateOrdered;
-                    row.Cell(4).Value = cancelledOrders[index].CustomerCode;
-                    row.Cell(5).Value = cancelledOrders[index].CustomerName;
-                    row.Cell(6).Value = cancelledOrders[index].ItemCode;
-                    row.Cell(7).Value = cancelledOrders[index].ItemDescription;
-                    row.Cell(8).Value = cancelledOrders[index].QuantityOrdered;
-                    row.Cell(9).Value = cancelledOrders[index].Status;
-                    row.Cell(10).Value = cancelledOrders[index].CancelledDate;
-                    row.Cell(11).Value = cancelledOrders[index].CancelledBy;
-                    row.Cell(12).Value = cancelledOrders[index].Reason;
+                    row.Cell(1).Value = orders[index].MirId;
+                    row.Cell(2).Value = orders[index].DateNeeded;
+                    row.Cell(3).Value = orders[index].DateOrdered;
+                    row.Cell(4).Value = orders[index].CustomerCode;
+                    row.Cell(5).Value = orders[index].CustomerName;
+                    row.Cell(6).Value = orders[index].ItemCode;
+                    row.Cell(7).Value = orders[index].ItemDescription;
+                    row.Cell(8).Value = orders[index].QuantityOrdered;
+                    row.Cell(9).Value = orders[index].Status;
+                    row.Cell(10).Value = orders[index].CancelledDate;
+                    row.Cell(11).Value = orders[index].CancelledBy;
+                    row.Cell(12).Value = orders[index].Reason;
                 }
 
                 worksheet.Columns().AdjustToContents();
-                workbook.SaveAs($"Cancelled Orders Report {request.DateFrom}-{request.DateTo}.xlsx");
+                workbook.SaveAs($"Order Summary Report {request.DateFrom}-{request.DateTo}.xlsx");
 
             }
 
             return Unit.Value;
+
         }
     }
 }

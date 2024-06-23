@@ -134,14 +134,10 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.IMPORT_REPOSITORY
         {
             var validate = await _context.RawMaterials.Where(
                     x => x.ItemCode == rawmaterial &&
-                         x.ItemDescription == itemDescription)
-                .Where(x => x.IsActive == true)
+                         x.ItemDescription == itemDescription && x.IsActive == true)
                 .FirstOrDefaultAsync();
 
-            if (validate == null)
-                return false;
-
-            return true;
+            return validate != null;
         }
 
         public async Task<bool> CheckUomCode(string uom)

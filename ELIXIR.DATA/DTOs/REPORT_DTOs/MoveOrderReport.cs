@@ -2,8 +2,8 @@
 {
     public class MoveOrderReport
     {
+        public string MIRId { get; set; }
         public int? MoveOrderId { get; set; }
-        public int? OrderNo { get; set; }
         public string CustomerCode { get; set; }
         public string CustomerName { get; set; }
         public string FarmCode { get; set; }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELIXIR.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20240405000710_RemoveSupplierAndCustomerOnMiscEntities")]
-    partial class RemoveSupplierAndCustomerOnMiscEntities
+    [Migration("20240611124428_AddTransactIdOnMoveOrderEntity")]
+    partial class AddTransactIdOnMoveOrderEntity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -705,6 +705,9 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<DateTime?>("TimeStamp")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Uom")
                         .HasColumnType("nvarchar(max)");
 
@@ -801,6 +804,12 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<string>("ItemDescription")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("MoveOrderCancellationRemarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrderCancellationRemarks")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
@@ -810,7 +819,7 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<int>("OrderNoPKey")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("OriginalQuantityOrdered")
+                    b.Property<decimal?>("OriginalQuantityOrdered")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("PlateNumber")
@@ -822,11 +831,11 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<DateTime?>("PreparedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("PreparingCancellationRemarks")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("QuantityOrdered")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ReceivedDate")
                         .HasColumnType("datetime2");
@@ -836,9 +845,6 @@ namespace ELIXIR.DATA.Migrations
 
                     b.Property<DateTime?>("RejectedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Remarks")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SetBy")
                         .HasColumnType("nvarchar(max)");

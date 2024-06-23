@@ -14,7 +14,7 @@ using ELIXIR.DATA.SERVICES;
 using Microsoft.AspNetCore.SignalR;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIR.DATA.CORE.INTERFACES.ORDER_HUB;
-using Microsoft.EntityFrameworkCore.Query.Internal;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 {
@@ -111,8 +111,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 {
                     ItemCode = total.Key.ItemCode,
                     Reserve = total.Key.ActualGood -
-                              ((total.Key.QuantityOrdered != 0 ? total.Key.QuantityOrdered : 0) +
-                               (total.Key.Quantity != 0 ? total.Key.Quantity : 0))
+                              ((total.Key.QuantityOrdered != null ? total.Key.QuantityOrdered : 0) +
+                               (total.Key.Quantity != null ? total.Key.Quantity : 0))
                 });
 
             var customer = _context.Customers.Select(x => new
@@ -414,6 +414,26 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         {
             orders.IsActive = true;
 
+            var customer = await _context.Customers.Where(customers =>
+            customers.CustomerName == orders.FarmName &&
+            customers.CustomerCode == orders.FarmCode &&
+            customers.IsActive)
+            .FirstOrDefaultAsync();
+
+            if (customer is not null)
+            {
+                orders.CustomerId = customer.Id;
+            }
+
+            var itemDetails = await _context.RawMaterials
+                .Include(x => x.ItemCategory)
+                .FirstOrDefaultAsync(item => item.ItemCode == orders.ItemCode);
+
+            if(itemDetails is not null)
+            {
+                orders.Category = itemDetails.ItemCategory.ItemCategoryName;
+            }
+
             await _context.Orders.AddAsync(orders);
 
             return true;
@@ -434,7 +454,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
 
         public async Task<bool> ValidateCustomerName(Ordering orders)
         {
-            var customername = await _context.Customers.Where(x => x.Id == orders.CustomerId)
+            var customername = await _context.Customers
+                .Where(x => 
+                    x.CustomerName == orders.FarmName)
                 .Where(x => x.IsActive == true)
                 .FirstOrDefaultAsync();
 
@@ -457,6 +479,18 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 return false;
 
             return true;
+        }
+
+        public async Task<bool> ValidateCustomer(Ordering orders)
+        {
+            var customers = await _context.Customers
+                .Where(x => x.CustomerCode == orders.FarmCode && 
+                x.CustomerName == orders.FarmName &&
+                x.Id == orders.CustomerId)
+                .Where(x => x.IsActive == true)
+                .FirstOrDefaultAsync();
+
+            return customers != null;
         }
 
         public async Task<bool> ValidateRawMaterial(Ordering orders)
@@ -500,29 +534,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
         public async Task<PagedList<CustomerListForPreparationSchedule>> GetAllListofOrdersPagination(
             UserParams userParams)
         {
-            //var orders = _context.Orders.OrderBy(x => x.OrderDate)
-            //                            .GroupBy(x => new
-            //                            {
-            //                                x.FarmName,
-            //                                x.IsActive,
-            //                                x.PreparedDate,
-            //                                x.ForAllocation,
-            //                                x.FarmCode,
-            //                                x.FarmType,
-
-            //                            }).Where(x => x.Key.IsActive == true)
-            //                              .Where(x => x.Key.PreparedDate == null)
-            //                              .Where(x => x.Key.ForAllocation == null)
-            //                            .Select(x => new OrderDto
-            //                              {
-            //                                  Farm = x.Key.FarmName,
-            //                                  FarmType = x.Key.FarmType,
-            //                                  FarmCode = x.Key.FarmCode,
-            //                                  IsActive = x.Key.IsActive,
-            //                                  NumberofOrders = x.Count(x => x.ItemCode)
-
-            //                              });
-
             var customers = _context.Customers
                 .Include(x => x.Orders)
                 .Where(x => x.IsActive == true &&
@@ -538,8 +549,6 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     CompanyName = x.CompanyName,
                     LocationName = x.LocationName,
                     FarmName = x.FarmType.FarmName,
-
-                    /*Orders = x.Orders*/
                 });
 
           
@@ -548,27 +557,17 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 userParams.PageSize);
         }
 
-        public async Task<IReadOnlyList<OrderDto>> GetOrdersForNotification()
+        public async Task<int> GetOrdersForNotification()
         {
-            var orders = _context.Orders
-                .OrderBy(x => x.OrderDate)
-                .Where(x => x.IsActive == true)
-                .Where(x => x.PreparedDate == null)
-                .Where(x => x.ForAllocation == null)
-                .Where(x => x.IsCancelledOrder == null)
-                // .Where(x => x.AllocatedQuantity != null || x.QuantityOrdered != null)
-                .GroupBy(x => new
-                {
-                    x.FarmName,
-                    x.IsActive,
-                    x.PreparedDate
-                })
-                .Select(x => new OrderDto
-                {
-                    Farm = x.Key.FarmName,
-                    IsActive = x.Key.IsActive
-                });
-            return await orders.ToListAsync();
+            var orderCount = await _context.Customers
+            .Include(x => x.Orders)
+            .Where(x => x.IsActive == true &&
+                        x.Orders.Any(o => o.IsActive == true &&
+                                          o.PreparedDate == null &&
+                                          o.ForAllocation == null))
+            .CountAsync();
+
+            return orderCount;
         }
 
         public async Task<bool> ValidateOrderAndDateNeeded(Ordering orders)
@@ -1030,6 +1029,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 from moveorder in leftJ.DefaultIfEmpty()
                 group moveorder by new
                 {
+                    ordering.TransactId,
                     ordering.Id,
                     ordering.OrderNoPKey,
                     ordering.OrderDate,
@@ -1050,6 +1050,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 into total
                 select new OrderDto
                 {
+                    TransactionId = total.Key.TransactId,
                     Id = total.Key.Id,
                     OrderNo = total.Key.OrderNoPKey,
                     OrderDate = total.Key.OrderDate.ToString("MM/dd/yyyy"),
@@ -2004,46 +2005,86 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await orders.Where(x => x.OrderNo == orderid).ToListAsync();
         }
 
-        public async Task<bool> TransanctListOfMoveOrders(TransactMoveOrder transact)
+        public async Task<bool> TransanctListOfMoveOrders(TransactMoveOrder[] transacts)
         {
-            var existing = await _context.MoveOrders.Where(x => x.OrderNo == transact.OrderNo).ToListAsync();
-
-            await _context.TransactMoveOrder.AddAsync(transact);
-
-
-            foreach (var items in existing)
+            foreach (var transact in transacts)
             {
-                items.IsTransact = true;
+                // Initialize properties
+                transact.IsActive = true;
+                transact.IsTransact = true;
+                transact.PreparedDate = DateTime.Now;
+
+                var existingTransact = await _context.TransactMoveOrder
+                                                     .FirstOrDefaultAsync(x => x.OrderNo == transact.OrderNo);
+
+                if (existingTransact == null)
+                {
+                    // If it doesn't exist, add the new transact order
+                    await _context.TransactMoveOrder.AddAsync(transact);
+                }
+                else
+                {
+                    // Update existing order if needed
+                    existingTransact.IsActive = transact.IsActive;
+                    existingTransact.IsTransact = transact.IsTransact;
+                    existingTransact.PreparedDate = transact.PreparedDate;
+                }
+
+                // Fetch and update related move orders
+                var relatedMoveOrders = await _context.MoveOrders
+                                                      .Where(x => x.OrderNo == transact.OrderNo && x.IsRejectForPreparation != true)
+                                                      .ToListAsync();
+
+                foreach (var item in relatedMoveOrders)
+                {
+                    item.IsTransact = true;
+                }
             }
 
+            await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<IReadOnlyList<OrderDto>> GetMoveOrdersForNotification()
-        {
-            var orders = _context.Orders
-                .Where(o => o.IsActive
-                            && o.IsApproved == true
-                            && !o.IsMove
-                            && o.IsCancelledOrder == null
-                            && !o.IsCancel == null)
-                .GroupBy(o => new
-                {
-                    o.FarmName,
-                    o.IsActive,
-                    o.IsApproved,
-                    o.IsMove,
-                    o.IsCancelledOrder,
-                    o.IsCancel
-                })
-                .Select(g => new OrderDto
-                {
-                    Farm = g.Key.FarmName,
-                    IsActive = g.Key.IsActive,
-                    IsApproved = g.Key.IsApproved ?? false
-                });
 
-            return await orders.ToListAsync();
+        public async Task<int> GetMoveOrdersForNotification()
+        {
+            var count = await _context.Orders
+            .Join(_context.Customers, order => order.FarmName, customer => customer.CustomerName,
+                (order, customer) => new { Order = order, Customer = customer })
+            .Join(_context.Farms, joined => joined.Customer.FarmTypeId, farm => farm.Id,
+                (joined, farm) => new { OrderCustomer = joined, Farm = farm })
+            .GroupBy(x => new
+            {
+                x.OrderCustomer.Order.FarmName,
+                x.OrderCustomer.Order.IsActive,
+                x.OrderCustomer.Order.IsApproved,
+                x.OrderCustomer.Order.PreparedDate,
+                x.OrderCustomer.Order.IsMove,
+                x.OrderCustomer.Customer.Id,
+                x.OrderCustomer.Customer.CompanyCode,
+                x.OrderCustomer.Customer.CompanyName,
+                x.OrderCustomer.Customer.DepartmentName,
+                x.OrderCustomer.Customer.LocationName,
+                x.OrderCustomer.Order.IsCancelledOrder,
+                x.OrderCustomer.Order.IsCancel,
+                FarmType = x.Farm.FarmName
+            })
+            .Where(x => x.Key.IsActive == true && x.Key.IsApproved == true && x.Key.PreparedDate != null
+                        && x.Key.IsMove == false && x.Key.IsCancelledOrder == null && x.Key.IsCancel == null)
+            .Select(x => new CustomersForMoveOrderDTO
+            {
+                Farm = x.Key.FarmName,
+                IsActive = x.Key.IsActive,
+                IsApproved = x.Key.IsApproved != null,
+                CustomerId = x.Key.Id,
+                CompanyCode = x.Key.CompanyCode,
+                CompanyName = x.Key.CompanyName,
+                DepartmentName = x.Key.DepartmentName,
+                LocationName = x.Key.LocationName,
+                FarmType = x.Key.FarmType
+            }).Distinct().CountAsync();
+
+            return count;
         }
 
         public async Task<IReadOnlyList<OrderDto>> GetAllForTransactMoveOrderNotification()
@@ -2629,6 +2670,24 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
             return await PagedList<MoveOrderDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
         }
 
-        
+        public async Task<Ordering[]> ValidateInformation(Ordering[] orders)
+        {
+            foreach (var order in orders)
+            {
+                var items = await _context.RawMaterials
+                    .Include(ic => ic.ItemCategory)
+                    .Include(uom => uom.UOM)
+                    .FirstOrDefaultAsync(item => item.ItemCode == order.ItemCode);
+
+                var customer = await _context.Customers.FirstOrDefaultAsync(customer => customer.CustomerName == order.FarmName);
+
+                order.ItemDescription = items.ItemDescription;
+                order.Category = items.ItemCategory.ItemCategoryName;
+                order.Uom = items.UOM.UOM_Description;
+                order.FarmCode = customer.CustomerCode;
+            }
+
+            return orders;
+        }
     }
 }

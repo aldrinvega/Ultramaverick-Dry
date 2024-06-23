@@ -468,9 +468,9 @@ namespace ELIXIR.API.Controllers.QC_CONTROLLER
             var mixingcount = listofmixing.Count();
 
             //OrderingCount
-            var orderingfarmcount = orderingfarm.Count();
+            var orderingfarmcount = orderingfarm;
             var orderingapprovalcount = orderingapproval.Count();
-            var moveordercount = moveorderlist.Count();
+            var moveordercount = moveorderlist;
             var transactmoveordercount = transactmoveorderlist.Count();
             var forapprovallistcount = forapprovallist.Count();
             var rejectlistcount = rejectlist.Count();

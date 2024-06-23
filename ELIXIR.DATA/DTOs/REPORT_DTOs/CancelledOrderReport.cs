@@ -8,7 +8,7 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
 {
     public class CancelledOrderReport
     {
-
+        public string MirId { get; set; }
         public int OrderId { get; set; }
         public string DateOrdered { get; set; }
         public string DateNeeded { get; set; }
@@ -20,7 +20,9 @@ namespace ELIXIR.DATA.DTOs.REPORT_DTOs
         public string CancelledDate { get; set; }
         public string Reason { get; set; }
         public string CancelledBy { get; set; }
-
+        public string Uom { get; set; }
+        public string Category { get; set; }
+        public string Status { get; set; }
 
     }
 }

@@ -4,6 +4,10 @@ using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using System.Drawing;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using System.Collections.Generic;
+using Asp.Versioning;
+using DocumentFormat.OpenXml.Bibliography;
 
 namespace ELIXIR.API.Controllers.REPORT_CONTROLLER
 {
@@ -419,9 +423,9 @@ namespace ELIXIR.API.Controllers.REPORT_CONTROLLER
 
         [HttpGet]
         [Route("ConsolidatedReport")]
-        public async Task<IActionResult> ConsolidatedReports([FromQuery] string dateFrom, [FromQuery] string dateTo)
+        public async Task<IActionResult> ConsolidatedReports([FromQuery] string dateFrom, [FromQuery] string dateTo, [FromQuery] string Department)
         {
-            var consolidatedReport = await _unitOfWork.Report.ConsolidatedReport(dateFrom, dateTo);
+            var consolidatedReport = await _unitOfWork.Report.ConsolidatedReport(dateFrom, dateTo, Department);
 
             return Ok(consolidatedReport);
         }
@@ -530,6 +534,36 @@ namespace ELIXIR.API.Controllers.REPORT_CONTROLLER
                 itemsWithBbd.TotalPages,
                 itemsWithBbd.HasPreviousPage,
                 itemsWithBbd.HasNextPage
+            };
+
+            return Ok(result);
+        }
+        [HttpGet]
+        [Route("OrderSummaryReportsPagination")]
+        public async Task<IActionResult> OrderSummaryReportPagination([FromQuery] string dateFrom,
+          [FromQuery] string dateTo, [FromQuery] UserParams userParams)
+        {
+            var orderSummaryReports = await _unitOfWork.Report
+                .OrderSummaryReportsPagination(dateFrom, dateTo, userParams);
+
+            Response.AddPaginationHeader(
+                orderSummaryReports.CurrentPage,
+                orderSummaryReports.PageSize,
+                orderSummaryReports.TotalCount,
+                orderSummaryReports.TotalPages,
+                orderSummaryReports.HasPreviousPage,
+                orderSummaryReports.HasNextPage
+                );
+
+            var result = new
+            {
+                orderSummaryReports,
+                orderSummaryReports.CurrentPage,
+                orderSummaryReports.PageSize,
+                orderSummaryReports.TotalCount,
+                orderSummaryReports.TotalPages,
+                orderSummaryReports.HasPreviousPage,
+                orderSummaryReports.HasNextPage
             };
 
             return Ok(result);

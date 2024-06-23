@@ -82,7 +82,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                     ItemCode = rawmaterial.ItemCode,
                     ItemDescription = rawmaterial.ItemDescription,
                     ItemCategory = category.ItemCategoryName,
-                    Uom = uom.UOM_Code,
+                    Uom = uom.UOM_Description,
                     BufferLevel = rawmaterial.BufferLevel,
                     DateAdded = (rawmaterial.DateAdded).ToString("MM/dd/yyyy"),
                     AddedBy = rawmaterial.AddedBy,

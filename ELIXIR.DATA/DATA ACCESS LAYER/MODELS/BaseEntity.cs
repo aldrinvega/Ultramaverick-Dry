@@ -1,11 +1,6 @@
-﻿using System;
+﻿namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
 
-namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
+public class BaseEntity
 {
-    public class BaseEntity
-    {
-        public int Id { get; set; }
-        
-
-    }
+    public int Id { get; set; }
 }

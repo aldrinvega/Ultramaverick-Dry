@@ -5,84 +5,22 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
 
 public class Ordering : BaseEntity
 {
-
-    public int TransactId
-    {
-        get;
-        set;
-    }
-    public string CustomerName
-    {
-        get;
-        set;
-    }
-    public string CustomerPosition
-    {
-        get;
-        set;
-    }
-    public string FarmType
-    {
-        get;
-        set;
-    }
-    public string FarmCode
-    {
-        get;
-        set;
-    }
-    public string FarmName
-    {
-        get;
-        set;
-    }
-    public int OrderNo
-    {
-        get;
-        set;
-    }
-    public string BatchNo
-    {
-        get;
-        set;
-    }
-
-    public DateTime OrderDate
-    {
-        get;
-        set;
-    }
-    public DateTime DateNeeded
-    {
-        get;
-        set;
-    }
-    public string TimeNeeded
-    {
-        get;
-        set;
-    }
-    public string TransactionType
-    {
-        get;
-        set;
-    }
-    public string ItemCode
-    {
-        get;
-        set;
-    }
-    public string ItemDescription
-    {
-        get;
-        set;
-    }
-    public string Uom
-    {
-        get;
-        set;
-    }
-    public decimal OriginalQuantityOrdered { get; set; }
+    public int TransactId { get; set; }
+    public string CustomerName { get; set; }
+    public string CustomerPosition { get; set; }
+    public string FarmType { get; set; }
+    public string FarmCode { get; set; }
+    public string FarmName { get; set; }
+    public int OrderNo { get; set; }
+    public string BatchNo { get; set; }
+    public DateTime OrderDate { get; set; }
+    public DateTime DateNeeded { get; set; }
+    public string TimeNeeded { get; set; }
+    public string TransactionType { get; set; }
+    public string ItemCode { get; set; }
+    public string ItemDescription { get; set; }
+    public string Uom { get; set; }
+    public decimal? OriginalQuantityOrdered { get; set; }
     public decimal QuantityOrdered { get; set; }
     public string Category { get; set; }
     public bool IsActive { get; set; }
@@ -112,5 +50,4 @@ public class Ordering : BaseEntity
     public int? CustomerId { get; set; }
     public string MoveOrderCancellationRemarks { get; set; }
     public string PreparingCancellationRemarks { get; set; }
-
 }

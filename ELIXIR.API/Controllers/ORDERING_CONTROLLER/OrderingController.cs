@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 using ELIXIR.DATA.CORE.INTERFACES.ORDER_HUB;
 using ELIXIR.DATA.SERVICES;
 using Microsoft.AspNetCore.SignalR;
+using Asp.Versioning;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using DocumentFormat.OpenXml.ExtendedProperties;
 
 namespace ELIXIR.API.Controllers.ORDERING_CONTROLLER;
 
@@ -108,29 +111,35 @@ public class OrderingController : BaseApiController
         return Ok(orders);
     }
 
+    
     [HttpPost]
     [Route("ValidateNewOrders")]
     public async Task<IActionResult> ValidateNewOrders([FromBody] Ordering[] order)
     {
-        List<Ordering> notExistFarmName = new List<Ordering>();
-        List<Ordering> notExistFarmCode = new List<Ordering>();
-        List<Ordering> notExistRawMats = new List<Ordering>();
-        List<Ordering> notExistUom = new List<Ordering>();
-        List<Ordering> duplicateList = new List<Ordering>();
-        List<Ordering> previousdateNeeded = new List<Ordering>();
-        List<Ordering> filteredOrders = new List<Ordering>();
-        List<Ordering> orderList = new List<Ordering>();
+        var notExistFarmName = new List<Ordering>();
+        var notExistFarmCode = new List<Ordering>();
+        var notExistRawMats = new List<Ordering>();
+        var notExistUom = new List<Ordering>();
+        var duplicateList = new List<Ordering>();
+        var previousdateNeeded = new List<Ordering>();
+        var filteredOrders = new List<Ordering>();
+        var orderList = new List<Ordering>();
+        var notExistCustomer = new List<Ordering>();
 
-        foreach (Ordering items in order)
+        foreach (var items in order)
         {
             var validateDuplicate = await _unitOfWork.Order.ValidateExistingOrders(items);
             var validateFarmName = await _unitOfWork.Order.ValidateCustomerName(items);
             var validateFarmCode = await _unitOfWork.Order.ValidateCustomerCode(items);
             var validateRawMaterial = await _unitOfWork.Order.ValidateRawMaterial(items);
             var validateUom = await _unitOfWork.Order.ValidateUom(items);
+            //var validateCustomer = await _unitOfWork.Order.ValidateCustomer(items);
             // var validateDateNeeded = await _unitOfWork.Order.ValidateOrderAndDateNeeded(items);
 
-
+            //if(validateCustomer == false)
+            //{
+            //    notExistCustomer.Add(items);
+            //}
             if (validateDuplicate == false)
             {
                 duplicateList.Add(items);
@@ -179,12 +188,13 @@ public class OrderingController : BaseApiController
             notExistFarmCode,
             notExistRawMats,
             notExistUom,
-            previousdateNeeded
+            previousdateNeeded,
+            notExistCustomer,
         };
         await _unitOfWork.Order.ValidateIfForAllocation(orderList);
 
         if (notExistFarmName.Count == 0 && notExistFarmCode.Count == 0 && notExistRawMats.Count == 0
-            && notExistUom.Count == 0 && duplicateList.Count == 0 && previousdateNeeded.Count == 0)
+            && notExistUom.Count == 0 && duplicateList.Count == 0 && previousdateNeeded.Count == 0 && notExistCustomer.Count == 0)
         {
             
             await _unitOfWork.CompleteAsync();
@@ -425,7 +435,7 @@ public class OrderingController : BaseApiController
     [Route("AddDeliveryStatus")]
     public async Task<IActionResult> AddDeliveryStatus([FromBody] OrderDto[] order)
     {
-        foreach (OrderDto items in order)
+        foreach (var items in order)
         {
             await _unitOfWork.Order.AddDeliveryStatus(items);
         }
@@ -720,20 +730,13 @@ public class OrderingController : BaseApiController
 
     [HttpPost]
     [Route("TransactListOfMoveOrders")]
-    public async Task<IActionResult> TransactListOfMoveOrders([FromBody] TransactMoveOrder[] transact)
+    public async Task<IActionResult> TransactListOfMoveOrders([FromBody] TransactMoveOrder[] transacts)
     {
-        foreach (TransactMoveOrder items in transact)
-        {
-            items.IsActive = true;
-            items.IsTransact = true;
-            items.PreparedDate = DateTime.Now;
-
-            await _unitOfWork.Order.TransanctListOfMoveOrders(items);
-        }
+        await _unitOfWork.Order.TransanctListOfMoveOrders(transacts);
 
         await _unitOfWork.CompleteAsync();
 
-        return Ok(transact);
+        return Ok(transacts);
     }
 
     ////NEW METHODS////
@@ -850,5 +853,5 @@ public class OrderingController : BaseApiController
         return new JsonResult("Something Wrong");
     }
 
-    
+
 }

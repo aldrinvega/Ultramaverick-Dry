@@ -702,6 +702,9 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<DateTime?>("TimeStamp")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Uom")
                         .HasColumnType("nvarchar(max)");
 
@@ -813,7 +816,7 @@ namespace ELIXIR.DATA.Migrations
                     b.Property<int>("OrderNoPKey")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("OriginalQuantityOrdered")
+                    b.Property<decimal?>("OriginalQuantityOrdered")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("PlateNumber")

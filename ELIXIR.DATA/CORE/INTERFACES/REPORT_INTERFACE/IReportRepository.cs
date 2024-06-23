@@ -23,7 +23,7 @@ public interface IReportRepository
     Task<IReadOnlyList<InventoryMovementReport>> InventoryMovementReport(string DateFrom, string DateTo,
         string PlusOne);
 
-    Task<IReadOnlyList<ConsolidatedReport>> ConsolidatedReport(string dateFrom, string dateTo);
+    Task<IReadOnlyList<ConsolidatedReport>> ConsolidatedReport(string dateFrom, string dateTo, string Department);
     Task<IReadOnlyList<MoveOrderReport>> ApprovedMoveOrderReport(string dateFrom, string dateTo);
     Task<IReadOnlyList<OrderVsServeReportsDTO>> OrderVsServeReports(string dateFrom, string dateTo);
     Task<PagedList<OrderVsServeReportsDTO>> OrderVsServeReportsPagination(string dateFrom, string dateTo,
@@ -44,5 +44,6 @@ public interface IReportRepository
     Task<PagedList<InventoryMovementReport>> InventoryMovementReportPagination(string DateFrom,
     string DateTo, string PlusOne, UserParams userParams);
     Task<PagedList<MoveOrderReport>> ApprovedMoveOrderReportPagination(string dateFrom, string dateTo, UserParams userParams);
-
+    Task<IReadOnlyList<CancelledOrderReport>> OrderSummaryReports(string DateFrom, string DateTo);
+    Task<PagedList<CancelledOrderReport>> OrderSummaryReportsPagination(string DateFrom, string DateTo, UserParams userParams);
 }

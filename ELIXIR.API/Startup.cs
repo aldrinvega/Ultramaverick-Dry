@@ -41,14 +41,10 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-        //     services.AddControllers()
-        //.AddJsonOptions(options =>
-        //{
-        //    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-        
-        //    options.JsonSerializerOptions.MaxDepth = 32;
-        //});
-
+        services.AddMediatR(x =>
+        {
+            x.RegisterServicesFromAssemblies(typeof(Program).Assembly);
+        });
         services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(AddNewChecklistQuestionCommand).Assembly));
         services.AddMediatR(x =>
             x.RegisterServicesFromAssemblies(typeof(GetAllChecklists.GetAllChecklistsQuery).Assembly));
@@ -84,7 +80,7 @@ public class Startup
         services.AddScoped<IOrdering, OrderingRepository>();
 
         services.AddDbContext<StoreContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("LiveConnection")));
+            options.UseSqlServer(Configuration.GetConnectionString("Docker")).EnableDetailedErrors());
 
         services.Configure<ApiBehaviorOptions>(options =>
         {
@@ -103,13 +99,6 @@ public class Startup
                 return new BadRequestObjectResult(errorResponse);
             };
         });
-
-        //services.AddHttpsRedirection(options =>
-        //{
-        //    options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
-        //    options.HttpsPort = 82;
-        /// sample
-        //});
 
         services.AddApplicationServices();
 

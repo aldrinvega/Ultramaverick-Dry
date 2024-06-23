@@ -5,14 +5,14 @@
 namespace ELIXIR.DATA.Migrations
 {
     /// <inheritdoc />
-    public partial class AddReasonOnOrderEntityForCancellationOfOrders : Migration
+    public partial class AddTransactIdOnMoveOrderEntity : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "Reason",
-                table: "Orders",
+                name: "TransactionId",
+                table: "MoveOrders",
                 type: "nvarchar(max)",
                 nullable: true);
         }
@@ -21,8 +21,8 @@ namespace ELIXIR.DATA.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Reason",
-                table: "Orders");
+                name: "TransactionId",
+                table: "MoveOrders");
         }
     }
 }
