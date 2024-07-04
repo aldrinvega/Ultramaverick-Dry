@@ -24,6 +24,8 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questio
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY;
 using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions.AddNewChecklistQuestions;
+using Carter;
+using ELIXIR.API.Features.Setup.User_Roles;
 
 namespace ELIXIR.API;
 
@@ -78,7 +80,6 @@ public class Startup
         services.AddScoped<IReportRepository, ReportRepository>();
         services.AddScoped<IRawMaterialRepository, RawMaterialRepository>();
         services.AddScoped<IOrdering, OrderingRepository>();
-
         services.AddDbContext<StoreContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("Docker")).EnableDetailedErrors());
 
@@ -116,6 +117,7 @@ public class Startup
 
         services.AddControllers();
         services.AddSignalR();
+        services.AddCarter();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -132,6 +134,7 @@ public class Startup
         app.UseCors(_policyName);
 
         app.UseAuthorization();
+       
         //app.ApplyMigrations();
 
         app.UserSwaggerDocumentation();
@@ -143,6 +146,7 @@ public class Startup
             endpoints.MapSwagger();
             endpoints.MapControllers();
             endpoints.MapHub<OrderHub>("moveorder");
+            endpoints.MapCarter();
         });
     }
 }

@@ -852,6 +852,4 @@ public class OrderingController : BaseApiController
 
         return new JsonResult("Something Wrong");
     }
-
-
 }

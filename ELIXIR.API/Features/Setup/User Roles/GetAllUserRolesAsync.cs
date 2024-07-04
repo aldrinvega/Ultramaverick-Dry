@@ -11,39 +11,9 @@ namespace ELIXIR.API.Features.Setup.User_Roles;
 
 [Route("api/Roles"), ApiController]
 
-public class GetAllUserRolesAsync : ControllerBase
+public class GetAllUserRolesAsync
 {
-    private readonly IMediator _mediator;
-
-    public GetAllUserRolesAsync(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
-    [HttpGet("page")]
-    public async Task<IActionResult> GetUserRoles([FromQuery] GetAllUserRolesAsyncQuery request)
-    {
-        var roles = await _mediator.Send(request);
-        Response.AddPaginationHeader(
-            roles.CurrentPage, 
-            roles.PageSize, 
-            roles.TotalCount, 
-            roles.TotalPages, 
-            roles.HasNextPage, 
-            roles.HasPreviousPage);
-
-        var rolesResult = new
-        {
-            roles,
-            roles.CurrentPage,
-            roles.PageSize,
-            roles.TotalCount,
-            roles.TotalPages,
-            roles.HasNextPage,
-            roles.HasPreviousPage
-        };
-        return Ok(rolesResult);
-    }
+    
     public class GetAllUserRolesAsyncQuery : UserParams, IRequest<PagedList<GetAllUserRolesAsyncResult>>
     {
         public string Search { get; set; }

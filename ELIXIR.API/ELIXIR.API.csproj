@@ -16,6 +16,7 @@
     <PackageReference Include="Asp.Versioning.Mvc" Version="7.1.1" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.1.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Carter" Version="7.2.0" />
     <PackageReference Include="ClosedXML" Version="0.103.0-beta" />
     <PackageReference Include="EPPlus" Version="5.8.4" />
     <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
