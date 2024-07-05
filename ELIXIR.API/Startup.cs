@@ -134,8 +134,8 @@ public class Startup
         app.UseCors(_policyName);
 
         app.UseAuthorization();
-       
-        //app.ApplyMigrations();
+
+        app.ApplyMigrations();
 
         app.UserSwaggerDocumentation();
         app.UseDefaultFiles();

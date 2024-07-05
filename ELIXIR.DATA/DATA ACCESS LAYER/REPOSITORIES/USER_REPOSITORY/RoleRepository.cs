@@ -307,9 +307,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES
                                            ModuleId = rolemodule.Id,
                                            IsActive = rolemodule.IsActive,
                                          
-                                       })
-                                            .Where(x => x.IsActive == true)
-                                            .ToListAsync();
+                                       }).Where(x => x.IsActive == true)
+                                         .ToListAsync();
         }
 
         public async Task<IReadOnlyList<RoleDto>> GetRoleByStatus(bool status)

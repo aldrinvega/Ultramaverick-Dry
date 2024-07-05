@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ELIXIR.API.Common;
@@ -6,6 +8,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using RDF.Arcana.API.Common;
 
 namespace ELIXIR.API.Features.Setup.User_Roles;
 
@@ -24,15 +27,26 @@ public class AddNewUserRole
         {
             _context = context;
         }
-
         async Task<Result> IRequestHandler<AddNewUserRoleCommand, Result>.Handle(AddNewUserRoleCommand request, CancellationToken cancellationToken)
         {
+            List<Error> errors = new();
+
             var existingRole = await _context.Roles.AnyAsync(r => r.RoleName == request.RoleName);
 
             if (existingRole)
             {
-                return UserRoleErrors.UserRoleAlreadyExist(request.RoleName);
-            };
+                errors.Add(UserRoleErrors.UserRoleAlreadyExist(request.RoleName));
+            }
+
+            if (string.IsNullOrEmpty(request.RoleName))
+            {
+                errors.Add(UserRoleErrors.RoleNameRequired());
+            }
+
+            if (errors.Any())
+            {
+                return Result.Failure(errors);
+            }
 
             var role = new UserRole
             {
@@ -47,5 +61,6 @@ public class AddNewUserRole
             await _context.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
+
     }
 }

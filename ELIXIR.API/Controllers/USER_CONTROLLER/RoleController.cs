@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ELIXIR.API.Controllers
 {
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [ApiExplorerSettings(IgnoreApi = false)]
    // [EnableCors("CorsPolicy")]
 
     public class RoleController : BaseApiController
@@ -23,6 +23,7 @@ namespace ELIXIR.API.Controllers
 
         }
 
+        //Done
         [HttpGet]
         [Route("GetAllRoles")]
         public async Task<IActionResult> Get()
@@ -32,6 +33,7 @@ namespace ELIXIR.API.Controllers
             return Ok(roles);
         }
 
+       //Done
         [HttpGet]
         [Route("GetUntagModuleByRoleId/{id}/{menuid}")]
         public async Task<IActionResult> GetAllAvailableModule(int id, int menuid)
@@ -42,6 +44,7 @@ namespace ELIXIR.API.Controllers
             return Ok(roles);
         }
 
+        //Done
         [HttpGet]
         [Route("GetAllRolesWithPagination/{status}")]
         public async Task<ActionResult<IEnumerable<RoleDto>>> GetAllRolesWithPagination([FromRoute] bool status, [FromQuery] UserParams userParams)
@@ -64,6 +67,7 @@ namespace ELIXIR.API.Controllers
             return Ok(roleResult);
         }
 
+        //Done
         [HttpGet]
         [Route("GetAllRolesWithPaginationOrig/{status}")]
         public async Task<ActionResult<IEnumerable<RoleDto>>> GetAllUsersWithPaginationOrig([FromRoute] bool status, [FromQuery] UserParams userParams, [FromQuery] string search)
@@ -92,6 +96,7 @@ namespace ELIXIR.API.Controllers
             return Ok(roleResult);
         }
 
+        //Done
         [HttpGet]
         [Route("GetAllRoleModules")]
         public async Task<IActionResult> GetRoleModules()
@@ -113,6 +118,7 @@ namespace ELIXIR.API.Controllers
             return Ok(roles);
         }
 
+        //Done
         [HttpGet]
         [Route("GetRolesByStatus/{status}")]
         public async Task<IActionResult> GetRolesByStatus(bool status)
@@ -125,6 +131,7 @@ namespace ELIXIR.API.Controllers
             return Ok(roles);
         }
 
+        //Done
         [HttpPost]
         [Route("AddNewRole")]
         public async Task<IActionResult> CreateRole(UserRole role)
@@ -142,6 +149,7 @@ namespace ELIXIR.API.Controllers
             return new JsonResult("Something went Wrong!") { StatusCode = 500 };
         }
 
+        //Done
         [HttpPut]
         [Route("UpdateRole/{id}")]
         public async Task<IActionResult> UpdateRole(int id, [FromBody] UserRole role)
@@ -155,6 +163,7 @@ namespace ELIXIR.API.Controllers
             return new JsonResult("Successfully Updated!");
         }
 
+        //Done
         [HttpPut]
         [Route("InActiveRole/{id}")]
         public async Task<IActionResult> InActiveRole(int id, [FromBody] UserRole role)
@@ -168,6 +177,7 @@ namespace ELIXIR.API.Controllers
             return new JsonResult("Successfully InActive Role!");
         }
 
+        //Done
         [HttpPut]
         [Route("ActivateRole/{id}")]
         public async Task<IActionResult> ActivateRole(int id, [FromBody] UserRole role)
@@ -181,6 +191,7 @@ namespace ELIXIR.API.Controllers
             return new JsonResult("Successfully Activate Role!");
         }
 
+        //Done
         [HttpGet]
         [Route("GetAllActiveRoles")]
         public async Task<IActionResult> GetAllActive()
@@ -190,6 +201,7 @@ namespace ELIXIR.API.Controllers
             return Ok(role);
         }
 
+        //Done
         [HttpGet]
         [Route("GetAllInActiveRoles")]
         public async Task<IActionResult> GetAllInActive()
@@ -208,6 +220,7 @@ namespace ELIXIR.API.Controllers
             return Ok(rolemodule);
         }
 
+        //Done
         [HttpGet]
         [Route("GetRoleModulebyId/{id}/{menuid}")]
         public async Task<IActionResult> GetRoleModuleById(int id, int menuid)
@@ -251,6 +264,7 @@ namespace ELIXIR.API.Controllers
             return new JsonResult("Successfully Tag Module!");
         }
 
+        //Done
         [HttpPut]
         [Route("UntagModule")]
         public async Task<IActionResult> UntagModule([FromBody] UserRole_Modules[] rolemodule)
@@ -273,6 +287,7 @@ namespace ELIXIR.API.Controllers
             }
         }
 
+        //Done
         [HttpPut]
         [Route("TagModuleinRole")]
         public async Task<IActionResult> ActivateTagModuleinRole([FromBody] UserRole_Modules[] rolemodule)
@@ -292,6 +307,7 @@ namespace ELIXIR.API.Controllers
             return new JsonResult("Successfully Activated Tag Modules!");
         }
 
+        //Done
         [HttpGet]
         [Route("GetRoleModuleWithId/{id}")]
         public async Task<IActionResult> GetRoleModuleWithId(int id)

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
 {
@@ -19,6 +20,9 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
             get; 
             set; 
         }
+
+        public virtual UserRole Role { get; set; }
+        public virtual Module Module { get; set; }
         
     }
 }

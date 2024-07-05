@@ -21,6 +21,12 @@ public class UpdateUserRole
     public class Handler : IRequestHandler<UpdateUserRoleCommand, Result>
     {
         private readonly StoreContext _context;
+
+        public Handler(StoreContext context)
+        {
+            _context = context;
+        }
+
         public async Task<Result> Handle(UpdateUserRoleCommand request, CancellationToken cancellationToken)
         {
             var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
@@ -38,6 +44,8 @@ public class UpdateUserRole
             {
                 role.ModifiedBy = "Admin";
             }
+
+            await _context.SaveChangesAsync(cancellationToken);
 
             return Result.Success();
         }
