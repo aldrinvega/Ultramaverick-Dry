@@ -25,7 +25,6 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY;
 using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions.AddNewChecklistQuestions;
 using Carter;
-using ELIXIR.API.Features.Setup.User_Roles;
 
 namespace ELIXIR.API;
 
@@ -101,6 +100,18 @@ public class Startup
             };
         });
 
+        //services.AddApiVersioning(options =>
+        //{
+        //    options.DefaultApiVersion = new ApiVersion(1);
+        //    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+
+        //})
+        //  .AddApiExplorer(options =>
+        //  {
+        //      options.GroupNameFormat = "'v'VVV";
+        //      options.SubstituteApiVersionInUrl = true;
+        //  });
+
         services.AddApplicationServices();
 
         services.AddSwaggerDocumentation();
@@ -110,8 +121,8 @@ public class Startup
             opt.AddPolicy(name: _policyName, builder =>
             {
                 builder.AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
+                       .AllowAnyHeader()
+                       .AllowAnyMethod();
             });
         });
 
@@ -135,12 +146,11 @@ public class Startup
 
         app.UseAuthorization();
 
-        app.ApplyMigrations();
+        //app.ApplyMigrations();
 
         app.UserSwaggerDocumentation();
         app.UseDefaultFiles();
         app.UseStaticFiles();
-
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapSwagger();

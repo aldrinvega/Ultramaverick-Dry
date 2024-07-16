@@ -159,7 +159,6 @@ public class ReportRepository : IReportRepository
 
         return await PagedList<WarehouseReport>.CreateAsync(warehouse, userParams.PageNumber, userParams.PageSize);
     }
-
     //Transformation Report
     public async Task<IReadOnlyList<TransformationReport>> TransformationReport(string DateFrom, string DateTo)
     {

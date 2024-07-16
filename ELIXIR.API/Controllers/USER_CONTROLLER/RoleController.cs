@@ -3,7 +3,6 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
 using ELIXIR.DATA.DTOs;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -106,6 +105,7 @@ namespace ELIXIR.API.Controllers
             return Ok(rolemodules);
         }
 
+        //Not In Use
         [HttpGet]
         [Route("GetbyId/{id}")]
         public async Task<IActionResult> GetRoles(int id)
@@ -230,6 +230,8 @@ namespace ELIXIR.API.Controllers
             return Ok(rolemodule);
         }
 
+
+        //Not In Used
         [HttpGet]
         [Route("GetRoleModuleByIdAndParentId/{id}/{status}/{menuid}")]
         public async Task<IActionResult> GetRoleModuleByIdAndParentId(int id, string status, int menuid)
@@ -239,7 +241,7 @@ namespace ELIXIR.API.Controllers
             return Ok(rolemodule);
         }
 
-
+        //Done
         [HttpPost]
         [Route("TagandModules")]
         public async Task<IActionResult> TagModules([FromBody] UserRole_Modules[] roleModule)

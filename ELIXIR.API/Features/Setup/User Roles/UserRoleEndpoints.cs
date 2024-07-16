@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Asp.Versioning;
+using Asp.Versioning.Builder;
 using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -22,6 +24,12 @@ public class UserRoleEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
+        //ApiVersionSet apiVersionSet = app.NewApiVersionSet()
+        // .HasApiVersion(new ApiVersion(1))
+        // .ReportApiVersions()
+        // .Build();
+
+        //Comment
         var group = app.MapGroup("api/user-roles");
 
         group.MapPost("", AddNewUserRole);
@@ -36,6 +44,7 @@ public class UserRoleEndpoints : ICarterModule
         group.MapPatch("/untag", UntagModule);
         group.MapPatch("/tag", TagModule);
     }
+
 
     public static async Task<IResult> AddNewUserRole(AddNewUserRoleCommand request, IMediator _mediator)
     {
@@ -156,4 +165,6 @@ public class UserRoleEndpoints : ICarterModule
         var result = await _mediator.Send(query);
         return Results.Ok(result);
     }
+
+    
 }
