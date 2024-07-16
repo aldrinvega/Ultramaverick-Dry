@@ -34,10 +34,6 @@
   <p align="center"><strong>Reports:</strong> Generates various reports based on inventory data.</p>
 
 
-<h2 align="center">Disclaimer</h2>
-
-<p align="center">This repository is solely owned by RDF Feed, Livestock and Foods Inc. Any unauthorized use or distribution is strictly prohibited.</p>
-
 <div align="center">
   <p>Disclaimer:</p>
   <p>This repository is solely owned by RDF Feed, Livestock and Foods Inc. Any unauthorized use or distribution is strictly prohibited.</p>
