@@ -31,5 +31,12 @@
         public string? EmployeeId { get; set; }
         public string? EmployeeName { get; set; }
         public string Status { get; set; }
+        public string CompanyCode { get; set; }
+        public string CompanyName { get; set; }
+        public string DepartmentCode { get; set; }
+        public string LocationCode { get; set; }
+        public string LocationName { get; set; }
+        public string AccountTitleCode { get; set; }
+        public string AccountTitleName { get; set; }
     }
 }

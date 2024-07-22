@@ -80,7 +80,18 @@ public class ExportTransactedMoveOrdersReport : ControllerBase
                         "Transacted By",
                         "Transaction Type",
                         "Transacted Date",
-                        "Delivery Date"
+                        "Delivery Date",
+                        "Account Title Code",
+                        "Account Title",
+                        "Company Code",
+                        "Company Name",
+                        "Location Code",
+                        "Location Name",
+                        "Department Code",
+                        "Department Name",
+                        "Employee Id",
+                        "Employee Name"
+
                 };
 
 
@@ -115,6 +126,17 @@ public class ExportTransactedMoveOrdersReport : ControllerBase
                     row.Cell(11).Value = transactedMoveOrderReports[index].TransactionType;
                     row.Cell(12).Value = transactedMoveOrderReports[index].TransactedDate;
                     row.Cell(13).Value = transactedMoveOrderReports[index].DeliveryDate;
+                    row.Cell(14).Value = transactedMoveOrderReports[index].AccountTitleCode;
+                    row.Cell(15).Value = transactedMoveOrderReports[index].AccountTitle;
+                    row.Cell(16).Value = transactedMoveOrderReports[index].CompanyCode;
+                    row.Cell(17).Value = transactedMoveOrderReports[index].CompanyName;
+                    row.Cell(18).Value = transactedMoveOrderReports[index].LocationCode;
+                    row.Cell(19).Value = transactedMoveOrderReports[index].LocationName;
+                    row.Cell(20).Value = transactedMoveOrderReports[index].DepartmentCode;
+                    row.Cell(21).Value = transactedMoveOrderReports[index].DepartmentName;
+                    row.Cell(22).Value = transactedMoveOrderReports[index].EmployeeId;
+                    row.Cell(23).Value = transactedMoveOrderReports[index].EmployeeName;
+
                 }
 
                 worksheet.Columns().AdjustToContents();

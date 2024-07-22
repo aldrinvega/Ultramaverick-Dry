@@ -26,6 +26,7 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY;
 using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions.AddNewChecklistQuestions;
 using Carter;
 using ELIXIR.API.Features.Setup.User_Roles;
+using Asp.Versioning;
 
 namespace ELIXIR.API;
 
@@ -81,7 +82,7 @@ public class Startup
         services.AddScoped<IRawMaterialRepository, RawMaterialRepository>();
         services.AddScoped<IOrdering, OrderingRepository>();
         services.AddDbContext<StoreContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("Docker")).EnableDetailedErrors());
+            options.UseSqlServer(Configuration.GetConnectionString("Testing")).EnableDetailedErrors());
 
         services.Configure<ApiBehaviorOptions>(options =>
         {
@@ -100,6 +101,18 @@ public class Startup
                 return new BadRequestObjectResult(errorResponse);
             };
         });
+
+        //services.AddApiVersioning(options =>
+        //{
+        //    options.DefaultApiVersion = new ApiVersion(1);
+        //    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+
+        //})
+        //    .AddApiExplorer(options =>
+        //{
+        //    options.GroupNameFormat = "'v'V";
+        //    options.SubstituteApiVersionInUrl = true;
+        //});
 
         services.AddApplicationServices();
 

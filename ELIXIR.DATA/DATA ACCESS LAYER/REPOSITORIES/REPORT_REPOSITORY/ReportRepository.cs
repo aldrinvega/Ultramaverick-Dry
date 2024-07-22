@@ -264,7 +264,15 @@ public class ReportRepository : IReportRepository
             TransactedDate = order.transactmoveorder.PreparedDate.ToString() ?? "N/A",
             EmployeeId = order.moveorder.AdvancesToEmployees.EmployeeId,
             EmployeeName = order.moveorder.AdvancesToEmployees.EmployeeName,
-            Status = order.transactmoveorder != null ? "Transacted" : "Pending"
+            Status = order.transactmoveorder != null ? "Transacted" : "Pending",
+            DepartmentCode = order.moveorder.DepartmentCode,
+            DepartmentName = order.moveorder.DepartmentName,
+            LocationCode = order.moveorder.LocationCode,
+            LocationName = order.moveorder.LocationName,
+            CompanyCode = order.moveorder.CompanyCode,
+            CompanyName = order.moveorder.CompanyName,
+            AccountTitleCode = order.moveorder.AccountTitleCode,
+            AccountTitle = order.moveorder.AccountTitles
         });
 
         return moveOrderReports.ToList();
@@ -403,12 +411,12 @@ public class ReportRepository : IReportRepository
     public async Task<PagedList<MiscellaneousIssueReport>> MIssueReportPagination(string DateFrom, string DateTo, UserParams userParams)
     {
         var issues = (from issue in _context.MiscellaneousIssues
+                      where issue.TransactionDate >= DateTime.Parse(DateFrom) &&
+                         issue.TransactionDate <= DateTime.Parse(DateTo) && issue.IsActive == true
                       join issuedetails in _context.MiscellaneousIssueDetails
                           on issue.Id equals issuedetails.IssuePKey into leftJ
                       from issuedetails in leftJ.DefaultIfEmpty()
-                      where issuedetails.PreparedDate >= DateTime.Parse(DateFrom) &&
-                            issuedetails.PreparedDate <= DateTime.Parse(DateTo) && issuedetails.IsActive == true &&
-                            issuedetails.IsTransact == true
+                      where issuedetails.IsActive == true && issuedetails.IsTransact == true
                       select new MiscellaneousIssueReport
                       {
                           IssueId = issue.Id,
@@ -639,6 +647,7 @@ public class ReportRepository : IReportRepository
         DateTime toDate = DateTime.Parse(dateTo);
 
         var orders = await _context.MoveOrders
+            .Include(emp => emp.AdvancesToEmployees)
             .Where(moveorder => moveorder.IsActive == true &&
                                 moveorder.IsRejectForPreparation != true)
             .Join(_context.TransactMoveOrder,
@@ -663,7 +672,17 @@ public class ReportRepository : IReportRepository
                 TransactedBy = s.transact.PreparedBy,
                 TransactionType = s.moveorder.DeliveryStatus,
                 TransactedDate = s.transact.PreparedDate.ToString(),
-                DeliveryDate = s.transact.DeliveryDate.ToString()
+                DeliveryDate = s.transact.DeliveryDate.ToString(),
+                DepartmentCode = s.moveorder.DepartmentCode,
+                DepartmentName = s.moveorder.DepartmentName,
+                LocationCode = s.moveorder.LocationCode,
+                LocationName = s.moveorder.LocationName,
+                CompanyCode = s.moveorder.CompanyCode,
+                CompanyName = s.moveorder.CompanyName,
+                AccountTitleCode = s.moveorder.AccountTitleCode,
+                AccountTitle = s.moveorder.AccountTitles,
+                EmployeeId = s.moveorder.AdvancesToEmployees.EmployeeId,
+                EmployeeName = s.moveorder.AdvancesToEmployees.EmployeeName
             })
             .ToListAsync();
 

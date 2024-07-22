@@ -13,51 +13,6 @@
   <component name="ChangeListManager">
     <list default="true" id="a52501b5-a0a4-45ca-a210-4d1e8b3c8605" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ELIXIR.API/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ELIXIR.API/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/config/applicationhost.config" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/config/applicationhost.config" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Approved Move Orders 01-01-2024 - 04-01-2024.xlsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Controllers/ORDERING_CONTROLLER/OrderingController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Controllers/ORDERING_CONTROLLER/OrderingController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Controllers/QC_CONTROLLER/ReceivingController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Controllers/QC_CONTROLLER/ReceivingController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Controllers/REPORT_CONTROLLER/ReportController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Controllers/REPORT_CONTROLLER/ReportController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Controllers/WAREHOUSE_CONTROLLER/WarehouseController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Controllers/WAREHOUSE_CONTROLLER/WarehouseController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.API/ELIXIR.API.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/ELIXIR.API.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Startup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Startup.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/ORDERING_INTERFACE/IOrdering.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/ORDERING_INTERFACE/IOrdering.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/REPORT_INTERFACE/IReportRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/REPORT_INTERFACE/IReportRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/BaseEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/BaseEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/ORDERING_MODEL/Ordering.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/ORDERING_MODEL/Ordering.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportApprovedMoveorderReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportApprovedMoveorderReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportCancelledOrdersReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportCancelledOrdersReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportConsolidatedReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportConsolidatedReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportInventoryMovementReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportInventoryMovementReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportMiscIssueHistoryReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportMiscIssueHistoryReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportMoveOrderHistoryReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportMoveOrderHistoryReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportTransactedMoveOrdersReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportTransactedMoveOrdersReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/UpdateOrderWithTheOriginalOrder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/UpdateOrderWithTheOriginalOrder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/REPORT_REPOSITORY/ReportRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/REPORT_REPOSITORY/ReportRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/RawMaterialRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/RawMaterialRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/ORDERING_DTOs/OrderDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/ORDERING_DTOs/OrderDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/RECEIVING_DTOs/WarehouseReceivingDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/RECEIVING_DTOs/WarehouseReceivingDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/REPORT_DTOs/CancelledOrderReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/REPORT_DTOs/CancelledOrderReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/REPORT_DTOs/ConsolidatedReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/REPORT_DTOs/ConsolidatedReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/REPORT_DTOs/InventoryMovementReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/REPORT_DTOs/InventoryMovementReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/REPORT_DTOs/MiscellaneousIssueReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/REPORT_DTOs/MiscellaneousIssueReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/REPORT_DTOs/MoveOrderReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/REPORT_DTOs/MoveOrderReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/ELIXIR.DATA.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/ELIXIR.DATA.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/Migrations/20240224153244_InitialCreate.Designer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/Migrations/20240224153244_InitialCreate.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/Migrations/20240403005245_AddOriginalQunsityOnOrdersEntity.Designer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/Migrations/20240403005245_AddOriginalQunsityOnOrdersEntity.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/Migrations/20240404005640_AddSupplierAndCustomerOnMiscTranscationsEntities.Designer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/Migrations/20240404005640_AddSupplierAndCustomerOnMiscTranscationsEntities.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/Migrations/20240404020038_AddReasonOnOrderEntityForCancellationOfOrders.Designer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/Migrations/20240404020038_AddReasonOnOrderEntityForCancellationOfOrders.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/Migrations/20240405000710_RemoveSupplierAndCustomerOnMiscEntities.Designer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/Migrations/20240405000710_RemoveSupplierAndCustomerOnMiscEntities.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/Migrations/20240405003830_AddCancellationRemarksOnOrderingEntity.Designer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/Migrations/20240405003830_AddCancellationRemarksOnOrderingEntity.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/Migrations/StoreContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/Migrations/StoreContextModelSnapshot.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,10 +44,10 @@
     &quot;accountId&quot;: &quot;7e4485fb-5771-4ad6-884f-95cb4480b057&quot;
   }
 }</component>
-  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
-  <component name="KubernetesApiProvider"><![CDATA[{
-  "isMigrated": true
-}]]></component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -119,7 +74,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "developmentenv",
+    "git-widget-placeholder": "dev-vsa",
     "last_opened_file_path": "C:/Users/avega/source/repos/aldrinvega/Ultramaverick-Dry/ELIXIR.API.sln",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.stylelint": "true",
@@ -260,6 +215,7 @@
       <workItem from="1712106837728" duration="10515000" />
       <workItem from="1712852890828" duration="657000" />
       <workItem from="1718286668957" duration="3281000" />
+      <workItem from="1720398520834" duration="2415000" />
     </task>
     <task id="LOCAL-00001" summary="Adjust preparation schedule and appsettings.json">
       <option name="closed" value="true" />
