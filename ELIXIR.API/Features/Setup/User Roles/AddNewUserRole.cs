@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ELIXIR.API.Common;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

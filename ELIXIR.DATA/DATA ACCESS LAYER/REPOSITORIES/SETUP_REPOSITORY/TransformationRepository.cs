@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.GENERIC_REPOSITORY;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 {

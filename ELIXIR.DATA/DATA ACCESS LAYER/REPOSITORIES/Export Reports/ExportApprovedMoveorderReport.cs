@@ -72,6 +72,7 @@ public class ExportApprovedMoveorderReport : ControllerBase
 
                 var headers = new List<string>
                 {
+                    "MIR Id",
                     "MoveOrder Id",
                     "Customer Name",
                     "Customer Code",
@@ -104,17 +105,18 @@ public class ExportApprovedMoveorderReport : ControllerBase
                 {
                     var row = worksheet.Row(index + 1);
 
-                    row.Cell(1).Value = approvedMoveOrders[index - 1].MoveOrderId;
-                    row.Cell(2).Value = approvedMoveOrders[index - 1].CustomerName;
-                    row.Cell(3).Value = approvedMoveOrders[index - 1].CustomerCode;
-                    row.Cell(4).Value = approvedMoveOrders[index - 1].ItemCode;
-                    row.Cell(5).Value = approvedMoveOrders[index - 1].ItemDescription;
-                    row.Cell(6).Value = approvedMoveOrders[index - 1].TransactionType;
-                    row.Cell(7).Value = approvedMoveOrders[index - 1].Category;
-                    row.Cell(8).Value = approvedMoveOrders[index - 1].Quantity;
-                    row.Cell(9).Value = approvedMoveOrders[index - 1].PreparedDate;
-                    row.Cell(10).Value = approvedMoveOrders[index - 1].DeliveryStatus;
-                    row.Cell(11).Value = approvedMoveOrders[index - 1].TransactedBy;
+                    row.Cell(1).Value = approvedMoveOrders[index - 1].MIRId;
+                    row.Cell(2).Value = approvedMoveOrders[index - 1].MoveOrderId;
+                    row.Cell(3).Value = approvedMoveOrders[index - 1].CustomerName;
+                    row.Cell(4).Value = approvedMoveOrders[index - 1].CustomerCode;
+                    row.Cell(5).Value = approvedMoveOrders[index - 1].ItemCode;
+                    row.Cell(6).Value = approvedMoveOrders[index - 1].ItemDescription;
+                    row.Cell(7).Value = approvedMoveOrders[index - 1].TransactionType;
+                    row.Cell(8).Value = approvedMoveOrders[index - 1].Category;
+                    row.Cell(9).Value = approvedMoveOrders[index - 1].Quantity;
+                    row.Cell(10).Value = approvedMoveOrders[index - 1].PreparedDate;
+                    row.Cell(11).Value = approvedMoveOrders[index - 1].DeliveryStatus;
+                    row.Cell(12).Value = approvedMoveOrders[index - 1].TransactedBy;
                 }
 
                 worksheet.Columns().AdjustToContents();

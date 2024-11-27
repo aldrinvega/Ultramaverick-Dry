@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 {
@@ -574,7 +573,8 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     ActualGood = x.Sum(x => x.ActualGood)
                 });
 
-            var getOrderingReserve = _context.Orders.Where(x => x.IsActive == true & x.IsCancelledOrder == null)
+            var getOrderingReserve = _context.Orders
+                .Where(x => x.IsActive == true & x.IsCancelledOrder == null)
                 .Where(x => x.PreparedDate != null)
                 .GroupBy(x => new
                 {
@@ -582,7 +582,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 }).Select(x => new OrderingInventory
                 {
                     ItemCode = x.Key.ItemCode,
-                    QuantityOrdered = x.Sum(x => x.AllocatedQuantity ?? (int)x.QuantityOrdered)
+                    QuantityOrdered = (x.Sum(x => x.AllocatedQuantity ?? (int)x.QuantityOrdered))
                 });
 
             var getTransformationReserve = _context.Transformation_Request.Where(x => x.IsActive == true)
@@ -595,7 +595,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     QuantityOrdered = x.Sum(x => x.Quantity)
                 });
 
-            var getSOH = (from warehouse in getWarehouseIn
+             var getSOH = (from warehouse in getWarehouseIn
                 join issue in getIssueOut
                     on warehouse.ItemCode equals issue.ItemCode
                     into leftJ2
@@ -644,7 +644,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 {
                     ItemCode = total.Key.ItemCode,
                     Reserve = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
-                              total.Key.QuantityOrdered
+                              (total.Key.QuantityOrdered == null ? 0 : total.Key.QuantityOrdered)
                 });
 
             var getSuggestedPo = (from posummary in getPoSummary
@@ -761,19 +761,34 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     Quantity = x.Sum(x => x.ActualGood)
                 });
 
-            var individualDifferences = from wr in _context.WarehouseReceived
-                join mo in _context.MoveOrders
-                    on wr.Id equals mo.WarehouseId
-                    into moveOrders
-                from mo in moveOrders.DefaultIfEmpty()
-                where wr.IsActive && wr.IsWarehouseReceive
-                select new
+
+            var getIssueOutByWarehouseId = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
+                .GroupBy(x => new
                 {
-                    wr.ItemCode,
-                    wr.ActualGood,
-                    QuantityOrdered = mo != null ? mo.QuantityOrdered : 0,
-                    CostByWarehouse = wr.UnitCost * (wr.ActualGood - (mo != null ? mo.QuantityOrdered : 0))
-                };
+                    x.ItemCode,
+                }).Select(x => new IssueInventory
+                {
+                    ItemCode = x.Key.ItemCode,
+                    Quantity = x.Sum(x => x.Quantity)
+                });
+
+            //For checking later
+
+            var individualDifferences = from wr in _context.WarehouseReceived
+   
+              join mo in _context.MoveOrders
+                on wr.Id equals mo.WarehouseId
+                into moveOrders
+              from mo in moveOrders.DefaultIfEmpty()
+              where wr.IsActive && wr.IsWarehouseReceive &&
+                    !_context.MiscellaneousIssueDetails.Any(misc => misc.WarehouseId == wr.Id) 
+              select new
+              {
+                wr.ItemCode,
+                wr.ActualGood,
+                QuantityOrdered = mo != null ? mo.QuantityOrdered : 0,
+                CostByWarehouse = wr.UnitCost * (wr.ActualGood - (mo != null ? mo.QuantityOrdered : 0))
+              };
 
 
             // Calculate the sum of differences per ItemCode

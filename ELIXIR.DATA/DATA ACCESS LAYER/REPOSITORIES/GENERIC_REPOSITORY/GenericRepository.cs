@@ -1,16 +1,12 @@
-﻿using ELIXIR.DATA.CORE.ICONFIGURATION;
-using ELIXIR.DATA.CORE.INTERFACES;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using ELIXIR.DATA.CORE.INTERFACES.GENERIC_INTERFACE;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
-using ELIXIR.DATA.DTOs;
-using ELIXIR.DATA.SERVICES;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES
+namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.GENERIC_REPOSITORY
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {

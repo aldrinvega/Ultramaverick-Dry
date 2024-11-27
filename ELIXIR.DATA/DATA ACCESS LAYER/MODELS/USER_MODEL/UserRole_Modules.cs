@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS
+namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL
 {
     public class UserRole_Modules : BaseEntity
     {

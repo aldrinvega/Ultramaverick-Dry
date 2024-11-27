@@ -1,9 +1,8 @@
 ﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace RDF.Arcana.API.Common;
+namespace ELIXIR.DATA.SERVICES;
 
 public static class MigrationExtentions
 {

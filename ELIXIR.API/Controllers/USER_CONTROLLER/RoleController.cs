@@ -1,15 +1,14 @@
-﻿using ELIXIR.DATA.CORE.ICONFIGURATION;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
-using ELIXIR.DATA.DTOs;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ELIXIR.DATA.CORE.ICONFIGURATION;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
+using ELIXIR.DATA.DTOs.USER_DTOs;
+using Microsoft.AspNetCore.Mvc;
 
-namespace ELIXIR.API.Controllers
+namespace ELIXIR.API.Controllers.USER_CONTROLLER
 {
     [ApiExplorerSettings(IgnoreApi = true)]
    // [EnableCors("CorsPolicy")]

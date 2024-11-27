@@ -8,6 +8,7 @@ namespace ELIXIR.DATA.DTOs.INVENTORY_DTOs;
 
 public class IssueInventory
 {
+    public int WarehouseId { get; set; }
     public string ItemCode { get; set; }
     public decimal Quantity { get; set; }
 

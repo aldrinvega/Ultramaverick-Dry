@@ -73,6 +73,8 @@ public class ExportInventoryMovementReport : ControllerBase
                     "Item Code",
                     "Item Description",
                     "Item Category",
+                    "Unit Cost",
+                    "Total Amount",
                     "Move Ordere",
                     "Misc. Issued",
                     "Receive",
@@ -102,12 +104,14 @@ public class ExportInventoryMovementReport : ControllerBase
                     row.Cell(1).Value = inventoryMovementReport[index - 1].ItemCode;
                     row.Cell(2).Value = inventoryMovementReport[index - 1].ItemDescription;
                     row.Cell(3).Value = inventoryMovementReport[index - 1].ItemCategory;
-                    row.Cell(4).Value = inventoryMovementReport[index - 1].TotalMoveOrderedOut;
-                    row.Cell(5).Value = inventoryMovementReport[index - 1].TotalMiscIssue;
-                    row.Cell(6).Value = inventoryMovementReport[index - 1].TotalReceived;
-                    row.Cell(7).Value = inventoryMovementReport[index - 1].TotalMicReceipt;
-                    row.Cell(8).Value = inventoryMovementReport[index - 1].Ending;
-                    row.Cell(9).Value = inventoryMovementReport[index - 1].CurrentStock;
+                    row.Cell(4).Value = inventoryMovementReport[index - 1].UnitCost;
+                    row.Cell(5).Value = inventoryMovementReport[index - 1].TotalAmount;
+                    row.Cell(6).Value = inventoryMovementReport[index - 1].TotalMoveOrderedOut;
+                    row.Cell(7).Value = inventoryMovementReport[index - 1].TotalMiscIssue;
+                    row.Cell(8).Value = inventoryMovementReport[index - 1].TotalReceived;
+                    row.Cell(9).Value = inventoryMovementReport[index - 1].TotalMicReceipt;
+                    row.Cell(10).Value = inventoryMovementReport[index - 1].Ending;
+                    row.Cell(11).Value = inventoryMovementReport[index - 1].CurrentStock;
                 }
 
                 worksheet.Columns().AdjustToContents();

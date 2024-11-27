@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
+using DocumentFormat.OpenXml.Vml;
 
 namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY;
 
@@ -248,6 +249,7 @@ public class ReportRepository : IReportRepository
 
         var moveOrderReports = orders.Select(order => new MoveOrderReport
         {
+            MIRId = order.moveorder.TransactionId,
             MoveOrderId = order.moveorder.OrderNo,
             CustomerCode = order.moveorder.FarmCode,
             CustomerName = order.moveorder.FarmName,
@@ -843,7 +845,7 @@ public class ReportRepository : IReportRepository
 
         var getMoveOrderOutByDate = _context.MoveOrders.Where(x => x.IsActive == true)
             .Where(x => x.IsPrepared == true)
-            .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(DateTo) &&
+            .Where(x => x.PreparedDate.Value.Date >= DateTime.Parse(DateFrom) && x.PreparedDate.Value.Date <= DateTime.Parse(DateTo) &&
                         x.ApprovedDate != null)
             .GroupBy(x => new
             {
@@ -890,7 +892,7 @@ public class ReportRepository : IReportRepository
 
         var getIssueOutByDate = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
             .Where(x => x.IsTransact == true)
-            .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(DateTo))
+            .Where(x => x.PreparedDate.Date >= DateTime.Parse(DateFrom) && x.PreparedDate.Date <= DateTime.Parse(DateTo))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -903,7 +905,7 @@ public class ReportRepository : IReportRepository
 
         var getIssueOutByDatePlus = _context.MiscellaneousIssueDetails.Where(x => x.IsActive == true)
             .Where(x => x.IsTransact == true)
-            .Where(x => x.PreparedDate >= DateTime.Parse(PlusOne) && x.PreparedDate <= DateTime.Parse(dateToday))
+            .Where(x => x.PreparedDate.Date >= DateTime.Parse(PlusOne) && x.PreparedDate.Date <= DateTime.Parse(dateToday))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -941,7 +943,7 @@ public class ReportRepository : IReportRepository
 
         var getTransformIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
             .Where(x => x.TransactionType == "Transformation")
-            .Where(x => x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo))
+            .Where(x => x.ReceivingDate.Date >= DateTime.Parse(DateFrom) && x.ReceivingDate.Date <= DateTime.Parse(DateTo))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -953,7 +955,7 @@ public class ReportRepository : IReportRepository
 
         var getTransformInPlus = _context.WarehouseReceived.Where(x => x.IsActive == true)
             .Where(x => x.TransactionType == "Transformation")
-            .Where(x => x.ReceivingDate >= DateTime.Parse(PlusOne) && x.ReceivingDate <= DateTime.Parse(dateToday))
+            .Where(x => x.ReceivingDate.Date >= DateTime.Parse(PlusOne) && x.ReceivingDate.Date <= DateTime.Parse(dateToday))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -966,7 +968,7 @@ public class ReportRepository : IReportRepository
 
         var getReceiptIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
             .Where(x => x.TransactionType == "MiscellaneousReceipt")
-            .Where(x => x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo))
+            .Where(x => x.ReceivingDate.Date >= DateTime.Parse(DateFrom) && x.ReceivingDate.Date <= DateTime.Parse(DateTo))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -978,7 +980,7 @@ public class ReportRepository : IReportRepository
 
         var getReceiptInPlus = _context.WarehouseReceived.Where(x => x.IsActive == true)
             .Where(x => x.TransactionType == "MiscellaneousReceipt")
-            .Where(x => x.ReceivingDate >= DateTime.Parse(PlusOne) && x.ReceivingDate <= DateTime.Parse(dateToday))
+            .Where(x => x.ReceivingDate.Date >= DateTime.Parse(PlusOne) && x.ReceivingDate.Date <= DateTime.Parse(dateToday))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -1059,6 +1061,89 @@ public class ReportRepository : IReportRepository
                                 total.Sum(x => x.moveorder.QuantityOrdered == 0 ? 0 : x.moveorder.QuantityOrdered)
                       });
 
+        
+var getWarehouseStockById = _context.WarehouseReceived
+    .Where(x => x.UnitCost > 0)
+    .Select(x => new WarehouseInventory
+    {
+        WarehouseId = x.Id,
+        ItemCode = x.ItemCode,
+        UnitCost = x.UnitCost,
+        ActualGood = x.ActualGood
+    });
+
+var getMoveOrderOutid = _context.MoveOrders
+    .Where(x => x.PreparedDate.HasValue && x.PreparedDate.Value.Date >= DateTime.Parse(DateFrom) && x.PreparedDate.Value.Date <= DateTime.Parse(DateTo) &&
+                x.ApprovedDate != null && x.IsActive && x.IsPrepared)
+    .GroupBy(x => new
+    {
+        x.WarehouseId,
+        x.ItemCode,
+    })
+    .Select(x => new MoveOrderInventory
+    {
+        WarehouseId = x.Key.WarehouseId,
+        ItemCode = x.Key.ItemCode,
+        QuantityOrdered = x.Sum(y => y.QuantityOrdered),
+    });
+
+var getIssueOutId = _context.MiscellaneousIssueDetails
+    .Where(x => x.IsActive)
+    .Where(x => x.PreparedDate != null && x.PreparedDate.Date >= DateTime.Parse(DateFrom) && x.PreparedDate.Date <= DateTime.Parse(DateTo))
+    .GroupBy(x => new
+    {
+        x.WarehouseId,
+        x.ItemCode,
+    })
+    .Select(x => new
+    {
+        WarehouseId = x.Key.WarehouseId,
+        ItemCode = x.Key.ItemCode,
+        Quantity = x.Sum(y => y.Quantity),
+    });
+
+        var getUnitPrice = (from warehouse in getWarehouseStockById
+                    join moveorder in getMoveOrderOutid
+                    on warehouse.WarehouseId equals moveorder.WarehouseId into leftJ1
+                    from moveorder in leftJ1.DefaultIfEmpty()
+
+                    join issue in getIssueOutId
+                    on warehouse.WarehouseId equals issue.WarehouseId into leftJ2
+                    from issue in leftJ2.DefaultIfEmpty()
+
+                    group new
+                    {
+                        warehouse,
+                        moveorder,
+                        issue,
+                    } by new
+                    {
+                        warehouse.WarehouseId,
+                        warehouse.ItemCode,
+                    } into x
+                    select new UnitCostDTO
+                    {
+                        WarehouseId = x.Key.WarehouseId,
+                        ItemCode = x.Key.ItemCode,
+                        UnitCost = Math.Round((x.First().warehouse.UnitCost ?? 0m) * (x.First().warehouse.ActualGood != null ? x.First().warehouse.ActualGood : 0) - (x.First().moveorder.QuantityOrdered != null ? x.First().moveorder.QuantityOrdered : 0 ) - (x.First().issue.Quantity != null ? x.First().issue.Quantity : 0), 2),
+                        ActualGood = (x.First().warehouse.ActualGood != null ? x.First().warehouse.ActualGood : 0) + ((x.First().moveorder.QuantityOrdered != null ? x.First().moveorder.QuantityOrdered : 0) - (x.First().issue.Quantity != null ? x.First().issue.Quantity : 0))
+                    });
+
+        var getUnitpriceTotal = getUnitPrice
+                .Where(x => x.UnitCost > 0)
+                .GroupBy(x => new
+                {
+                    x.ItemCode,
+                })
+                .Select(x => new UnitCostDTO
+                {
+                    ItemCode = x.Key.ItemCode,
+                    UnitCost = Math.Round(x.Sum(y => y.UnitCost) / x.Sum(y => y.ActualGood), 2),
+                    ActualGood = x.Sum(y => y.ActualGood),
+                    TotalUnitPrice = x.Sum(y => y.UnitCost),
+                });
+
+
         var movementInventory = (from rawmaterial in _context.RawMaterials
                                  join moveorder in getMoveOrderOutByDate
                                      on rawmaterial.ItemCode equals moveorder.ItemCode
@@ -1112,6 +1197,8 @@ public class ReportRepository : IReportRepository
                                      on rawmaterial.ItemCode equals issuePlus.ItemCode
                                      into leftJ13
                                  from issuePlus in leftJ13.DefaultIfEmpty()
+                                 join auc in getUnitpriceTotal
+                                    on rawmaterial.ItemCode equals auc.ItemCode
                                  group new
                                  {
                                      rawmaterial,
@@ -1127,7 +1214,8 @@ public class ReportRepository : IReportRepository
                                      receiptPlus,
                                      moveorderPlus,
                                      transformoutPlus,
-                                     issuePlus
+                                     issuePlus,
+                                     auc
                                  }
                                      by new
                                      {
@@ -1147,6 +1235,8 @@ public class ReportRepository : IReportRepository
                                          MoveOrderPlus = moveorderPlus.QuantityOrdered != null ? moveorderPlus.QuantityOrdered : 0,
                                          TransformOutPlus = transformoutPlus.WeighingScale != null ? transformoutPlus.WeighingScale : 0,
                                          IssuePlus = issuePlus.Quantity != null ? issuePlus.Quantity : 0,
+                                         AverageUnitCost = auc.UnitCost != null ? auc.UnitCost : 0,
+                                         TotalCost = auc.UnitCost != null ? auc.TotalUnitPrice : 0 ,
                                      }
             into total
                                  select new InventoryMovementReport
@@ -1154,7 +1244,7 @@ public class ReportRepository : IReportRepository
                                      ItemCode = total.Key.ItemCode,
                                      ItemDescription = total.Key.ItemDescription,
                                      ItemCategory = total.Key.ItemCategoryName,
-                                     TotalMoveOrderedOut = total.Key.MoveOrder + total.Key.Transformation + total.Key.Issue,
+                                     TotalMoveOrderedOut = total.Key.MoveOrder,
                                      TotalMiscIssue = total.Key.Issue,
                                      TotalMicReceipt = total.Key.ReceiptIn,
                                      TotalReceived = total.Key.ReceiveIn,
@@ -1162,7 +1252,10 @@ public class ReportRepository : IReportRepository
                                               (total.Key.MoveOrder + total.Key.Transformation + total.Key.Issue),
                                      CurrentStock = total.Key.SOH - total.Key.Issue,
                                      PurchasedOrder = total.Key.ReceivePlus + total.Key.TransformPlus + total.Key.ReceiptPlus,
-                                     OthersPlus = total.Key.MoveOrderPlus + total.Key.TransformOutPlus + total.Key.IssuePlus
+                                     OthersPlus = total.Key.MoveOrderPlus + total.Key.TransformOutPlus + total.Key.IssuePlus,
+                                     UnitCost = total.Key.AverageUnitCost,
+                                     TotalAmount = total.Key.AverageUnitCost * ((total.Key.ReceiveIn + total.Key.ReceiptIn + total.Key.TransformIn) -
+                                              (total.Key.MoveOrder + total.Key.Transformation + total.Key.Issue)),
                                  });
 
         return await movementInventory.ToListAsync();
@@ -1308,7 +1401,7 @@ public class ReportRepository : IReportRepository
 
         var getReceiptIn = _context.WarehouseReceived.Where(x => x.IsActive == true)
             .Where(x => x.TransactionType == "MiscellaneousReceipt")
-            .Where(x => x.ReceivingDate >= DateTime.Parse(DateFrom) && x.ReceivingDate <= DateTime.Parse(DateTo))
+            .Where(x => x.ReceivingDate.Date >= DateTime.Parse(DateFrom) && x.ReceivingDate.Date <= DateTime.Parse(DateTo))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -1320,7 +1413,7 @@ public class ReportRepository : IReportRepository
 
         var getReceiptInPlus = _context.WarehouseReceived.Where(x => x.IsActive == true)
             .Where(x => x.TransactionType == "MiscellaneousReceipt")
-            .Where(x => x.ReceivingDate >= DateTime.Parse(PlusOne) && x.ReceivingDate <= DateTime.Parse(dateToday))
+            .Where(x => x.ReceivingDate.Date >= DateTime.Parse(PlusOne) && x.ReceivingDate.Date <= DateTime.Parse(dateToday))
             .GroupBy(x => new
             {
                 x.ItemCode,
@@ -2199,6 +2292,7 @@ public class ReportRepository : IReportRepository
             .GroupBy(x => new
             {
                 x.Id,
+                x.TransactionId,
                 x.OrderNo,
                 x.ItemCode,
                 x.ItemDescription,
@@ -2220,6 +2314,7 @@ public class ReportRepository : IReportRepository
             .Where(x => x.Key.IsReject != true)
             .Select(x => new MoveOrderReport
             {
+                MIRId = x.Key.TransactionId,
                 MoveOrderId = x.Key.OrderNo,
                 CustomerName = x.Key.FarmName,
                 CustomerCode = x.Key.FarmCode,

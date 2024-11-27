@@ -40,7 +40,7 @@ public class GetInventoryInformationByItemCode : ControllerBase
     {
         public string ItemCode { get; set; }
         public string ItemDesccription { get; set; }
-        public decimal StockOnHand { get; set; }
+        public decimal Reserve { get; set; }
         public decimal AverageIssuance { get; set; }
         public decimal BufferLevel { get; set; }
     }
@@ -175,7 +175,6 @@ public class GetInventoryInformationByItemCode : ControllerBase
                                       total.Sum(x => x.issue.Quantity == null ? 0 : x.issue.Quantity))
                           });
 
-            ///try mong alisin and sum sa getorderingReservesataass kasi by Item code naman sila
             var getReserve = (from warehouse in getWarehouseStock
                               join ordering in getOrderingReserve
                                   on warehouse.ItemCode equals ordering.ItemCode
@@ -196,7 +195,7 @@ public class GetInventoryInformationByItemCode : ControllerBase
                               {
                                   ItemCode = total.Key.ItemCode,
                                   Reserve = total.Sum(x => x.warehouse.ActualGood == null ? 0 : x.warehouse.ActualGood) -
-                                            total.Key.QuantityOrdered
+                                            (total.Key.QuantityOrdered == null ? 0 : total.Key.QuantityOrdered)
                               });
 
             var getMoveOrderOutPerMonth = _context.MoveOrders
@@ -336,7 +335,7 @@ public class GetInventoryInformationByItemCode : ControllerBase
                                  ItemCode = total.Key.ItemCode,
                                  ItemDesccription = total.Key.ItemDescription,
                                  BufferLevel = total.Key.BufferLevel,
-                                 StockOnHand = total.Key.SOH,
+                                 Reserve = total.Key.Reserve,
                                  AverageIssuance = Math.Round(Convert.ToDecimal(total.Key.AverageIssuance), 2),
                              }).FirstOrDefaultAsync(x => x.ItemCode == request.ItemCode);
 

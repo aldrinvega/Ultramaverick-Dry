@@ -25,8 +25,6 @@ using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORT_REPOSITORY;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY;
 using static ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.QC_REPOSITORY.Checklist_Questions.AddNewChecklistQuestions;
 using Carter;
-using ELIXIR.API.Features.Setup.User_Roles;
-using Asp.Versioning;
 
 namespace ELIXIR.API;
 
@@ -48,6 +46,7 @@ public class Startup
         {
             x.RegisterServicesFromAssemblies(typeof(Program).Assembly);
         });
+
         services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(AddNewChecklistQuestionCommand).Assembly));
         services.AddMediatR(x =>
             x.RegisterServicesFromAssemblies(typeof(GetAllChecklists.GetAllChecklistsQuery).Assembly));
@@ -82,7 +81,7 @@ public class Startup
         services.AddScoped<IRawMaterialRepository, RawMaterialRepository>();
         services.AddScoped<IOrdering, OrderingRepository>();
         services.AddDbContext<StoreContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("Testing")).EnableDetailedErrors());
+            options.UseSqlServer(Configuration.GetConnectionString("Docker")).EnableDetailedErrors());
 
         services.Configure<ApiBehaviorOptions>(options =>
         {

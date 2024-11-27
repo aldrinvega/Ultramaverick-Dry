@@ -1,6 +1,4 @@
-﻿using ELIXIR.API.Common;
-
-namespace RDF.Arcana.API.Common;
+﻿namespace ELIXIR.API.Common;
 
 public record Error(string Code, string Message)
 {

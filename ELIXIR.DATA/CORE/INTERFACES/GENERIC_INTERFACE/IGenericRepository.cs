@@ -1,10 +1,7 @@
-﻿using ELIXIR.DATA.CORE.ICONFIGURATION;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
-using ELIXIR.DATA.DTOs;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ELIXIR.DATA.CORE.INTERFACES
+namespace ELIXIR.DATA.CORE.INTERFACES.GENERIC_INTERFACE
 {
       public interface IGenericRepository<T> where T : class
     {

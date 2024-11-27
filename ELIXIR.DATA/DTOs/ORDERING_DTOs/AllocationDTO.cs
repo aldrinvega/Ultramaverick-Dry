@@ -1,4 +1,4 @@
-﻿namespace ELIXIR.DATA.DTOs
+﻿namespace ELIXIR.DATA.DTOs.ORDERING_DTOs
 {
     public class AllocationDTO
     {

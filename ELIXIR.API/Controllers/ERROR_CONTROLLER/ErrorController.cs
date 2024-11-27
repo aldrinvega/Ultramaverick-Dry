@@ -1,7 +1,7 @@
 ﻿using ELIXIR.API.ERRORS;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ELIXIR.API.Controllers
+namespace ELIXIR.API.Controllers.ERROR_CONTROLLER
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("errors/{code}")]

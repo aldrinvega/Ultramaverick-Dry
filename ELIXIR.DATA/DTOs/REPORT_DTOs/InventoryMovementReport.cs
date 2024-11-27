@@ -15,6 +15,8 @@
         public decimal PurchasedOrder { get; set; }
         public decimal OthersPlus { get; set; }
         public decimal Receipt { get; set; }
+        public decimal? UnitCost { get; set; }
+        public decimal? TotalAmount { get; set; }
 
     }
 }

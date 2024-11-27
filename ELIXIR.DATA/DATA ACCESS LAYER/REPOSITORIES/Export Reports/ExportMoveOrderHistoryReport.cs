@@ -70,6 +70,7 @@ public class ExportMoveOrderHistoryReport : ControllerBase
 
                 var headers = new List<string>
                 { 
+                        "MIR Id",
                         "Move Order Id",
                         "Customer Code",
                         "Customer Name",
@@ -116,31 +117,32 @@ public class ExportMoveOrderHistoryReport : ControllerBase
                 {
                     var row = worksheet.Row(index + 2);
 
-                    row.Cell(1).Value = moveOrderHistoryReports[index].MoveOrderId;
-                    row.Cell(2).Value = moveOrderHistoryReports[index].CustomerCode;
-                    row.Cell(3).Value = moveOrderHistoryReports[index].CustomerName;
-                    row.Cell(4).Value = moveOrderHistoryReports[index].ItemCode;
-                    row.Cell(5).Value = moveOrderHistoryReports[index].ItemDescription;
-                    row.Cell(6).Value = moveOrderHistoryReports[index].Uom;
-                    row.Cell(7).Value = moveOrderHistoryReports[index].Category;
-                    row.Cell(8).Value = moveOrderHistoryReports[index].Quantity;
-                    row.Cell(9).Value = moveOrderHistoryReports[index].ExpirationDate;
-                    row.Cell(10).Value = moveOrderHistoryReports[index].TransactionType;
-                    row.Cell(11).Value = moveOrderHistoryReports[index].MoveOrderBy;
-                    row.Cell(12).Value = moveOrderHistoryReports[index].MoveOrderDate;
-                    row.Cell(13).Value = moveOrderHistoryReports[index].TransactedBy;
-                    row.Cell(14).Value = moveOrderHistoryReports[index].TransactedDate;
-                    row.Cell(15).Value = moveOrderHistoryReports[index].AccountTitleCode;
-                    row.Cell(16).Value = moveOrderHistoryReports[index].AccountTitle;
-                    row.Cell(17).Value = moveOrderHistoryReports[index].CompanyCode;
-                    row.Cell(18).Value = moveOrderHistoryReports[index].CompanyName;
-                    row.Cell(19).Value = moveOrderHistoryReports[index].DepartmentCode;
-                    row.Cell(20).Value = moveOrderHistoryReports[index].DepartmentName;
-                    row.Cell(21).Value = moveOrderHistoryReports[index].LocationCode;
-                    row.Cell(22).Value = moveOrderHistoryReports[index].LocationName;
-                    row.Cell(23).Value = moveOrderHistoryReports[index].EmployeeId;
-                    row.Cell(24).Value = moveOrderHistoryReports[index].EmployeeName;
-                    row.Cell(25).Value = moveOrderHistoryReports[index].Status;
+                    row.Cell(1).Value = moveOrderHistoryReports[index].MIRId;
+                    row.Cell(2).Value = moveOrderHistoryReports[index].MoveOrderId;
+                    row.Cell(3).Value = moveOrderHistoryReports[index].CustomerCode;
+                    row.Cell(4).Value = moveOrderHistoryReports[index].CustomerName;
+                    row.Cell(5).Value = moveOrderHistoryReports[index].ItemCode;
+                    row.Cell(6).Value = moveOrderHistoryReports[index].ItemDescription;
+                    row.Cell(7).Value = moveOrderHistoryReports[index].Uom;
+                    row.Cell(8).Value = moveOrderHistoryReports[index].Category;
+                    row.Cell(9).Value = moveOrderHistoryReports[index].Quantity;
+                    row.Cell(10).Value = moveOrderHistoryReports[index].ExpirationDate;
+                    row.Cell(11).Value = moveOrderHistoryReports[index].TransactionType;
+                    row.Cell(12).Value = moveOrderHistoryReports[index].MoveOrderBy;
+                    row.Cell(13).Value = moveOrderHistoryReports[index].MoveOrderDate;
+                    row.Cell(14).Value = moveOrderHistoryReports[index].TransactedBy;
+                    row.Cell(15).Value = moveOrderHistoryReports[index].TransactedDate;
+                    row.Cell(16).Value = moveOrderHistoryReports[index].AccountTitleCode;
+                    row.Cell(17).Value = moveOrderHistoryReports[index].AccountTitle;
+                    row.Cell(18).Value = moveOrderHistoryReports[index].CompanyCode;
+                    row.Cell(19).Value = moveOrderHistoryReports[index].CompanyName;
+                    row.Cell(20).Value = moveOrderHistoryReports[index].DepartmentCode;
+                    row.Cell(21).Value = moveOrderHistoryReports[index].DepartmentName;
+                    row.Cell(22).Value = moveOrderHistoryReports[index].LocationCode;
+                    row.Cell(23).Value = moveOrderHistoryReports[index].LocationName;
+                    row.Cell(24).Value = moveOrderHistoryReports[index].EmployeeId;
+                    row.Cell(25).Value = moveOrderHistoryReports[index].EmployeeName;
+                    row.Cell(26).Value = moveOrderHistoryReports[index].Status;
                 }
 
                 worksheet.Columns().AdjustToContents();

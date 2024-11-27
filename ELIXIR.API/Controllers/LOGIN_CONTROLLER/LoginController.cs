@@ -1,11 +1,9 @@
-﻿ using System.Runtime.CompilerServices;
- using ELIXIR.DATA.CORE.ICONFIGURATION;
+﻿using ELIXIR.DATA.CORE.ICONFIGURATION;
 using ELIXIR.DATA.JWT.AUTHENTICATION;
 using Microsoft.AspNetCore.Authorization;
- using Microsoft.AspNetCore.Http;
- using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
-namespace ELIXIR.API.Controllers
+namespace ELIXIR.API.Controllers.LOGIN_CONTROLLER
 {
     [Route("api/[controller]")]
     [ApiController]

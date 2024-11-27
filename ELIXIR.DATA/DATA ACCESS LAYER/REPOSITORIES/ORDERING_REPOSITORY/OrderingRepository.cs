@@ -2379,6 +2379,7 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                     .Where(x => x.AllocatedQuantity == null)
                     .Where(x => x.IsActive == true)
                     .Where(x => x.IsCancelledOrder == null)
+                    .Where(x => x.IsMove == false)
                     .SumAsync(x => x.QuantityOrdered);
 
                 // var totalStocks = receivedStocks - (orderingReserve + getIssueOut);
@@ -2393,13 +2394,11 @@ namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ORDERING_REPOSITORY
                 if (totalOrdersPerItemAndStore <= allocation.SOH)
                 {
                     order.AllocatedQuantity = (int)order.QuantityOrdered;
-                    order.ForAllocation = null;
                 }
                 else
                 {
                     var allocatedStocks = (int)(order.QuantityOrdered / percentageToAllocate);
                     order.AllocatedQuantity = allocatedStocks;
-                    order.ForAllocation = null;
                 }
 
                 results.Add(new AllocationResult

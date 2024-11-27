@@ -1,10 +1,10 @@
-version: '3.4'
+version: '3.9'
 
 services:
   rdf.umdry.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:5007;http://+5008
+      - ASPNETCORE_URLS=https://+:5007;http://+:5008
     ports:
       - "5007:5007"
       - "5008:5008"

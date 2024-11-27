@@ -12,7 +12,63 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a52501b5-a0a4-45ca-a210-4d1e8b3c8605" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ELIXIR.API/.idea/projectSettingsUpdater.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ELIXIR.API/.idea/projectSettingsUpdater.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ELIXIR.API/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ELIXIR.API/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Common/Error.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Common/Error.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Common/Result.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Common/Result.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Controllers/ERROR_CONTROLLER/ErrorController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Controllers/ERROR_CONTROLLER/ErrorController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Controllers/LOGIN_CONTROLLER/LoginController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Controllers/LOGIN_CONTROLLER/LoginController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Controllers/USER_CONTROLLER/ModuleController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Controllers/USER_CONTROLLER/ModuleController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Controllers/USER_CONTROLLER/RoleController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Controllers/USER_CONTROLLER/RoleController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Controllers/USER_CONTROLLER/UserController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Controllers/USER_CONTROLLER/UserController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Features/Inventory/GetInventoryInformationByItemCode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Features/Inventory/GetInventoryInformationByItemCode.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Features/Setup/User Roles/AddNewUserRole.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Features/Setup/User Roles/AddNewUserRole.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Features/Setup/User Roles/UserRoleErrors.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Features/Setup/User Roles/UserRoleErrors.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.API/Startup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.API/Startup.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/ICONFIGURATION/IUnitOfWork.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/ICONFIGURATION/IUnitOfWork.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/GENERIC_INTERFACE/IGenericRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/GENERIC_INTERFACE/IGenericRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/SETUP_INTERFACE/ICustomerRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/SETUP_INTERFACE/ICustomerRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/SETUP_INTERFACE/ILotNameAndCategoriesRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/SETUP_INTERFACE/ILotNameAndCategoriesRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/SETUP_INTERFACE/IRawMaterialRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/SETUP_INTERFACE/IRawMaterialRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/SETUP_INTERFACE/IReasonRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/SETUP_INTERFACE/IReasonRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/SETUP_INTERFACE/ISupplierRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/SETUP_INTERFACE/ISupplierRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/SETUP_INTERFACE/ITransformationRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/SETUP_INTERFACE/ITransformationRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/SETUP_INTERFACE/IUomRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/SETUP_INTERFACE/IUomRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/USER_INTERFACE/IModuleRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/USER_INTERFACE/IModuleRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/USER_INTERFACE/IRoleRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/USER_INTERFACE/IRoleRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/USER_INTERFACE/IUserRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/CORE/INTERFACES/USER_INTERFACE/IUserRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/USER_MODEL/Department.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/USER_MODEL/Department.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/USER_MODEL/UserRole.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/USER_MODEL/UserRole.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/USER_MODEL/UserRole_Modules.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/USER_MODEL/UserRole_Modules.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/UnitOfWork.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/MODELS/UnitOfWork.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportApprovedMoveorderReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportApprovedMoveorderReport.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportInventoryMovementReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportInventoryMovementReport.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportMoveOrderHistoryReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportMoveOrderHistoryReport.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/GENERIC_REPOSITORY/GenericRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/GENERIC_REPOSITORY/GenericRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/ORDERING_REPOSITORY/OrderingRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/REPORT_REPOSITORY/ReportRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/REPORT_REPOSITORY/ReportRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/CustomerRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/CustomerRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/LotNameAndCategoriesRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/LotNameAndCategoriesRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/RawMaterialRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/RawMaterialRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/ReasonRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/ReasonRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/SupplierRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/SupplierRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/TransformationRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/TransformationRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/UomRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/SETUP_REPOSITORY/UomRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/USER_REPOSITORY/ModuleRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/USER_REPOSITORY/ModuleRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/USER_REPOSITORY/RoleRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/USER_REPOSITORY/RoleRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/USER_REPOSITORY/UserRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/USER_REPOSITORY/UserRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/INVENTORY_DTOs/IssueInventory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/INVENTORY_DTOs/IssueInventory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/INVENTORY_DTOs/WarehouseInventory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/INVENTORY_DTOs/WarehouseInventory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/ORDERING_DTOs/AllocationDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/ORDERING_DTOs/AllocationDTO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/REPORT_DTOs/InventoryMovementReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/REPORT_DTOs/InventoryMovementReport.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/USER_DTOs/ModuleDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/USER_DTOs/ModuleDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/USER_DTOs/RoleDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/USER_DTOs/RoleDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/USER_DTOs/UserDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/DTOs/USER_DTOs/UserDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/JWT/SERVICES/UserService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/JWT/SERVICES/UserService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ELIXIR.DATA/SERVICES/MigrationExtentions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ELIXIR.DATA/SERVICES/MigrationExtentions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.override.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.override.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,9 +97,21 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/aldrinvega/Ultramaverick-Dry&quot;,
-    &quot;accountId&quot;: &quot;7e4485fb-5771-4ad6-884f-95cb4480b057&quot;
+    &quot;accountId&quot;: &quot;30b9c006-92a0-4c07-a652-648be39c455f&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportApprovedMoveorderReport.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportCancelledOrdersReport.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportConsolidatedReport.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportInventoryMovementReport.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportItemsWithBbdReport.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportMiscIssueHistoryReport.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportMiscReceiptHistoryReport.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportMoveOrderHistoryReport.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportNearlyExpireItemsReport.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/Export Reports/ExportServedVsOrderReport.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -64,37 +132,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Launch Settings Profile.ELIXIR.API: IIS Express.executor": "Debug",
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "Docker.ELIXIR.API/Dockerfile.executor": "Run",
-    "Docker.docker-compose.yml.--build: Compose Deployment.executor": "Debug",
-    "Docker.docker-compose.yml: Compose Deployment.executor": "Debug",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "dev-vsa",
-    "last_opened_file_path": "C:/Users/avega/source/repos/aldrinvega/Ultramaverick-Dry/ELIXIR.API.sln",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.stylelint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.stylelint": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "Docker",
-    "settings.editor.splitter.proportion": "0.2609582",
-    "vue.rearranger.settings.migration": "true"
-  },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "C:\\Users\\av0408\\AppData\\Roaming\\JetBrains\\Rider2024.2\\resharper-host\\DecompilerCache",
-      "C:\\Users\\av0408\\AppData\\Roaming\\JetBrains\\Rider2024.2\\resharper-host\\SourcesCache",
-      "C:\\Users\\av0408\\AppData\\Local\\Symbols\\src"
-    ]
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Launch Settings Profile.ELIXIR.API: IIS Express.executor&quot;: &quot;Debug&quot;,
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Docker.ELIXIR.API/Dockerfile.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml.--build: Compose Deployment.executor&quot;: &quot;Debug&quot;,
+    &quot;Docker.docker-compose.yml: Compose Deployment.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;developmentenv&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/avega/source/repos/aldrinvega/Ultramaverick-Dry/ELIXIR.API.sln&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.stylelint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.stylelint&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;Docker&quot;,
+    &quot;settings.editor.splitter.proportion&quot;: &quot;0.2609582&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Docker.docker-compose.yml: Compose Deployment">
     <configuration name="ELIXIR.API: FolderProfile" type="DotNetMsBuildPublish" factoryName="Publish to IIS">
       <riderPublish configuration="Release" platform="Any CPU" publish_profile="FolderProfile.pubxml" pubxml_path="$PROJECT_DIR$/ELIXIR.API/Properties/PublishProfiles/FolderProfile.pubxml" uuid_high="-8403624971411110585" uuid_low="-5197296087255001206" />
@@ -216,6 +277,10 @@
       <workItem from="1712852890828" duration="657000" />
       <workItem from="1718286668957" duration="3281000" />
       <workItem from="1720398520834" duration="2415000" />
+      <workItem from="1728002214988" duration="1162000" />
+      <workItem from="1731460927597" duration="3948000" />
+      <workItem from="1732090490133" duration="4338000" />
+      <workItem from="1732668441373" duration="833000" />
     </task>
     <task id="LOCAL-00001" summary="Adjust preparation schedule and appsettings.json">
       <option name="closed" value="true" />
@@ -326,262 +391,121 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>811</line>
+          <line>739</line>
           <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="">
             <startOffsets>
-              <option value="33782" />
+              <option value="31138" />
             </startOffsets>
             <endOffsets>
-              <option value="34058" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>740</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="">
-            <startOffsets>
-              <option value="31136" />
-            </startOffsets>
-            <endOffsets>
-              <option value="31276" />
+              <option value="31278" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>709</line>
+          <line>707</line>
           <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="">
             <startOffsets>
-              <option value="29902" />
+              <option value="29904" />
             </startOffsets>
             <endOffsets>
-              <option value="30057" />
+              <option value="30059" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>660</line>
+          <line>659</line>
           <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="">
             <startOffsets>
-              <option value="27791" />
+              <option value="27793" />
             </startOffsets>
             <endOffsets>
-              <option value="27973" />
+              <option value="27975" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>637</line>
+          <line>636</line>
           <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="">
             <startOffsets>
-              <option value="26899" />
+              <option value="26859" />
             </startOffsets>
             <endOffsets>
-              <option value="27039" />
+              <option value="26999" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="8" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>597</line>
+          <line>575</line>
           <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Method 'GetAllItemForInventoryPagination'">
             <startOffsets>
-              <option value="25165" />
+              <option value="24231" />
             </startOffsets>
             <endOffsets>
-              <option value="26365" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>576</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'">
-            <startOffsets>
-              <option value="24343" />
-            </startOffsets>
-            <endOffsets>
-              <option value="24390" />
+              <option value="24720" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>587</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'">
-            <startOffsets>
-              <option value="24849" />
-            </startOffsets>
-            <endOffsets>
-              <option value="24867" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="13" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>565</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'">
-            <startOffsets>
-              <option value="23944" />
-            </startOffsets>
-            <endOffsets>
-              <option value="23962" />
-            </endOffsets>
-          </properties>
+          <line>564</line>
+          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'" />
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>555</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'">
-            <startOffsets>
-              <option value="23557" />
-            </startOffsets>
-            <endOffsets>
-              <option value="23575" />
-            </endOffsets>
-          </properties>
+          <line>554</line>
+          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'" />
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>545</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'">
-            <startOffsets>
-              <option value="23180" />
-            </startOffsets>
-            <endOffsets>
-              <option value="23198" />
-            </endOffsets>
-          </properties>
+          <line>544</line>
+          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'" />
           <option name="timeStamp" value="16" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>534</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'">
-            <startOffsets>
-              <option value="22733" />
-            </startOffsets>
-            <endOffsets>
-              <option value="22751" />
-            </endOffsets>
-          </properties>
+          <line>533</line>
+          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'" />
           <option name="timeStamp" value="17" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>523</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'">
-            <startOffsets>
-              <option value="22296" />
-            </startOffsets>
-            <endOffsets>
-              <option value="22314" />
-            </endOffsets>
-          </properties>
+          <line>522</line>
+          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'" />
           <option name="timeStamp" value="18" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>512</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'">
-            <startOffsets>
-              <option value="21866" />
-            </startOffsets>
-            <endOffsets>
-              <option value="21884" />
-            </endOffsets>
-          </properties>
+          <line>511</line>
+          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'" />
           <option name="timeStamp" value="19" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>502</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'">
-            <startOffsets>
-              <option value="21499" />
-            </startOffsets>
-            <endOffsets>
-              <option value="21517" />
-            </endOffsets>
-          </properties>
+          <line>501</line>
+          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'" />
           <option name="timeStamp" value="20" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>490</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'">
-            <startOffsets>
-              <option value="21014" />
-            </startOffsets>
-            <endOffsets>
-              <option value="21032" />
-            </endOffsets>
-          </properties>
+          <line>489</line>
+          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPagination'" />
           <option name="timeStamp" value="21" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>1047</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPaginationOrig'">
-            <startOffsets>
-              <option value="45042" />
-            </startOffsets>
-            <endOffsets>
-              <option value="45060" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="22" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>1036</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPaginationOrig'">
-            <startOffsets>
-              <option value="44535" />
-            </startOffsets>
-            <endOffsets>
-              <option value="44583" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="23" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>1016</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="Lambda expression inside Method 'GetAllItemForInventoryPaginationOrig'">
-            <startOffsets>
-              <option value="43799" />
-            </startOffsets>
-            <endOffsets>
-              <option value="43870" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="25" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/ELIXIR.DATA/DATA ACCESS LAYER/REPOSITORIES/INVENTORY_REPOSITORY/RawMaterialInventory.cs</url>
-          <line>1108</line>
-          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="">
-            <startOffsets>
-              <option value="47696" />
-            </startOffsets>
-            <endOffsets>
-              <option value="47836" />
-            </endOffsets>
-          </properties>
+          <line>1107</line>
+          <properties documentPath="C:\Users\avega\RiderProjects\ELIXIR-DEPOT\ELIXIR.DATA\DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\RawMaterialInventory.cs" containingFunctionPresentation="" />
           <option name="timeStamp" value="27" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">

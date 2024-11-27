@@ -1,7 +1,6 @@
-﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
-using System;
+﻿using System;
 
-namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
+namespace ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
 
 public class UserRole : BaseEntity
 {

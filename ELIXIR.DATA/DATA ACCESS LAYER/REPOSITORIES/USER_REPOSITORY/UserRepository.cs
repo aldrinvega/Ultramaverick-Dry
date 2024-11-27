@@ -1,18 +1,17 @@
-﻿using ELIXIR.DATA.CORE.INTERFACES;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
-using ELIXIR.DATA.DTOs;
-using ELIXIR.DATA.DTOs.USER_DTOs;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ELIXIR.DATA.CORE.INTERFACES.USER_INTERFACE;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.GENERIC_REPOSITORY;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
+using ELIXIR.DATA.DTOs.USER_DTOs;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
-namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES
+namespace ELIXIR.DATA.DATA_ACCESS_LAYER.REPOSITORIES.USER_REPOSITORY
 {
     public class UserRepository : GenericRepository<UserDto>, IUserRepository
     {

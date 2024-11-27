@@ -1,12 +1,11 @@
-﻿using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
-using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS;
-using ELIXIR.DATA.DTOs;
-using ELIXIR.DATA.DTOs.USER_DTOs;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using ELIXIR.DATA.CORE.INTERFACES.GENERIC_INTERFACE;
+using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
+using ELIXIR.DATA.DTOs.USER_DTOs;
 
-namespace ELIXIR.DATA.CORE.INTERFACES
+namespace ELIXIR.DATA.CORE.INTERFACES.USER_INTERFACE
 {
     public interface IUserRepository : IGenericRepository<UserDto>
     {
