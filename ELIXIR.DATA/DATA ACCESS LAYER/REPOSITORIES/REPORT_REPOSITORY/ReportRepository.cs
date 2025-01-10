@@ -1062,45 +1062,45 @@ public class ReportRepository : IReportRepository
                       });
 
         
-var getWarehouseStockById = _context.WarehouseReceived
-    .Where(x => x.UnitCost > 0)
-    .Select(x => new WarehouseInventory
-    {
-        WarehouseId = x.Id,
-        ItemCode = x.ItemCode,
-        UnitCost = x.UnitCost,
-        ActualGood = x.ActualGood
-    });
+        var getWarehouseStockById = _context.WarehouseReceived
+            .Where(x => x.UnitCost > 0)
+            .Select(x => new WarehouseInventory
+            {
+                WarehouseId = x.Id,
+                ItemCode = x.ItemCode,
+                UnitCost = x.UnitCost,
+                ActualGood = x.ActualGood
+            });
 
-var getMoveOrderOutid = _context.MoveOrders
-    .Where(x => x.PreparedDate.HasValue && x.PreparedDate.Value.Date >= DateTime.Parse(DateFrom) && x.PreparedDate.Value.Date <= DateTime.Parse(DateTo) &&
-                x.ApprovedDate != null && x.IsActive && x.IsPrepared)
-    .GroupBy(x => new
-    {
-        x.WarehouseId,
-        x.ItemCode,
-    })
-    .Select(x => new MoveOrderInventory
-    {
-        WarehouseId = x.Key.WarehouseId,
-        ItemCode = x.Key.ItemCode,
-        QuantityOrdered = x.Sum(y => y.QuantityOrdered),
-    });
+        var getMoveOrderOutid = _context.MoveOrders
+            .Where(x => x.PreparedDate.HasValue && x.PreparedDate.Value.Date >= DateTime.Parse(DateFrom) && x.PreparedDate.Value.Date <= DateTime.Parse(DateTo) &&
+                        x.ApprovedDate != null && x.IsActive && x.IsPrepared)
+            .GroupBy(x => new
+            {
+                x.WarehouseId,
+                x.ItemCode,
+            })
+            .Select(x => new MoveOrderInventory
+            {
+                WarehouseId = x.Key.WarehouseId,
+                ItemCode = x.Key.ItemCode,
+                QuantityOrdered = x.Sum(y => y.QuantityOrdered),
+            });
 
-var getIssueOutId = _context.MiscellaneousIssueDetails
-    .Where(x => x.IsActive)
-    .Where(x => x.PreparedDate != null && x.PreparedDate.Date >= DateTime.Parse(DateFrom) && x.PreparedDate.Date <= DateTime.Parse(DateTo))
-    .GroupBy(x => new
-    {
-        x.WarehouseId,
-        x.ItemCode,
-    })
-    .Select(x => new
-    {
-        WarehouseId = x.Key.WarehouseId,
-        ItemCode = x.Key.ItemCode,
-        Quantity = x.Sum(y => y.Quantity),
-    });
+        var getIssueOutId = _context.MiscellaneousIssueDetails
+            .Where(x => x.IsActive)
+            .Where(x => x.PreparedDate != null && x.PreparedDate.Date >= DateTime.Parse(DateFrom) && x.PreparedDate.Date <= DateTime.Parse(DateTo))
+            .GroupBy(x => new
+            {
+                x.WarehouseId,
+                x.ItemCode,
+            })
+            .Select(x => new
+            {
+                WarehouseId = x.Key.WarehouseId,
+                ItemCode = x.Key.ItemCode,
+                Quantity = x.Sum(y => y.Quantity),
+            });
 
         var getUnitPrice = (from warehouse in getWarehouseStockById
                     join moveorder in getMoveOrderOutid

@@ -81,7 +81,9 @@ public class Startup
         services.AddScoped<IRawMaterialRepository, RawMaterialRepository>();
         services.AddScoped<IOrdering, OrderingRepository>();
         services.AddDbContext<StoreContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("Docker")).EnableDetailedErrors());
+            options.UseSqlServer(Configuration
+                    .GetConnectionString("LiveConnection"), sqlServerOptions => sqlServerOptions.CommandTimeout(300))
+                        .EnableDetailedErrors());
 
         services.Configure<ApiBehaviorOptions>(options =>
         {

@@ -75,7 +75,7 @@ public class ExportInventoryMovementReport : ControllerBase
                     "Item Category",
                     "Unit Cost",
                     "Total Amount",
-                    "Move Ordere",
+                    "Move Orders",
                     "Misc. Issued",
                     "Receive",
                     "Misc. Receipt",
