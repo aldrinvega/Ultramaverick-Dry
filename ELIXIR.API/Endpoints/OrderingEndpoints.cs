@@ -1,16 +1,20 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ELIXIR.API.Http;
 using ELIXIR.DATA.CORE.ICONFIGURATION;
+using ELIXIR.DATA.CORE.INTERFACES.ORDER_HUB;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
 using ELIXIR.DATA.DTOs.ORDERING_DTOs;
+using ELIXIR.DATA.SERVICES;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ELIXIR.API.Endpoints
 {
@@ -50,6 +54,16 @@ namespace ELIXIR.API.Endpoints
             public static readonly MvcParameter<List<int>> OrderIds = MvcParameter.Query<List<int>>("orderIds");
             public static readonly MvcParameter<ReasontDTO> Reason = MvcParameter.Body<ReasontDTO>("reason");
             public static readonly MvcParameter<int> RouteId = MvcParameter.Route<int>("id");
+
+            public static readonly MvcParameter<bool> Status = MvcParameter.Query<bool>("status");
+            public static readonly MvcParameter<int> Orderid = MvcParameter.Query<int>("orderid");
+            public static readonly MvcParameter<TransactMoveOrder[]> Transact = MvcParameter.Body<TransactMoveOrder[]>("transact");
+            public static readonly MvcParameter<Ordering[]> MoveOrders = MvcParameter.Body<Ordering[]>("moveOrders");
+            public static readonly MvcParameter<Ordering[]> OrderNos = MvcParameter.Body<Ordering[]>("orderNos");
+            public static readonly MvcParameter<AllocationFinalResult> Allocation = MvcParameter.Body<AllocationFinalResult>("allocation");
+            public static readonly MvcParameter<string> ItemCode = MvcParameter.Query<string>("itemCode");
+            public static readonly MvcParameter<string> Customer = MvcParameter.Query<string>("customer");
+            public static readonly MvcParameter<List<ManualAllocation>> ManualAllocations = MvcParameter.Body<List<ManualAllocation>>("order");
         }
 
         public static IEndpointRouteBuilder MapOrderingEndpoints(this IEndpointRouteBuilder app)
@@ -100,6 +114,20 @@ namespace ELIXIR.API.Endpoints
             group.MapGet("GetAllApprovedMoveOrder", GetAllApprovedMoveOrder).WithMvcParameters(P.Id);
             group.MapPut("CancelOrdersInMoveOrder/{id}", CancelOrdersInMoveOrder).WithMvcParameters(P.Reason, P.RouteId);
             group.MapGet("GetAllApprovedOrderCalendar", GetAllApprovedOrderCalendar);
+
+            // Transact move order
+            group.MapGet("GetTotalListForMoveOrder", GetTotalListForMoveOrder).WithMvcParameters(P.Status);
+            group.MapGet("ListOfMoveOrdersForTransact", ListOfMoveOrdersForTransact).WithMvcParameters(P.Orderid);
+            group.MapPost("TransactListOfMoveOrders", TransactListOfMoveOrders).WithMvcParameters(P.Transact);
+            group.MapPost("SetBeingPrepared", SetBeingPrepared).WithMvcParameters(P.MoveOrders);
+            group.MapPost("UnsetBeingPrepared", UnsetBeingPrepared).WithMvcParameters(P.OrderNos);
+
+            // Allocation
+            group.MapPut("Allocate", AllocateOrderPerItem).WithMvcParameters(P.Allocation);
+            group.MapGet("GetAllListOfOrdersForAllocationPagination", GetAllListOfOrdersForAllocationPagination).WithMvcParameters(P.UserParams);
+            group.MapGet("GetAllListofOrdersForAllocation", GetAllListofOrdersForAllocation).WithMvcParameters(P.ItemCode);
+            group.MapPost("CancelForPendingAllocation", CancelForAllocation).WithMvcParameters(P.Customer);
+            group.MapPut("ManualAllocation", ManualAllocateOrders).WithMvcParameters(P.ManualAllocations);
 
             return app;
         }
@@ -753,6 +781,169 @@ namespace ELIXIR.API.Endpoints
             var orders = await unitOfWork.Order.GetAllApprovedOrdersForCalendar();
 
             return MvcResults.Ok(orders);
+        }
+
+        //------------------TRANSACT MOVE ORDER-------------------------
+
+        private static async Task<IResult> GetTotalListForMoveOrder(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var status = await bind.BindAsync(P.Status);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.TotalListForTransactMoveOrder(status);
+
+            return MvcResults.Ok(orders);
+        }
+
+        private static async Task<IResult> ListOfMoveOrdersForTransact(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var orderid = await bind.BindAsync(P.Orderid);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.ListOfMoveOrdersForTransact(orderid);
+
+            return MvcResults.Ok(orders);
+        }
+
+        private static async Task<IResult> TransactListOfMoveOrders(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var transact = await bind.BindAsync(P.Transact);
+            if (bind.Failure() is { } failure) return failure;
+
+            foreach (TransactMoveOrder items in transact)
+            {
+                items.IsActive = true;
+                items.IsTransact = true;
+                items.PreparedDate = DateTime.Now;
+
+                await unitOfWork.Order.TransanctListOfMoveOrders(items);
+            }
+
+            await unitOfWork.CompleteAsync();
+
+            return MvcResults.Ok(transact);
+        }
+
+        private static async Task<IResult> SetBeingPrepared(HttpContext http, [FromServices] IUnitOfWork unitOfWork,
+            [FromServices] IHubContext<OrderHub, IOrderHub> hub)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var moveOrders = await bind.BindAsync(P.MoveOrders);
+            if (bind.Failure() is { } failure) return failure;
+
+            foreach (var item in moveOrders)
+            {
+                var result = await unitOfWork.Order.SetBeingPrepared(item);
+
+                if (!result) continue;
+                // Call the SignalR hub method to broadcast the update
+                await hub.Clients.All.SetBeingPrepared(item);
+                return MvcResults.Ok();
+            }
+
+            return MvcResults.Json("Someone is already preparing!");
+        }
+
+        private static async Task<IResult> UnsetBeingPrepared(HttpContext http, [FromServices] IUnitOfWork unitOfWork,
+            [FromServices] IHubContext<OrderHub, IOrderHub> hub)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var orderNos = await bind.BindAsync(P.OrderNos);
+            if (bind.Failure() is { } failure) return failure;
+
+            foreach (Ordering item in orderNos)
+            {
+                // The repository returns bool, so this is always true for the first item (kept from the controller).
+                var result = await unitOfWork.Order.UnsetBeingPrepared(item);
+
+                if (result != null)
+                {
+                    await hub.Clients.All.SetBeingPrepared(item);
+                    return MvcResults.Ok();
+                }
+            }
+
+            return MvcResults.Json("Something Wrong");
+        }
+
+        //========Allocation========//
+
+        private static async Task<IResult> AllocateOrderPerItem(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var allocation = await bind.BindAsync(P.Allocation);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.AllocateOrdersPerItems(allocation);
+            await unitOfWork.CompleteAsync();
+            return MvcResults.Ok(orders);
+        }
+
+        private static async Task<IResult> GetAllListOfOrdersForAllocationPagination(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var userParams = await bind.BindAsync(P.UserParams);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.GetAllListofOrdersForAllocationPagination(userParams);
+
+            http.Response.AddPaginationHeader(orders.CurrentPage, orders.PageSize, orders.TotalCount, orders.TotalPages,
+                orders.HasNextPage, orders.HasPreviousPage);
+
+            var orderResult = new
+            {
+                orders,
+                orders.CurrentPage,
+                orders.PageSize,
+                orders.TotalCount,
+                orders.TotalPages,
+                orders.HasNextPage,
+                orders.HasPreviousPage
+            };
+
+            return MvcResults.Ok(orderResult);
+        }
+
+        private static async Task<IResult> GetAllListofOrdersForAllocation(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var itemCode = await bind.BindAsync(P.ItemCode);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.GetAllListofOrdersAllocation(itemCode);
+
+            return MvcResults.Ok(orders);
+        }
+
+        private static async Task<IResult> CancelForAllocation(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var customer = await bind.BindAsync(P.Customer);
+            if (bind.Failure() is { } failure) return failure;
+
+            var order = await unitOfWork.Order.CancelForPendingAllocation(customer);
+
+            if (!order)
+                return MvcResults.BadRequest("Something went wrong");
+
+            return MvcResults.Ok();
+        }
+
+        private static async Task<IResult> ManualAllocateOrders(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var order = await bind.BindAsync(P.ManualAllocations);
+            if (bind.Failure() is { } failure) return failure;
+
+            var isSuccess = await unitOfWork.Order.ManualAllocationForOrders(order);
+            await unitOfWork.CompleteAsync();
+            if (isSuccess)
+                return MvcResults.Ok("Manual Allocation Complete");
+
+            return MvcResults.Json("Something Wrong");
         }
     }
 }
