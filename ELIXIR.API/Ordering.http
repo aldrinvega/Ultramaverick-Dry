@@ -1,0 +1,306 @@
+# Ordering API (Minimal API endpoints, formerly OrderingController).
+# Every route, binding and response matches the former controller; see SPEC.md.
+# Note: these call the configured database. Mutating requests change data.
+
+@baseUrl = http://localhost:5000
+@accept = application/json, text/plain, */*
+
+# --- Orders and scheduling ---
+
+### GetAllListofOrders
+GET {{baseUrl}}/api/Ordering/GetAllListofOrders?farms=Farm%20A
+Accept: {{accept}}
+
+### EditOrderQuantity
+PUT {{baseUrl}}/api/Ordering/EditOrderQuantity
+Accept: {{accept}}
+Content-Type: application/json
+
+{"id": 1, "farmName": "Farm A", "farmCode": "F01", "itemCode": "RM-001", "uom": "KG", "quantityOrdered": 10.5, "orderDate": "2024-01-02T00:00:00", "dateNeeded": "2024-01-05T00:00:00"}
+
+### SchedulePreparedOrderedDate
+PUT {{baseUrl}}/api/Ordering/SchedulePreparedOrderedDate
+Accept: {{accept}}
+Content-Type: application/json
+
+[{"id": 1, "farmName": "Farm A", "farmCode": "F01", "itemCode": "RM-001", "uom": "KG", "quantityOrdered": 10.5, "orderDate": "2024-01-02T00:00:00", "dateNeeded": "2024-01-05T00:00:00"}]
+
+### ApprovePreparedDate
+PUT {{baseUrl}}/api/Ordering/ApprovePreparedDate
+Accept: {{accept}}
+Content-Type: application/json
+
+[{"id": 1, "farmName": "Farm A", "farmCode": "F01", "itemCode": "RM-001", "uom": "KG", "quantityOrdered": 10.5, "orderDate": "2024-01-02T00:00:00", "dateNeeded": "2024-01-05T00:00:00"}]
+
+### RejectPreparedDate
+PUT {{baseUrl}}/api/Ordering/RejectPreparedDate
+Accept: {{accept}}
+Content-Type: application/json
+
+[{"id": 1, "farmName": "Farm A", "farmCode": "F01", "itemCode": "RM-001", "uom": "KG", "quantityOrdered": 10.5, "orderDate": "2024-01-02T00:00:00", "dateNeeded": "2024-01-05T00:00:00"}]
+
+### GetAllListofPreparedDate
+PUT {{baseUrl}}/api/Ordering/GetAllListofPreparedDate
+Accept: {{accept}}
+
+### OrderSummary
+GET {{baseUrl}}/api/Ordering/OrderSummary?dateFrom=2024-01-01&dateTo=2024-01-31
+Accept: {{accept}}
+
+### ValidateNewOrders
+POST {{baseUrl}}/api/Ordering/ValidateNewOrders
+Accept: {{accept}}
+Content-Type: application/json
+
+[{"id": 1, "farmName": "Farm A", "farmCode": "F01", "itemCode": "RM-001", "uom": "KG", "quantityOrdered": 10.5, "orderDate": "2024-01-02T00:00:00", "dateNeeded": "2024-01-05T00:00:00"}]
+
+### AddNewOrder
+POST {{baseUrl}}/api/Ordering/AddNewOrder
+Accept: {{accept}}
+Content-Type: application/json
+
+[{"id": 1, "farmName": "Farm A", "farmCode": "F01", "itemCode": "RM-001", "uom": "KG", "quantityOrdered": 10.5, "orderDate": "2024-01-02T00:00:00", "dateNeeded": "2024-01-05T00:00:00"}]
+
+### GetAllListOfOrdersPagination
+GET {{baseUrl}}/api/Ordering/GetAllListOfOrdersPagination?PageNumber=1&PageSize=10
+Accept: {{accept}}
+
+### CancelOrders
+PUT {{baseUrl}}/api/Ordering/CancelOrders
+Accept: {{accept}}
+Content-Type: application/json
+
+[{"id": 1, "farmName": "Farm A", "farmCode": "F01", "itemCode": "RM-001", "uom": "KG", "quantityOrdered": 10.5, "orderDate": "2024-01-02T00:00:00", "dateNeeded": "2024-01-05T00:00:00"}]
+
+### GetAllListOfCancelledOrders
+GET {{baseUrl}}/api/Ordering/GetAllListOfCancelledOrders
+Accept: {{accept}}
+
+### ReturnCancelledOrders
+PUT {{baseUrl}}/api/Ordering/ReturnCancelledOrders
+Accept: {{accept}}
+Content-Type: application/json
+
+{"id": 1, "farmName": "Farm A", "farmCode": "F01", "itemCode": "RM-001", "uom": "KG", "quantityOrdered": 10.5, "orderDate": "2024-01-02T00:00:00", "dateNeeded": "2024-01-05T00:00:00"}
+
+# --- Move-order preparation ---
+
+### GetAllListForMoveOrderPagination
+GET {{baseUrl}}/api/Ordering/GetAllListForMoveOrderPagination?PageNumber=1&PageSize=10&dateFrom=2024-01-01&dateTo=2024-01-31
+Accept: {{accept}}
+
+### GetAllListOfApprovedPreparedForMoveOrder
+GET {{baseUrl}}/api/Ordering/GetAllListOfApprovedPreparedForMoveOrder?farm=Farm%20A
+Accept: {{accept}}
+
+### DetailedListOfOrders
+GET {{baseUrl}}/api/Ordering/DetailedListOfOrders?farm=Farm%20A
+Accept: {{accept}}
+
+### GetAllListForScheduleApproval
+GET {{baseUrl}}/api/Ordering/GetAllListForScheduleApproval
+Accept: {{accept}}
+
+### GetAllOrdersForScheduleApproval
+GET {{baseUrl}}/api/Ordering/GetAllOrdersForScheduleApproval?id=1
+Accept: {{accept}}
+
+### GetAllOutOfStockByItemCodeAndOrderDate
+GET {{baseUrl}}/api/Ordering/GetAllOutOfStockByItemCodeAndOrderDate?itemcode=RM-001&orderdate=2024-01-02
+Accept: {{accept}}
+
+### PrepareItemsForMoveOrder
+POST {{baseUrl}}/api/Ordering/PrepareItemsForMoveOrder
+Accept: {{accept}}
+Content-Type: application/json
+
+{"id": 1, "orderNoPKey": 41, "quantityOrdered": 7.75}
+
+### GetAllListOfOrdersForMoveOrder
+GET {{baseUrl}}/api/Ordering/GetAllListOfOrdersForMoveOrder?id=1
+Accept: {{accept}}
+
+### GetAvailableStockFromWarehouse
+GET {{baseUrl}}/api/Ordering/GetAvailableStockFromWarehouse?id=1&itemcode=RM-001
+Accept: {{accept}}
+
+### ListOfPreparedItemsForMoveOrder
+GET {{baseUrl}}/api/Ordering/ListOfPreparedItemsForMoveOrder?id=1
+Accept: {{accept}}
+
+### CancelPreparedItems
+PUT {{baseUrl}}/api/Ordering/CancelPreparedItems
+Accept: {{accept}}
+Content-Type: application/json
+
+{"id": 1, "orderNoPKey": 41, "quantityOrdered": 7.75}
+
+### AddPlateNumberInMoveOrder
+PUT {{baseUrl}}/api/Ordering/AddPlateNumberInMoveOrder
+Accept: {{accept}}
+Content-Type: application/json
+
+[{"id": 1, "plateNumber": "ABC-123"}]
+
+### AddDeliveryStatus
+PUT {{baseUrl}}/api/Ordering/AddDeliveryStatus
+Accept: {{accept}}
+Content-Type: application/json
+
+[{"id": 1, "deliveryStatus": "Delivered"}]
+
+### ApproveListOfMoveOrder
+PUT {{baseUrl}}/api/Ordering/ApproveListOfMoveOrder
+Accept: {{accept}}
+Content-Type: application/json
+
+[{"id": 1, "orderNoPKey": 41, "quantityOrdered": 7.75}]
+
+### RejectListOfMoveOrder
+PUT {{baseUrl}}/api/Ordering/RejectListOfMoveOrder
+Accept: {{accept}}
+Content-Type: application/json
+
+{"id": 1, "orderNoPKey": 41, "quantityOrdered": 7.75}
+
+### RejectApproveListOfMoveOrder
+PUT {{baseUrl}}/api/Ordering/RejectApproveListOfMoveOrder
+Accept: {{accept}}
+Content-Type: application/json
+
+{"id": 1, "orderNoPKey": 41, "quantityOrdered": 7.75}
+
+### ReturnMoveOrderForApproval
+PUT {{baseUrl}}/api/Ordering/ReturnMoveOrderForApproval
+Accept: {{accept}}
+Content-Type: application/json
+
+{"id": 1, "orderNoPKey": 41, "quantityOrdered": 7.75}
+
+### UpdatePrintStatus
+PUT {{baseUrl}}/api/Ordering/UpdatePrintStatus
+Accept: {{accept}}
+Content-Type: application/json
+
+[1, 2, 3]
+
+# --- Move-order approval, print, view ---
+
+### GetAllForApprovalMoveOrderPagination
+GET {{baseUrl}}/api/Ordering/GetAllForApprovalMoveOrderPagination?PageNumber=1&PageSize=10
+Accept: {{accept}}
+
+### GetAllForApprovalMoveOrderPaginationOrig
+GET {{baseUrl}}/api/Ordering/GetAllForApprovalMoveOrderPaginationOrig?PageNumber=1&PageSize=10&search=farm
+Accept: {{accept}}
+
+### PrintMultipleMoveOrderSlip
+GET {{baseUrl}}/api/Ordering/PrintMultipleMoveOrderSlip?orderIds=1&orderIds=2
+Accept: {{accept}}
+
+### ViewMoveOrderForApproval
+GET {{baseUrl}}/api/Ordering/ViewMoveOrderForApproval?id=1
+Accept: {{accept}}
+
+### ApprovedMoveOrderPagination
+GET {{baseUrl}}/api/Ordering/ApprovedMoveOrderPagination?PageNumber=1&PageSize=10&dateFrom=2024-01-01&dateTo=2024-01-31
+Accept: {{accept}}
+
+### ApprovedMoveOrderPaginationOrig
+GET {{baseUrl}}/api/Ordering/ApprovedMoveOrderPaginationOrig?PageNumber=1&PageSize=10&search=farm&dateFrom=2024-01-01&dateTo=2024-01-31
+Accept: {{accept}}
+
+### RejectedMoveOrderPagination
+GET {{baseUrl}}/api/Ordering/RejectedMoveOrderPagination?PageNumber=1&PageSize=10
+Accept: {{accept}}
+
+### RejectedMoveOrderPaginationOrig
+GET {{baseUrl}}/api/Ordering/RejectedMoveOrderPaginationOrig?PageNumber=1&PageSize=10&search=farm
+Accept: {{accept}}
+
+### GetAllApprovedMoveOrder
+GET {{baseUrl}}/api/Ordering/GetAllApprovedMoveOrder?id=1
+Accept: {{accept}}
+
+### CancelOrdersInMoveOrder/1
+PUT {{baseUrl}}/api/Ordering/CancelOrdersInMoveOrder/1
+Accept: {{accept}}
+Content-Type: application/json
+
+{"reason": "Truck unavailable"}
+
+### GetAllApprovedOrderCalendar
+GET {{baseUrl}}/api/Ordering/GetAllApprovedOrderCalendar
+Accept: {{accept}}
+
+# --- Transact move order ---
+
+### GetTotalListForMoveOrder
+GET {{baseUrl}}/api/Ordering/GetTotalListForMoveOrder?status=true
+Accept: {{accept}}
+
+### ListOfMoveOrdersForTransact
+GET {{baseUrl}}/api/Ordering/ListOfMoveOrdersForTransact?orderid=1
+Accept: {{accept}}
+
+### TransactListOfMoveOrders
+POST {{baseUrl}}/api/Ordering/TransactListOfMoveOrders
+Accept: {{accept}}
+Content-Type: application/json
+
+[{"id": 1, "orderNo": 11, "preparedBy": "clerk"}]
+
+### SetBeingPrepared
+POST {{baseUrl}}/api/Ordering/SetBeingPrepared
+Accept: {{accept}}
+Content-Type: application/json
+
+[{"id": 1, "farmName": "Farm A", "farmCode": "F01", "itemCode": "RM-001", "uom": "KG", "quantityOrdered": 10.5, "orderDate": "2024-01-02T00:00:00", "dateNeeded": "2024-01-05T00:00:00"}]
+
+### UnsetBeingPrepared
+POST {{baseUrl}}/api/Ordering/UnsetBeingPrepared
+Accept: {{accept}}
+Content-Type: application/json
+
+[{"id": 1, "farmName": "Farm A", "farmCode": "F01", "itemCode": "RM-001", "uom": "KG", "quantityOrdered": 10.5, "orderDate": "2024-01-02T00:00:00", "dateNeeded": "2024-01-05T00:00:00"}]
+
+# --- Allocation ---
+
+### Allocate
+PUT {{baseUrl}}/api/Ordering/Allocate
+Accept: {{accept}}
+Content-Type: application/json
+
+{"soh": 20, "allocations": []}
+
+### GetAllListOfOrdersForAllocationPagination
+GET {{baseUrl}}/api/Ordering/GetAllListOfOrdersForAllocationPagination?PageNumber=1&PageSize=10
+Accept: {{accept}}
+
+### GetAllListofOrdersForAllocation
+GET {{baseUrl}}/api/Ordering/GetAllListofOrdersForAllocation?itemCode=RM-001
+Accept: {{accept}}
+
+### CancelForPendingAllocation
+POST {{baseUrl}}/api/Ordering/CancelForPendingAllocation?customer=Farm%20A
+Accept: {{accept}}
+
+### ManualAllocation
+PUT {{baseUrl}}/api/Ordering/ManualAllocation
+Accept: {{accept}}
+Content-Type: application/json
+
+[{"id": 1, "itemCode": "RM-001", "quantityOrdered": 4}]
+
+# --- Error paths (same responses as the former controller) ---
+
+### EditOrderQuantity
+PUT {{baseUrl}}/api/Ordering/EditOrderQuantity
+Accept: {{accept}}
+Content-Type: application/json
+
+{"id":
+
+### GetAllOrdersForScheduleApproval
+GET {{baseUrl}}/api/Ordering/GetAllOrdersForScheduleApproval?id=abc
+Accept: {{accept}}

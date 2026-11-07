@@ -1,4 +1,5 @@
-﻿using ELIXIR.API.MIDDLEWARE;
+﻿using ELIXIR.API.Http;
+using ELIXIR.API.MIDDLEWARE;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -14,6 +15,7 @@ namespace ELIXIR.API.EXTENSIONS
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                c.OperationFilter<MvcParameterOperationFilter>();
             });
 
             return services;
