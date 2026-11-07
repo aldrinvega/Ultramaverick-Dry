@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ELIXIR.API.Http;
 using ELIXIR.DATA.CORE.ICONFIGURATION;
@@ -44,6 +45,11 @@ namespace ELIXIR.API.Endpoints
             public static readonly MvcParameter<MoveOrder[]> MoveOrderArray = MvcParameter.Body<MoveOrder[]>("moveorder");
             public static readonly MvcParameter<OrderDto[]> OrderDtoArray = MvcParameter.Body<OrderDto[]>("order");
             public static readonly MvcParameter<int[]> PrintIds = MvcParameter.Body<int[]>("moveorder");
+
+            public static readonly MvcParameter<string> Search = MvcParameter.Query<string>("search");
+            public static readonly MvcParameter<List<int>> OrderIds = MvcParameter.Query<List<int>>("orderIds");
+            public static readonly MvcParameter<ReasontDTO> Reason = MvcParameter.Body<ReasontDTO>("reason");
+            public static readonly MvcParameter<int> RouteId = MvcParameter.Route<int>("id");
         }
 
         public static IEndpointRouteBuilder MapOrderingEndpoints(this IEndpointRouteBuilder app)
@@ -82,6 +88,18 @@ namespace ELIXIR.API.Endpoints
             group.MapPut("RejectApproveListOfMoveOrder", RejectApproveListOfMoveOrder).WithMvcParameters(P.MoveOrder);
             group.MapPut("ReturnMoveOrderForApproval", ReturnMoveOrderForApproval).WithMvcParameters(P.MoveOrder);
             group.MapPut("UpdatePrintStatus", UpdatePrintStatus).WithMvcParameters(P.PrintIds);
+
+            group.MapGet("GetAllForApprovalMoveOrderPagination", GetAllForApprovalMoveOrderPagination).WithMvcParameters(P.UserParams);
+            group.MapGet("GetAllForApprovalMoveOrderPaginationOrig", GetAllForApprovalMoveOrderPaginationOrig).WithMvcParameters(P.UserParams, P.Search);
+            group.MapGet("PrintMultipleMoveOrderSlip", PrintMultipleMoveOrderSlip).WithMvcParameters(P.OrderIds);
+            group.MapGet("ViewMoveOrderForApproval", ViewMoveOrderForApproval).WithMvcParameters(P.Id);
+            group.MapGet("ApprovedMoveOrderPagination", ApprovedMoveOrderPagination).WithMvcParameters(P.UserParams, P.DateFrom, P.DateTo);
+            group.MapGet("ApprovedMoveOrderPaginationOrig", ApprovedMoveOrderPaginationOrig).WithMvcParameters(P.UserParams, P.Search, P.DateFrom, P.DateTo);
+            group.MapGet("RejectedMoveOrderPagination", RejectedMoveOrderPagination).WithMvcParameters(P.UserParams);
+            group.MapGet("RejectedMoveOrderPaginationOrig", RejectedMoveOrderPaginationOrig).WithMvcParameters(P.UserParams, P.Search);
+            group.MapGet("GetAllApprovedMoveOrder", GetAllApprovedMoveOrder).WithMvcParameters(P.Id);
+            group.MapPut("CancelOrdersInMoveOrder/{id}", CancelOrdersInMoveOrder).WithMvcParameters(P.Reason, P.RouteId);
+            group.MapGet("GetAllApprovedOrderCalendar", GetAllApprovedOrderCalendar);
 
             return app;
         }
@@ -582,6 +600,159 @@ namespace ELIXIR.API.Endpoints
 
             await unitOfWork.Order.UpdatePrintStatus(moveorder);
             return MvcResults.Ok(moveorder);
+        }
+
+        /// <summary>The paginated move-order response shared by the approval/approved/rejected list endpoints.</summary>
+        private static IResult MoveOrderPage(HttpContext http, PagedList<MoveOrderDto> moveorder)
+        {
+            http.Response.AddPaginationHeader(moveorder.CurrentPage, moveorder.PageSize, moveorder.TotalCount,
+                moveorder.TotalPages, moveorder.HasNextPage, moveorder.HasPreviousPage);
+
+            var moveorderResult = new
+            {
+                moveorder,
+                moveorder.CurrentPage,
+                moveorder.PageSize,
+                moveorder.TotalCount,
+                moveorder.TotalPages,
+                moveorder.HasNextPage,
+                moveorder.HasPreviousPage
+            };
+
+            return MvcResults.Ok(moveorderResult);
+        }
+
+        private static async Task<IResult> GetAllForApprovalMoveOrderPagination(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var userParams = await bind.BindAsync(P.UserParams);
+            if (bind.Failure() is { } failure) return failure;
+
+            return MoveOrderPage(http, await unitOfWork.Order.ForApprovalMoveOrderPagination(userParams));
+        }
+
+        private static async Task<IResult> GetAllForApprovalMoveOrderPaginationOrig(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var userParams = await bind.BindAsync(P.UserParams);
+            var search = await bind.BindAsync(P.Search);
+            if (bind.Failure() is { } failure) return failure;
+
+            if (search == null)
+                return MoveOrderPage(http, await unitOfWork.Order.ForApprovalMoveOrderPagination(userParams));
+
+            return MoveOrderPage(http, await unitOfWork.Order.ForApprovalMoveOrderPaginationOrig(userParams, search));
+        }
+
+        private static async Task<IResult> PrintMultipleMoveOrderSlip(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var orderIds = await bind.BindAsync(P.OrderIds);
+            if (bind.Failure() is { } failure) return failure;
+
+            if (orderIds == null || !orderIds.Any())
+                return MvcResults.BadRequest("No order IDs provided");
+
+            var orders = await unitOfWork.Order.MultiplePrintingForMOS(orderIds);
+            return MvcResults.Ok(orders);
+        }
+
+        private static async Task<IResult> ViewMoveOrderForApproval(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var id = await bind.BindAsync(P.Id);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.ViewMoveOrderForApproval(id);
+
+            if (orders.Count != 0)
+            {
+                return MvcResults.Ok(orders);
+            }
+
+            var order = await unitOfWork.Order.ViewMoveOrderForApprovalOriginal(id);
+            return MvcResults.Ok(order);
+        }
+
+        private static async Task<IResult> ApprovedMoveOrderPagination(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var userParams = await bind.BindAsync(P.UserParams);
+            var dateFrom = await bind.BindAsync(P.DateFrom);
+            var dateTo = await bind.BindAsync(P.DateTo);
+            if (bind.Failure() is { } failure) return failure;
+
+            return MoveOrderPage(http, await unitOfWork.Order.ApprovedMoveOrderPagination(userParams, dateFrom, dateTo));
+        }
+
+        private static async Task<IResult> ApprovedMoveOrderPaginationOrig(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var userParams = await bind.BindAsync(P.UserParams);
+            var search = await bind.BindAsync(P.Search);
+            var dateFrom = await bind.BindAsync(P.DateFrom);
+            var dateTo = await bind.BindAsync(P.DateTo);
+            if (bind.Failure() is { } failure) return failure;
+
+            if (search == null)
+                return MoveOrderPage(http, await unitOfWork.Order.ApprovedMoveOrderPagination(userParams, dateFrom, dateTo));
+
+            return MoveOrderPage(http,
+                await unitOfWork.Order.ApprovedMoveOrderPaginationOrig(userParams, search, dateFrom, dateTo));
+        }
+
+        private static async Task<IResult> RejectedMoveOrderPagination(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var userParams = await bind.BindAsync(P.UserParams);
+            if (bind.Failure() is { } failure) return failure;
+
+            return MoveOrderPage(http, await unitOfWork.Order.RejectedMoveOrderPagination(userParams));
+        }
+
+        private static async Task<IResult> RejectedMoveOrderPaginationOrig(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var userParams = await bind.BindAsync(P.UserParams);
+            var search = await bind.BindAsync(P.Search);
+            if (bind.Failure() is { } failure) return failure;
+
+            if (search == null)
+                return MoveOrderPage(http, await unitOfWork.Order.RejectedMoveOrderPagination(userParams));
+
+            return MoveOrderPage(http, await unitOfWork.Order.RejectedMoveOrderPaginationOrig(userParams, search));
+        }
+
+        private static async Task<IResult> GetAllApprovedMoveOrder(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var id = await bind.BindAsync(P.Id);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.GetAllApprovedMoveOrder(id);
+
+            return MvcResults.Ok(orders);
+        }
+
+        private static async Task<IResult> CancelOrdersInMoveOrder(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var reason = await bind.BindAsync(P.Reason);
+            var id = await bind.BindAsync(P.RouteId);
+            if (bind.Failure() is { } failure) return failure;
+
+            await unitOfWork.Order.CancelControlInMoveOrder(id, reason);
+
+            await unitOfWork.CompleteAsync();
+
+            return MvcResults.Ok("Successfully cancel orders");
+        }
+
+        private static async Task<IResult> GetAllApprovedOrderCalendar([FromServices] IUnitOfWork unitOfWork)
+        {
+            var orders = await unitOfWork.Order.GetAllApprovedOrdersForCalendar();
+
+            return MvcResults.Ok(orders);
         }
     }
 }
