@@ -39,19 +39,19 @@ Branch `feature/ordering-minimal-api`, worktree `.worktrees/ordering-minimal-api
 ## Task List (details in `tasks/todo.md`)
 
 ### Phase 0: Environment
-- [ ] Task 0: ASP.NET Core 7.0 runtime available locally
+- [x] Task 0: ASP.NET Core 7.0 runtime available locally
 
 ### Phase 1: Test harness
-- [ ] Task 1: Scaffold `tests/ELIXIR.Tests` + `ElixirApiFactory` + one smoke test
+- [x] Task 1: Scaffold `tests/ELIXIR.Tests` + `ElixirApiFactory` + one smoke test
 
 ### Phase 2: Contract tests against the existing controller (no production changes)
-- [ ] Task 2: Group A — orders & scheduling (#1–13)
-- [ ] Task 3: Group B — move-order preparation & approval (#14–31)
-- [ ] Task 4: Group C — move-order pagination, print, view (#32–42)
-- [ ] Task 5: Group D — transact, SignalR, allocation (#43–52)
+- [x] Task 2: Group A — orders & scheduling (#1–13)
+- [x] Task 3: Group B — move-order preparation & approval (#14–31)
+- [x] Task 4: Group C — move-order pagination, print, view (#32–42)
+- [x] Task 5: Group D — transact, SignalR, allocation (#43–52)
 
 ### Checkpoint 1
-- [ ] All contract tests are green against `OrderingController`; build has no new warnings; **stop and show you the test list**
+- [x] All contract tests are green against `OrderingController` (100 tests; Group E added for binding errors); build has no new warnings; **stop and show you the test list**
 
 ### Phase 3: Conversion
 - [ ] Task 6: Newtonsoft result/body helpers + `AddEndpointsApiExplorer` + empty `MapOrderingEndpoints`
