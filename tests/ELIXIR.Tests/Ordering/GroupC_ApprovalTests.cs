@@ -16,15 +16,15 @@ public sealed class GroupC_ApprovalTests : OrderingContractTestBase
 {
     public GroupC_ApprovalTests(ElixirApiFactory factory) : base(factory) { }
 
-    private static PagedList<MoveOrderDto> Page() => TestData.PageTwo(TestData.MoveOrderDto());
+    private static PagedList<MoveOrderDto> Page() => TestData.LastPage(TestData.MoveOrderDto());
 
     private static async Task AssertMoveOrderPage(HttpResponseMessage response, PagedList<MoveOrderDto> page)
     {
-        Contract.AssertPaginationHeader(response, Contract.PageTwoHeader);
+        Contract.AssertPaginationHeader(response, Contract.LastPageHeader);
         await Contract.AssertJsonLiteral(response, HttpStatusCode.OK, Contract.PagedBody("moveorder", page));
     }
 
-    private static UserParams PageTwoParams() => Arg.Is<UserParams>(p => p.PageNumber == 2 && p.PageSize == 1);
+    private static UserParams RequestedPageTwoParams() => Arg.Is<UserParams>(p => p.PageNumber == 2 && p.PageSize == 1);
 
     // #32 GET GetAllForApprovalMoveOrderPagination
     [Fact]
@@ -36,7 +36,7 @@ public sealed class GroupC_ApprovalTests : OrderingContractTestBase
         var response = await Get("GetAllForApprovalMoveOrderPagination?PageNumber=2&PageSize=1");
 
         await AssertMoveOrderPage(response, page);
-        await Order.Received(1).ForApprovalMoveOrderPagination(PageTwoParams());
+        await Order.Received(1).ForApprovalMoveOrderPagination(RequestedPageTwoParams());
     }
 
     // #33 GET GetAllForApprovalMoveOrderPaginationOrig
@@ -49,7 +49,7 @@ public sealed class GroupC_ApprovalTests : OrderingContractTestBase
         var response = await Get("GetAllForApprovalMoveOrderPaginationOrig?PageNumber=2&PageSize=1");
 
         await AssertMoveOrderPage(response, page);
-        await Order.Received(1).ForApprovalMoveOrderPagination(PageTwoParams());
+        await Order.Received(1).ForApprovalMoveOrderPagination(RequestedPageTwoParams());
         await Order.DidNotReceive().ForApprovalMoveOrderPaginationOrig(Arg.Any<UserParams>(), Arg.Any<string>());
     }
 
@@ -122,7 +122,7 @@ public sealed class GroupC_ApprovalTests : OrderingContractTestBase
         var response = await Get("ApprovedMoveOrderPagination?PageNumber=2&PageSize=1&dateFrom=2024-01-01&dateTo=2024-01-31");
 
         await AssertMoveOrderPage(response, page);
-        await Order.Received(1).ApprovedMoveOrderPagination(PageTwoParams(), "2024-01-01", "2024-01-31");
+        await Order.Received(1).ApprovedMoveOrderPagination(RequestedPageTwoParams(), "2024-01-01", "2024-01-31");
     }
 
     // #37 GET ApprovedMoveOrderPaginationOrig
@@ -135,7 +135,7 @@ public sealed class GroupC_ApprovalTests : OrderingContractTestBase
         var response = await Get("ApprovedMoveOrderPaginationOrig?PageNumber=2&PageSize=1&dateFrom=2024-01-01&dateTo=2024-01-31");
 
         await AssertMoveOrderPage(response, page);
-        await Order.Received(1).ApprovedMoveOrderPagination(PageTwoParams(), "2024-01-01", "2024-01-31");
+        await Order.Received(1).ApprovedMoveOrderPagination(RequestedPageTwoParams(), "2024-01-01", "2024-01-31");
         await Order.DidNotReceive().ApprovedMoveOrderPaginationOrig(Arg.Any<UserParams>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
     }
 
@@ -148,7 +148,7 @@ public sealed class GroupC_ApprovalTests : OrderingContractTestBase
         var response = await Get("ApprovedMoveOrderPaginationOrig?PageNumber=2&PageSize=1&search=farm&dateFrom=2024-01-01&dateTo=2024-01-31");
 
         await AssertMoveOrderPage(response, page);
-        await Order.Received(1).ApprovedMoveOrderPaginationOrig(PageTwoParams(), "farm", "2024-01-01", "2024-01-31");
+        await Order.Received(1).ApprovedMoveOrderPaginationOrig(RequestedPageTwoParams(), "farm", "2024-01-01", "2024-01-31");
     }
 
     // #38 GET RejectedMoveOrderPagination
@@ -161,7 +161,7 @@ public sealed class GroupC_ApprovalTests : OrderingContractTestBase
         var response = await Get("RejectedMoveOrderPagination?PageNumber=2&PageSize=1");
 
         await AssertMoveOrderPage(response, page);
-        await Order.Received(1).RejectedMoveOrderPagination(PageTwoParams());
+        await Order.Received(1).RejectedMoveOrderPagination(RequestedPageTwoParams());
     }
 
     // #39 GET RejectedMoveOrderPaginationOrig

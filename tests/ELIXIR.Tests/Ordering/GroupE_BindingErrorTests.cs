@@ -218,6 +218,77 @@ public sealed class GroupE_BindingErrorTests : OrderingContractTestBase
         await Order.DidNotReceive().CancelControlInMoveOrder(Arg.Any<int>(), Arg.Any<ReasontDTO>());
     }
 
+    // ---- every endpoint checks binding before doing anything ----
+
+    /// <summary>
+    /// Every endpoint whose parameters can fail to bind (bodies, int/bool/list/UserParams query or route values).
+    /// Endpoints taking only strings or nothing cannot fail binding and are not listed.
+    /// </summary>
+    public static TheoryData<string, string, string?> InvalidInputPerEndpoint() => new()
+    {
+        // request bodies (malformed JSON)
+        { "PUT", "EditOrderQuantity", "{" },
+        { "PUT", "SchedulePreparedOrderedDate", "[{" },
+        { "PUT", "ApprovePreparedDate", "[{" },
+        { "PUT", "RejectPreparedDate", "[{" },
+        { "POST", "ValidateNewOrders", "[{" },
+        { "POST", "AddNewOrder", "[{" },
+        { "PUT", "CancelOrders", "[{" },
+        { "PUT", "ReturnCancelledOrders", "{" },
+        { "POST", "PrepareItemsForMoveOrder", "{" },
+        { "PUT", "CancelPreparedItems", "{" },
+        { "PUT", "AddPlateNumberInMoveOrder", "[{" },
+        { "PUT", "AddDeliveryStatus", "[{" },
+        { "PUT", "ApproveListOfMoveOrder", "[{" },
+        { "PUT", "RejectListOfMoveOrder", "{" },
+        { "PUT", "RejectApproveListOfMoveOrder", "{" },
+        { "PUT", "ReturnMoveOrderForApproval", "{" },
+        { "PUT", "UpdatePrintStatus", "[1," },
+        { "PUT", "CancelOrdersInMoveOrder/1", "{" },
+        { "POST", "TransactListOfMoveOrders", "[{" },
+        { "POST", "SetBeingPrepared", "[{" },
+        { "POST", "UnsetBeingPrepared", "[{" },
+        { "PUT", "Allocate", "{" },
+        { "PUT", "ManualAllocation", "[{" },
+        // query values
+        { "GET", "GetAllListOfOrdersPagination?PageNumber=x", null },
+        { "GET", "GetAllListForMoveOrderPagination?PageNumber=x", null },
+        { "GET", "GetAllOrdersForScheduleApproval?id=x", null },
+        { "GET", "GetAllListOfOrdersForMoveOrder?id=x", null },
+        { "GET", "GetAvailableStockFromWarehouse?id=x", null },
+        { "GET", "ListOfPreparedItemsForMoveOrder?id=x", null },
+        { "GET", "GetAllForApprovalMoveOrderPagination?PageNumber=x", null },
+        { "GET", "GetAllForApprovalMoveOrderPaginationOrig?PageNumber=x", null },
+        { "GET", "PrintMultipleMoveOrderSlip?orderIds=x", null },
+        { "GET", "ViewMoveOrderForApproval?id=x", null },
+        { "GET", "ApprovedMoveOrderPagination?PageNumber=x", null },
+        { "GET", "ApprovedMoveOrderPaginationOrig?PageNumber=x", null },
+        { "GET", "RejectedMoveOrderPagination?PageNumber=x", null },
+        { "GET", "RejectedMoveOrderPaginationOrig?PageNumber=x", null },
+        { "GET", "GetAllApprovedMoveOrder?id=x", null },
+        { "GET", "GetTotalListForMoveOrder?status=x", null },
+        { "GET", "ListOfMoveOrdersForTransact?orderid=x", null },
+        { "GET", "GetAllListOfOrdersForAllocationPagination?PageNumber=x", null },
+    };
+
+    [Theory]
+    [MemberData(nameof(InvalidInputPerEndpoint))]
+    public async Task Invalid_input_returns_validation_error_without_touching_data(string method, string pathAndQuery, string? body)
+    {
+        var response = body is null
+            ? await SendNoBody(new HttpMethod(method), pathAndQuery)
+            : await SendRaw(new HttpMethod(method), pathAndQuery, body);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(Contract.JsonContentType, response.Content.Headers.ContentType?.ToString());
+        var text = await response.Content.ReadAsStringAsync();
+        Assert.StartsWith("{\"errors\":[\"", text);
+        Assert.EndsWith("\"],\"statusCode\":400,\"message\":\"You have made a bad reqeust!\"}", text);
+        Assert.Empty(Order.ReceivedCalls());
+        await UnitOfWork.DidNotReceive().CompleteAsync();
+        Assert.Empty(Factory.Hub.ReceivedCalls());
+    }
+
     // ---- routing and unhandled errors ----
 
     [Fact]

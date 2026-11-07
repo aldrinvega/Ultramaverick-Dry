@@ -162,12 +162,12 @@ public sealed class GroupD_TransactAllocationTests : OrderingContractTestBase
     [Fact]
     public async Task GetAllListOfOrdersForAllocationPagination_returns_header_and_paged_body()
     {
-        var page = TestData.PageTwo(TestData.OrderDto());
+        var page = TestData.LastPage(TestData.OrderDto());
         Order.GetAllListofOrdersForAllocationPagination(Arg.Any<UserParams>()).Returns(page);
 
         var response = await Get("GetAllListOfOrdersForAllocationPagination?PageNumber=2&PageSize=1");
 
-        Contract.AssertPaginationHeader(response, Contract.PageTwoHeader);
+        Contract.AssertPaginationHeader(response, Contract.LastPageHeader);
         await Contract.AssertJsonLiteral(response, HttpStatusCode.OK, Contract.PagedBody("orders", page));
         await Order.Received(1).GetAllListofOrdersForAllocationPagination(Arg.Is<UserParams>(p => p.PageNumber == 2 && p.PageSize == 1));
     }

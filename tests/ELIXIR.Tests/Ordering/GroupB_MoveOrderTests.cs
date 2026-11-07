@@ -24,12 +24,12 @@ public sealed class GroupB_MoveOrderTests : OrderingContractTestBase
     [Fact]
     public async Task GetAllListForMoveOrderPagination_returns_header_and_paged_body_and_passes_dates()
     {
-        var page = TestData.PageTwo(new CustomersForMoveOrderDTO { CustomerId = 3, Farm = "Farm A" });
+        var page = TestData.LastPage(new CustomersForMoveOrderDTO { CustomerId = 3, Farm = "Farm A" });
         Order.GetAllListForMoveOrderPagination(Arg.Any<UserParams>(), Arg.Any<string>(), Arg.Any<string>()).Returns(page);
 
         var response = await Get("GetAllListForMoveOrderPagination?PageNumber=2&PageSize=1&dateFrom=2024-01-01&dateTo=2024-01-31");
 
-        Contract.AssertPaginationHeader(response, Contract.PageTwoHeader);
+        Contract.AssertPaginationHeader(response, Contract.LastPageHeader);
         await Contract.AssertJsonLiteral(response, HttpStatusCode.OK, Contract.PagedBody("orders", page));
         await Order.Received(1).GetAllListForMoveOrderPagination(
             Arg.Is<UserParams>(p => p.PageNumber == 2 && p.PageSize == 1), "2024-01-01", "2024-01-31");

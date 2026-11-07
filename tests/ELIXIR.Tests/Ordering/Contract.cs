@@ -85,12 +85,12 @@ internal static class Contract
     }
 
     /// <summary>
-    /// Header produced for page 2 of 3 (pageSize 1, totalCount 3). AddPaginationHeader is called with
-    /// (HasNextPage, HasPreviousPage) into parameters (hasPreviousPage, hasNextPage), so the two flags
-    /// are swapped in the header; both are true on page 2. <see cref="PageOneHeader"/> shows the swap.
+    /// Header produced for page 3 of 3 (pageSize 1, totalCount 3). AddPaginationHeader is called with
+    /// (HasNextPage, HasPreviousPage) into parameters (hasPreviousPage, hasNextPage), so the flags are swapped:
+    /// the real HasNextPage=false, HasPreviousPage=true are emitted as hasPrevious=false, hasNext=true.
     /// </summary>
-    public const string PageTwoHeader =
-        "{\"currentPage\":2,\"itemsPerPage\":1,\"totalItems\":3,\"totalPages\":3,\"hasPrevious\":true,\"hasNext\":true}";
+    public const string LastPageHeader =
+        "{\"currentPage\":3,\"itemsPerPage\":1,\"totalItems\":3,\"totalPages\":3,\"hasPrevious\":false,\"hasNext\":true}";
 
     /// <summary>Page 1 of 3: real HasNextPage=true, HasPreviousPage=false, emitted swapped.</summary>
     public const string PageOneHeader =

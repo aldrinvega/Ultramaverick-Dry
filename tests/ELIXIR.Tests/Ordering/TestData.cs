@@ -76,8 +76,11 @@ internal static class TestData
         DateNeeded = "01/05/2024"
     };
 
-    /// <summary>Page 2 of 3 with page size 1 (header: <see cref="Contract.PageTwoHeader"/>).</summary>
-    public static PagedList<T> PageTwo<T>(T item) => new(new List<T> { item }, count: 3, pageNumber: 2, pageSize: 1);
+    /// <summary>
+    /// Page 3 of 3 with page size 1 (header: <see cref="Contract.LastPageHeader"/>). HasNextPage and HasPreviousPage
+    /// differ, so the swapped AddPaginationHeader arguments are observable.
+    /// </summary>
+    public static PagedList<T> LastPage<T>(T item) => new(new List<T> { item }, count: 3, pageNumber: 3, pageSize: 1);
 
     /// <summary>Page 1 of 3 with page size 1 (header: <see cref="Contract.PageOneHeader"/>).</summary>
     public static PagedList<T> PageOne<T>(T item) => new(new List<T> { item }, count: 3, pageNumber: 1, pageSize: 1);

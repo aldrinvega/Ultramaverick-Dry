@@ -233,12 +233,12 @@ public sealed class GroupA_OrdersTests : OrderingContractTestBase
     [Fact]
     public async Task GetAllListOfOrdersPagination_returns_header_and_paged_body()
     {
-        var page = TestData.PageTwo(new CustomerListForPreparationSchedule { Id = 5, CustomerName = "Farm A" });
+        var page = TestData.LastPage(new CustomerListForPreparationSchedule { Id = 5, CustomerName = "Farm A" });
         Order.GetAllListofOrdersPagination(Arg.Any<UserParams>()).Returns(page);
 
         var response = await Get("GetAllListOfOrdersPagination?PageNumber=2&PageSize=1");
 
-        Contract.AssertPaginationHeader(response, Contract.PageTwoHeader);
+        Contract.AssertPaginationHeader(response, Contract.LastPageHeader);
         await Contract.AssertJsonLiteral(response, HttpStatusCode.OK, Contract.PagedBody("orders", page));
         await Order.Received(1).GetAllListofOrdersPagination(Arg.Is<UserParams>(p => p.PageNumber == 2 && p.PageSize == 1));
     }
