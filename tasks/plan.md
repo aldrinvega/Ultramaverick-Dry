@@ -21,10 +21,19 @@ Branch `feature/ordering-minimal-api`, worktree `.worktrees/ordering-minimal-api
 - **Endpoints move one group at a time.** Each group's actions are removed from `OrderingController` in
   the same commit that maps them in `OrderingEndpoints`. A route never exists twice, and the app works
   after every commit. The last group deletes the controller file.
-- **Newtonsoft response/body helpers** (`ELIXIR.API/Http/`) use the same `SerializerSettings` MVC uses, read
-  from `IOptions<MvcNewtonsoftJsonOptions>`, so the two can't drift apart. Body binding is a
-  `NewtonsoftBody<T>` type with a `BindAsync` method. Malformed or empty bodies return the same 400
-  `ApiValidationError` shape that MVC's `InvalidModelStateResponseFactory` produces today (captured by tests first).
+- **MVC reuse inside Minimal API handlers** (approved 2026-11-07 at Checkpoint 1, replacing hand-written
+  Newtonsoft helpers). Routes are plain `MapGet/MapPut/MapPost` in `OrderingEndpoints`. Handlers:
+  - bind query/route/body values with MVC's `ParameterBinder` + value providers + input formatters
+    (`ELIXIR.API/Http/MvcRequestBinder.cs`), sharing one `ActionContext`/`ModelStateDictionary` per request.
+    Bad input yields the same responses as the `[ApiController]` filters: an `UnsupportedContentTypeException`
+    becomes 415 via `IClientErrorFactory`, and invalid model state goes through `ApiBehaviorOptions.InvalidModelStateResponseFactory`.
+  - return the same MVC `IActionResult`s as today (`OkObjectResult`, `JsonResult`, `OkResult`, `BadRequestObjectResult`),
+    executed through an `IResult` adapter (`ELIXIR.API/Http/MvcResult.cs`). This gives identical formatters,
+    content negotiation and the null → 204 behavior.
+  - Swagger: parameters are declared as endpoint metadata (`WithMvcParameters`) and rendered by a Swashbuckle
+    operation filter. Bodies use `.Accepts<T>()`. A Swagger test pins the parameters/bodies captured from the controller.
+  Probing showed why: MVC's error responses (multiple Newtonsoft messages, 415 ProblemDetails, "is not valid"
+  messages for query values, combined route+body errors) are too varied to copy reliably by hand.
 - **Tests run on the .NET 7 runtime**, the same as production (`mcr.microsoft.com/dotnet/aspnet:7.0`). This
   Mac only has .NET 10. Rolling forward to 10 would test Minimal API binding on a different framework
   version than the one that ships. Plan: install the ASP.NET Core 7.0 runtime into `~/.dotnet`
@@ -54,7 +63,7 @@ Branch `feature/ordering-minimal-api`, worktree `.worktrees/ordering-minimal-api
 - [x] All contract tests are green against `OrderingController` (100 tests; Group E added for binding errors); build has no new warnings; **stop and show you the test list**
 
 ### Phase 3: Conversion
-- [ ] Task 6: Newtonsoft result/body helpers + `AddEndpointsApiExplorer` + empty `MapOrderingEndpoints`
+- [ ] Task 6: Swagger contract test (captured from controller) + MVC reuse helpers + Swagger filter + `AddEndpointsApiExplorer` + empty `MapOrderingEndpoints`
 - [ ] Task 7: Move Group A
 - [ ] Task 8: Move Group B
 - [ ] Task 9: Move Group C

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ELIXIR.API.Endpoints;
 using ELIXIR.API.EXTENSIONS;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
@@ -113,6 +114,7 @@ public class Startup
 
         services.AddApplicationServices();
 
+        services.AddEndpointsApiExplorer();
         services.AddSwaggerDocumentation();
 
         services.AddCors(opt =>
@@ -153,6 +155,7 @@ public class Startup
         {
             endpoints.MapSwagger();
             endpoints.MapControllers();
+            endpoints.MapOrderingEndpoints();
             endpoints.MapHub<OrderHub>("moveorder");
         });
     }
