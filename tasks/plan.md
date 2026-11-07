@@ -63,17 +63,17 @@ Branch `feature/ordering-minimal-api`, worktree `.worktrees/ordering-minimal-api
 - [x] All contract tests are green against `OrderingController` (100 tests; Group E added for binding errors); build has no new warnings; **stop and show you the test list**
 
 ### Phase 3: Conversion
-- [ ] Task 6: Swagger contract test (captured from controller) + MVC reuse helpers + Swagger filter + `AddEndpointsApiExplorer` + empty `MapOrderingEndpoints`
-- [ ] Task 7: Move Group A
-- [ ] Task 8: Move Group B
-- [ ] Task 9: Move Group C
-- [ ] Task 10: Move Group D + delete `OrderingController.cs`
+- [x] Task 6: Swagger contract test (captured from controller) + MVC reuse helpers + Swagger filter + `AddEndpointsApiExplorer` + empty `MapOrderingEndpoints`
+- [x] Task 7: Move Group A
+- [x] Task 8: Move Group B
+- [x] Task 9: Move Group C
+- [x] Task 10: Move Group D + delete `OrderingController.cs`
 
 ### Checkpoint 2
-- [ ] All contract tests still green; controller gone; no new warnings
+- [x] All contract tests still green; controller gone; no new warnings (157 tests; 142 warnings)
 
 ### Phase 4: Finish
-- [ ] Task 11: Swagger test (52 operations under `/api/Ordering`) + `ELIXIR.API/Ordering.http`
+- [x] Task 11: Swagger test (52 operations under `/api/Ordering`) + `ELIXIR.API/Ordering.http`
 - [ ] Task 12: `test-gap-analysis`, then a reviewer round (CLAUDE.md workflow, max 2), then the `/agent-skills:ship` GO/NO-GO report
 
 ## Skills to load (CLAUDE.md table)
