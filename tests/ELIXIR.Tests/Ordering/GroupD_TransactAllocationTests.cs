@@ -121,6 +121,16 @@ public sealed class GroupD_TransactAllocationTests : OrderingContractTestBase
         await Factory.Hub.Clients.All.DidNotReceive().SetBeingPrepared(Arg.Any<OrderingEntity>());
     }
 
+    [Fact]
+    public async Task SetBeingPrepared_empty_array_returns_json_string_without_broadcast()
+    {
+        var response = await Send(HttpMethod.Post, "SetBeingPrepared", Array.Empty<OrderingEntity>());
+
+        await Contract.AssertJsonString(response, "Someone is already preparing!");
+        await Order.DidNotReceive().SetBeingPrepared(Arg.Any<OrderingEntity>());
+        await Factory.Hub.Clients.All.DidNotReceive().SetBeingPrepared(Arg.Any<OrderingEntity>());
+    }
+
     // #47 POST UnsetBeingPrepared
     [Fact]
     public async Task UnsetBeingPrepared_handles_only_first_item_and_broadcasts_it()

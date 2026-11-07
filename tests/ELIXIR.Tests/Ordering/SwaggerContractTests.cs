@@ -17,7 +17,7 @@ public sealed class SwaggerContractTests : IClassFixture<ElixirApiFactory>
 
     public SwaggerContractTests(ElixirApiFactory factory) => _factory = factory;
 
-    /// <summary>Captured from OrderingController on 2026-11-07, in document order.</summary>
+    /// <summary>Captured from OrderingController on 2026-11-07. Compared as a set (order-insensitive); responses are not compared.</summary>
     private static readonly string[] Expected =
     {
         "GET /api/Ordering/GetAllListofOrders #Ordering (farms@query:string) body=-",

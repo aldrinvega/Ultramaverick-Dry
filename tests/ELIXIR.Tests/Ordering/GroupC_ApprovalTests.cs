@@ -65,6 +65,24 @@ public sealed class GroupC_ApprovalTests : OrderingContractTestBase
         await Order.DidNotReceive().ForApprovalMoveOrderPagination(Arg.Any<UserParams>());
     }
 
+    [Fact]
+    public async Task Orig_endpoints_treat_empty_search_as_no_search()
+    {
+        var page = Page();
+        Order.ForApprovalMoveOrderPagination(Arg.Any<UserParams>()).Returns(page);
+        Order.ApprovedMoveOrderPagination(Arg.Any<UserParams>(), Arg.Any<string>(), Arg.Any<string>()).Returns(page);
+        Order.RejectedMoveOrderPagination(Arg.Any<UserParams>()).Returns(page);
+
+        await AssertMoveOrderPage(await Get("GetAllForApprovalMoveOrderPaginationOrig?search="), page);
+        await AssertMoveOrderPage(await Get("ApprovedMoveOrderPaginationOrig?search=&dateFrom=2024-01-01"), page);
+        await AssertMoveOrderPage(await Get("RejectedMoveOrderPaginationOrig?search="), page);
+
+        await Order.DidNotReceive().ForApprovalMoveOrderPaginationOrig(Arg.Any<UserParams>(), Arg.Any<string>());
+        await Order.DidNotReceive().ApprovedMoveOrderPaginationOrig(Arg.Any<UserParams>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
+        await Order.DidNotReceive().RejectedMoveOrderPaginationOrig(Arg.Any<UserParams>(), Arg.Any<string>());
+        await Order.Received(1).ApprovedMoveOrderPagination(Arg.Any<UserParams>(), "2024-01-01", null!);
+    }
+
     // #34 GET PrintMultipleMoveOrderSlip
     [Fact]
     public async Task PrintMultipleMoveOrderSlip_binds_repeated_ids_and_returns_json()

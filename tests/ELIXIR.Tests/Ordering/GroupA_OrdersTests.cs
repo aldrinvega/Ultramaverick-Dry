@@ -84,9 +84,16 @@ public sealed class GroupA_OrdersTests : OrderingContractTestBase
 
     // #3 PUT SchedulePreparedOrderedDate
     [Fact]
-    public async Task SchedulePreparedOrderedDate_generates_number_stamps_items_and_saves_twice()
+    public async Task SchedulePreparedOrderedDate_saves_number_before_stamping_items_and_saves_twice()
     {
-        Order.GenerateNumber(Arg.Do<GenerateOrderNo>(g => g.Id = 77)).Returns(true);
+        // With EF the generated key only exists after SaveChanges, so the substitute assigns it in CompleteAsync.
+        GenerateOrderNo? generated = null;
+        Order.GenerateNumber(Arg.Do<GenerateOrderNo>(g => generated = g)).Returns(true);
+        UnitOfWork.CompleteAsync().Returns(_ =>
+        {
+            if (generated is not null) generated.Id = 77;
+            return Task.CompletedTask;
+        });
 
         var response = await Send(HttpMethod.Put, "SchedulePreparedOrderedDate",
             new[] { TestData.Order(1), TestData.Order(2) });
@@ -96,6 +103,22 @@ public sealed class GroupA_OrdersTests : OrderingContractTestBase
         await Order.Received(1).SchedulePreparedDate(Arg.Is<OrderingEntity>(o => o.Id == 1 && o.OrderNoPKey == 77));
         await Order.Received(1).SchedulePreparedDate(Arg.Is<OrderingEntity>(o => o.Id == 2 && o.OrderNoPKey == 77));
         await AssertCompleted(2);
+    }
+
+    [Fact]
+    public async Task SchedulePreparedOrderedDate_repository_failure_midway_returns_500_after_first_save_only()
+    {
+        Order.GenerateNumber(Arg.Any<GenerateOrderNo>()).Returns(true);
+        Order.SchedulePreparedDate(Arg.Is<OrderingEntity>(o => o.Id == 2))
+            .Returns<bool>(_ => throw new InvalidOperationException("boom"));
+
+        var response = await Send(HttpMethod.Put, "SchedulePreparedOrderedDate",
+            new[] { TestData.Order(1), TestData.Order(2), TestData.Order(3) });
+
+        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        Assert.StartsWith("System.InvalidOperationException: boom", await response.Content.ReadAsStringAsync());
+        await Order.DidNotReceive().SchedulePreparedDate(Arg.Is<OrderingEntity>(o => o.Id == 3));
+        await AssertCompleted(1);
     }
 
     // #4 PUT ApprovePreparedDate
@@ -207,6 +230,73 @@ public sealed class GroupA_OrdersTests : OrderingContractTestBase
         await Order.Received(6).ValidateNewOrders(Arg.Any<OrderingEntity>());
         await Order.DidNotReceive().ValidateIfForAllocation(Arg.Any<List<OrderingEntity>>());
         await AssertCompleted(0);
+    }
+
+    /// <summary>Each validator on its own must block the save (one row per <c>X.Count == 0</c> check).</summary>
+    public static TheoryData<string, string> SingleFailingValidator() => new()
+    {
+        { "ValidateExistingOrders", "duplicateList" },
+        { "ValidateCustomerName", "notExistFarmName" },
+        { "ValidateCustomerCode", "notExistFarmCode" },
+        { "ValidateRawMaterial", "notExistRawMats" },
+        { "ValidateUom", "notExistUom" },
+    };
+
+    [Theory]
+    [MemberData(nameof(SingleFailingValidator))]
+    public async Task ValidateNewOrders_any_single_failing_validator_blocks_the_save(string validator, string list)
+    {
+        AllValidatorsReturn(true);
+        FailValidator(validator);
+        var order = TestData.Order(1);
+
+        var response = await Send(HttpMethod.Post, "ValidateNewOrders", new[] { order });
+
+        var lists = new Dictionary<string, OrderingEntity[]>
+        {
+            ["duplicateList"] = Array.Empty<OrderingEntity>(),
+            ["filteredOrders"] = Array.Empty<OrderingEntity>(),
+            ["notExistFarmName"] = Array.Empty<OrderingEntity>(),
+            ["notExistFarmCode"] = Array.Empty<OrderingEntity>(),
+            ["notExistRawMats"] = Array.Empty<OrderingEntity>(),
+            ["notExistUom"] = Array.Empty<OrderingEntity>(),
+            ["previousdateNeeded"] = Array.Empty<OrderingEntity>(),
+        };
+        lists[list] = new[] { order };
+        await Contract.AssertJsonLiteral(response, HttpStatusCode.BadRequest,
+            "{" + string.Join(",", lists.Select(kv => "\"" + kv.Key + "\":" + Contract.MvcJson(kv.Value))) + "}");
+        await Order.DidNotReceive().ValidateIfForAllocation(Arg.Any<List<OrderingEntity>>());
+        await AssertCompleted(0);
+    }
+
+    [Fact]
+    public async Task ValidateNewOrders_order_failing_several_validators_goes_to_first_matching_list()
+    {
+        AllValidatorsReturn(true);
+        FailValidator("ValidateExistingOrders");
+        FailValidator("ValidateCustomerName");
+        FailValidator("ValidateUom");
+        var order = TestData.Order(1);
+
+        var response = await Send(HttpMethod.Post, "ValidateNewOrders", new[] { order });
+
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.StartsWith("{\"duplicateList\":[" + Contract.MvcJson(order) + "],\"filteredOrders\":[],\"notExistFarmName\":[],", body);
+        Assert.EndsWith(",\"notExistUom\":[],\"previousdateNeeded\":[]}", body);
+    }
+
+    private void FailValidator(string validator)
+    {
+        switch (validator)
+        {
+            case "ValidateExistingOrders": Order.ValidateExistingOrders(Arg.Any<OrderingEntity>()).Returns(false); break;
+            case "ValidateCustomerName": Order.ValidateCustomerName(Arg.Any<OrderingEntity>()).Returns(false); break;
+            case "ValidateCustomerCode": Order.ValidateCustomerCode(Arg.Any<OrderingEntity>()).Returns(false); break;
+            case "ValidateRawMaterial": Order.ValidateRawMaterial(Arg.Any<OrderingEntity>()).Returns(false); break;
+            case "ValidateUom": Order.ValidateUom(Arg.Any<OrderingEntity>()).Returns(false); break;
+            default: throw new ArgumentOutOfRangeException(nameof(validator), validator, null);
+        }
     }
 
     private void AllValidatorsReturn(bool value)
