@@ -68,7 +68,13 @@ namespace ELIXIR.API.Endpoints
 
         public static IEndpointRouteBuilder MapOrderingEndpoints(this IEndpointRouteBuilder app)
         {
+            // Binding, validation errors and results go through MVC (ParameterBinder, ApiBehaviorOptions,
+            // Newtonsoft formatters), so these endpoints need services.AddControllers().AddNewtonsoftJson() to stay.
             var group = app.MapGroup("api/Ordering").WithTags("Ordering");
+            // AUTH: these endpoints are anonymous, like the former controller ([Authorize] is commented out on
+            // BaseApiController). They are not controllers, so restoring [Authorize] there will NOT cover them:
+            // enable this line at the same time (or set a global AuthorizationOptions.FallbackPolicy).
+            // group.RequireAuthorization(new AuthorizeAttribute { AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme });
 
             group.MapGet("GetAllListofOrders", GetAllListofOrders).WithMvcParameters(P.Farms);
             group.MapPut("EditOrderQuantity", EditOrderQuantity).WithMvcParameters(P.Order);

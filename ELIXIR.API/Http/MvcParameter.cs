@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -51,6 +50,6 @@ namespace ELIXIR.API.Http
     {
         /// <summary>Declares the MVC parameters this endpoint binds (used for the Swagger description).</summary>
         public static RouteHandlerBuilder WithMvcParameters(this RouteHandlerBuilder builder, params MvcParameter[] parameters)
-            => builder.WithMetadata(new MvcParametersMetadata(parameters.ToArray()));
+            => builder.WithMetadata(new MvcParametersMetadata(parameters));
     }
 }

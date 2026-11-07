@@ -246,3 +246,7 @@ In both cases, also: the build has no new warnings, and Swagger lists all 52 Ord
    `text/plain` with no quotes. No content negotiation needs to be copied.
 4. **Other controllers:** not being converted for some time. `NewtonsoftResults` stays in `ELIXIR.API/Http/`.
 5. **Build:** load the matching dotnet skills before building (see the CLAUDE.md skills table).
+6. **Auth (from /ship security audit):** the endpoints stay anonymous like the controller. They are not
+   controllers, so restoring `[Authorize]` on `BaseApiController` will not cover them. Enable the commented
+   `group.RequireAuthorization(...)` line in `OrderingEndpoints.MapOrderingEndpoints` at the same time, or set a global
+   `AuthorizationOptions.FallbackPolicy`.
