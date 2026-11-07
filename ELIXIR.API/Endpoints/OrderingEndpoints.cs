@@ -5,6 +5,7 @@ using ELIXIR.DATA.CORE.ICONFIGURATION;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIR.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
+using ELIXIR.DATA.DTOs.ORDERING_DTOs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,16 @@ namespace ELIXIR.API.Endpoints
             public static readonly MvcParameter<List<Ordering>> OrderList = MvcParameter.Body<List<Ordering>>("order");
             public static readonly MvcParameter<Ordering> Orders = MvcParameter.Body<Ordering>("orders");
             public static readonly MvcParameter<Ordering[]> OrdersArray = MvcParameter.Body<Ordering[]>("orders");
+
+            public static readonly MvcParameter<string> Farm = MvcParameter.Query<string>("farm");
+            public static readonly MvcParameter<int> Id = MvcParameter.Query<int>("id");
+            public static readonly MvcParameter<string> Itemcode = MvcParameter.Query<string>("itemcode");
+            public static readonly MvcParameter<string> Orderdate = MvcParameter.Query<string>("orderdate");
+            public static readonly MvcParameter<MoveOrder> MoveOrderOrder = MvcParameter.Body<MoveOrder>("order");
+            public static readonly MvcParameter<MoveOrder> MoveOrder = MvcParameter.Body<MoveOrder>("moveorder");
+            public static readonly MvcParameter<MoveOrder[]> MoveOrderArray = MvcParameter.Body<MoveOrder[]>("moveorder");
+            public static readonly MvcParameter<OrderDto[]> OrderDtoArray = MvcParameter.Body<OrderDto[]>("order");
+            public static readonly MvcParameter<int[]> PrintIds = MvcParameter.Body<int[]>("moveorder");
         }
 
         public static IEndpointRouteBuilder MapOrderingEndpoints(this IEndpointRouteBuilder app)
@@ -52,6 +63,25 @@ namespace ELIXIR.API.Endpoints
             group.MapPut("CancelOrders", CancelOrders).WithMvcParameters(P.OrdersArray);
             group.MapGet("GetAllListOfCancelledOrders", GetAllListOfCancelledOrders);
             group.MapPut("ReturnCancelledOrders", ReturnCancelledOrders).WithMvcParameters(P.Orders);
+
+            group.MapGet("GetAllListForMoveOrderPagination", GetAllListForMoveOrderPagination).WithMvcParameters(P.UserParams, P.DateTo, P.DateFrom);
+            group.MapGet("GetAllListOfApprovedPreparedForMoveOrder", GetAllListOfApprovedPreparedForMoveOrder).WithMvcParameters(P.Farm);
+            group.MapGet("DetailedListOfOrders", DetailedListOfOrders).WithMvcParameters(P.Farm);
+            group.MapGet("GetAllListForScheduleApproval", GetAllListForScheduleApproval);
+            group.MapGet("GetAllOrdersForScheduleApproval", GetAllOrdersForScheduleApproval).WithMvcParameters(P.Id);
+            group.MapGet("GetAllOutOfStockByItemCodeAndOrderDate", GetAllOutOfStockByItemCodeAndOrderDate).WithMvcParameters(P.Itemcode, P.Orderdate);
+            group.MapPost("PrepareItemsForMoveOrder", PrepareItemsForMoveOrder).WithMvcParameters(P.MoveOrderOrder);
+            group.MapGet("GetAllListOfOrdersForMoveOrder", GetAllListOfOrdersForMoveOrder).WithMvcParameters(P.Id);
+            group.MapGet("GetAvailableStockFromWarehouse", GetAvailableStockFromWarehouse).WithMvcParameters(P.Id, P.Itemcode);
+            group.MapGet("ListOfPreparedItemsForMoveOrder", ListOfPreparedItemsForMoveOrder).WithMvcParameters(P.Id);
+            group.MapPut("CancelPreparedItems", CancelPreparedItems).WithMvcParameters(P.MoveOrder);
+            group.MapPut("AddPlateNumberInMoveOrder", AddPlateNumberInMoveOrder).WithMvcParameters(P.OrderArray);
+            group.MapPut("AddDeliveryStatus", AddDeliveryStatus).WithMvcParameters(P.OrderDtoArray);
+            group.MapPut("ApproveListOfMoveOrder", ApproveListOfMoveOrder).WithMvcParameters(P.MoveOrderArray);
+            group.MapPut("RejectListOfMoveOrder", RejectListOfMoveOrder).WithMvcParameters(P.MoveOrder);
+            group.MapPut("RejectApproveListOfMoveOrder", RejectApproveListOfMoveOrder).WithMvcParameters(P.MoveOrder);
+            group.MapPut("ReturnMoveOrderForApproval", ReturnMoveOrderForApproval).WithMvcParameters(P.MoveOrder);
+            group.MapPut("UpdatePrintStatus", UpdatePrintStatus).WithMvcParameters(P.PrintIds);
 
             return app;
         }
@@ -302,6 +332,256 @@ namespace ELIXIR.API.Endpoints
             await unitOfWork.CompleteAsync();
 
             return MvcResults.Ok("Successfully return orders");
+        }
+
+        private static async Task<IResult> GetAllListForMoveOrderPagination(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var userParams = await bind.BindAsync(P.UserParams);
+            var dateTo = await bind.BindAsync(P.DateTo);
+            var dateFrom = await bind.BindAsync(P.DateFrom);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.GetAllListForMoveOrderPagination(userParams, dateFrom, dateTo);
+
+            http.Response.AddPaginationHeader(orders.CurrentPage, orders.PageSize, orders.TotalCount, orders.TotalPages,
+                orders.HasNextPage, orders.HasPreviousPage);
+
+            var orderResult = new
+            {
+                orders,
+                orders.CurrentPage,
+                orders.PageSize,
+                orders.TotalCount,
+                orders.TotalPages,
+                orders.HasNextPage,
+                orders.HasPreviousPage
+            };
+
+            return MvcResults.Ok(orderResult);
+        }
+
+        private static async Task<IResult> GetAllListOfApprovedPreparedForMoveOrder(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var farm = await bind.BindAsync(P.Farm);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.TotalListOfApprovedPreparedDate(farm);
+
+            return orders == null ? MvcResults.BadRequest("No Orders Currently Available") : MvcResults.Ok(orders);
+        }
+
+        private static async Task<IResult> DetailedListOfOrders(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var farm = await bind.BindAsync(P.Farm);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.DetailedListOfOrders(farm);
+
+            return MvcResults.Ok(orders);
+        }
+
+        private static async Task<IResult> GetAllListForScheduleApproval([FromServices] IUnitOfWork unitOfWork)
+        {
+            var orders = await unitOfWork.Order.GetAllListForApprovalOfSchedule();
+
+            return MvcResults.Ok(orders);
+        }
+
+        private static async Task<IResult> GetAllOrdersForScheduleApproval(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var id = await bind.BindAsync(P.Id);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.GetAllOrdersForScheduleApproval(id);
+
+            return MvcResults.Ok(orders);
+        }
+
+        private static async Task<IResult> GetAllOutOfStockByItemCodeAndOrderDate(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var itemcode = await bind.BindAsync(P.Itemcode);
+            var orderdate = await bind.BindAsync(P.Orderdate);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.GetAllOutOfStockByItemCodeAndOrderDate(itemcode, orderdate);
+
+            return MvcResults.Ok(orders);
+        }
+
+        private static async Task<IResult> PrepareItemsForMoveOrder(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var order = await bind.BindAsync(P.MoveOrderOrder);
+            if (bind.Failure() is { } failure) return failure;
+
+            var details = await unitOfWork.Order.GetMoveOrderDetailsForMoveOrder(order.OrderNoPKey);
+
+            order.OrderNoPKey = details.Id;
+            order.OrderDate = details.OrderDateTime;
+            order.DateNeeded = details.DateNeededDateTime;
+            order.PreparedDate = details.PreparedDateTime;
+            order.FarmName = details.Farm;
+            order.FarmCode = details.FarmCode;
+            order.FarmType = details.FarmType;
+            order.ItemCode = details.ItemCode;
+            order.ItemDescription = details.ItemDescription;
+            order.Uom = details.Uom;
+            order.Category = details.Category;
+            order.IsActive = true;
+            order.IsPrepared = true;
+
+            await unitOfWork.Order.PrepareItemForMoveOrder(order);
+            await unitOfWork.CompleteAsync();
+
+            return MvcResults.Ok(order);
+        }
+
+        private static async Task<IResult> GetAllListOfOrdersForMoveOrder(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var id = await bind.BindAsync(P.Id);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.ListOfOrdersForMoveOrder(id);
+            return MvcResults.Ok(orders);
+        }
+
+        private static async Task<IResult> GetAvailableStockFromWarehouse(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var id = await bind.BindAsync(P.Id);
+            var itemcode = await bind.BindAsync(P.Itemcode);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.GetActualItemQuantityInWarehouse(id, itemcode);
+
+            var getFirstExpiry = await unitOfWork.Order.GetFirstExpiry(itemcode);
+
+            var resultList = new
+            {
+                orders,
+                getFirstExpiry.WarehouseId
+            };
+
+            return MvcResults.Ok(resultList);
+        }
+
+        private static async Task<IResult> ListOfPreparedItemsForMoveOrder(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var id = await bind.BindAsync(P.Id);
+            if (bind.Failure() is { } failure) return failure;
+
+            var orders = await unitOfWork.Order.ListOfPreparedItemsForMoveOrder(id);
+
+            return MvcResults.Ok(orders);
+        }
+
+        private static async Task<IResult> CancelPreparedItems(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var moveorder = await bind.BindAsync(P.MoveOrder);
+            if (bind.Failure() is { } failure) return failure;
+
+            await unitOfWork.Order.CancelMoveOrder(moveorder);
+            await unitOfWork.CompleteAsync();
+
+            return MvcResults.Ok("Successfully cancel prepared items");
+        }
+
+        private static async Task<IResult> AddPlateNumberInMoveOrder(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var order = await bind.BindAsync(P.OrderArray);
+            if (bind.Failure() is { } failure) return failure;
+
+            foreach (Ordering items in order)
+            {
+                await unitOfWork.Order.AddPlateNumberInMoveOrder(items);
+            }
+
+            await unitOfWork.CompleteAsync();
+
+            return MvcResults.Json("Successfully added plate number!");
+        }
+
+        private static async Task<IResult> AddDeliveryStatus(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var order = await bind.BindAsync(P.OrderDtoArray);
+            if (bind.Failure() is { } failure) return failure;
+
+            foreach (OrderDto items in order)
+            {
+                await unitOfWork.Order.AddDeliveryStatus(items);
+            }
+
+            await unitOfWork.CompleteAsync();
+
+            return MvcResults.Json("Successfully added delivery status!");
+        }
+
+        private static async Task<IResult> ApproveListOfMoveOrder(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var moveorder = await bind.BindAsync(P.MoveOrderArray);
+            if (bind.Failure() is { } failure) return failure;
+
+            await unitOfWork.Order.ApprovalForMoveOrder(moveorder);
+            await unitOfWork.CompleteAsync();
+
+            return MvcResults.Json("Successfully approved list for move order!");
+        }
+
+        private static async Task<IResult> RejectListOfMoveOrder(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var moveorder = await bind.BindAsync(P.MoveOrder);
+            if (bind.Failure() is { } failure) return failure;
+
+            await unitOfWork.Order.RejectForMoveOrder(moveorder);
+            await unitOfWork.CompleteAsync();
+
+            return MvcResults.Json("Successfully reject list for move order!");
+        }
+
+        private static async Task<IResult> RejectApproveListOfMoveOrder(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var moveorder = await bind.BindAsync(P.MoveOrder);
+            if (bind.Failure() is { } failure) return failure;
+
+            await unitOfWork.Order.RejectApproveMoveOrder(moveorder);
+            await unitOfWork.CompleteAsync();
+
+            return MvcResults.Json("Successfully reject approved list for move order!");
+        }
+
+        private static async Task<IResult> ReturnMoveOrderForApproval(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var moveorder = await bind.BindAsync(P.MoveOrder);
+            if (bind.Failure() is { } failure) return failure;
+
+            await unitOfWork.Order.ReturnMoveOrderForApproval(moveorder);
+            await unitOfWork.CompleteAsync();
+
+            return MvcResults.Json("Successfully return list for move order!");
+        }
+
+        private static async Task<IResult> UpdatePrintStatus(HttpContext http, [FromServices] IUnitOfWork unitOfWork)
+        {
+            var bind = await MvcRequestBinder.CreateAsync(http);
+            var moveorder = await bind.BindAsync(P.PrintIds);
+            if (bind.Failure() is { } failure) return failure;
+
+            await unitOfWork.Order.UpdatePrintStatus(moveorder);
+            return MvcResults.Ok(moveorder);
         }
     }
 }
