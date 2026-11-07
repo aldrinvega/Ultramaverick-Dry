@@ -24,7 +24,10 @@ namespace ELIXIR.API.Http
             if (httpContext.Items.TryGetValue(Key, out var existing) && existing is ActionContext context)
                 return context;
 
-            context = new ActionContext(httpContext, httpContext.GetRouteData(), new ActionDescriptor());
+            // Same error limit MVC gives a controller's ModelState.
+            var mvcOptions = httpContext.RequestServices.GetRequiredService<IOptions<MvcOptions>>().Value;
+            context = new ActionContext(httpContext, httpContext.GetRouteData(), new ActionDescriptor(),
+                new ModelStateDictionary(mvcOptions.MaxModelValidationErrors));
             httpContext.Items[Key] = context;
             return context;
         }
@@ -58,12 +61,25 @@ namespace ELIXIR.API.Http
         {
             var actionContext = MvcRequestContext.Get(httpContext);
             var mvcOptions = httpContext.RequestServices.GetRequiredService<IOptions<MvcOptions>>().Value;
-            var valueProvider = await CompositeValueProvider.CreateAsync(actionContext, mvcOptions.ValueProviderFactories);
-            return new MvcRequestBinder(actionContext, valueProvider);
+            try
+            {
+                var valueProvider = await CompositeValueProvider.CreateAsync(actionContext, mvcOptions.ValueProviderFactories);
+                return new MvcRequestBinder(actionContext, valueProvider);
+            }
+            catch (ValueProviderException exception)
+            {
+                // What MVC's controller invoker does (CompositeValueProvider.TryCreateAsync, internal): record the error
+                // under the empty key and skip binding, so an unreadable form body is a 400, not a 500.
+                actionContext.ModelState.TryAddModelException(string.Empty, exception);
+                return new MvcRequestBinder(actionContext, valueProvider: null);
+            }
         }
 
         public async Task<T> BindAsync<T>(MvcParameter<T> parameter)
         {
+            if (_valueProvider is null)
+                return default!; // value providers could not be created; Failure() reports it
+
             var bindingInfo = new BindingInfo { BindingSource = parameter.Source };
             var descriptor = new ParameterDescriptor
             {

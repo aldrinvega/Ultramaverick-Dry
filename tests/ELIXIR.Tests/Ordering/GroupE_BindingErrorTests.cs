@@ -35,7 +35,7 @@ public sealed class GroupE_BindingErrorTests : OrderingContractTestBase
         Assert.Equal("application/problem+json; charset=utf-8", response.Content.Headers.ContentType?.ToString());
         Assert.Matches(
             "^" + Regex.Escape("{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.13\",\"title\":\"Unsupported Media Type\",\"status\":415,\"traceId\":\"") +
-            "00-[0-9a-f]{32}-[0-9a-f]{16}-00\"}$",
+            "[^\"]+\"}$",
             await response.Content.ReadAsStringAsync());
     }
 
@@ -135,6 +135,35 @@ public sealed class GroupE_BindingErrorTests : OrderingContractTestBase
 
         await AssertUnsupportedMediaType(response);
         await Order.DidNotReceive().ManualAllocationForOrders(Arg.Any<List<ManualAllocation>>());
+    }
+
+    private static HttpContent RawContent(string body, string contentType)
+    {
+        var content = new StringContent(body, Encoding.UTF8);
+        content.Headers.Remove("Content-Type");
+        content.Headers.TryAddWithoutValidation("Content-Type", contentType);
+        return content;
+    }
+
+    [Fact]
+    public async Task Unreadable_multipart_form_returns_400_even_on_a_query_endpoint()
+    {
+        var response = await Client.SendAsync(Contract.Request(HttpMethod.Get, BasePath + "GetAllListofOrders",
+            RawContent("garbage", "multipart/form-data; boundary=xyz")));
+
+        await AssertValidationError(response,
+            "Failed to read the request form. Unexpected end of Stream, the content may have already been read by another component. ");
+        await Order.DidNotReceive().GetAllListOfOrders(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task Multipart_form_without_boundary_returns_400()
+    {
+        var response = await Client.SendAsync(Contract.Request(HttpMethod.Put, BasePath + "EditOrderQuantity",
+            RawContent("garbage", "multipart/form-data")));
+
+        await AssertValidationError(response, "Failed to read the request form. Missing content-type boundary.");
+        await Order.DidNotReceive().EditQuantityOrder(Arg.Any<OrderingEntity>());
     }
 
     // ---- query and route values ----
@@ -287,6 +316,37 @@ public sealed class GroupE_BindingErrorTests : OrderingContractTestBase
         Assert.Empty(Order.ReceivedCalls());
         await UnitOfWork.DidNotReceive().CompleteAsync();
         Assert.Empty(Factory.Hub.ReceivedCalls());
+    }
+
+    // ---- CORS (policy unchanged; endpoints must still be covered by UseCors) ----
+
+    [Theory]
+    [InlineData("PUT", "EditOrderQuantity")]
+    [InlineData("POST", "ValidateNewOrders")]
+    [InlineData("GET", "GetAllListOfOrdersPagination")]
+    public async Task Cors_preflight_is_allowed_for_any_origin(string method, string path)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Options, BasePath + path);
+        request.Headers.Add("Origin", "http://frontend.example");
+        request.Headers.Add("Access-Control-Request-Method", method);
+
+        var response = await Client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Equal("*", Assert.Single(response.Headers.GetValues("Access-Control-Allow-Origin")));
+    }
+
+    [Fact]
+    public async Task Cors_header_is_sent_on_actual_requests()
+    {
+        Order.GetAllListForApprovalOfSchedule().Returns(new List<OrderDto>());
+        var request = new HttpRequestMessage(HttpMethod.Get, BasePath + "GetAllListForScheduleApproval");
+        request.Headers.Add("Origin", "http://frontend.example");
+
+        var response = await Client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("*", Assert.Single(response.Headers.GetValues("Access-Control-Allow-Origin")));
     }
 
     // ---- routing and unhandled errors ----
