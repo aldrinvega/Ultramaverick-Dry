@@ -28,4 +28,15 @@ public sealed class SmokeTests : IClassFixture<ElixirApiFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         await _factory.Order.Received(1).GetAllListForApprovalOfSchedule();
     }
+
+    [Fact]
+    public async Task OrderHub_is_still_mapped_at_moveorder()
+    {
+        var client = _factory.CreateClient();
+
+        var response = await client.PostAsync("moveorder/negotiate?negotiateVersion=1", content: null);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("\"connectionToken\"", await response.Content.ReadAsStringAsync());
+    }
 }
